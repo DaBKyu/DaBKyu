@@ -11,11 +11,13 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @Entity(name="addedRelatedProduct")
 @Table(name="added_related_product")
 @IdClass(AddedRelatedProductEntityID.class)
