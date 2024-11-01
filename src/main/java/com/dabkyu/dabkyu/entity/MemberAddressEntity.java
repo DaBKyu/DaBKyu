@@ -1,0 +1,43 @@
+package com.dabkyu.dabkyu.entity;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Entity(name="memberAddress")
+@Table(name="member_address")
+public class MemberAddressEntity {
+
+    @Id
+	@Column(name="member_address_seqno")
+	private Long memberAddressSeqno;
+	
+    @ManyToOne(fetch = FetchType.LAZY)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JoinColumn(name="email", nullable = false)
+	private MemberEntity email;
+
+    @Column(name="address", length=200, nullable=false)
+	private String address;
+
+    @Column(name="zipcode", length=20, nullable=false)
+	private String zipcode;
+
+    @Column(name="detail_addr", length=20, nullable=false)
+	private String detailAddr;
+
+	
+
+
+}

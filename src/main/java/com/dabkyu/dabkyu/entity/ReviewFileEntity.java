@@ -1,0 +1,43 @@
+package com.dabkyu.dabkyu.entity;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Entity(name="reviewfile")
+@Table(name="review_file")
+public class ReviewFileEntity {
+
+    @Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REVIEWFILE_SEQ")
+	@SequenceGenerator(name="REVIEWFILE_SEQ", sequenceName = "review_file_seq", initialValue = 1, allocationSize = 1)
+	@Column(name="reviewfile_seqno", nullable=false)
+    private Long reviewfileSeqno;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JoinColumn(name="review_seqno", nullable = false)
+	private ReviewEntity reviewSeqno;
+	
+    @Column(name="org_filename", length=200, nullable=false)
+	private String orgFilename;
+	
+	@Column(name="stored_filename", length=200, nullable=false)
+	private String storedFilename;
+
+
+}
