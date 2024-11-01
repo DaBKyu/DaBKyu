@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 웹 페이지</title>
+    <link rel="stylesheet" href="/css/mypage.css"> <!-- CSS 파일 연결 -->
+    <style>
+        body {
+    display: flex;
+    font-family: Arial, sans-serif;
+}
+
+#myMenu {
+    width: 250px; /* 메뉴 너비 조정 */
+    padding: 20px;
+    background-color: #f8f9fa; /* 배경 색상 */
+}
+
+.order-list {
+    flex: 1; /* 나머지 공간을 차지 */
+    padding: 20px;
+}
+
+.order-list-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.search-container {
+    margin-top: 20px;
+}
+
+.order-table {
+    margin-top: 20px;
+}
+
+.delivery-years {
+    display: flex; /* 가로 배치 */
+    gap: 10px; /* 날짜 간의 간격 */
+}
+
+.delivery-years span {
+    padding: 5px 10px; /* 날짜 패딩 */
+    border: 1px solid #ccc; /* 테두리 추가 */
+    border-radius: 5px; /* 모서리 둥글게 */
+}
+
+.delivery-period {
+    margin-top: 20px; /* 간격 조정 */
+}
+
+.order-summary {
+    margin-top: 20px; /* 간격 조정 */
+}
+
+.order-details {
+    margin-top: 10px; /* 간격 조정 */
+}
+
+      
+    </style>
+</head>
+<body>
+    <div id="myMenu">
+        <h2>mypage</h2>
+        <nav>
+            <!-- 나의 쇼핑 섹션 -->
+            <div>
+                <div>나의 쇼핑</div>
+                <ul>
+                    <li><a href="#" title="주문목록/배송조회">주문/배송조회</a></li>
+                    <li><a href="#" title="취소/반품/교환/환불내역">취소/반품/교환/환불내역</a></li>
+                    <li><a href="#" title="구매내역조회">구매내역조회</a></li>
+                </ul>
+            </div>
+
+            <!-- 나의 정보 섹션 -->
+            <div>
+                <div>나의 정보</div>
+                <ul>
+                    <li><a href="#" title="회원정보 수정">회원정보 수정</a></li>
+                    <li><a href="#" title="회원정보 탈퇴">회원정보 탈퇴</a></li>
+                </ul>
+            </div>
+
+            <!-- 나의 관심목록 섹션 -->
+            <div>
+                <div>나의 관심목록</div>
+                <ul>
+                    <li><a href="#" title="찜한 상품">찜한 상품</a></li>
+                </ul>
+            </div>
+
+            <!-- 나의 활동 섹션 -->
+            <div>
+                <div>나의 활동</div>
+                <ul>
+                    <li><a href="#" title="리뷰 모음">리뷰 모음</a></li>
+                    <li><a href="#" title="문의 게시판">문의 게시판</a></li>
+                </ul>
+            </div>
+
+            <!-- 나의 혜택 섹션 -->
+            <div>
+                <div>나의 혜택</div>
+                <ul>
+                    <li><a href="#" title="할인쿠폰">할인쿠폰</a></li>
+                    <li><a href="#" title="등급">등급페이지</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <div class="order-list">
+        <span class="order-list-title">주문목록</span>
+        
+        <div class="search-container">
+            <div class="search-input-wrapper">
+                <input type="text" placeholder="주문한 상품을 검색할 수 있어요!" class="search-input">
+                <div class="search-icon">
+                    <!-- 검색 아이콘 SVG 코드 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 배송 기간 추가 -->
+        <div class="delivery-period">
+            <div class="delivery-years">
+                <span>최근 6개월</span>
+                <span>2024년</span>
+                <span>2023년</span>
+                <span>2022년</span>
+            </div>
+        </div>
+
+        <!-- 배송 완료 내용  -->
+       
+
+        <div class="order-table">
+            <table class="order-details">
+                <colgroup>
+                    <col width="600">
+                    <col>
+                </colgroup>
+                <tbody>
+                    <tr class="order-row">
+                        <td class="order-info">
+                            <div class="order-status">
+                                <div class="status-details">
+                                    <span class="status-text" style="font-size: 1.25rem; font-weight: bold;">배송완료</span>
+                                    <span class="arrival-date" style="color: #008C00;">10/16(수) 도착</span>
+                                </div>
+                                <div class="status-actions">
+                                    <button class="action-button">
+                                        <div class="button-indicator"></div>
+                                        <div class="button-indicator"></div>
+                                        <div class="button-indicator"></div>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="order-item">
+                                <div class="item-details">
+                                    <div class="item-image">
+                                        <a href="" target="_blank">
+                                            <img loading="lazy" width="64" height="64" src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg" alt="충전기">
+                                        </a>
+                                    </div>
+                                    <div class="item-description">
+                                        <a href="" target="_blank" class="item-title">
+                                            <img class="rocket-badge" loading="lazy" height="16" src="" alt="ROCKET">
+                                            <span class="item-name">충전기</span>
+                                        </a>
+                                        <div class="item-price">
+                                            <span class="item-price-value">0 원</span>
+                                            <span class="item-quantity">1개</span>
+                                        </div>
+                                        <div class="item-actions">
+                                            <button class="add-to-cart">장바구니 담기</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="order-actions">
+                            <div class="action-buttons">
+                                <button class="exchange-return">교환, 반품 신청</button>
+                                <button class="write-review">리뷰 작성하기</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+    
+    
+            <div class="sc-178zqvr-2 jTQcSU"><div class="sc-178zqvr-3 kXhaGH"><h4 class="sc-178zqvr-4 kCXCvA">배송상품 주문상태 안내</h4></div>
+    
+            <div class="order-status">
+                <div class="status-item">
+                    <i class="status-icon order-confirmed"></i>
+                    <div class="status-details">
+                        <span class="status-text">
+                            <span style="color: #111;">주문, 결제, 확인</span><br>
+                            <span>이 완료되었습니다.</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <i class="status-icon preparing"></i>
+                    <div class="status-details">
+                        <span class="status-text">
+                            <span>판매자가 발송할</span><br>
+                            <span style="color: #111;">상품을 준비중</span><span>입니다.</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <i class="status-icon ready-for-shipping"></i>
+                    <div class="status-details">
+                        <span class="status-text">
+                            <span>상품준비가 완료되어</span><br>
+                            <span>곧 </span><span style="color: #111;">배송</span><span>될 </span><span style="color: #111;">예정</span><span>입니다.</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <i class="status-icon shipping"></i>
+                    <div class="status-details">
+                        <span class="status-text">
+                            <span>상품이 고객님께</span><br>
+                            <span style="color: #111;">배송중</span><span>입니다.</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <i class="status-icon delivered"></i>
+                    <div class="status-details">
+                        <span class="status-text">
+                            <span>상품이 주문자에게</span><br>
+                            <span style="color: #111;">전달완료</span><span>되었습니다.</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            
+    
+    
+    
+    
+            <div class="exchange-return-request">
+                <h1 class="title">교환, 반품 신청</h1>
+                
+                <div class="step-indicator">
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <span class="step-label">상품 선택</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <span class="step-label">사유 선택</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <span class="step-label">해결방법 선택</span>
+                    </div>
+                </div>
+            
+                <div class="product-selection">
+                    <span class="instruction">상품을 선택해 주세요</span>
+                    
+                    <div class="product-item">
+                        <a href="#" class="product-link">
+                            <img loading="lazy" src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg" alt="서가 퀵차지 QC3.0 18W USB 고속충전기 + C타입 케이블 1.5m 세트, 화이트, 1개" width="64" height="64">
+                            <span class="product-name">
+                                <img class="rocket-badge" loading="lazy" height="16" src="https://image8.coupangcdn.com/image/my/common/badge/badge_3x/logo_Rocket_16@3x.png" alt="ROCKET">
+                                서가 퀵차지 QC3.0 18W USB 고속충전기 + C타입 케이블 1.5m 세트, 화이트, 1개
+                            </span>
+                            <span class="product-quantity">1개</span>
+                        </a>
+                    </div>
+                    
+                    <button class="next-step-button">다음 단계
+                        <svg width="16" height="16" fill="white" aria-hidden="true" role="presentation">
+                            <path d="M11.057 8L5.53 13.529c-.26.26-.26.682 0 .942.26.26.682.26.942 0l6-6c.26-.26.26-.682 0-.942l-6-6c-.26-.26-.682-.26-.942 0-.26.26-.26.682 0 .942L11.057 8z"></path>
+                        </svg>
+                    </button>
+                </div>
+            
+                <div class="selected-product">
+                    <span class="notice">선택한 상품은 현재 접수할 수 없는 상태입니다</span>
+                    <div class="selected-product-details">
+                        <span class="summary">선택한 상품 1건</span>
+                        <div class="product-item">
+                            <a href="#" class="product-link">
+                                <img loading="lazy" src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg" alt="서가 퀵차지 QC3.0 18W USB 고속충전기 + C타입 케이블 1.5m 세트, 화이트, 1개" width="64" height="64">
+                                <span class="product-name">
+                                    <img class="rocket-badge" loading="lazy" height="16" src="https://image8.coupangcdn.com/image/my/common/badge/badge_3x/logo_Rocket_16@3x.png" alt="">
+                                    서가 퀵차지 QC3.0 18W USB 고속충전기 + C타입 케이블 1.5m 세트, 화이트, 1개
+                                </span>
+                                <span class="product-quantity">1개</span>
+                                <span class="product-price">0 원</span>
+                            </a>
+                        </div>
+                        <span class="reason-title">선택한 사유</span>
+                    </div>
+                </div>
+            
+                <div class="resolution">
+                    <span class="resolution-question">어떤 해결방법을 원하세요?</span>
+                </div>
+            
+                <div class="action-buttons">
+                    <button class="prev-step-button">이전 단계</button>
+                    <button class="submit-button" disabled>신청하기</button>
+                </div>
+            </div>
+        </div>
+    
+    
+    
+    
+     
+                            
+
+
+
+</body>
+
+
+
+
+
+</html>
