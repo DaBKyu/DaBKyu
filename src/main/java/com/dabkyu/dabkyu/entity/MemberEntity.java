@@ -52,8 +52,8 @@ public class MemberEntity {
 	@Column(name="lastpw_date", nullable=true)
 	private LocalDateTime lastpwDate;
 
-    @Column(name="fromsocial",length=2, nullable=false)
-	private String fromsocial;
+    @Column(name="fromSocial",length=2, nullable=false)
+	private String fromSocial;
 
     @Column(name="pwcheck", nullable=false)
 	private int pwcheck;

@@ -10,72 +10,73 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder 
+@NoArgsConstructor
+@Builder
 public class MemberDTO {
-	private String email;
-	private String password;
-	private String telno;
-	private String username;
-	private String memberGrade;
-	private String pay;
-	private LocalDateTime regdate;
-	private LocalDateTime lastloginDate;
-	private LocalDateTime lastlogoutDate;
-	private LocalDateTime lastpwDate;
-	private String fromsocial;
-	private int pwcheck;
-	private int point;
-	private String myCategories;
-	private String role;
-	private String notificationYn;
-	private String emailRecept;
-	private LocalDateTime emailReceptDate;
+    
+    private String email;
+    private String password;
+    private String telno;
+    private String username;
+    private String memberGrade;
+    private String pay;
+    private LocalDateTime regdate;
+    private LocalDateTime lastloginDate;
+    private LocalDateTime lastlogoutDate;
+    private LocalDateTime lastpwDate;
+    private String fromSocial;
+    private int pwcheck;
+    private int point;
+    private String myCategories;
+    private String role;
+    private String notificationYn;
+    private String emailRecept;
+    private LocalDateTime emailReceptDate;
+    
+    public MemberDTO(MemberEntity memberEntity) {
+        this.email = memberEntity.getEmail();
+        this.password = memberEntity.getEmail();
+        this.telno = memberEntity.getTelno();
+        this.username = memberEntity.getUsername();
+        this.memberGrade = memberEntity.getMemberGrade();
+        this.pay = memberEntity.getPay();
+        this.regdate = memberEntity.getRegdate();
+        this.lastloginDate = memberEntity.getLastloginDate();
+        this.lastlogoutDate = memberEntity.getLastlogoutDate();
+        this.lastpwDate = memberEntity.getLastpwDate();
+        this.fromSocial = memberEntity.getFromSocial();
+        this.pwcheck = memberEntity.getPoint();
+        this.point = memberEntity.getPoint();
+        this.myCategories = memberEntity.getMyCategories();
+        this.role = memberEntity.getRole();
+        this.notificationYn = memberEntity.getNotificationYn();
+        this.emailRecept = memberEntity.getEmailRecept();
+        this.emailReceptDate = memberEntity.getEmailReceptDate();
+    }
 
-	public MemberDTO(MemberEntity entity) {
-	this.email = entity.getEmail();
-	this.password = entity.getPassword();
-	this.telno = entity.getTelno();
-	this.username = entity.getUsername();
-	this.memberGrade = entity.getMemberGrade();
-	this.pay = entity.getPay();
-	this.regdate = entity.getRegdate();
-	this.lastloginDate = entity.getLastloginDate();
-	this.lastlogoutDate = entity.getLastlogoutDate();
-	this.lastpwDate = entity.getLastpwDate();
-	this.fromsocial = entity.getFromsocial();
-	this.pwcheck = entity.getPwcheck();
-	this.point = entity.getPoint();
-	this.myCategories = entity.getMyCategories();
-	this.role = entity.getRole();
-	this.notificationYn = entity.getNotificationYn();
-	this.emailRecept = entity.getEmailRecept();
-	this.emailReceptDate = entity.getEmailReceptDate();
-	}
+    public MemberEntity dtoEntity(MemberDTO dto) {
 
-	public MemberEntity dtoToEntity(MemberDTO dto) {
-		MemberEntity entity = MemberEntity.builder()
-										  .email(dto.getEmail())
-										  .password(dto.getPassword())
-										  .telno(dto.getTelno())
-										  .username(dto.getUsername())
-										  .memberGrade(dto.getMemberGrade())
-										  .pay(dto.getPay())
-										  .regdate(dto.getRegdate())
-										  .lastloginDate(dto.getLastloginDate())
-										  .lastlogoutDate(dto.getLastlogoutDate())
-										  .lastpwDate(dto.getLastpwDate())
-										  .fromsocial(dto.getFromsocial())
-										  .pwcheck(dto.getPwcheck())
-										  .point(dto.getPoint())
-										  .myCategories(dto.getMyCategories())
-										  .role(dto.getRole())
-										  .notificationYn(dto.getNotificationYn())
-										  .emailRecept(dto.getEmailRecept())
-										  .emailReceptDate(dto.getEmailReceptDate())
-										  .build();
-
-		return entity;
-	}
+        MemberEntity memberEntity = MemberEntity.builder()
+                                                .email(dto.getEmail())
+                                                .password(dto.getPassword())
+                                                .telno(dto.getTelno())
+                                                .username(dto.getUsername())
+                                                .memberGrade(dto.getMemberGrade())
+                                                .pay(dto.getPay())
+                                                .regdate(dto.getRegdate())
+                                                .lastloginDate(dto.getLastloginDate())
+                                                .lastlogoutDate(dto.getLastlogoutDate())
+                                                .lastpwDate(dto.getLastpwDate())
+                                                .fromSocial(dto.getFromSocial())
+                                                .pwcheck(dto.getPwcheck())
+                                                .point(dto.getPoint())
+                                                .myCategories(dto.getMyCategories())
+                                                .role(dto.getRole())
+                                                .notificationYn(dto.getNotificationYn())
+                                                .emailRecept(dto.getEmailRecept())
+                                                .emailReceptDate(dto.getEmailReceptDate())
+                                                .build();
+        return memberEntity;
+    }
 }
