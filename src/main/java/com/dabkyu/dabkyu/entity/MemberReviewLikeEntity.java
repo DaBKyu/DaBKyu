@@ -13,6 +13,7 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +22,7 @@ import lombok.Setter;
 @Entity(name="memberReviewlike")
 @Table(name="member_review_like")
 @IdClass(MemberReviewLikeEntityID.class)
+@Builder
 public class MemberReviewLikeEntity {
 
     @Id

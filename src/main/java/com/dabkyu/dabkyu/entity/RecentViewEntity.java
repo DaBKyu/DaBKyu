@@ -10,6 +10,7 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,7 @@ import lombok.Setter;
 @Entity(name="recentView")
 @Table(name="recent_view")
 @IdClass(RecentViewEntityID.class)
+@Builder
 public class RecentViewEntity {
 
     @Id
