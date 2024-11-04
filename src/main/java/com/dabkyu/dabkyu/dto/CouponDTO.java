@@ -15,7 +15,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class CouponDTO {
-
     private Long couponSeqno;
     private String couponName;
     private String couponType;
@@ -28,22 +27,21 @@ public class CouponDTO {
     private int minOrder;
     private String couponRole;
 
-    public CouponDTO(CouponEntity couponEntity) {
-        this.couponSeqno = couponEntity.getCouponSeqno();
-        this.couponName = couponEntity.getCouponName();
-        this.couponType = couponEntity.getCouponType();
-        this.couponTarget = couponEntity.getCouponTarget();
-        this.couponInfo = couponEntity.getCouponInfo();
-        this.percentDiscount = couponEntity.getPercentDiscount();
-        this.amountDiscount = couponEntity.getAmountDiscount();
-        this.couponStartDate = couponEntity.getCouponStartDate();
-        this.couponEndDate = couponEntity.getCouponEndDate();
-        this.minOrder= couponEntity.getMinOrder();
-        this.couponRole= couponEntity.getCouponRole();
+    public CouponDTO(CouponEntity entity) {
+        this.couponSeqno = entity.getCouponSeqno();
+        this.couponName = entity.getCouponName();
+        this.couponType = entity.getCouponType();
+        this.couponTarget = entity.getCouponTarget();
+        this.couponInfo = entity.getCouponInfo();
+        this.percentDiscount = entity.getPercentDiscount();
+        this.amountDiscount = entity.getAmountDiscount();
+        this.couponStartDate = entity.getCouponStartDate();
+        this.couponEndDate = entity.getCouponEndDate();
+        this.minOrder= entity.getMinOrder();
+        this.couponRole= entity.getCouponRole();
     }
 
     public CouponEntity dtoToEntity(CouponDTO dto) {
-        
         CouponEntity entity = CouponEntity.builder()
                                           .couponSeqno(dto.getCouponSeqno())
                                           .couponName(dto.getCouponName())
@@ -57,6 +55,4 @@ public class CouponDTO {
                                           .build();
         return entity;
     }
-
-
 }

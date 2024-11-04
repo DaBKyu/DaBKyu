@@ -17,13 +17,12 @@ public class AddedRelatedProductDTO {
 	private OrderProductEntity orderProductSeqno;
 	private Long relatedproductSeqno;
 
-    public AddedRelatedProductDTO(AddedRelatedProductEntity addedRelatedProductEntity) {
-        this.orderProductSeqno = addedRelatedProductEntity.getOrderProductSeqno();
-        this.relatedproductSeqno = addedRelatedProductEntity.getRelatedproductSeqno();
+    public AddedRelatedProductDTO(AddedRelatedProductEntity entity) {
+        this.orderProductSeqno = entity.getOrderProductSeqno();
+        this.relatedproductSeqno = entity.getRelatedproductSeqno();
     }
 
     public AddedRelatedProductEntity dtoToEntity(AddedRelatedProductDTO dto) {
-        
         AddedRelatedProductEntity entity = AddedRelatedProductEntity.builder()
                                            .orderProductSeqno(dto.getOrderProductSeqno())
                                            .relatedproductSeqno(dto.getRelatedproductSeqno())
