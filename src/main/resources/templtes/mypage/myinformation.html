@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 웹 페이지</title>
+    <link rel="stylesheet" href="/css/mypage.css"> <!-- CSS 파일 연결 -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .withdrawal-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .withdrawal-container h2 {
+            margin-bottom: 20px;
+        }
+        .withdrawal-container input {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .withdrawal-container button {
+            padding: 10px;
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .withdrawal-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 웹 페이지</title>
+    <link rel="stylesheet" href="/css/mypage.css"> <!-- CSS 파일 연결 -->
+    <style>
+        body {
+    display: flex;
+    font-family: Arial, sans-serif;
+}
+
+#myMenu {
+    width: 250px; /* 메뉴 너비 조정 */
+    padding: 20px;
+    background-color: #f8f9fa; /* 배경 색상 */
+}
+
+.order-list {
+    flex: 1; /* 나머지 공간을 차지 */
+    padding: 20px;
+}
+
+.order-list-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.search-container {
+    margin-top: 20px;
+}
+
+.order-table {
+    margin-top: 20px;
+}
+
+.delivery-years {
+    display: flex; /* 가로 배치 */
+    gap: 10px; /* 날짜 간의 간격 */
+}
+
+.delivery-years span {
+    padding: 5px 10px; /* 날짜 패딩 */
+    border: 1px solid #ccc; /* 테두리 추가 */
+    border-radius: 5px; /* 모서리 둥글게 */
+}
+
+.delivery-period {
+    margin-top: 20px; /* 간격 조정 */
+}
+
+.order-summary {
+    margin-top: 20px; /* 간격 조정 */
+}
+
+.order-details {
+    margin-top: 10px; /* 간격 조정 */
+}
+
+      
+    </style>
+</head>
+<body>
+    <div id="myMenu">
+        <h2>mypage</h2>
+        <nav>
+            <!-- 나의 쇼핑 섹션 -->
+            <div>
+                <div>나의 쇼핑</div>
+                <ul>
+                    <li><a href="#" title="주문목록/배송조회">주문/배송조회</a></li>
+                    <li><a href="#" title="취소/반품/교환/환불내역">취소/반품/교환/환불내역</a></li>
+                    <li><a href="#" title="구매내역조회">구매내역조회</a></li>
+                </ul>
+            </div>
+
+            <!-- 나의 정보 섹션 -->
+            <div>
+                <div>나의 정보</div>
+                <ul>
+                    <li><a href="#" title="회원정보 수정">회원정보 수정</a></li>
+                    <li><a href="#" title="회원정보 탈퇴">회원정보 탈퇴</a></li>
+                </ul>
+            </div>
+
+            <!-- 나의 관심목록 섹션 -->
+            <div>
+                <div>나의 관심목록</div>
+                <ul>
+                    <li><a href="#" title="찜한 상품">찜한 상품</a></li>
+                </ul>
+            </div>
+
+            <!-- 나의 활동 섹션 -->
+            <div>
+                <div>나의 활동</div>
+                <ul>
+                    <li><a href="#" title="리뷰 모음">리뷰 모음</a></li>
+                    <li><a href="#" title="문의 게시판">문의 게시판</a></li>
+                </ul>
+            </div>
+
+            <!-- 나의 혜택 섹션 -->
+            <div>
+                <div>나의 혜택</div>
+                <ul>
+                    <li><a href="#" title="할인쿠폰">할인쿠폰</a></li>
+                    <li><a href="#" title="등급">등급페이지</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    <div class="withdrawal-container">
+        <h2>회원 탈퇴</h2>
+        <input type="password" id="password" placeholder="비밀번호를 입력하세요" required>
+        <button id="withdrawBtn">탈퇴하기</button>
+        <div id="message" style="margin-top: 10px;"></div>
+    </div>
+
+    <script>
+        document.getElementById('withdrawBtn').addEventListener('click', function() {
+            const password = document.getElementById('password').value;
+            const correctPassword = "1234"; // 실제 비밀번호로 교체
+
+            // 회원 탈퇴 확인 팝업창
+            if (confirm("정말로 회원 탈퇴를 하시겠습니까?")) {
+                if (password === correctPassword) {
+                    // 비밀번호가 맞으면 탈퇴 처리
+                    document.getElementById('message').textContent = "회원 탈퇴가 완료되었습니다.";
+                    // 여기에서 실제 탈퇴 로직을 구현하세요 (서버 요청 등)
+                } else {
+                    // 비밀번호가 틀리면 오류 메시지 표시
+                    document.getElementById('message').textContent = "비밀번호가 일치하지 않습니다.";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
