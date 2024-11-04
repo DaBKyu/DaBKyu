@@ -1,9 +1,7 @@
 package com.dabkyu.dabkyu.dto;
 
 import java.time.LocalDateTime;
-
 import com.dabkyu.dabkyu.entity.MemberEntity;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
