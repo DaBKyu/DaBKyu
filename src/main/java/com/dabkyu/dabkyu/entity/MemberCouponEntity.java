@@ -33,7 +33,4 @@ public class MemberCouponEntity {
 	@JoinColumn(name="coupon_seqno", nullable = false)
 	private CouponEntity couponSeqno;
 	
-
-
-
 }

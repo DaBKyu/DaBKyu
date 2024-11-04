@@ -32,6 +32,11 @@ public class ReviewEntity {
 		initialValue = 1, allocationSize = 1)
     @Column(name="review_seqno",nullable=false)
 	private Long reviewSeqno;
+	
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name="email",nullable=false)
+    private MemberEntity email;
 
     @ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)

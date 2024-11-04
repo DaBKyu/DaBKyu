@@ -2,6 +2,8 @@ package com.dabkyu.dabkyu.entity;
 
 import java.time.LocalDateTime;
 
+import com.dabkyu.dabkyu.dto.MemberDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -43,22 +45,22 @@ public class MemberEntity {
     @Column(name="regdate",nullable=false)
 	private LocalDateTime regdate;
 
-    @Column(name="lastlogin_date", nullable=true)
+    @Column(name="lastlogin_date",nullable=true)
 	private LocalDateTime lastloginDate;
 	
-	@Column(name="lastlogout_date", nullable=true)
+	@Column(name="lastlogout_date",nullable=true)
 	private LocalDateTime lastlogoutDate;
 	
-	@Column(name="lastpw_date", nullable=true)
+	@Column(name="lastpw_date",nullable=true)
 	private LocalDateTime lastpwDate;
 
-    @Column(name="fromSocial",length=2, nullable=false)
+    @Column(name="fromSocial",length=2,nullable=false)
 	private String fromSocial;
 
-    @Column(name="pwcheck", nullable=false)
+    @Column(name="pwcheck",nullable=false)
 	private int pwcheck;
 
-    @Column(name="point", nullable=true)
+    @Column(name="point",nullable=true)
 	private int point;
 
     @Column(name="my_categories",length=200,nullable=true)
@@ -76,4 +78,19 @@ public class MemberEntity {
     @Column(name="email_recept_date",nullable=true)
 	private LocalDateTime emailReceptDate;
     
+	@Column(name="authkey",length=200,nullable=false)
+	private String authkey;
+
+	@Column(name="gender",length=20,nullable=false)
+	private String gender;
+
+	@Column(name="birthday",nullable=false)
+	private LocalDateTime birthday;
+
+	public void modifyMemberInfo(MemberDTO dto) {
+        this.telno = dto.getTelno();
+        this.pay = dto.getPay();
+        this.notificationYn = dto.getNotificationYn();
+        this.emailRecept = dto.getEmailRecept();
+	}
 }
