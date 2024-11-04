@@ -1,98 +1,135 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>메일 발송</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>반응형 페이지</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/css/board.css">
 </head>
 <body>
-    <!-- 네비게이션 바 -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Admin</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="#">상품관리</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">회원관리</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">배송관리</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">문의목록</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">통계</a></li>
+
+  <!-- 상단 네비게이션 바 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">관리자 페이지</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">상품관리</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">회원관리</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">배송관리</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">문의목록</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <h4 style="display: inline-block">쿠폰 생성</h3>&emsp;&emsp;&emsp;
+    <h4 style="display: inline-block">생성된 쿠폰 리스트</h3>
+    <hr>
+
+    <div class="row">
+      <!-- 왼쪽 쿠폰 생성 섹션 -->
+      <div class="col-lg-6 col-md-12 mb-4">
+        <!-- 쿠폰 적용범위-->
+        <div class="mb-3">
+            <label for="" class="form-label" style="display: inline-block;">쿠폰 적용 범위</label>
+            <div class="input-group mb-3" >
+                <input type="text" class="form-control" aria-label="Text input with dropdown button">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#">Action</a></li>
+                  <li><a class="dropdown-item" href="#">Another action</a></li>
+                  <li><a class="dropdown-item" href="#">Something else here</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#">Separated link</a></li>
                 </ul>
-                <span class="navbar-text">Admin01</span>
             </div>
+
         </div>
-    </nav>
-
-    <!-- 메일 발송 폼 -->
-    <div class="container mt-5">
-        <h2>메일 발송</h2>
-
-        <!-- 발송 범위 설정 -->
-        <form>
-            <div class="row mb-3">
-                <!-- 발송 방법 설정 -->
-                <div class="col-md-4">
-                    <label for="emailCategory" class="form-label">발송 범위 설정</label>
-                    <select id="emailCategory" class="form-select">
-                        <option>전체</option>
-                        <option>카테고리</option>
-                        <option>상품</option>
-                    </select>
-                </div>
-
-                <!-- 카테고리 검색 -->
-                <div class="col-md-4">
-                    <label for="categorySearch" class="form-label">카테고리 검색</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="카테고리 검색" aria-label="categorySearch" aria-describedby="button-addon2">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
-                </div>
-                </div>
-
-                <!-- 상품 검색 -->
-                <div class="col-md-4">
-                    <label for="categorySearch" class="form-label">상품 검색</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="상품 검색" aria-label="productSearch" aria-describedby="button-addon2">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
-                </div>
-                </div>
-
-                
 
 
-            <!-- 제목 입력 -->
-            <div class="mb-3">
-                <label for="subject" class="form-label">제목</label>
-                <input type="text" id="subject" placeholder="" class="form-control">
-            </div>
 
-            <!-- 내용 입력 -->
-            <div class="mb-3">
-                <label for="content" class="form-label">내용</label>
-                <textarea id="content" rows='5' placeholder="" class='form-control'></textarea>
-            </div>
+        <!-- 상품 검색 -->
+        <div class="mb-3">
+          <label for="productSearch" class="form-label">상품 검색</label>
+          <input type="text" id="productSearch" class="form-control" placeholder="아이폰 16 pro, 갤럭시 S24 등...">
+        </div>
 
-            <!-- 파일 첨부 -->
-            <div class='mb-3'>
-                <label for='fileUpload' class='form-label'>파일첨부</label>
-                <input type='file' id='fileUpload' class='form-control' multiple>
-            </div>
+        <!-- 적용된 상품 목록 -->
+        <div class="mb-3">
+          <label for="" class="form-label">적용된 상품</label>
+          <div id="" class="">
+            <span class="badge bg-primary">아이폰 16 pro</span>
+            <span class="badge bg-primary">갤럭시 S24</span>
+          </div>
+        </div>
 
-            <!-- 버튼 -->
-            <button type='button' class='btn btn-primary'>메일 보내기</button>
-            <button type='button' class='btn btn-secondary'>작성 취소</button>
+        <!-- 카테고리 선택 -->
+        <div class="mb-3">
+          <label for="" class="form-label">적용된 카테고리</label>
+          <select id="" class="form-select">
+            <option>카테고리 1</option>
+            <option>카테고리 2</option>
+            <option>카테고리 3</option>
+          </select>
+        </div>
 
-        </form>
+      </div>
 
+      <!-- 오른쪽 쿠폰 설정 섹션 -->
+      <div class="col-lg-6 col-md-12 mb-4">
+        <!-- 사용 혜택 -->
+        <div class="mb-3">
+          <label for="" class="form-label">사용 혜택</label>
+          <input type="number" id="" class="form-control" placeholder="">
+        </div>
+
+        <!-- 사용 기간 -->
+        <div class="mb-3">
+          <label for="" class="form-label">사용 기간</label>
+          <input type="datetime-local" id="" class="form-control mb-2">
+          ~
+          <input type="datetime-local" id="" class="form-control mt-2">
+        </div>
+
+        <!-- 권한 설정 -->
+        <div class="">
+          <label for="" class="form-label">권한 설정</label>
+          <select id="" class="form-select mb-3">
+            <option>플래티넘</option>
+            <option>골드</option>
+            <option>실버</option>
+            <option>브론즈</option>
+          </select>
+
+          <!-- 쿠폰명 입력 -->
+          <input type="text" id="" placeholder='쿠폰명 입력' class='form-control'>
+        </div>
+
+      </div> 
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js'></script>
+    <!-- 생성 버튼 -->
+    <button type='submit' class='btn btn-primary'>생성</button>
+
+  </div>
+
+  <!-- Bootstrap JS (필요 시) -->
+  <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'></script>
 
 </body>
 </html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메일발송페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" >
+    <link rel="stylesheet" href="../../static/css/board.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            //파일첨부 이벤트
+            $('.filebox .upload-hidden').on('change', function(){  			
+                if(window.FileReader){
+                    var filename = $(this)[0].files[0].name;
+                    if(!validFileType(filename)){
+                        alert("허용하지 않는 확장자 파일입니다.");
+                        return false;
+                    }else{
+                        if(!validFileSize($(this)[0].files[0])){
+                            alert("파일 사이즈가 10MB를 초과합니다.");
+                            return false;
+                        }else{
+                            if(!validFileNameSize(filename)){
+                                alert("파일명이 30자를 초과합니다.");
+                                return false;
+                            }
+                        }
+                    }
+                } else {
+                    var filename = $(this).val().split('/').pop().split('\\').pop();
+                }
+                $(this).prev().val(filename); //input upload-name 에 파일명 설정해주기
+    
+                readImage($(this)[0]); //미리보기
+            });
+        });
+    
+        function validFileType(filename) {
+            const fileTypes = ["png", "jpg", "jpeg"];
+            return fileTypes.indexOf(filename.substring(filename.lastIndexOf(".")+1, filename.length).toLowerCase()) >= 0;
+        }
+        
+        function validFileSize(file){
+            if(file.size > 10000000){ //10MB
+                return false;
+            }else{
+                return true;
+            }
+        }
+    
+        function validFileNameSize(filename){
+            if(filename.length > 30){ //30자
+                return false;
+            }else{
+                return true;
+            }
+        }
+    
+        //이미지 띄우기
+        function readImage(input) {
+            if(input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e){
+                    const previewImage = document.getElementById("preview");
+                    previewImage.src = e.target.result;
+                   }
+                
+                // reader가 이미지 읽도록 하기
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        // function imageChange(event){
+        // let i = event.target.files.length-1;
+        // for(let image of event.target.files){
+        //     let img = document.createElement("img");
+        //     const reader = new FileReader();
+        //     reader.onload = function(event){
+        //         img.setAttribute("preview", event.target.result);
+        //     }
+        //     reader.readAsDataURL(event.target.files[i--]);  
+        //     document.querySelector(".filebox").appendChild(img);
+        // }
+    //    }
+        
+        //이미지 원본 팝업 띄우기
+        function popImage(url) {
+            var img = new Image();
+            img.src = url;
+            var img_width = img.width;
+            var win_width = img.width + 25;
+            var img_height = img.height;
+            var win = img.height + 30;
+            var popup = window.open('', '_blank', 'width=' + img_width + ', height=' + img_height + ', menubars=no, scrollbars=auto');
+            popup.document.write("<style>body{margin:0px;}</style><img src='"+url+"' width='"+win_width+"'>");
+        }
+    </script>
+    <style>
+         img#preview{cursor:pointer;max-height:100px; max-width:100%;display:block;}
+    </style>
+</head>
+
+<body>
+    <!-- 네비게이션 바 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="#">상품관리</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">회원관리</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">배송관리</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">문의목록</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">통계</a></li>
+                </ul>
+                <span class="navbar-text">Admin01</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 메일 발송 폼 -->
+    <div class="container mt-5">
+        <h2>메일 발송</h2>
+
+        <!-- 발송 범위 설정 -->
+        <form class="card p-4 mb-4">
+            <div class="row mb-3">
+                <!-- 발송 방법 설정 -->
+                <div class="col-md-4">
+                    <label for="emailCategory" class="form-label">발송 범위 설정</label>
+                    <select id="emailCategory" class="form-select">
+                        <option>전체</option>
+                        <option>카테고리</option>
+                        <option>상품</option>
+                    </select>
+                </div>
+
+                <!-- 카테고리 검색 -->
+                <div class="col-md-4">
+                    <label for="categorySearch" class="form-label">카테고리 검색</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="카테고리 검색" aria-label="categorySearch" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
+                    </div>
+                </div>
+
+                <!-- 상품 검색 -->
+                <div class="col-md-4">
+                    <label for="productSearch" class="form-label">상품 검색</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="상품 검색" aria-label="productSearch" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
+                    </div>
+                </div>
+
+                <!-- 선택된 카테고리, 상품 확인 -->
+                <div class="col-md-6 mt-2">
+                    <ul class="form-control mb-2 border p-2 select_list" >
+                        <li>
+                            <span>test</span>
+                            <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+                        </li>
+                        <li>
+                            <span>test</span>
+                            <button type="button" class="btn-close btn-close-sm" aria-label="Close"></button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6 mt-2">
+                    <ul class="form-control mb-2 border p-2">
+                        <li>
+                            <span>test</span>
+                            <button type="button" class="btn-close" aria-label="Close"></button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 제목 입력 -->
+            <div class="mb-3">
+                <label for="subject" class="form-label">제목</label>
+                <input type="text" id="subject" placeholder="" class="form-control">
+            </div>
+
+            <!-- 내용 입력 -->
+            <div class="mb-3">
+                <label for="content" class="form-label">내용</label>
+                <textarea id="content" rows='5' placeholder="" class='form-control'></textarea>
+            </div>
+
+            <!-- 파일 첨부 -->
+            <div class='mb-3'>
+                <label for='fileUpload' class='form-label'>파일첨부</label>
+                <input type='file' id='fileUpload' class='form-control' multiple>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="d-grid gap-2 d-md-block">
+                <button type='button' class='btn btn-primary'>메일 보내기</button>
+                <button type='button' class='btn btn-secondary'>작성 취소</button>
+            </div>
+
+        </form>
+    </div>
+    
+</body>
+</html>
