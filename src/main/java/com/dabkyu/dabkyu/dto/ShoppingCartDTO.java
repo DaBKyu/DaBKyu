@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class ShoppingCartDTO {
     private MemberEntity email;
 	private OrderProductEntity orderProductSeqno;

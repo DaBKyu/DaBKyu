@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class MemberNotificationDTO {
     private MemberEntity email;
 	private NotificationEntity notificationSeqno;

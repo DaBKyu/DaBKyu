@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class NotificationDTO {
     private Long notificationSeqno;
 	private Long notificationName;

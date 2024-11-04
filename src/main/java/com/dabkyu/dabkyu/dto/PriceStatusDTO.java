@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class PriceStatusDTO {
     private ProductEntity productSeqno;
 	private int price;

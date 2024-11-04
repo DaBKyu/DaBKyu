@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class OrderInfoDTO {
     private Long orderSeqno;
 	private MemberEntity email;

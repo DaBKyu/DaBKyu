@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class ReviewFileDTO {
     private Long reviewfileSeqno;
 	private ReviewEntity reviewSeqno;

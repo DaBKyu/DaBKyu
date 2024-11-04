@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class LikeListDTO {
 	private MemberEntity email;
 	private ProductEntity productSeqno;

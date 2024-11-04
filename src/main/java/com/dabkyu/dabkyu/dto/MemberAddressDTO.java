@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class MemberAddressDTO {
 	private Long memberAddressSeqno;
 	private MemberEntity email;

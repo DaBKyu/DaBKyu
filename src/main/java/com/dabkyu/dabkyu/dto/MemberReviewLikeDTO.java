@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class MemberReviewLikeDTO {
     private MemberEntity email;
 	private Long reviewSeqno;

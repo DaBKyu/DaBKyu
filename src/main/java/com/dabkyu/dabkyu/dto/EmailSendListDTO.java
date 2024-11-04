@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class EmailSendListDTO {
 	private Long emailSendlistSeqno;
 	private String targetCategory;

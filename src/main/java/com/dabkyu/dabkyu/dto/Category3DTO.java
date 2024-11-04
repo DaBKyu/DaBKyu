@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class Category3DTO {
     private Long category3Seqno;
     private Category2Entity category2Seqno;

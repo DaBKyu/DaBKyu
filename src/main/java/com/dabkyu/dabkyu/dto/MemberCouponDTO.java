@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class MemberCouponDTO {
     private MemberEntity email;
 	private CouponEntity couponSeqno;

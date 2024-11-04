@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class ProductFileDTO {
     private Long productfileSeqno;
 	private ProductEntity productSeqno;

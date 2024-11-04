@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class AddedRelatedProductDTO {
 	private OrderProductEntity orderProductSeqno;
 	private Long relatedproductSeqno;

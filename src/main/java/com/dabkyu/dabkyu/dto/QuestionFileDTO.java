@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class QuestionFileDTO {
     private Long questionfileSeqno;
 	private QuestionEntity queSeqno;

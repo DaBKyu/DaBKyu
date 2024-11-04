@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder 
 public class QuestionCommentDTO {
     private QuestionEntity queSeqno;
 	private String comWriter;
