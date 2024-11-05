@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>취소/반품/교환/환불 내역</title>
-    <link rel="stylesheet" href="/css/mypage.css"> <!-- CSS 파일 연결 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CSS 추가 -->
+    <link rel="stylesheet" href="/css/mypage.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             display: flex;
@@ -13,13 +13,13 @@
         }
 
         #myMenu {
-            width: 250px; /* 메뉴 너비 조정 */
+            width: 250px;
             padding: 20px;
-            background-color: #f8f9fa; /* 배경 색상 */
+            background-color: #f8f9fa;
         }
 
         .order-list {
-            flex: 1; /* 나머지 공간을 차지 */
+            flex: 1;
             padding: 20px;
         }
 
@@ -35,51 +35,45 @@
         .order-history table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
 
         .order-history th, .order-history td {
             border: 1px solid #ccc;
             padding: 10px;
             text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .order-history th {
             background-color: #f1f1f1;
         }
 
-        /* Modal 스타일 */
-        .modal {
-            display: none; /* 기본적으로 숨김 */
-            position: fixed; /* 고정 위치 */
-            z-index: 1000; /* 최상위 */
-            left: 0;
-            top: 0;
-            width: 100%; /* 전체 너비 */
-            height: 100%; /* 전체 높이 */
-            overflow: auto; /* 필요 시 스크롤 */
-            background-color: rgba(0, 0, 0, 0.4); /* 반투명 배경 */
+        .coupon-input {
+            margin-top: 20px;
         }
 
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; /* 중앙 배치 */
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%; /* 화면 크기에 따라 조정 가능 */
+        .coupon-input input {
+            padding: 10px;
+            width: 70%;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
+        .coupon-input button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+        }
+
+        .coupon-input button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -87,22 +81,23 @@
     <div id="myMenu">
         <h2>mypage</h2>
         <div class="user-icon">
-            <i class="fas fa-user-circle"></i> <!-- 사용자 아이콘 -->
+            <i class="fas fa-user-circle"></i> 
         </div>
         <nav>
             <div>
                 <div>나의 쇼핑</div>
                 <ul>
                     <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="returns.html" title="취소/반품/교환/환불내역" class="active">취소/반품/교환/환불내역</a></li>
-                    <li><a href="purchase-history.html" title="구매내역조회">구매내역조회</a></li>
+                    <li><a href="returns.html" title="취소/반품/교환/환불내역">취소/반품/교환/환불내역</a></li>
+                    <li><a href="purchase_history.html" title="구매내역조회">구매내역조회</a></li>
                 </ul>
             </div>
             <div>
                 <div>나의 정보</div>
                 <ul>
-                    <li><a href="edit-profile.html" title="회원정보 수정">회원정보 수정</a></li>
-                    <li><a href="profile.html" title="회원정보 탈퇴">회원정보 탈퇴</a></li>
+                    <li><a href="view_profile.html" title="회원정보 보기">회원정보 보기</a></li> 
+                    <li><a href="edit_profile.html" title="회원정보 수정">회원정보 수정</a></li>
+                     <li><a href="delete_account.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
                 </ul>
             </div>
             <div>
@@ -127,64 +122,88 @@
             </div>
         </nav>
     </div>
-    
+
     <div class="order-list">
-        <h1 class="order-list-title">취소/반품/교환/환불 내역</h1>
+        <h2 class="order-list-title">할인 쿠폰 입력</h2>
+        <div class="coupon-input">
+            <input type="text" id="couponCode" placeholder="쿠폰 코드 입력">
+            <button id="submitCoupon">입력하기</button>
+        </div>
+
         <div class="order-history">
+            <h3>사용 가능한 쿠폰 목록</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>주문 번호</th>
-                        <th>상품명</th>
+                        <th>쿠폰명</th>
+                        <th>할인액</th>
+                        <th>사용조건</th>
+                        <th>유효기간</th>
+                        <th>쿠폰종류</th>
                         <th>상태</th>
-                        <th>신청 날짜</th>
-                        <th>상세 보기</th>
+                    </tr>
+                </thead>
+                <tbody id="couponTableBody">
+                    <tr>
+                        <td>여름 세일 쿠폰</td>
+                        <td>10,000원</td>
+                        <td>3만원 이상 구매 시</td>
+                        <td>2024-12-31</td>
+                        <td>일반</td>
+                        <td>사용가능</td>
+                    </tr>
+                    <tr>
+                        <td>추석 할인 쿠폰</td>
+                        <td>5,000원</td>
+                        <td>5만원 이상 구매 시</td>
+                        <td>2024-09-30</td>
+                        <td>일반</td>
+                        <td>사용완료</td>
+                    </tr>
+                    <tr>
+                        <td>겨울 특가 쿠폰</td>
+                        <td>15,000원</td>
+                        <td>10만원 이상 구매 시</td>
+                        <td>2024-11-15</td>
+                        <td>일반</td>
+                        <td>기간완료</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="order-history">
+            <h3>사용 완료/기간 완료 쿠폰 목록</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>쿠폰명</th>
+                        <th>할인액</th>
+                        <th>상태</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>123456</td>
-                        <td>상품 A</td>
-                        <td>취소 요청</td>
-                        <td>2024-11-01</td>
-                        <td><button class="detail-button" onclick="openModal('주문 번호: 123456\n상품명: 상품 A\n상태: 취소 요청\n신청 날짜: 2024-11-01')">상세 보기</button></td>
+                        <td>추석 할인 쿠폰</td>
+                        <td>5,000원</td>
+                        <td>사용완료</td>
                     </tr>
                     <tr>
-                        <td>789012</td>
-                        <td>상품 B</td>
-                        <td>반품 승인</td>
-                        <td>2024-10-30</td>
-                        <td><button class="detail-button" onclick="openModal('주문 번호: 789012\n상품명: 상품 B\n상태: 반품 승인\n신청 날짜: 2024-10-30')">상세 보기</button></td>
+                        <td>겨울 특가 쿠폰</td>
+                        <td>15,000원</td>
+                        <td>기간완료</td>
                     </tr>
-                   
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal()">&times;</span>
-            <p id="modal-text"></p>
-        </div>
-    </div>
-
     <script>
-        function openModal(text) {
-            document.getElementById('modal-text').innerText = text;
-            document.getElementById('myModal').style.display = "block";
-        }
-
-        function closeModal() {
-            document.getElementById('myModal').style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('myModal')) {
-                closeModal();
-            }
-        }
+        document.getElementById('submitCoupon').addEventListener('click', function() {
+            const couponCode = document.getElementById('couponCode').value;
+            alert(`쿠폰 코드 "${couponCode}"이(가) 입력되었습니다.`);
+            document.getElementById('couponCode').value = ''; // 입력 필드 초기화
+        });
     </script>
 </body>
 </html>

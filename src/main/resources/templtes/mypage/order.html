@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내 웹 페이지</title>
-    <link rel="stylesheet" href="/css/mypage.css"> <!-- CSS 파일 연결 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CSS 추가 -->
     <style>
         body {
@@ -36,6 +35,23 @@
 
         .search-container {
             margin-top: 20px;
+            display: flex; /* 텍스트 박스와 아이콘을 가로로 배치 */
+            align-items: center; /* 아이콘과 텍스트 입력란 세로 가운데 정렬 */
+        }
+
+        .search-input {
+            flex: 1; /* 검색창이 남은 공간을 차지하도록 */
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-icon {
+            margin-left: 10px; /* 아이콘과 입력란 간의 간격 */
+            color: #888;
+            font-size: 1.25rem; /* 아이콘 크기 조정 */
+            cursor: pointer;
         }
 
         .order-table {
@@ -84,7 +100,7 @@
             margin: 15% auto; /* 중앙 배치 */
             padding: 20px;
             border: 1px solid #888;
-            width: 80%; /* 화면 크기에 따라 조정 가능 */
+            width: 60%; /* 화면 크기에 따라 조정 가능 */
         }
 
         .close-button {
@@ -99,6 +115,35 @@
             color: black;
             text-decoration: none;
             cursor: pointer;
+        }
+
+        .review-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .review-form textarea {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .review-form button {
+            padding: 10px;
+            font-size: 1rem;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .review-form button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -120,8 +165,9 @@
             <div>
                 <div>나의 정보</div>
                 <ul>
+                    <li><a href="view_profile.html" title="회원정보 보기">회원정보 보기</a></li> 
                     <li><a href="edit_profile.html" title="회원정보 수정">회원정보 수정</a></li>
-                    <li><a href="profile.html" title="회원정보 탈퇴">회원정보 탈퇴</a></li>
+                    <li><a href="delete_account.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
                 </ul>
             </div>
             <div>
@@ -152,15 +198,7 @@
         
         <div class="search-container">
             <input type="text" placeholder="주문한 상품을 검색할 수 있어요!" class="search-input">
-        </div>
-
-        <div class="delivery-period">
-            <div class="delivery-years">
-                <span>최근 6개월</span>
-                <span>2024년</span>
-                <span>2023년</span>
-                <span>2022년</span>
-            </div>
+            <i class="fas fa-search search-icon"></i> <!-- 검색 아이콘 추가 -->
         </div>
 
         <div class="order-table">
@@ -184,7 +222,7 @@
                         </td>
                         <td class="order-actions">
                             <button class="exchange-return" id="exchangeReturnBtn">교환, 반품 신청</button>
-                            <button class="write-review" id="writeReviewBtn">리뷰 작성하기</button> <!-- 리뷰하기 버튼 추가 -->
+                            <button class="write-review" id="writeReviewBtn">리뷰 작성하기</button> <!-- 리뷰 작성 버튼 -->
                         </td>
                     </tr>
                 </tbody>
@@ -192,125 +230,48 @@
         </div>
     </div>
 
-    <!-- 교환/반품 신청 모달 -->
-    <div id="exchangeReturnModal" class="modal">
+    <!-- 리뷰 작성 모달 -->
+    <div id="reviewModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
-            <h1 class="title">교환, 반품 신청</h1>
-            <div class="step-indicator">
-                <div class="step"><span class="step-number">1</span><span class="step-label">상품 선택</span></div>
-                <div class="step"><span class="step-number">2</span><span class="step-label">사유 선택</span></div>
-            </div>
-            <div class="product-selection">
-                <span class="instruction">상품을 선택해 주세요</span>
-                <div class="product-item">
-                    <img loading="lazy" src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg" alt="충전기" width="64" height="64">
-                    <span class="product-name">충전기</span>
-                    <span class="product-quantity">1개</span>
-                </div>
-                <button class="next-step-button" id="nextStepBtn">다음 단계</button>
-            </div>
-            <div class="action-buttons">
-                <button class="prev-step-button" id="prevStepBtnExchange">이전 단계</button>
-                <button class="submit-button" disabled>신청하기</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 사유 선택 모달 -->
-    <div id="reasonSelectionModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h1 class="title">사유 선택</h1>
-            <span class="instruction">사유를 선택해 주세요</span>
-            <ul>
-                <li><input type="checkbox" id="reason1"><label for="reason1">상품 불량</label></li>
-                <li><input type="checkbox" id="reason2"><label for="reason2">사이즈 미스</label></li>
-                <li><input type="checkbox" id="reason3"><label for="reason3">주문 실수</label></li>
-            </ul>
-            <button class="next-step-button" id="nextStepAfterReasonBtn">다음 단계</button>
-            <button class="prev-step-button" id="prevStepBtnReason">이전 단계</button>
-        </div>
-    </div>
-
-    <!-- 해결 방법 선택 모달 -->
-    <div id="solutionSelectionModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h1 class="title">해결 방법 선택</h1>
-            <span class="instruction">해결 방법을 선택해 주세요</span>
-            <ul>
-                <li><input type="checkbox" id="solution1"><label for="solution1">환불</label></li>
-                <li><input type="checkbox" id="solution2"><label for="solution2">교환</label></li>
-            </ul>
-            <button class="submit-button" id="submitRequestBtn">신청하기</button>
-            <button class="prev-step-button" id="prevStepBtnSolution">이전 단계</button>
+            <h1>리뷰 작성</h1>
+            <form class="review-form">
+                <label for="reviewText">리뷰를 작성해 주세요:</label>
+                <textarea id="reviewText" name="review" rows="4" required></textarea>
+                <button type="submit">리뷰 제출</button>
+            </form>
         </div>
     </div>
 
     <script>
-        // 교환/반품 신청 모달 열기
-        document.getElementById('exchangeReturnBtn').addEventListener('click', function() {
-            document.getElementById('exchangeReturnModal').style.display = 'block';
+        // 리뷰 작성하기 버튼 클릭 시 모달 열기
+        const writeReviewBtn = document.getElementById("writeReviewBtn");
+        const reviewModal = document.getElementById("reviewModal");
+        const closeButton = document.querySelector(".close-button");
+
+        // 리뷰 작성 팝업 열기
+        writeReviewBtn.addEventListener("click", function() {
+            reviewModal.style.display = "block";
         });
 
-        // 모달 닫기 기능
-        document.querySelectorAll('.close-button').forEach(button => {
-            button.addEventListener('click', function() {
-                document.getElementById('exchangeReturnModal').style.display = 'none';
-                document.getElementById('reasonSelectionModal').style.display = 'none';
-                document.getElementById('solutionSelectionModal').style.display = 'none';
-            });
+        // 모달 닫기
+        closeButton.addEventListener("click", function() {
+            reviewModal.style.display = "none";
         });
 
-        window.addEventListener('click', function(event) {
-            const exchangeModal = document.getElementById('exchangeReturnModal');
-            const reasonModal = document.getElementById('reasonSelectionModal');
-            const solutionModal = document.getElementById('solutionSelectionModal');
-            if (event.target === exchangeModal) {
-                exchangeModal.style.display = 'none';
-            }
-            if (event.target === reasonModal) {
-                reasonModal.style.display = 'none';
-            }
-            if (event.target === solutionModal) {
-                solutionModal.style.display = 'none';
+        // 모달 외부 클릭 시 닫기
+        window.addEventListener("click", function(event) {
+            if (event.target === reviewModal) {
+                reviewModal.style.display = "none";
             }
         });
 
-        // 다음 단계 버튼 클릭 이벤트 (상품 선택에서 사유 선택으로)
-        document.getElementById('nextStepBtn').addEventListener('click', function() {
-            document.getElementById('exchangeReturnModal').style.display = 'none';
-            document.getElementById('reasonSelectionModal').style.display = 'block'; // 사유 선택 모달 열기
-        });
-
-        // 이전 단계 버튼 클릭 이벤트 (사유 선택에서 상품 선택으로)
-        document.getElementById('prevStepBtnReason').addEventListener('click', function() {
-            document.getElementById('reasonSelectionModal').style.display = 'none';
-            document.getElementById('exchangeReturnModal').style.display = 'block'; // 상품 선택 모달 열기
-        });
-
-        // 다음 단계 버튼 클릭 이벤트 (사유 선택에서 해결 방법 선택으로)
-        document.getElementById('nextStepAfterReasonBtn').addEventListener('click', function() {
-            document.getElementById('reasonSelectionModal').style.display = 'none';
-            document.getElementById('solutionSelectionModal').style.display = 'block'; // 해결 방법 선택 모달 열기
-        });
-
-        // 이전 단계 버튼 클릭 이벤트 (해결 방법 선택에서 사유 선택으로)
-        document.getElementById('prevStepBtnSolution').addEventListener('click', function() {
-            document.getElementById('solutionSelectionModal').style.display = 'none';
-            document.getElementById('reasonSelectionModal').style.display = 'block'; // 사유 선택 모달 열기
-        });
-
-        // 리뷰 작성 버튼 클릭 이벤트
-        document.getElementById('writeReviewBtn').addEventListener('click', function() {
-            alert("리뷰 작성을 위해 새로운 페이지로 이동합니다."); // 리뷰 작성 페이지로 이동하는 기능
-        });
-
-        // 신청하기 버튼 클릭 이벤트 (해결 방법 선택 모달에서)
-        document.getElementById('submitRequestBtn').addEventListener('click', function() {
-            alert("신청이 완료되었습니다."); // 신청 완료 메시지 팝업
-            document.getElementById('solutionSelectionModal').style.display = 'none'; // 모달 닫기
+        // 리뷰 제출 폼 처리 (실제 서버로 제출하는 로직은 추가해야 합니다)
+        document.querySelector(".review-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // 페이지 리로딩 방지
+            const reviewText = document.getElementById("reviewText").value;
+            alert("리뷰가 제출되었습니다: " + reviewText);
+            reviewModal.style.display = "none"; // 제출 후 모달 닫기
         });
     </script>
 </body>
