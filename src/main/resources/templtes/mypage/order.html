@@ -158,16 +158,16 @@
                 <div>나의 쇼핑</div>
                 <ul>
                     <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="returns.html" title="취소/반품/교환/환불내역">취소/반품/교환/환불내역</a></li>
-                    <li><a href="purchase_history.html" title="구매내역조회">구매내역조회</a></li>
+                    <li><a href="cancelRefundChange.html" title="취소/반품/교환/">취소/반품/교환/</a></li>
+                    
                 </ul>
             </div>
             <div>
                 <div>나의 정보</div>
                 <ul>
-                    <li><a href="view_profile.html" title="회원정보 보기">회원정보 보기</a></li> 
-                    <li><a href="edit_profile.html" title="회원정보 수정">회원정보 수정</a></li>
-                    <li><a href="delete_account.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
+                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li> 
+                    <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
+                    <li><a href="deleteAccount.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
                 </ul>
             </div>
             <div>
@@ -180,13 +180,13 @@
                 <div>나의 활동</div>
                 <ul>
                     <li><a href="reviews.html" title="리뷰 모음">리뷰 모음</a></li>
-                    <li><a href="inquiries.html" title="문의 게시판">문의 게시판</a></li>
+                    <li><a href="myQuestion.html" title="문의 게시판">문의 게시판</a></li>
                 </ul>
             </div>
             <div>
                 <div>나의 혜택</div>
                 <ul>
-                    <li><a href="coupons.html" title="할인쿠폰">할인쿠폰</a></li>
+                    <li><a href="myCoupons.html" title="할인쿠폰">할인쿠폰</a></li>
                     <li><a href="membership.html" title="등급">등급페이지</a></li>
                 </ul>
             </div>
@@ -243,6 +243,62 @@
         </div>
     </div>
 
+    <!-- 교환/반품 신청 모달 -->
+    <div id="exchangeReturnModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h1 class="title">교환, 반품 신청</h1>
+            <div class="step-indicator">
+                <div class="step"><span class="step-number">1</span><span class="step-label">상품 선택</span></div>
+                <div class="step"><span class="step-number">2</span><span class="step-label">사유 선택</span></div>
+            </div>
+            <div class="product-selection">
+                <span class="instruction">상품을 선택해 주세요</span>
+                <div class="product-item">
+                    <img loading="lazy" src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg" alt="충전기" width="64" height="64">
+                    <span class="product-name">충전기</span>
+                    <span class="product-quantity">1개</span>
+                </div>
+                <button class="next-step-button" id="nextStepBtn">다음 단계</button>
+            </div>
+            <div class="action-buttons">
+                <button class="prev-step-button" id="prevStepBtnExchange">이전 단계</button>
+                <button class="submit-button" disabled>신청하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사유 선택 모달 -->
+    <div id="reasonSelectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h1 class="title">사유 선택</h1>
+            <span class="instruction">사유를 선택해 주세요</span>
+            <ul>
+                <li><input type="checkbox" id="reason1"><label for="reason1">상품 불량</label></li>
+                <li><input type="checkbox" id="reason2"><label for="reason2">사이즈 미스</label></li>
+                <li><input type="checkbox" id="reason3"><label for="reason3">주문 실수</label></li>
+            </ul>
+            <button class="next-step-button" id="nextStepAfterReasonBtn">다음 단계</button>
+            <button class="prev-step-button" id="prevStepBtnReason">이전 단계</button>
+        </div>
+    </div>
+
+    <!-- 해결 방법 선택 모달 -->
+    <div id="solutionSelectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h1 class="title">해결 방법 선택</h1>
+            <span class="instruction">해결 방법을 선택해 주세요</span>
+            <ul>
+                <li><input type="checkbox" id="solution1"><label for="solution1">환불</label></li>
+                <li><input type="checkbox" id="solution2"><label for="solution2">교환</label></li>
+            </ul>
+            <button class="submit-button" id="submitRequestBtn">신청하기</button>
+            <button class="prev-step-button" id="prevStepBtnSolution">이전 단계</button>
+        </div>
+    </div>
+
     <script>
         // 리뷰 작성하기 버튼 클릭 시 모달 열기
         const writeReviewBtn = document.getElementById("writeReviewBtn");
@@ -272,6 +328,65 @@
             const reviewText = document.getElementById("reviewText").value;
             alert("리뷰가 제출되었습니다: " + reviewText);
             reviewModal.style.display = "none"; // 제출 후 모달 닫기
+        });
+
+        // 교환/반품 신청 모달 열기
+        document.getElementById('exchangeReturnBtn').addEventListener('click', function() {
+            document.getElementById('exchangeReturnModal').style.display = 'block';
+        });
+
+        // 모달 닫기 기능
+        document.querySelectorAll('.close-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('exchangeReturnModal').style.display = 'none';
+                document.getElementById('reasonSelectionModal').style.display = 'none';
+                document.getElementById('solutionSelectionModal').style.display = 'none';
+            });
+        });
+
+        window.addEventListener('click', function(event) {
+            const exchangeModal = document.getElementById('exchangeReturnModal');
+            const reasonModal = document.getElementById('reasonSelectionModal');
+            const solutionModal = document.getElementById('solutionSelectionModal');
+            if (event.target === exchangeModal) {
+                exchangeModal.style.display = 'none';
+            }
+            if (event.target === reasonModal) {
+                reasonModal.style.display = 'none';
+            }
+            if (event.target === solutionModal) {
+                solutionModal.style.display = 'none';
+            }
+        });
+
+        // 다음 단계 버튼 클릭 이벤트 (상품 선택에서 사유 선택으로)
+        document.getElementById('nextStepBtn').addEventListener('click', function() {
+            document.getElementById('exchangeReturnModal').style.display = 'none';
+            document.getElementById('reasonSelectionModal').style.display = 'block'; // 사유 선택 모달 열기
+        });
+
+        // 다음 단계 버튼 클릭 이벤트 (사유 선택에서 해결 방법 선택으로)
+        document.getElementById('nextStepAfterReasonBtn').addEventListener('click', function() {
+            document.getElementById('reasonSelectionModal').style.display = 'none';
+            document.getElementById('solutionSelectionModal').style.display = 'block'; // 해결 방법 선택 모달 열기
+        });
+
+        // 이전 단계 버튼 클릭 이벤트 (사유 선택으로 돌아가기)
+        document.getElementById('prevStepBtnExchange').addEventListener('click', function() {
+            document.getElementById('exchangeReturnModal').style.display = 'block';
+            document.getElementById('reasonSelectionModal').style.display = 'none';
+        });
+
+        // 이전 단계 버튼 클릭 이벤트 (상품 선택으로 돌아가기)
+        document.getElementById('prevStepBtnReason').addEventListener('click', function() {
+            document.getElementById('reasonSelectionModal').style.display = 'none';
+            document.getElementById('exchangeReturnModal').style.display = 'block';
+        });
+
+        // 이전 단계 버튼 클릭 이벤트 (사유 선택으로 돌아가기)
+        document.getElementById('prevStepBtnSolution').addEventListener('click', function() {
+            document.getElementById('solutionSelectionModal').style.display = 'none';
+            document.getElementById('reasonSelectionModal').style.display = 'block';
         });
     </script>
 </body>
