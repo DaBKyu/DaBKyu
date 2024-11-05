@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상품페이지미리보기</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/master.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-
     <!-- 네비게이션 바 -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
@@ -18,11 +18,33 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="#">상품관리</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">회원관리</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">배송관리</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">문의목록</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">통계</a></li>
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown" aria-expanded="false">상품관리</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="../master/productManage.html">상품관리</a></li>
+                            <li><a class="dropdown-item" href="../master/categoryManage.html">카테고리 관리</a></li>
+                            <li><a class="dropdown-item" href="../master/productUpload.html">상품 등록</a></li>
+                          </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="../master/userManage.html">회원관리</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../master/deliveryManage.html">배송관리</a></li>
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">문의/리뷰목록</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="../master/qnaList.html">문의 목록</a></li>
+                            <li><a class="dropdown-item" href="../master/reviewList.html">리뷰 목록</a></li>
+                          </ul>
+                    </li>
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="../master/mailLog.html">메일 발송 목록</a></li>
+                            <li><a class="dropdown-item" href="../master/mailSend.html">메일 발송</a></li>
+                          </ul>
+                    </li>
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">쿠폰</a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="../master/couponMake.html">쿠폰 생성</a></li>
+                        <li><a class="dropdown-item" href="../master/couponList.html">생성된 쿠폰 리스트</a></li>
+                      </ul>
+                    </li>
                 </ul>
                 <span class="navbar-text">Admin01</span>
             </div>
