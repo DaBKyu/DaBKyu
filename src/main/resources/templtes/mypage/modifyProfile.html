@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 정보</title>
+    <link rel="stylesheet" href="/css/mypage.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+        }
+
+        #myMenu {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .user-icon {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .order-list {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .order-list-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .form-section {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-input {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex: 1;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close-button {
+            cursor: pointer;
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="myMenu">
+        <h2>mypage</h2>
+        <div class="user-icon">
+            <i class="fas fa-user-circle"></i> <!-- 사용자 아이콘 -->
+        </div>
+        <nav>
+            <div>
+                <div>나의 쇼핑</div>
+                <ul>
+                    <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
+                    <li><a href="cancelRefundChange.html" title="취소/반품/교환/">취소/반품/교환/</a></li>
+                    
+                </ul>
+            </div>
+            <div>
+                <div>나의 정보</div>
+                <ul>
+                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li> 
+                    <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
+                    <li><a href="deleteAccount.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 관심목록</div>
+                <ul>
+                    <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 활동</div>
+                <ul>
+                    <li><a href="reviews.html" title="리뷰 모음">리뷰 모음</a></li>
+                    <li><a href="myQuestion.html" title="문의 게시판">문의 게시판</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 혜택</div>
+                <ul>
+                    <li><a href="myCoupons.html" title="할인쿠폰">할인쿠폰</a></li>
+                    <li><a href="membership.html" title="등급">등급페이지</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <div class="order-list">
+        <div class="order-list-title">회원 정보</div>
+        <div class="form-section">
+            <label for="name">이름:</label>
+            <input type="text" id="name" class="modal-input" placeholder="이름 입력">
+        </div>
+        <div class="form-section">
+            <label for="email">이메일:</label>
+            <input type="email" id="email" class="modal-input" placeholder="이메일 입력">
+            <button id="emailChangeBtn">이메일 변경</button>
+        </div>
+        <div class="form-section">
+            <label for="password">비밀번호:</label>
+            <input type="password" id="password" class="modal-input" placeholder="비밀번호 입력">
+            <button id="passwordChangeBtn">비밀번호 변경</button>
+        </div>
+        <div class="form-section">
+            <label for="address">기본 배송지:</label>
+            <input type="text" id="address" class="modal-input" placeholder="배송지 입력">
+            <button>변경</button>
+        </div>
+        <div class="form-section">
+            <button id="editProfileLink">회원정보 수정</button>
+        </div>
+    </div>
+
+    <!-- 이메일 인증 모달 -->
+    <div id="emailVerificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeEmailModal">&times;</span>
+            <h3>이메일 인증</h3>
+            <p>새 이메일 주소를 입력하세요:</p>
+            <input type="email" id="newEmail" class="modal-input" placeholder="새 이메일 입력">
+            <button id="requestVerificationCodeBtn">인증번호 요청</button>
+            <p id="verificationSection" style="display:none; margin-top: 20px;">
+                인증번호 입력: 
+                <input type="text" id="verificationCode" class="modal-input" placeholder="인증번호 입력">
+                <button id="verifyCodeBtn">확인</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- 비밀번호 변경 모달 -->
+    <div id="passwordChangeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closePasswordModal">&times;</span>
+            <h3>비밀번호 변경</h3>
+            <p>기존 비밀번호:</p>
+            <input type="password" id="currentPassword" class="modal-input" placeholder="기존 비밀번호 입력">
+            <p>신규 비밀번호:</p>
+            <input type="password" id="newPassword" class="modal-input" placeholder="신규 비밀번호 입력">
+            <p>신규 비밀번호 확인:</p>
+            <input type="password" id="confirmNewPassword" class="modal-input" placeholder="신규 비밀번호 다시 입력">
+            <button id="confirmPasswordChangeBtn">비밀번호 변경</button>
+        </div>
+    </div>
+
+    <script>
+        // 이메일 변경 버튼 클릭 시 모달 열기
+        const emailChangeBtn = document.getElementById('emailChangeBtn');
+        const emailVerificationModal = document.getElementById('emailVerificationModal');
+        const closeEmailModal = document.getElementById('closeEmailModal');
+        const requestVerificationCodeBtn = document.getElementById('requestVerificationCodeBtn');
+        const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+        const verificationSection = document.getElementById('verificationSection');
+        const newEmail = document.getElementById('newEmail');
+        const verificationCode = document.getElementById('verificationCode');
+
+        emailChangeBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // 링크 기본 동작 방지
+            emailVerificationModal.style.display = 'block'; // 모달 열기
+        });
+
+        closeEmailModal.addEventListener('click', function() {
+            emailVerificationModal.style.display = 'none';
+        });
+
+        // 인증번호 요청 버튼 클릭 시
+        requestVerificationCodeBtn.addEventListener('click', function() {
+            const email = newEmail.value;
+            if (email) {
+                alert("인증번호가 요청되었습니다. 이메일을 확인해주세요.");
+                verificationSection.style.display = 'block'; // 인증번호 입력 필드 보이기
+            } else {
+                alert("이메일 주소를 입력해주세요.");
+            }
+        });
+
+        // 인증번호 확인 버튼 클릭 시
+        verifyCodeBtn.addEventListener('click', function() {
+            const code = verificationCode.value;
+            if (code) {
+                alert("인증이 완료되었습니다.");
+                emailVerificationModal.style.display = 'none'; // 모달 닫기
+            } else {
+                alert("인증번호를 입력해주세요.");
+            }
+        });
+
+        // 비밀번호 변경 버튼 클릭 시 모달 열기
+        const passwordChangeBtn = document.getElementById('passwordChangeBtn');
+        const passwordChangeModal = document.getElementById('passwordChangeModal');
+        const closePasswordModal = document.getElementById('closePasswordModal');
+        const confirmPasswordChangeBtn = document.getElementById('confirmPasswordChangeBtn');
+
+        passwordChangeBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            passwordChangeModal.style.display = 'block'; // 모달 열기
+        });
+
+        closePasswordModal.addEventListener('click', function() {
+            passwordChangeModal.style.display = 'none';
+        });
+
+        // 비밀번호 변경 확인 버튼 클릭 시
+        confirmPasswordChangeBtn.addEventListener('click', function() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            if (currentPassword && newPassword && confirmNewPassword) {
+                if (newPassword === confirmNewPassword) {
+                    alert("비밀번호가 변경되었습니다.");
+                    passwordChangeModal.style.display = 'none'; // 모달 닫기
+                } else {
+                    alert("신규 비밀번호가 일치하지 않습니다.");
+                }
+            } else {
+                alert("모든 필드를 입력해주세요.");
+            }
+        });
+
+        // 회원정보 수정 버튼 클릭 시
+        const editProfileLink = document.getElementById('editProfileLink');
+        editProfileLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            alert("회원정보가 수정되었습니다.");
+        });
+
+        // 모달 외부 클릭 시 모달 닫기
+        window.onclick = function(event) {
+            if (event.target == emailVerificationModal) {
+                emailVerificationModal.style.display = "none";
+            }
+            if (event.target == passwordChangeModal) {
+                passwordChangeModal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

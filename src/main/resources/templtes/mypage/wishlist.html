@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>찜 리스트</title>
+    <link rel="stylesheet" href="/css/mypage.css"> <!-- CSS 파일 연결 -->
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+        }
+
+        #myinterest {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .product-list {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+        .product-item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .product-item button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .product-item button:hover {
+            background-color: #0056b3;
+        }
+
+        .select-all {
+            margin-bottom: 10px;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .close-button {
+            cursor: pointer;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+        }
+
+        .close-button:hover {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div id="myMenu">
+        <h2>mypage</h2>
+        <div class="user-icon">
+            <i class="fas fa-user-circle"></i> <!-- 사용자 아이콘 -->
+        </div>
+        <nav>
+            <div>
+                <div>나의 쇼핑</div>
+                <ul>
+                    <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
+                    <li><a href="cancelRefundChange.html" title="취소/반품/교환/">취소/반품/교환/</a></li>
+                    
+                </ul>
+            </div>
+            <div>
+                <div>나의 정보</div>
+                <ul>
+                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li> 
+                    <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
+                    <li><a href="deleteAccount.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 관심목록</div>
+                <ul>
+                    <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 활동</div>
+                <ul>
+                    <li><a href="reviews.html" title="리뷰 모음">리뷰 모음</a></li>
+                    <li><a href="myQuestion.html" title="문의 게시판">문의 게시판</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 혜택</div>
+                <ul>
+                    <li><a href="myCoupons.html" title="할인쿠폰">할인쿠폰</a></li>
+                    <li><a href="membership.html" title="등급">등급페이지</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <div class="product-list">
+        <h2>찜한 상품 목록</h2>
+        <div class="select-all">
+            <input type="checkbox" id="selectAll"> 전체 선택
+            <button id="deleteSelectedBtn">선택 삭제</button>
+            <button id="addToCartBtn">장바구니 담기</button>
+        </div>
+
+        <div class="product-item">
+            <input type="checkbox" class="product-checkbox">
+            <img src="product1.jpg" alt="상품 이미지">
+            <div>상품 이름 1</div>
+            <button class="remove-btn">삭제</button>
+        </div>
+
+        <div class="product-item">
+            <input type="checkbox" class="product-checkbox">
+            <img src="product2.jpg" alt="상품 이미지">
+            <div>상품 이름 2</div>
+            <button class="remove-btn">삭제</button>
+        </div>
+
+        <div class="product-item">
+            <input type="checkbox" class="product-checkbox">
+            <img src="product3.jpg" alt="상품 이미지">
+            <div>상품 이름 3</div>
+            <button class="remove-btn">삭제</button>
+        </div>
+    </div>
+
+    <!-- 구매하기 모달 -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal">&times;</span>
+            <h3>상품 구매하기</h3>
+            <img id="modalProductImage" src="" alt="상품 이미지" style="width: 100%; max-width: 200px; margin-bottom: 10px;">
+            <div id="modalProductName"></div>
+            <div id="modalProductPrice"></div>
+            <button id="confirmPurchaseBtn">구매하기</button>
+        </div>
+    </div>
+
+    <script>
+        // 전체 선택 체크박스 기능
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const productCheckboxes = document.querySelectorAll('.product-checkbox');
+
+        selectAllCheckbox.addEventListener('change', function() {
+            productCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+
+        // 선택 삭제 버튼 기능
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        deleteSelectedBtn.addEventListener('click', function() {
+            productCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    checkbox.closest('.product-item').remove();
+                }
+            });
+        });
+
+        // 장바구니 담기 버튼 기능
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        addToCartBtn.addEventListener('click', function() {
+            const selectedProducts = [];
+            productCheckboxes.forEach((checkbox, index) => {
+                if (checkbox.checked) {
+                    const productName = `상품 이름 ${index + 1}`;
+                    const productPrice = `${(index + 1) * 10000} 원`; // 예시 가격
+                    const productImage = `product${index + 1}.jpg`; // 예시 이미지 경로
+                    selectedProducts.push({ name: productName, price: productPrice, image: productImage });
+                }
+            });
+            if (selectedProducts.length > 0) {
+                // 모달에 상품 정보 세팅
+                const product = selectedProducts[0]; // 첫 번째 상품만 예시로 표시
+                document.getElementById('modalProductName').textContent = product.name;
+                document.getElementById('modalProductPrice').textContent = product.price;
+                document.getElementById('modalProductImage').src = product.image;
+                document.getElementById('purchaseModal').style.display = 'block'; // 모달 열기
+            } else {
+                alert('선택된 상품이 없습니다.');
+            }
+        });
+
+        // 개별 삭제 버튼 기능
+        const removeBtns = document.querySelectorAll('.remove-btn');
+        removeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                btn.closest('.product-item').remove();
+            });
+        });
+
+        // 모달 닫기 기능
+        const closeModal = document.getElementById('closeModal');
+        closeModal.addEventListener('click', function() {
+            document.getElementById('purchaseModal').style.display = 'none'; // 모달 닫기
+        });
+
+        // 모달 외부 클릭 시 모달 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('purchaseModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+
+        // 구매하기 버튼 기능 (추가 필요시)
+        const confirmPurchaseBtn = document.getElementById('confirmPurchaseBtn');
+        confirmPurchaseBtn.addEventListener('click', function() {
+            alert('구매가 완료되었습니다.');
+            document.getElementById('purchaseModal').style.display = 'none'; // 모달 닫기
+        });
+    </script>
+</body>
+</html>
