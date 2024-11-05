@@ -1,11 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 페이지</title>
+<style>
+.ModifyForm {
+  width:400px;
+  height:auto;
+  margin: auto;
+  padding: 20px, 20px;
+  text-align: left;
+  background-color:#FFFFFF;
+  text-align: center;
+  border:2px solid #adabab;
+  border-radius: 10px;
+}
+</style>
 </head>
 <body>
+<div class="ModifyForm" align="center">
+    <div class="WriteForm">
+        <h1>로그인</h1>
+        <form name="loginForm" id="loginForm" method="post">
+            <!-- 아이디 기억 체크박스 -->
+            <input type="checkbox" id="rememberEmail" onclick="checkRememberEmail()" style="margin-left:-207px;">아이디 기억<br>
+            
+            <!--패스워드 기억 체크박스<input type="checkbox" id="rememberPassword" onclick="checkRememberPassword()">-->
+
+            <!-- 이메일 입력란 -->
+            <input type="text" class="input_field" id="email" name="email" placeholder="Email" style="width: 300px; height: 40px; border-radius: 5px; border: 1px solid; margin-bottom: 2px;"><br>
+
+            <!-- 패스워드 입력란 -->
+            <input type="password" class="input_field" id="password" name="password" placeholder="password" style="width: 300px; height: 40px; border-radius: 5px; border: 1px solid;" onkeydown="press()"><br>
+            
+            <!-- 자동 로그인 체크박스 -->
+            <input type="checkbox" id="rememberMe" class="remember" name="remember-me" onclick="checkRememberMe()" style="margin-left:-168px;">로그인 상태 유지<br>
+            
+            <p id="msg" style="color:red; text-align:center"></p>
+            <!-- 로그인 버튼 -->
+            <input type="button" id="btn_login" class="btn_login" value="Login" onclick="loginCheck()" style="width: 300px; height: 40px; margin-bottom: 20px; background-color: black; color: white; border-radius: 5px; border: 1px solid black;">
+
+            <br>
+
+            <a href="/oauth2/authorization/google" class="btn_login" style="display: inline-block; width: 300px; height: 40px; margin-bottom: 5px; text-align: center; line-height: 40px; text-decoration: none; border-radius: 5px; border: 1px solid black;">
+                Sign in with Google
+            </a>
+            <br>
+            <a href="/oauth2/authorization/naver" class="btn_login" style="display: inline-block; width: 300px; height: 40px; text-align: center; line-height: 40px;  text-decoration: none; border-radius: 5px; border: 1px solid black;">
+                Sign in with Naver
+            </a>
+            
+        
+            		
+        </form>
+        
+        <div class="bottomText">
+            <a href="/member/signup" style="text-decoration: none;" onmouseover="this.style.background='#e3e3e3';"
+            onmouseout="this.style.background='white'; this.style.textDecoration='none';">회원가입</a>
+            <a href="/member/searchID" 
+               style="text-decoration: none;" 
+               onmouseover="this.style.background='#e3e3e3'; this.style.textDecoration='none';" 
+               onmouseout="this.style.background='white'; this.style.textDecoration='none';">아이디 찾기</a>
+            <a href="/member/searchPassword" 
+               style="text-decoration: none;" 
+               onmouseover="this.style.background='#e3e3e3'; this.style.textDecoration='none';" 
+               onmouseout="this.style.background='white'; this.style.textDecoration='none';">비밀번호 찾기</a>
+            <br><br>
+        </div>
     
+    </div>
+</div>
 </body>
 </html>
