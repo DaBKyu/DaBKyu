@@ -5,17 +5,24 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.entity.AddressEntity;
+import com.dabkyu.dabkyu.entity.MemberAddressEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
+import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
-import com.dabkyu.dabkyu.entity.repository.AddressRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberAddressRepository;
+//import com.dabkyu.dabkyu.entity.repository.AddressRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
+import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionFileRepository;
-import com.dabkyu.dabkyu.entity.repository.QuestionRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewFileRepository;
 
 import lombok.AllArgsConstructor;
@@ -25,8 +32,9 @@ import lombok.AllArgsConstructor;
 public class MemberServiceImpl implements MemberService {
     
     private final MemberRepository memberRepository;
-	private final AddressRepository addressRepository;
-    private final QuestionRepository questionRepository;
+	//private final AddressRepository addressRepository;
+    private final OrderProductRepository orderProductRepository;
+    private final MemberAddressRepository memberAddressRepository;
 	private final QuestionFileRepository questionFileRepository;
 	private final ReviewFileRepository reviewFileRepository;
     
@@ -35,23 +43,23 @@ public class MemberServiceImpl implements MemberService {
     public void signup(MemberDTO member) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:mm:ss");
         MemberEntity memberEntity = MemberEntity.builder()
-                                                .email(member.getEmail())
-                                                .password(member.getPassword())
-                                                .telno(member.getTelno())
-                                                .username(member.getUsername())
-                                                .memberGrade("BRONZE")
-                                                .regdate(LocalDateTime.now())
-                                                .lastpwDate(LocalDateTime.now())
-                                                .fromSocial("N")
-                                                .pwcheck(0)
-                                                .point(0)
-                                                .role("USER")
-                                                .notificationYn(member.getNotificationYn())
-                                                .emailRecept(member.getEmailRecept())
-                                                .emailReceptDate(LocalDateTime.parse("2000-01-01, 00:00:00", formatter))
-                                                .gender(member.getGender())
-                                                .birthday(member.getBirthday())
-                                                .build();
+                                                                                  .email(member.getEmail())
+                                                                                  .password(member.getPassword())
+                                                                                  .telno(member.getTelno())
+                                                                                  .username(member.getUsername())
+                                                                                  .memberGrade("BRONZE")
+                                                                                  .regdate(LocalDateTime.now())
+                                                                                  .lastpwDate(LocalDateTime.now())
+                                                                                  .fromSocial("N")
+                                                                                  .pwcheck(0)
+                                                                                  .point(0)
+                                                                                  .role("USER")
+                                                                                  .notificationYn(member.getNotificationYn())
+                                                                                  .emailRecept(member.getEmailRecept())
+                                                                                  .emailReceptDate(LocalDateTime.parse("2000-01-01, 00:00:00", formatter))
+                                                                                  .gender(member.getGender())
+                                                                                  .birthday(member.getBirthday())
+                                                                                  .build();
         memberRepository.save(memberEntity);
     }
 
@@ -60,6 +68,51 @@ public class MemberServiceImpl implements MemberService {
     public void modifyMemberInfo(MemberDTO member) {
         MemberEntity memberEntity = memberRepository.findById(member.getEmail()).get();
         memberEntity.modifyMemberInfo(member);
+    }
+
+    // 회원 주문제품 내역
+    @Override
+	public Page<OrderProductEntity> orderProductList(String email, int page, int orderNum, String keyword) {
+        PageRequest pageRequest = PageRequest.of(page -1, orderNum, Sort.by(Direction.DESC, "orderProductSeqno"));
+        return orderProductRepository.findOrderProductsByEmailAndProductNameContaining(email, keyword, pageRequest);
+    }
+
+    // 배송지 목록 조회
+    @Override
+	public List<MemberAddressEntity> addressList(String email) {
+        return memberAddressRepository.findByEmail(email);
+    }
+
+	// 배송지 상세 조회
+    @Override
+	public MemberAddressDTO viewAddress(Long memberAddressSeqno) {
+        return memberAddressRepository.findById(memberAddressSeqno).map(addr -> new MemberAddressDTO(addr)).get();
+    }
+
+	// 배송지 등록
+    @Override
+	public void addAddress(MemberAddressDTO address) {
+        memberAddressRepository.save(address.dtoToEntity(address));
+    }
+
+	// 배송지 수정
+    @Override
+	public void modifyAddress(MemberAddressDTO address) {
+        MemberAddressEntity memberAddressEntity = memberAddressRepository.findById(address.getMemberAddressSeqno()).get();
+        memberAddressEntity.setAddrName(address.getAddrName());
+        memberAddressEntity.setAddress(address.getAddress());
+        memberAddressEntity.setZipcode(address.getZipcode());
+        memberAddressEntity.setDetailAddr(address.getDetailAddr());
+        memberAddressEntity.setRequest(address.getRequest());
+        memberAddressEntity.setIsBasic(address.getIsBasic());
+        memberAddressRepository.save(memberAddressEntity);
+    }
+
+    // 배송지 삭제
+    @Override
+	public void deleteAddress(Long seqno) {
+        MemberAddressEntity memberAddressEntity = memberAddressRepository.findById(seqno).get();
+        memberAddressRepository.delete(memberAddressEntity);
     }
 
     // 회원비밀번호수정
@@ -100,8 +153,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDTO memberInfo(String email) {
        return memberRepository.findById(email)
-                              .map((member) -> new MemberDTO(member))
-                              .get();
+                                                .map((member) -> new MemberDTO(member))
+                                                .get();
     }
 
     // 로그인, 로그아웃, 패스워드 변경 시간 업데이트
@@ -126,22 +179,19 @@ public class MemberServiceImpl implements MemberService {
     // 회원이 등록한 문의 첨부파일 삭제
     @Override
     public List<QuestionFileEntity> getStoredQuestionFilenameList(String email) {
-
-        return questionFileRepository.findByQueSeqno()
+        return questionFileRepository.findByEmail(email);
     }
 
     // 회원이 등록한 리뷰 첨부파일 삭제
     @Override
     public List<ReviewFileEntity> getStoredReviewFilenameList(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getStoredReviewFilenameList'");
+        return reviewFileRepository.findByEmail(email);
     }
 
     // 회원정보 삭제
     @Override
     public void deleteID(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteID'");
+        MemberEntity memberEntity = memberRepository.findById(email).get();
+        memberRepository.delete(memberEntity);
     }
-
 }

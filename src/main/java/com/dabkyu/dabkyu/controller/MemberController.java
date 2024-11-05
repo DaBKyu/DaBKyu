@@ -4,14 +4,19 @@ import java.io.File;
 import java.net.URLEncoder;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
+import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.entity.MemberAddressEntity;
+import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 import com.dabkyu.dabkyu.service.MemberService;
+import com.dabkyu.dabkyu.util.PageUtil;
 import com.dabkyu.dabkyu.util.PasswordMaker;
 
 import jakarta.servlet.http.HttpSession;
@@ -35,13 +40,16 @@ public class MemberController {
     private final MemberService service;
     private final BCryptPasswordEncoder pwdEncoder;
     
+
     // 로그인 화면
     @GetMapping("/member/login")
     public void getLogin() {}
 
+
     // 로그인(Spring Security)
     @PostMapping("/member/login")
     public void postLogin() {}
+
 
     // Spring Security 이후 로그인 처리
     @ResponseBody
@@ -61,6 +69,7 @@ public class MemberController {
         return "{\"message\":\"good\"}";
     }
     
+
     // 로그아웃 전처리
     @GetMapping("/member/beforeLogout")
     public String getBeforeLogout(HttpSession session) throws Exception {
@@ -71,14 +80,17 @@ public class MemberController {
         return "redirect:/member/logout";
     }
 
+
     // 로그아웃(Spring Security)
     @GetMapping("/member/logout")
     public void getLogout(HttpSession session) throws Exception {}
+
 
     // 회원가입 화면
     @GetMapping("/member/signup")
     public void getSignup() {}
     
+
     // 회원가입, 회원 정보 수정
     @ResponseBody
     @PostMapping("/member/signup")
@@ -103,16 +115,114 @@ public class MemberController {
         return "{\"username\":" + URLEncoder.encode(member.getUsername(), "UTF-8") + "\", \"status\":\"good\"}";
     }
     
+
     // OAuth2 회원가입
     @PostMapping("/member/oauth2Signup")
     public void postOAuth2Signup() throws Exception {}
+
+
+    // 마이페이지
+    @GetMapping("/mypage")
+    public void getMypage(
+        Model model,
+        HttpSession session,
+        @RequestParam(name = "keyword",defaultValue = "",required = false)
+        String keyword,
+        @RequestParam("page")
+        int page
+    ) throws Exception {
+
+        String email = (String) session.getAttribute("email");
+
+        int orderNum = 5;   // 한 번에 보여줄 주문 갯수
+        int pagelistNum = 10;   // 페이지 리스트 갯수
+
+        PageUtil pageUtil = new PageUtil();
+        Page<OrderProductEntity> orderProductList = service.orderProductList(email, page, orderNum, keyword);
+        int totalCount = (int) orderProductList.getTotalElements();
+
+        model.addAttribute("orderProductList", orderProductList);
+        model.addAttribute("listIsEmpty", orderProductList.hasContent()?"N":"Y");
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("page", page);
+        model.addAttribute("orderNum", orderNum);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("pageList", pageUtil.getOrderList(page, orderNum, pagelistNum, totalCount, keyword));
+    }
     
+
+    // 취소, 환불, 교환 내역 조회
+    @GetMapping("/mypage/cancelRefundChange")
+    public void getCancelRefundChange(
+        Model model,
+        HttpSession session
+    ) throws Exception {
+
+        String email = (String) session.getAttribute("email");
+        // 취소, 환불 교환 내역 관리 테이블 필요
+    }
+    
+
+    // 배송지 조회
+    @GetMapping("/mypage/address")
+    public void getAddress(Model model, HttpSession session) throws Exception {
+        
+        String email = (String) session.getAttribute("email");
+        List<MemberAddressEntity> addressList = service.addressList(email);
+
+        model.addAttribute("listIsEmpty", addressList.isEmpty()?"Y":"N");
+        model.addAttribute("addressList", addressList);
+    }
+
+
+    // 배송지 추가 화면
+    @GetMapping("/mypage/addAddress")
+    public void gerAddAddress() {}
+    
+
+    // 배송지 수정 화면
+    @GetMapping("/mypage/modifyAddress")
+    public void getModifyAddress(
+        Model model,
+        @RequestParam("memberAddressSeqno")
+        Long seqno
+    ) throws Exception {
+        
+        model.addAttribute("viewAddress", service.viewAddress(seqno));
+    }
+    
+    
+    // 배송지 등록
+    @PostMapping("/mypage/addAddress")
+    public String postAddAddress(MemberAddressDTO address) throws Exception {
+        service.addAddress(address);
+        return "{\"message\":\"good\"}";
+    }
+    
+
+    // 배송지 수정
+    @PostMapping("/mypage/modifyAddress")
+    public String postModifyAddress(MemberAddressDTO address) throws Exception {
+        service.modifyAddress(address);
+        return "{\"message\":\"good\"}";
+    }
+    
+
+    // 배송지 삭제
+    @GetMapping("/mypage/deleteAddress")
+    public String getDeleteAddress(@RequestParam("seqno") Long seqno) throws Exception {
+        service.deleteAddress(seqno);
+        return "redirect:/mypage/address";
+    }
+    
+
     // 회원 정보 화면
     @GetMapping("/mypage/memberInfo")
     public void getMemberInfo(Model model, HttpSession session) {
         String email = (String) session.getAttribute("email");
         model.addAttribute("member", service.memberInfo(email));
     }
+
 
     // 회원 정보 수정 화면
     @GetMapping("/mypage/modifyMemberInfo")
@@ -121,10 +231,12 @@ public class MemberController {
         model.addAttribute("member", service.memberInfo(email));
     }
     
+
     // 아이디 찾기 화면
     @GetMapping("/member/searchID")
     public void getSearchID() {}
     
+
     // 아이디 찾기
     @PostMapping("/member/searchID")
     public String postSearchID(
@@ -140,9 +252,11 @@ public class MemberController {
         return "{\"message\":\"" + email + "\"}";
     }
     
+
     // 비밀번호 찾기 화면
     @GetMapping("/member/searchPassword")
     public void getSearchPassword() {}
+
 
     // 비밀번호 찾기(임시 비밀번호)
     @ResponseBody
@@ -172,10 +286,12 @@ public class MemberController {
         return "{\"message\":\"good\", \"tempPW\":\"" + tempPW + "\"}";
     }
     
+
     // 비밀번호 변경 화면
     @GetMapping("/mypage/modifyMemberPassword")
     public void getModifyMemberPassword() {}
     
+
     // 비밀번호 변경
     @PostMapping("/mypage/modifyMemberPassword")
     public String postModifyMemberPassword(
@@ -198,6 +314,7 @@ public class MemberController {
         return "{\"message\":\"good\"}";
     }
     
+
     // 30일 이후 비밀번호 변경 화면 보기
     @GetMapping("/mypage/checkPasswordNotice")
     public void getCheckPasswordNotice(
@@ -211,6 +328,7 @@ public class MemberController {
         model.addAttribute("addedDate", addedDate);
     }
     
+
     // 비밀번호 변경 30일 이후로 연기
     @GetMapping("/mypage/modifyPasswordAfter30")
     public String getModifyPasswordAfter30(HttpSession session) throws Exception {
@@ -219,6 +337,7 @@ public class MemberController {
         return "redirect:/shop/list?page=1";
     }
     
+
     // 아이디 중복 확인
     @ResponseBody
     @PostMapping("/member/idCheck")
@@ -228,6 +347,7 @@ public class MemberController {
     
 
     // 주소 검색(api로 대체할지 논의 필요)
+
 
     // 회원 탈퇴
     @Transactional
@@ -279,5 +399,4 @@ public class MemberController {
 
         return "redirect:/";
     }
-    
 }

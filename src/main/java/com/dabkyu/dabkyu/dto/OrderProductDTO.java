@@ -21,7 +21,7 @@ public class OrderProductDTO {
 	private int price;
 
     public OrderProductDTO(OrderProductEntity entity) {
-        this.orderproductSeqno = entity.getOrderproductSeqno();
+        this.orderproductSeqno = entity.getOrderProductSeqno();
         this.productSeqno = entity.getProductSeqno();
         this.reviewYn = entity.getReviewYn();
         this.amount = entity.getAmount();
@@ -30,7 +30,7 @@ public class OrderProductDTO {
 
     public OrderProductEntity dtoToEntity(OrderProductDTO dto) {
         OrderProductEntity entity = OrderProductEntity.builder()
-                                                      .orderproductSeqno(dto.getOrderproductSeqno())
+                                                      .orderProductSeqno(dto.getOrderproductSeqno())
                                                       .productSeqno(dto.getProductSeqno())
                                                       .reviewYn(dto.getReviewYn())
                                                       .amount(dto.getAmount())

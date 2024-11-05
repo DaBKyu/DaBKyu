@@ -41,5 +41,4 @@ public class ReviewFileEntity {
 	@Column(name="stored_filename", length=200, nullable=false)
 	private String storedFilename;
 
-
 }

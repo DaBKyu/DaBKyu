@@ -61,19 +61,4 @@ public class ReviewEntity {
     @Column(name="secret_yn",length = 2,nullable=false)
 	private String secretYn;
 
-
-
-
-
-
-
-    
-
-
-
-    
-
-
-
-
 }

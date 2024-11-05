@@ -22,14 +22,14 @@ public class OrderDetailDTO {
     public OrderDetailDTO(OrderDetailEntity entity) {
         this.orderDetailSeqno = entity.getOrderDetailSeqno();
         this.orderSeqno = entity.getOrderSeqno();
-        this.orderproduct_seqno = entity.getOrderproduct_seqno();
+        this.orderproduct_seqno = entity.getOrderproductSeqno();
     }
 
     public OrderDetailEntity dtoToEntity(OrderDetailDTO dto) {
         OrderDetailEntity entity = OrderDetailEntity.builder()
                                                     .orderDetailSeqno(dto.getOrderDetailSeqno())
                                                     .orderSeqno(dto.getOrderSeqno())
-                                                    .orderproduct_seqno(dto.getOrderproduct_seqno())
+                                                    .orderproductSeqno(dto.getOrderproduct_seqno())
                                                     .build();
         return entity;
     }

@@ -23,7 +23,7 @@ public class OrderProductEntity {
 
     @Id
     @Column(name="orderproduct_seqno",nullable=false)
-	private Long orderproductSeqno;
+	private Long orderProductSeqno;
 
     @ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)
@@ -38,11 +38,5 @@ public class OrderProductEntity {
 
     @Column(name="price",nullable=false)
 	private int price;
-
-
-
-
-
-
 
 }

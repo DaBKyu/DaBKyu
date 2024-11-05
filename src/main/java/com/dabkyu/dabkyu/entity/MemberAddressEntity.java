@@ -6,9 +6,12 @@ import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +25,9 @@ import lombok.Setter;
 public class MemberAddressEntity {
 
     @Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MEMBERADDRESS_SEQ")	
+	@SequenceGenerator(name="MEMBERADDRESS_SEQ", sequenceName = "memberAddress_seq", 
+		initialValue = 1, allocationSize = 1)
 	@Column(name="member_address_seqno")
 	private Long memberAddressSeqno;
 	
@@ -29,6 +35,9 @@ public class MemberAddressEntity {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name="email", nullable = false)
 	private MemberEntity email;
+
+	@Column(name="addrName", length=20,nullable=false)
+	private String addrName;
 
     @Column(name="address", length=200, nullable=false)
 	private String address;
@@ -39,7 +48,9 @@ public class MemberAddressEntity {
     @Column(name="detail_addr", length=20, nullable=false)
 	private String detailAddr;
 
-	
+	@Column(name="request",length=200,nullable=true)
+	private String request;
 
-
+	@Column(name="isBasic",length=2,nullable=false)
+	private String isBasic;
 }

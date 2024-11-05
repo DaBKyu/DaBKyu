@@ -33,7 +33,6 @@ public class OrderDetailEntity {
     @ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name="orderproduct_seqno", nullable = false)
-	private OrderProductEntity orderproduct_seqno;
-
+	private OrderProductEntity orderproductSeqno;
 
 }

@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.entity.AddressEntity;
+import com.dabkyu.dabkyu.entity.MemberAddressEntity;
+import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 
@@ -16,6 +19,26 @@ public interface MemberService {
 
     // 회원 정보 수정
 	public void modifyMemberInfo(MemberDTO member);
+
+	// 회원 주문제품 내역
+	public Page<OrderProductEntity> orderProductList(String email, int page, int orderNum, String keyword);
+
+	// 취소, 환불, 교환 내역 조회
+
+	// 배송지 목록 조회
+	public List<MemberAddressEntity> addressList(String email);
+
+	// 배송지 상세 조회
+	public MemberAddressDTO viewAddress(Long memberAddressSeqno);
+
+	// 배송지 등록
+	public void addAddress(MemberAddressDTO address);
+
+	// 배송지 수정
+	public void modifyAddress(MemberAddressDTO address);
+
+	// 배송지 삭제
+	public void deleteAddress(Long seqno);
 	
 	// 패스워드 변경
 	public void modifyMemberPassword(MemberDTO member);

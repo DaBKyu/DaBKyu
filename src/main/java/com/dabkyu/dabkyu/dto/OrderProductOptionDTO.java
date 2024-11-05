@@ -19,13 +19,13 @@ public class OrderProductOptionDTO {
 	private ProductOptionEntity optionSeqno;
 
     public OrderProductOptionDTO(OrderProductOptionEntity entity) {
-        this.orderproductSeqno = entity.getOrderproductSeqno();
+        this.orderproductSeqno = entity.getOrderProductSeqno();
         this.optionSeqno = entity.getOptionSeqno();
     }
 
     public OrderProductOptionEntity dtoToEntity(OrderProductOptionDTO dto) {
         OrderProductOptionEntity entity = OrderProductOptionEntity.builder()
-                                                                  .orderproductSeqno(dto.getOrderproductSeqno())
+                                                                  .orderProductSeqno(dto.getOrderproductSeqno())
                                                                   .optionSeqno(dto.getOptionSeqno())
                                                                   .build();
         return entity;

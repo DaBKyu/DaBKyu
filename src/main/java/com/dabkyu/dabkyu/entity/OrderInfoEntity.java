@@ -62,15 +62,4 @@ public class OrderInfoEntity {
     @Column(name="total_price", nullable=false)
 	private int totalPrice;
 
-
-
-
-
-
-
-
-
-
-
-
 }
