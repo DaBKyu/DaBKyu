@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>반응형 페이지</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/css/master.css">
+</head>
+<body>
+
+  <!-- 상단 네비게이션 바 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">관리자 페이지</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">상품관리</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">회원관리</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">배송관리</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">문의목록</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <h4 style="display: inline-block">쿠폰 생성</h3>&emsp;&emsp;&emsp;
+    <h4 style="display: inline-block">생성된 쿠폰 리스트</h3>
+    <hr>
+
+    <div class="row">
+      <div class="col-lg-6 col-md-12 mb-4">
+
+        <!-- 쿠폰 적용범위-->
+        <div class="mb-3">
+            <label for="" class="form-label" style="display: inline-block;">쿠폰 적용 범위</label>
+            <div class="input-group mb-3" >
+                <input type="text" class="form-control" aria-label="Text input with dropdown button" placeholder="모든상품">
+                <div class="dropdown">
+                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">카테고리1</a></li>
+                    <li><a class="dropdown-item" href="#">카테고리2</a></li>
+                    <li><a class="dropdown-item" href="#">카테고리3</a></li>
+
+                    <li class="dropend">
+                      <a class="dropdown-toggle dropdown-item" href="#"  data-bs-toggle="dropdown" aria-expanded="false">카테고리4</a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">카테고리1</a></li>
+                        <li><a class="dropdown-item" href="#">카테고리2</a></li>
+                        <li><a class="dropdown-item" href="#">카테고리3</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상품 검색 -->
+        <div class="mb-3">
+          <label for="productSearch" class="form-label">상품 검색</label>
+          <div class="input-group mb-1">
+            <input type="text" class="form-control" placeholder="" aria-label="productSearch" aria-describedby="button-addon2">
+            <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
+          </div>
+          <ul class="form-control mb-2 border p-2 select_list" >
+            <li>
+                <span>test</span>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            </li>
+            <li>
+                <span>test</span>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            </li>
+        </ul>
+        </div>
+
+
+
+
+        <!-- 선택된 카테고리 -->
+        <div class="mb-3">
+          <label for="" class="form-label">선택된 카테고리</label>
+          <ul class="form-control mb-2 border p-2 select_list" >
+            <li>
+                <span>test</span>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            </li>
+            <li>
+                <span>test</span>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            </li>
+        </ul>
+        </div>
+
+        <!-- 선택된 소카테고리 -->
+        <div class="mb-3">
+          <label for="" class="form-label">선택된 소카테고리</label>
+          <ul class="form-control mb-2 border p-2 select_list" >
+            <li>
+                <span>test</span>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            </li>
+            <li>
+                <span>test</span>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            </li>
+        </ul>
+        </div>
+
+        <!-- 선택된 상품 -->
+        <div class="mb-3">
+          <label for="" class="form-label">선택된 상품</label>
+          <ul class="form-control mb-2 border p-2 select_list" >
+            <li>
+                <span>test</span>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            </li>
+            <li>
+                <span>test</span>
+                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
+            </li>
+        </ul>
+        </div>
+
+      </div>
+
+      <!-- 오른쪽 -->
+      <div class="col-lg-6 col-md-12 mb-4">
+
+        <!-- 사용 혜택 -->
+        <div class="mb-3 row">
+          <label for="" class="form-label">사용 혜택</label>
+          <div class="col-2 w-auto">
+            <select class="form-select " aria-label="혜택 옵션 선택">
+              <option selected>옵션</option>
+              <option value="1">금액 할인</option>
+              <option value="2">비율 할인</option>
+            </select>
+          </div>
+          <div class="col-6 w-50"><input type="text" class="form-control"></div> 
+          <div class="col-3 w-auto">
+            <select class="form-select" aria-label="옵션 내용 설정">
+              <option selected>화폐설정</option>
+              <option value="1">KRW</option>
+              <option value="2">USD</option>
+              <option value="3">CNY</option>
+              <option value="4">%</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 사용 기간 -->
+        <div class="mb-4 row">
+          <label for="" class="form-label">사용 기간</label>
+          <div class="col-5"><input type="datetime-local" id="" class="form-control"></div>
+          ~
+          <div class="col-5"><input type="datetime-local" id="" class="form-control"></div>
+        </div>
+
+        <div class="mb-3">
+          <label for="" class="form-label">사용 옵션</label>&emsp;
+          <div class="form-check" style="display: inline-block;">
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+              추가 할인 가능
+            </label>
+          </div>
+        </div>
+
+
+        <!-- 권한 설정 -->
+        <div class="">
+          <label for="" class="form-label">권한 설정</label> &emsp;
+          <select id="" class="form-select mb-3 w-auto" style="display: inline-block;">
+            <option>플래티넘</option>
+            <option>골드</option>
+            <option>실버</option>
+            <option>브론즈</option>
+          </select><br><br><br><br>
+
+          <label for="" class="form-label">쿠폰명</label> &emsp;
+          <input type="text" id="" placeholder='쿠폰명 입력' class='form-control w-50' style="display: inline-block;">
+        </div>
+
+      </div> 
+    </div><hr>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type='submit' class='btn btn-primary'>생성</button>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap JS (필요 시) -->
+  <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'></script>
+
+</body>
+</html>
