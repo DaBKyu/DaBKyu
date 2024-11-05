@@ -1,4 +1,4 @@
-a{text-decoration: none;}
+a{text-decoration: none; color: #000000;}
 .dropdown-item {
     color: #000000;
     }
@@ -18,9 +18,7 @@ a{text-decoration: none;}
             top: 0;
             left: 100%;
         }
-        .dropend .dropdown-toggle {
-            margin-left: .5em;
-        }
+
 }
 ol, ul{padding: 0;}
 li{
