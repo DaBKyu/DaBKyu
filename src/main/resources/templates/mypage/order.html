@@ -81,6 +81,17 @@
             margin-top: 10px; /* 간격 조정 */
         }
 
+        .period-selection {
+            margin-top: 10px;
+        }
+
+        .period-select {
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
         /* Modal 스타일 */
         .modal {
             display: none; /* 기본적으로 숨김 */
@@ -145,6 +156,57 @@
         .review-form button:hover {
             background-color: #0056b3;
         }
+
+        /* period-selection의 드롭다운과 아이콘을 가로로 배치 */
+        .period-select-container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* 드롭다운과 아이콘 사이의 간격 */
+        }
+
+        .search-icon {
+            font-size: 1.25rem; /* 아이콘 크기 조정 */
+            color: #888;
+            cursor: pointer;
+        }
+
+        /* 이미지 크기 조정 및 위치 설정 */
+        .order-item {
+            position: relative;
+        }
+
+        .item-image {
+            display: block; /* 이미지를 블록 요소로 설정하여 아래 텍스트와 구분되도록 */
+            width: 64px; /* 이미지 크기 설정 */
+            height: 64px; /* 이미지 크기 설정 */
+            margin-bottom: 10px; /* 이미지와 텍스트 사이에 간격 설정 */
+            object-fit: cover; /* 이미지 비율 유지 */
+        }
+
+
+        .reason-category {
+         margin-bottom: 20px;
+        }
+
+        .reason-category h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .reason-category ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .reason-category li {
+            margin-bottom: 8px;
+        }
+
+        .reason-category label {
+            font-size: 1rem;
+        }
+        
     </style>
 </head>
 <body>
@@ -158,8 +220,7 @@
                 <div>나의 쇼핑</div>
                 <ul>
                     <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="cancelRefundChange.html" title="취소/반품/교환/">취소/반품/교환/</a></li>
-                    
+                    <li><a href="cancelRefundChange.html" title="취소/반품/교환">취소/반품/교환</a></li>
                 </ul>
             </div>
             <div>
@@ -201,34 +262,50 @@
             <i class="fas fa-search search-icon"></i> <!-- 검색 아이콘 추가 -->
         </div>
 
-        <div class="order-table">
-            <table class="order-details">
-                <tbody>
-                    <tr class="order-row">
-                        <td class="order-info">
-                            <div class="order-status">
-                                <span class="status-text" style="font-size: 1.25rem; font-weight: bold;">배송완료</span>
-                                <span class="arrival-date" style="color: #008C00;">10/16(수) 도착</span>
-                            </div>
-                            <div class="order-item">
-                                <div class="item-description">
-                                    <span class="item-name">충전기</span>
-                                    <div class="item-price">
-                                        <span class="item-price-value">0 원</span>
-                                        <span class="item-quantity">1개</span>
+        <!-- 주문 기간 설정 드롭다운 메뉴 추가 -->
+            <div class="period-selection">
+                <label for="periodSelect">주문 기간 설정:</label>
+                <div class="period-select-container">
+                    <select id="periodSelect" class="period-select">
+                        <option value="1개월">1개월</option>
+                        <option value="6개월">6개월</option>
+                        <option value="2024년">2024년</option>
+                        <option value="2023년">2023년</option>
+                    </select>
+                    <!-- 검색 아이콘 추가 -->
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+
+            <div class="order-table">
+                <table class="order-details">
+                    <tbody>
+                        <tr class="order-row">
+                            <td class="order-info">
+                                <div class="order-status">
+                                    <span class="status-text" style="font-size: 1.25rem; font-weight: bold;">배송완료</span>
+                                    <span class="arrival-date" style="color: #008C00;">10/16(수) 도착</span>
+                                </div>
+                                <div class="order-item">
+                                    <!-- 충전기 이미지 추가 -->
+                                    <img src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg" alt="충전기" class="item-image">
+                                    <div class="item-description">
+                                        <span class="item-name">충전기</span>
+                                        <div class="item-price">
+                                            <span class="item-price-value">0 원</span>
+                                            <span class="item-quantity">1개</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="order-actions">
-                            <button class="exchange-return" id="exchangeReturnBtn">교환, 반품 신청</button>
-                            <button class="write-review" id="writeReviewBtn">리뷰 작성하기</button> <!-- 리뷰 작성 버튼 -->
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                            </td>
+                            <td class="order-actions">
+                                <button class="exchange-return" id="exchangeReturnBtn">교환, 반품 신청</button>
+                                <button class="write-review" id="writeReviewBtn">리뷰 작성하기</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
     <!-- 리뷰 작성 모달 -->
     <div id="reviewModal" class="modal">
@@ -259,30 +336,54 @@
                     <span class="product-name">충전기</span>
                     <span class="product-quantity">1개</span>
                 </div>
+                <button class="prev-step-button" id="prevStepBtnExchange">이전 단계</button>
                 <button class="next-step-button" id="nextStepBtn">다음 단계</button>
             </div>
-            <div class="action-buttons">
-                <button class="prev-step-button" id="prevStepBtnExchange">이전 단계</button>
-                <button class="submit-button" disabled>신청하기</button>
-            </div>
-        </div>
+          
+        </div>  
     </div>
 
     <!-- 사유 선택 모달 -->
-    <div id="reasonSelectionModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h1 class="title">사유 선택</h1>
-            <span class="instruction">사유를 선택해 주세요</span>
+<div id="reasonSelectionModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h1 class="title">사유 선택</h1>
+        <span class="instruction">사유를 선택해 주세요</span>
+        
+        <!-- 단순 변심 -->
+        <div class="reason-category">
+            <h3>단순 변심</h3>
             <ul>
-                <li><input type="checkbox" id="reason1"><label for="reason1">상품 불량</label></li>
-                <li><input type="checkbox" id="reason2"><label for="reason2">사이즈 미스</label></li>
-                <li><input type="checkbox" id="reason3"><label for="reason3">주문 실수</label></li>
+                <li><input type="checkbox" id="reason1-1"><label for="reason1-1">상품이 마음에 들지 않음</label></li>
+                <li><input type="checkbox" id="reason1-2"><label for="reason1-2">더 저렴한 상품을 발견함</label></li>
             </ul>
-            <button class="next-step-button" id="nextStepAfterReasonBtn">다음 단계</button>
-            <button class="prev-step-button" id="prevStepBtnReason">이전 단계</button>
         </div>
+
+        <!-- 배송 문제 -->
+        <div class="reason-category">
+            <h3>배송 문제</h3>
+            <ul>
+                <li><input type="checkbox" id="reason2-1"><label for="reason2-1">다른 상품이 배송됨</label></li>
+            </ul>
+        </div>
+
+        <!-- 상품 문제 -->
+        <div class="reason-category">
+            <h3>상품 문제</h3>
+            <ul>
+                <li><input type="checkbox" id="reason3-1"><label for="reason3-1">상품의 구성품/부속품이 들어있지 않음</label></li>
+                <li><input type="checkbox" id="reason3-2"><label for="reason3-2">상품이 설명과 다름</label></li>
+                <li><input type="checkbox" id="reason3-3"><label for="reason3-3">상품이 파손되어 배송됨</label></li>
+                <li><input type="checkbox" id="reason3-4"><label for="reason3-4">상품 결함/기능에 이상이 있음</label></li>
+            </ul>
+        </div>
+
+        <!-- 버튼들 -->
+        <button class="prev-step-button" id="prevStepBtnReason">이전 단계</button>
+        <button class="next-step-button" id="nextStepAfterReasonBtn">다음 단계</button>
+        
     </div>
+</div>
 
     <!-- 해결 방법 선택 모달 -->
     <div id="solutionSelectionModal" class="modal">
@@ -292,10 +393,11 @@
             <span class="instruction">해결 방법을 선택해 주세요</span>
             <ul>
                 <li><input type="checkbox" id="solution1"><label for="solution1">환불</label></li>
-                <li><input type="checkbox" id="solution2"><label for="solution2">교환</label></li>
+                
             </ul>
-            <button class="submit-button" id="submitRequestBtn">신청하기</button>
             <button class="prev-step-button" id="prevStepBtnSolution">이전 단계</button>
+            <button class="submit-button" id="submitRequestBtn">신청하기</button>
+            
         </div>
     </div>
 

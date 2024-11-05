@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내 웹 페이지</title>
-    <link rel="stylesheet" href="/css/mypage.css"> <!-- CSS 파일 연결 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CSS 추가 -->
     <style>
         body {
@@ -36,6 +35,23 @@
 
         .search-container {
             margin-top: 20px;
+            display: flex; 
+            align-items: center; 
+        }
+
+        .search-input {
+            flex: 1; 
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-icon {
+            margin-left: 10px; 
+            color: #888;
+            font-size: 1.25rem; 
+            cursor: pointer;
         }
 
         .order-table {
@@ -50,28 +66,33 @@
         .delivery-years span {
             padding: 5px 10px; 
             border: 1px solid #ccc; 
-            border-radius: 5px; 
+            border-radius: 5px;
         }
 
         .delivery-period {
+            margin-top: 20px;
+        }
+
+        .order-summary {
             margin-top: 20px; 
         }
 
-        .order-summary, .order-details {
-            margin-top: 20px; 
+        .order-details {
+            margin-top: 10px; 
         }
 
         
         .modal {
             display: none; 
-            position: fixed;
+            position: fixed; 
             z-index: 1000; 
             left: 0;
             top: 0;
             width: 100%; 
             height: 100%; 
             overflow: auto; 
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgb(0, 0, 0); 
+            background-color: rgba(0, 0, 0, 0.4); 
         }
 
         .modal-content {
@@ -96,30 +117,106 @@
             cursor: pointer;
         }
 
-        /* 회원 등급 테이블 스타일 */
-        table {
+        .modal-input {
+            margin-top: 10px;
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ccc;
             padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .highlight {
-            background-color: #e7f3fe;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
         }
 
-        /* 등급 정보 스타일 */
-        .grade-info {
-            margin-top: 20px; /* 간격 조정 */
+        button {
             padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+        }
+        /* 탈퇴 비밀번호 입력 폼 스타일 */
+        .password-form {
+            margin-top: 20px;
+        }
+
+        .password-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
             border: 1px solid #ccc;
-            background-color: #f9f9f9;
+        }
+
+        .password-form button {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .password-form button:hover {
+            background-color: #c82333;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+        }
+
+        /* 회원정보 보기 스타일 */
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-info {
+            margin-bottom: 20px;
+        }
+
+        .profile-info label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .profile-info p {
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+
+        .edit-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -134,7 +231,7 @@
                 <div>나의 쇼핑</div>
                 <ul>
                     <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="cancelRefundChange.html" title="취소/반품/교환/">취소/반품/교환/</a></li>
+                   <li><a href="cancelRefundChange.html" title="취소/반품/교환">취소/반품/교환</a></li>
                     
                 </ul>
             </div>
@@ -168,51 +265,33 @@
             </div>
         </nav>
     </div>
-    <div class="order-list">
-        <div class="grade-info">
-            <h3>회원 정보</h3>
-            <p>총 금액: <strong>65 만원</strong></p>
-            <p>현재 등급: <strong>실버</strong></p>
-            <p>등급 업그레이드에 필요한 금액: <strong>5 만원</strong></p>
+
+    <!-- 회원정보 보기 -->
+    <div class="profile-container">
+        <h2>회원정보 보기</h2>
+        <div class="profile-info">
+            <label for="username">이름:</label>
+            <p id="username">홍길동</p>
+        </div>
+        <div class="profile-info">
+            <label for="email">이메일:</label>
+            <p id="email">honggildong@example.com</p>
+        </div>
+        <div class="profile-info">
+            <label for="password">비밀번호:</label>
+            <p id="password">******</p>
+        </div>
+        <div class="profile-info">
+            <label for="joinDate">가입일:</label>
+            <p id="joinDate">2022년 5월 14일</p>
+        </div>
+        <div class="profile-info">
+            <label for="address">기본 배송지:</label>
+            <p id="address">서울특별시 강남구 테헤란로 123, 101호</p>
         </div>
 
-        <!-- 회원 등급 및 혜택 표 -->
-        <h2>회원 등급 및 혜택</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>회원 등급</th>
-                    <th>필요 금액 (만원)</th>
-                    <th>적립률</th>
-                   
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="highlight">
-                    <td>브론즈</td>
-                    <td>10</td>
-                    <td>0.5%</td>
-                   
-                </tr>
-                <tr>
-                    <td>실버</td>
-                    <td>10 - 70</td>
-                    <td>1%</td>
-                  
-                </tr>
-                <tr class="highlight">
-                    <td>골드</td>
-                    <td>70이상 </td>
-                    <td>1.5%</td>
-                   
-                </tr>
-                <tr>
-                    <td>플래티넘</td>
-                    <td>100 이상</td>
-                    <td>2%</td>
-                 
-                </tr>
-            </tbody>
-        </table>
-
-      
+        <!-- 수정 버튼 -->
+        <a href="modifyProfile.html" class="edit-button">회원정보 수정</a>
+    </div>
+</body>
+</html>
