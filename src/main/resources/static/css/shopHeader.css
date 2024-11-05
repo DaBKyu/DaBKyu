@@ -1,0 +1,44 @@
+@charset "utf-8";
+
+body { font-family: "나눔고딕", "맑은고딕" }
+h1 { font-family: "HY견고딕" }
+a:link { color: black; }
+a:visited { color: black; }
+a:hover { color: red; }
+a:active { color: red; }
+a { text-decoration : none; cursor: hand; }
+
+.top_menu > a:hover { color: red; font-weight: bold; }
+.top_menu > a:active { color: red; font-weight: bold;}
+
+.top_menu {
+	
+	width: 90%;
+	height: 150px;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	text-align: right;
+	align-items: top;
+	background-color: white;
+	padding: 10px;
+	z-index:1;
+}
+
+.main_shop {
+	width: 90%;
+	height: auto;
+	text-align: center;
+	padding-top:200px;
+	margin: auto;
+	position:relative;
+	background-color: white;
+	
+}
+
+.title_img {
+    max-width: 40%;
+    height: auto;
+    margin: auto;
+}
