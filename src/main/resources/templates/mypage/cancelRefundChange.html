@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>취소/반품/교환/환불 내역</title>
+    <title>취소/환불/교환</title>
     <link rel="stylesheet" href="/css/mypage.css"> <!-- CSS 파일 연결 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CSS 추가 -->
     <style>
@@ -93,8 +93,8 @@
             <div>
                 <div>나의 쇼핑</div>
                 <ul>
-                    <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="cancelRefundChange.html" title="취소/반품/교환">취소/반품/교환</a></li>
+                    <li><a href="order.html" title="주문목록/배송현황">주문/배송현황</a></li>
+                    <li><a href="cancelRefundChange.html" title="취소/환불/교환">취소/환불/교환</a></li>
                     
                 </ul>
             </div>
@@ -110,6 +110,7 @@
                 <div>나의 관심목록</div>
                 <ul>
                     <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                    <li><a href="myCategory.html" title=" 카테고리 "> 카테고리</a></li>
                 </ul>
             </div>
             <div>
@@ -130,7 +131,7 @@
     </div>
     
     <div class="order-list">
-        <h1 class="order-list-title">취소/반품/교환</h1>
+        <h1 class="order-list-title">취소/환불/교환</h1>
         <div class="order-history">
             <table>
                 <thead>
@@ -153,9 +154,9 @@
                     <tr>
                         <td>789012</td>
                         <td>상품 B</td>
-                        <td>반품 승인</td>
+                        <td>환불 승인</td>
                         <td>2024-10-30</td>
-                        <td><button class="detail-button" onclick="openModal('주문 번호: 789012\n상품명: 상품 B\n상태: 반품 승인\n신청 날짜: 2024-10-30')">상세 보기</button></td>
+                        <td><button class="detail-button" onclick="openModal('주문 번호: 789012\n상품명: 상품 B\n상태: 환불 승인\n신청 날짜: 2024-10-30')">상세 보기</button></td>
                     </tr>
                    
                 </tbody>

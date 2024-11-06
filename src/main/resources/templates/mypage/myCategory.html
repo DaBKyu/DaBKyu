@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>할인 쿠폰 페이지</title>
+    <title>관심 카테고리 페이지</title>
     <link rel="stylesheet" href="/css/mypage.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -97,6 +97,58 @@
         .coupon-input button:hover {
             background-color: #0056b3;
         }
+
+        /* 관심 카테고리 추가 폼 스타일 */
+        .category-form {
+            margin-bottom: 20px;
+        }
+
+        .category-form input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .category-form button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .category-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .category-list {
+            margin-top: 20px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .category-item span {
+            font-size: 1rem;
+        }
+
+        .category-item button {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .category-item button:hover {
+            background-color: darkred;
+        }
     </style>
 </head>
 <body>
@@ -125,7 +177,7 @@
                 <div>나의 관심목록</div>
                 <ul>
                     <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
-                    <li><a href="myCategory.html" title=" 카테고리 "> 카테고리</a></li>
+                    <li><a href="myCategory.html" title="카테고리">카테고리</a></li>
                 </ul>
             </div>
             <div>
@@ -146,99 +198,72 @@
     </div>
 
     <div class="order-list">
-        <h2 class="order-list-title">할인 쿠폰 입력</h2>
-        <div class="coupon-input">
-            <input type="text" id="couponCode" placeholder="쿠폰 코드 입력">
-            <button id="submitCoupon">입력하기</button>
+        <h3>관심 카테고리 관리</h3>
+
+        <!-- 카테고리 추가 폼 -->
+        <div class="category-form">
+            <input type="text" id="categoryInput" placeholder="새로운 관심 카테고리 입력">
+            <button id="addCategoryBtn">카테고리 추가</button>
         </div>
 
-        <!-- Tab Menu -->
-        <div class="tab">
-            <button class="active" id="activeTabBtn">사용 가능한 쿠폰</button>
-            <button id="expiredTabBtn">사용 완료/기간 완료</button>
-        </div>
-
-        <!-- Tab Content -->
-        <div class="tab-content">
-            <div id="availableCoupons" class="order-history">
-                <h3>사용 가능한 쿠폰 목록</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>쿠폰명</th>
-                            <th>할인액</th>
-                            <th>사용조건</th>
-                            <th>유효기간</th>
-                            <th>쿠폰종류</th>
-                            <th>상태</th>
-                        </tr>
-                    </thead>
-                    <tbody id="couponTableBody">
-                        <tr>
-                            <td>여름 세일 쿠폰</td>
-                            <td>10,000원</td>
-                            <td>3만원 이상 구매 시</td>
-                            <td>2024-12-31</td>
-                            <td>일반</td>
-                            <td>사용가능</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="expiredCoupons" class="order-history" style="display: none;">
-                <h3>사용 완료/기간 완료 쿠폰 목록</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>쿠폰명</th>
-                            <th>할인액</th>
-                            <th>상태</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>추석 할인 쿠폰</td>
-                            <td>5,000원</td>
-                            <td>사용완료</td>
-                        </tr>
-                        <tr>
-                            <td>겨울 특가 쿠폰</td>
-                            <td>15,000원</td>
-                            <td>기간완료</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <!-- 관심 카테고리 목록 -->
+        <div class="category-list" id="categoryList">
+            <!-- 카테고리 항목들이 여기에 추가될 것입니다. -->
         </div>
     </div>
 
     <script>
-        document.getElementById('submitCoupon').addEventListener('click', function() {
-            const couponCode = document.getElementById('couponCode').value;
-            alert(`쿠폰 코드 "${couponCode}"이(가) 입력되었습니다.`);
-            document.getElementById('couponCode').value = ''; // 입력 필드 초기화
+        // 카테고리 추가 버튼 클릭 시
+        document.getElementById('addCategoryBtn').addEventListener('click', function() {
+            var categoryInput = document.getElementById('categoryInput');
+            var categoryName = categoryInput.value.trim();
+
+            if (categoryName !== '') {
+                addCategoryToList(categoryName);
+                categoryInput.value = ''; // 입력 필드 초기화
+            } else {
+                alert('카테고리 이름을 입력하세요.');
+            }
         });
 
-        // 탭 전환 기능
-        const activeTabBtn = document.getElementById('activeTabBtn');
-        const expiredTabBtn = document.getElementById('expiredTabBtn');
-        const availableCoupons = document.getElementById('availableCoupons');
-        const expiredCoupons = document.getElementById('expiredCoupons');
+        // 카테고리 삭제 함수
+        function deleteCategory(categoryName) {
+            var categoryList = document.getElementById('categoryList');
+            var categories = categoryList.getElementsByClassName('category-item');
 
-        activeTabBtn.addEventListener('click', function() {
-            activeTabBtn.classList.add('active');
-            expiredTabBtn.classList.remove('active');
-            availableCoupons.style.display = 'block';
-            expiredCoupons.style.display = 'none';
-        });
+            for (var i = 0; i < categories.length; i++) {
+                var item = categories[i];
+                if (item.querySelector('span').textContent === categoryName) {
+                    item.remove();
+                    break;
+                }
+            }
+        }
 
-        expiredTabBtn.addEventListener('click', function() {
-            expiredTabBtn.classList.add('active');
-            activeTabBtn.classList.remove('active');
-            availableCoupons.style.display = 'none';
-            expiredCoupons.style.display = 'block';
-        });
+        // 카테고리 목록에 항목 추가 함수
+        function addCategoryToList(categoryName) {
+            var categoryList = document.getElementById('categoryList');
+
+            // 새 카테고리 항목 생성
+            var categoryItem = document.createElement('div');
+            categoryItem.className = 'category-item';
+
+            var categoryText = document.createElement('span');
+            categoryText.textContent = categoryName;
+
+            var deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '삭제';
+            deleteBtn.addEventListener('click', function() {
+                deleteCategory(categoryName);
+            });
+
+            // 카테고리 항목에 텍스트와 삭제 버튼 추가
+            categoryItem.appendChild(categoryText);
+            categoryItem.appendChild(deleteBtn);
+
+            // 목록에 추가
+            categoryList.appendChild(categoryItem);
+        }
     </script>
 
 </body>

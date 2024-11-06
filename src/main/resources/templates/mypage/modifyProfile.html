@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원 정보</title>
+    <title>회원 정보 수정페이지</title>
     <link rel="stylesheet" href="/css/mypage.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -111,8 +111,7 @@
                 <div>나의 쇼핑</div>
                 <ul>
                     <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="cancelRefundChange.html" title="취소/반품/교환">취소/반품/교환</a></li>
-                    
+                    <li><a href="cancelRefundChange.html" title="취소/환불/교환">취소/환불/교환</a></li>
                 </ul>
             </div>
             <div>
@@ -127,6 +126,7 @@
                 <div>나의 관심목록</div>
                 <ul>
                     <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                    <li><a href="myCategory.html" title=" 카테고리 "> 카테고리</a></li>
                 </ul>
             </div>
             <div>
@@ -165,8 +165,31 @@
         <div class="form-section">
             <label for="address">기본 배송지:</label>
             <input type="text" id="address" class="modal-input" placeholder="배송지 입력">
-            <button>변경</button>
+            <!-- 배송지 변경을 위한 링크 추가 -->
+            <a href="address.html">
+                <button>변경</button>
+            </a>
         </div>
+
+        <!-- 이벤트와 혜택 수신 여부 질문 추가 -->
+        <div class="form-section">
+            <label>이벤트와 혜택에 대한 속시 안내를 이메일로 받으시겠습니까?</label>
+            </label>
+        </div>
+
+        <!-- 이메일 수신 여부 수정 -->
+        <div class="form-section">
+            
+            <label for="emailOptInYes">
+                <input type="radio" id="emailOptInYes" name="emailOptIn" value="yes">
+                수신 동의
+            </label>
+            <label for="emailOptInNo">
+                <input type="radio" id="emailOptInNo" name="emailOptIn" value="no">
+                수신 안함
+            </label>
+        </div>
+
         <div class="form-section">
             <button id="editProfileLink">회원정보 수정</button>
         </div>

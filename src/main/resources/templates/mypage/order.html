@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내 웹 페이지</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome CSS 추가 -->
+    <title>내 웹 주문 페이지</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Font Awesome CSS 추가 -->
     <style>
         body {
             display: flex;
@@ -12,19 +14,24 @@
         }
 
         #myMenu {
-            width: 250px; /* 메뉴 너비 조정 */
+            width: 250px;
+            /* 메뉴 너비 조정 */
             padding: 20px;
-            background-color: #f8f9fa; /* 배경 색상 */
+            background-color: #f8f9fa;
+            /* 배경 색상 */
         }
 
         .user-icon {
-            font-size: 2rem; /* 아이콘 크기 조정 */
+            font-size: 2rem;
+            /* 아이콘 크기 조정 */
             text-align: center;
-            margin-bottom: 20px; /* 아이콘과 메뉴 간의 간격 */
+            margin-bottom: 20px;
+            /* 아이콘과 메뉴 간의 간격 */
         }
 
         .order-list {
-            flex: 1; /* 나머지 공간을 차지 */
+            flex: 1;
+            /* 나머지 공간을 차지 */
             padding: 20px;
         }
 
@@ -35,12 +42,15 @@
 
         .search-container {
             margin-top: 20px;
-            display: flex; /* 텍스트 박스와 아이콘을 가로로 배치 */
-            align-items: center; /* 아이콘과 텍스트 입력란 세로 가운데 정렬 */
+            display: flex;
+            /* 텍스트 박스와 아이콘을 가로로 배치 */
+            align-items: center;
+            /* 아이콘과 텍스트 입력란 세로 가운데 정렬 */
         }
 
         .search-input {
-            flex: 1; /* 검색창이 남은 공간을 차지하도록 */
+            flex: 1;
+            /* 검색창이 남은 공간을 차지하도록 */
             padding: 8px;
             font-size: 1rem;
             border: 1px solid #ccc;
@@ -48,9 +58,11 @@
         }
 
         .search-icon {
-            margin-left: 10px; /* 아이콘과 입력란 간의 간격 */
+            margin-left: 10px;
+            /* 아이콘과 입력란 간의 간격 */
             color: #888;
-            font-size: 1.25rem; /* 아이콘 크기 조정 */
+            font-size: 1.25rem;
+            /* 아이콘 크기 조정 */
             cursor: pointer;
         }
 
@@ -59,26 +71,34 @@
         }
 
         .delivery-years {
-            display: flex; /* 가로 배치 */
-            gap: 10px; /* 날짜 간의 간격 */
+            display: flex;
+            /* 가로 배치 */
+            gap: 10px;
+            /* 날짜 간의 간격 */
         }
 
         .delivery-years span {
-            padding: 5px 10px; /* 날짜 패딩 */
-            border: 1px solid #ccc; /* 테두리 추가 */
-            border-radius: 5px; /* 모서리 둥글게 */
+            padding: 5px 10px;
+            /* 날짜 패딩 */
+            border: 1px solid #ccc;
+            /* 테두리 추가 */
+            border-radius: 5px;
+            /* 모서리 둥글게 */
         }
 
         .delivery-period {
-            margin-top: 20px; /* 간격 조정 */
+            margin-top: 20px;
+            /* 간격 조정 */
         }
 
         .order-summary {
-            margin-top: 20px; /* 간격 조정 */
+            margin-top: 20px;
+            /* 간격 조정 */
         }
 
         .order-details {
-            margin-top: 10px; /* 간격 조정 */
+            margin-top: 10px;
+            /* 간격 조정 */
         }
 
         .period-selection {
@@ -94,24 +114,34 @@
 
         /* Modal 스타일 */
         .modal {
-            display: none; /* 기본적으로 숨김 */
-            position: fixed; /* 고정 위치 */
-            z-index: 1000; /* 최상위 */
+            display: none;
+            /* 기본적으로 숨김 */
+            position: fixed;
+            /* 고정 위치 */
+            z-index: 1000;
+            /* 최상위 */
             left: 0;
             top: 0;
-            width: 100%; /* 전체 너비 */
-            height: 100%; /* 전체 높이 */
-            overflow: auto; /* 필요 시 스크롤 */
-            background-color: rgb(0, 0, 0); /* 기본 배경 색상 */
-            background-color: rgba(0, 0, 0, 0.4); /* 반투명 배경 */
+            width: 100%;
+            /* 전체 너비 */
+            height: 100%;
+            /* 전체 높이 */
+            overflow: auto;
+            /* 필요 시 스크롤 */
+            background-color: rgb(0, 0, 0);
+            /* 기본 배경 색상 */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* 반투명 배경 */
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; /* 중앙 배치 */
+            margin: 15% auto;
+            /* 중앙 배치 */
             padding: 20px;
             border: 1px solid #888;
-            width: 60%; /* 화면 크기에 따라 조정 가능 */
+            width: 60%;
+            /* 화면 크기에 따라 조정 가능 */
         }
 
         .close-button {
@@ -157,15 +187,16 @@
             background-color: #0056b3;
         }
 
-        /* period-selection의 드롭다운과 아이콘을 가로로 배치 */
         .period-select-container {
             display: flex;
             align-items: center;
-            gap: 10px; /* 드롭다운과 아이콘 사이의 간격 */
+            gap: 10px;
+            /* 드롭다운과 아이콘 사이의 간격 */
         }
 
         .search-icon {
-            font-size: 1.25rem; /* 아이콘 크기 조정 */
+            font-size: 1.25rem;
+            /* 아이콘 크기 조정 */
             color: #888;
             cursor: pointer;
         }
@@ -176,16 +207,20 @@
         }
 
         .item-image {
-            display: block; /* 이미지를 블록 요소로 설정하여 아래 텍스트와 구분되도록 */
-            width: 64px; /* 이미지 크기 설정 */
-            height: 64px; /* 이미지 크기 설정 */
-            margin-bottom: 10px; /* 이미지와 텍스트 사이에 간격 설정 */
-            object-fit: cover; /* 이미지 비율 유지 */
+            display: block;
+            /* 이미지를 블록 요소로 설정하여 아래 텍스트와 구분되도록 */
+            width: 64px;
+            /* 이미지 크기 설정 */
+            height: 64px;
+            /* 이미지 크기 설정 */
+            margin-bottom: 10px;
+            /* 이미지와 텍스트 사이에 간격 설정 */
+            object-fit: cover;
+            /* 이미지 비율 유지 */
         }
 
-
         .reason-category {
-         margin-bottom: 20px;
+            margin-bottom: 20px;
         }
 
         .reason-category h3 {
@@ -206,9 +241,42 @@
         .reason-category label {
             font-size: 1rem;
         }
-        
+
+
+
+
+        /* 별점 스타일 */
+.star-rating {
+    display: inline-block;
+    font-size: 2rem;
+    cursor: pointer;
+    direction: rtl;  /* 별을 오른쪽에서 왼쪽으로 나열 */
+    margin-bottom: 10px;
+}
+
+.star-rating label {
+    color: #ccc;  /* 기본 회색 */
+}
+
+.star-rating input:checked ~ label {
+    color: gold;  /* 선택된 별은 금색 */
+}
+
+.star-rating input:checked + label {
+    color: gold;
+}
+
+.star-rating input {
+    display: none;  /* 라디오 버튼은 숨기고 레이블을 클릭하면 선택되도록 */
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: gold;  /* 마우스 호버시 별을 금색으로 */
+}
     </style>
 </head>
+
 <body>
     <div id="myMenu">
         <h2>mypage</h2>
@@ -219,14 +287,14 @@
             <div>
                 <div>나의 쇼핑</div>
                 <ul>
-                    <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="cancelRefundChange.html" title="취소/반품/교환">취소/반품/교환</a></li>
+                    <li><a href="order.html" title="주문목록/배송현황">주문/배송현황</a></li>
+                    <li><a href="cancelRefundChange.html" title="취소/환불/교환">취소/환불/교환</a></li>
                 </ul>
             </div>
             <div>
                 <div>나의 정보</div>
                 <ul>
-                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li> 
+                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li>
                     <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
                     <li><a href="deleteAccount.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
                 </ul>
@@ -235,6 +303,7 @@
                 <div>나의 관심목록</div>
                 <ul>
                     <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                    <li><a href="myCategory.html" title=" 카테고리 "> 카테고리</a></li>
                 </ul>
             </div>
             <div>
@@ -256,240 +325,412 @@
 
     <div class="order-list">
         <span class="order-list-title">주문목록</span>
-        
+
         <div class="search-container">
             <input type="text" placeholder="주문한 상품을 검색할 수 있어요!" class="search-input">
             <i class="fas fa-search search-icon"></i> <!-- 검색 아이콘 추가 -->
         </div>
 
         <!-- 주문 기간 설정 드롭다운 메뉴 추가 -->
-            <div class="period-selection">
-                <label for="periodSelect">주문 기간 설정:</label>
-                <div class="period-select-container">
-                    <select id="periodSelect" class="period-select">
-                        <option value="1개월">1개월</option>
-                        <option value="6개월">6개월</option>
-                        <option value="2024년">2024년</option>
-                        <option value="2023년">2023년</option>
-                    </select>
-                    <!-- 검색 아이콘 추가 -->
-                    <i class="fas fa-search search-icon"></i>
-                </div>
+        <div class="period-selection">
+            <label for="periodSelect">주문 기간 설정:</label>
+            <div class="period-select-container">
+                <select id="periodSelect" class="period-select">
+                    <option value="1개월">1개월</option>
+                    <option value="6개월">6개월</option>
+                    <option value="2024년">2024년</option>
+                    <option value="2023년">2023년</option>
+                </select>
+                <!-- 검색 아이콘 추가 -->
+                <i class="fas fa-search search-icon"></i>
             </div>
+        </div>
 
-            <div class="order-table">
-                <table class="order-details">
-                    <tbody>
-                        <tr class="order-row">
-                            <td class="order-info">
-                                <div class="order-status">
-                                    <span class="status-text" style="font-size: 1.25rem; font-weight: bold;">배송완료</span>
-                                    <span class="arrival-date" style="color: #008C00;">10/16(수) 도착</span>
-                                </div>
-                                <div class="order-item">
-                                    <!-- 충전기 이미지 추가 -->
-                                    <img src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg" alt="충전기" class="item-image">
-                                    <div class="item-description">
-                                        <span class="item-name">충전기</span>
-                                        <div class="item-price">
-                                            <span class="item-price-value">0 원</span>
-                                            <span class="item-quantity">1개</span>
-                                        </div>
+        <div class="order-table">
+            <table class="order-details">
+                <tbody>
+                    <tr class="order-row">
+                        <td class="order-info">
+                            <div class="order-status">
+                                <span class="status-text" style="font-size: 1.25rem; font-weight: bold;">배송완료</span>
+                                <span class="arrival-date" style="color: #008C00;">10/16(수) 도착</span>
+                            </div>
+                            <div class="order-item">
+                                <!-- 충전기 이미지 추가 -->
+                                <img src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg"
+                                    alt="충전기" class="item-image">
+                                <div class="item-description">
+                                    <span class="item-name">충전기</span>
+                                    <div class="item-price">
+                                        <span class="item-price-value">0 원</span>
+                                        <span class="item-quantity">1개</span>
                                     </div>
                                 </div>
-                            </td>
-                            <td class="order-actions">
-                                <button class="exchange-return" id="exchangeReturnBtn">교환, 반품 신청</button>
-                                <button class="write-review" id="writeReviewBtn">리뷰 작성하기</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-    <!-- 리뷰 작성 모달 -->
-    <div id="reviewModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h1>리뷰 작성</h1>
-            <form class="review-form">
-                <label for="reviewText">리뷰를 작성해 주세요:</label>
-                <textarea id="reviewText" name="review" rows="4" required></textarea>
-                <button type="submit">리뷰 제출</button>
-            </form>
+                            </div>
+                        </td>
+                        <td class="order-actions">
+                            <button class="exchange-return" id="exchangeReturnBtn">교환, 반품 신청</button>  <br>
+                            <button class="write-review" id="writeReviewBtn">리뷰 작성하기</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
-
-    <!-- 교환/반품 신청 모달 -->
-    <div id="exchangeReturnModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h1 class="title">교환, 반품 신청</h1>
-            <div class="step-indicator">
-                <div class="step"><span class="step-number">1</span><span class="step-label">상품 선택</span></div>
-                <div class="step"><span class="step-number">2</span><span class="step-label">사유 선택</span></div>
-            </div>
-            <div class="product-selection">
-                <span class="instruction">상품을 선택해 주세요</span>
-                <div class="product-item">
-                    <img loading="lazy" src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg" alt="충전기" width="64" height="64">
-                    <span class="product-name">충전기</span>
-                    <span class="product-quantity">1개</span>
-                </div>
-                <button class="prev-step-button" id="prevStepBtnExchange">이전 단계</button>
-                <button class="next-step-button" id="nextStepBtn">다음 단계</button>
-            </div>
-          
-        </div>  
-    </div>
-
-    <!-- 사유 선택 모달 -->
-<div id="reasonSelectionModal" class="modal">
+<!-- 리뷰 작성 모달 -->
+<div id="reviewModal" class="modal">
     <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h1 class="title">사유 선택</h1>
-        <span class="instruction">사유를 선택해 주세요</span>
-        
-        <!-- 단순 변심 -->
-        <div class="reason-category">
-            <h3>단순 변심</h3>
-            <ul>
-                <li><input type="checkbox" id="reason1-1"><label for="reason1-1">상품이 마음에 들지 않음</label></li>
-                <li><input type="checkbox" id="reason1-2"><label for="reason1-2">더 저렴한 상품을 발견함</label></li>
-            </ul>
-        </div>
+        <h1>리뷰 작성</h1>
+        <!-- action 속성에 리뷰 모음 페이지 URL 입력 -->
+        <form class="review-form" action="reviews.html" method="get">
+            <!-- 작성자 이름 입력 필드 추가 -->
+            <label for="authorName">작성자 이름:</label>
+            <input type="text" id="authorName" name="authorName" placeholder="작성자 이름을 입력하세요" required>
 
-        <!-- 배송 문제 -->
-        <div class="reason-category">
-            <h3>배송 문제</h3>
-            <ul>
-                <li><input type="checkbox" id="reason2-1"><label for="reason2-1">다른 상품이 배송됨</label></li>
-            </ul>
-        </div>
+            <label for="reviewText">리뷰를 작성해 주세요:</label>
+            <textarea id="reviewText" name="review" rows="4" required></textarea>
 
-        <!-- 상품 문제 -->
-        <div class="reason-category">
-            <h3>상품 문제</h3>
-            <ul>
-                <li><input type="checkbox" id="reason3-1"><label for="reason3-1">상품의 구성품/부속품이 들어있지 않음</label></li>
-                <li><input type="checkbox" id="reason3-2"><label for="reason3-2">상품이 설명과 다름</label></li>
-                <li><input type="checkbox" id="reason3-3"><label for="reason3-3">상품이 파손되어 배송됨</label></li>
-                <li><input type="checkbox" id="reason3-4"><label for="reason3-4">상품 결함/기능에 이상이 있음</label></li>
-            </ul>
-        </div>
+            <!-- 날짜 선택 -->
+            <label for="reviewDate">리뷰 작성 날짜:</label>
+            <input type="date" id="reviewDate" name="reviewDate" required>
+            
+            <!-- 별점 선택 -->
+            <div class="star-rating">
+                <input type="radio" id="star1" name="rating" value="1" hidden>
+                <label for="star1" class="star">&#9733;</label>
 
-        <!-- 버튼들 -->
-        <button class="prev-step-button" id="prevStepBtnReason">이전 단계</button>
-        <button class="next-step-button" id="nextStepAfterReasonBtn">다음 단계</button>
-        
+                <input type="radio" id="star2" name="rating" value="2" hidden>
+                <label for="star2" class="star">&#9733;</label>
+
+                <input type="radio" id="star3" name="rating" value="3" hidden>
+                <label for="star3" class="star">&#9733;</label>
+
+                <input type="radio" id="star4" name="rating" value="4" hidden>
+                <label for="star4" class="star">&#9733;</label>
+
+                <input type="radio" id="star5" name="rating" value="5" hidden>
+                <label for="star5" class="star">&#9733;</label>
+            </div>
+
+            <button type="submit">리뷰 제출</button>
+        </form>
     </div>
 </div>
 
-    <!-- 해결 방법 선택 모달 -->
-    <div id="solutionSelectionModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h1 class="title">해결 방법 선택</h1>
-            <span class="instruction">해결 방법을 선택해 주세요</span>
-            <ul>
-                <li><input type="checkbox" id="solution1"><label for="solution1">환불</label></li>
-                
-            </ul>
-            <button class="prev-step-button" id="prevStepBtnSolution">이전 단계</button>
-            <button class="submit-button" id="submitRequestBtn">신청하기</button>
-            
+
+
+        <!-- 교환/반품 신청 모달 -->
+        <div id="exchangeReturnModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h1 class="title">교환, 반품 신청</h1>
+                <div class="step-indicator">
+                    <div class="step"><span class="step-number">1</span><span class="step-label">상품 선택</span></div>
+                    <div class="step"><span class="step-number">2</span><span class="step-label">사유 선택</span></div>
+                </div>
+                <div class="product-selection">
+                    <span class="instruction">상품을 선택해 주세요</span>
+                    <div class="product-item">
+                        <img loading="lazy"
+                            src="https://thumbnail10.coupangcdn.com/thumbnails/remote/96x96ex/image/retail/images/1557803518313813-24830460-5d5c-4298-ac72-1df867ad1fec.jpg"
+                            alt="충전기" width="64" height="64">
+                        <span class="product-name">충전기</span>
+                        <span class="product-quantity">1개</span>
+                    </div>
+                    <button class="prev-step-button" id="prevStepBtnExchange">이전 단계</button>
+                    <button class="next-step-button" id="nextStepBtn">다음 단계</button>
+                </div>
+
+            </div>
         </div>
-    </div>
 
-    <script>
-        // 리뷰 작성하기 버튼 클릭 시 모달 열기
-        const writeReviewBtn = document.getElementById("writeReviewBtn");
-        const reviewModal = document.getElementById("reviewModal");
-        const closeButton = document.querySelector(".close-button");
+        <!-- 사유 선택 모달 -->
+        <div id="reasonSelectionModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h1 class="title">사유 선택</h1>
+                <span class="instruction">사유를 선택해 주세요</span>
 
-        // 리뷰 작성 팝업 열기
-        writeReviewBtn.addEventListener("click", function() {
-            reviewModal.style.display = "block";
-        });
+                <!-- 단순 변심 -->
+                <div class="reason-category">
+                    <h3>단순 변심</h3>
+                    <ul>
+                        <li><input type="checkbox" id="reason1-1"><label for="reason1-1">상품이 마음에 들지 않음</label></li>
+                        <li><input type="checkbox" id="reason1-2"><label for="reason1-2">더 저렴한 상품을 발견함</label></li>
+                    </ul>
+                </div>
 
-        // 모달 닫기
-        closeButton.addEventListener("click", function() {
-            reviewModal.style.display = "none";
-        });
+                <!-- 배송 문제 -->
+                <div class="reason-category">
+                    <h3>배송 문제</h3>
+                    <ul>
+                        <li><input type="checkbox" id="reason2-1"><label for="reason2-1">다른 상품이 배송됨</label></li>
+                    </ul>
+                    <label for="imageReason2">이미지 첨부 </label>
+                    <input type="file" id="imageReason2" accept="image/*"
+                        onchange="previewImage(event, 'imagePreview2')">
+                    <img id="imagePreview2" src="" alt="미리보기 이미지"
+                        style="display: none; width: 100px; height: 100px; object-fit: cover; margin-top: 10px;">
+                </div>
 
-        // 모달 외부 클릭 시 닫기
-        window.addEventListener("click", function(event) {
-            if (event.target === reviewModal) {
-                reviewModal.style.display = "none";
-            }
-        });
+                <!-- 상품 문제 -->
+                <div class="reason-category">
+                    <h3>상품 문제</h3>
+                    <ul>
+                        <li><input type="checkbox" id="reason3-1"><label for="reason3-1">상품의 구성품/부속품이 들어있지 않음</label>
+                        </li>
+                        <li><input type="checkbox" id="reason3-2"><label for="reason3-2">상품이 설명과 다름</label></li>
+                        <li><input type="checkbox" id="reason3-3"><label for="reason3-3">상품이 파손되어 배송됨</label></li>
+                        <li><input type="checkbox" id="reason3-4"><label for="reason3-4">상품 결함/기능에 이상이 있음</label></li>
+                    </ul>
+                    <label for="imageReason3">이미지 첨부 </label>
+                    <input type="file" id="imageReason3" accept="image/*"
+                        onchange="previewImage(event, 'imagePreview3')">
+                    <img id="imagePreview3" src="" alt="미리보기 이미지"
+                        style="display: none; width: 100px; height: 100px; object-fit: cover; margin-top: 10px;">
+                </div>
 
-        // 리뷰 제출 폼 처리 (실제 서버로 제출하는 로직은 추가해야 합니다)
-        document.querySelector(".review-form").addEventListener("submit", function(event) {
-            event.preventDefault(); // 페이지 리로딩 방지
-            const reviewText = document.getElementById("reviewText").value;
-            alert("리뷰가 제출되었습니다: " + reviewText);
-            reviewModal.style.display = "none"; // 제출 후 모달 닫기
-        });
+                <!-- 버튼들 -->
+                <button class="prev-step-button" id="prevStepBtnReason">이전 단계</button>
+                <button class="next-step-button" id="nextStepAfterReasonBtn">다음 단계</button>
+            </div>
+        </div>
 
-        // 교환/반품 신청 모달 열기
-        document.getElementById('exchangeReturnBtn').addEventListener('click', function() {
-            document.getElementById('exchangeReturnModal').style.display = 'block';
-        });
+        <!-- 해결 방법 선택 모달 -->
+        <div id="solutionSelectionModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h1 class="title">해결 방법</h1>
+                <ul>
+                    <li><label for="solution1">반품 후 환불</label></li>
+                </ul>
 
-        // 모달 닫기 기능
-        document.querySelectorAll('.close-button').forEach(button => {
-            button.addEventListener('click', function() {
-                document.getElementById('exchangeReturnModal').style.display = 'none';
-                document.getElementById('reasonSelectionModal').style.display = 'none';
-                document.getElementById('solutionSelectionModal').style.display = 'none';
+                <!-- 제품 사진 -->
+                <div class="product-image">
+                    <img src="product_image_url.jpg" alt="제품 이미지" width="200" />
+                </div>
+
+                <!-- 선택한 사유 -->
+                <div class="selected-reason">
+                    <p><strong>선택한 사유:</strong> <span id="selectedReasonText">없음</span></p>
+                </div>
+
+                <!-- 회수 환불 정보 확인 -->
+                <div class="refund-info">
+                    <p><strong>회수 환불 정보를 확인해주세요:</strong></p>
+                </div>
+
+                <!-- 상품 회수지, 회수 예정일, 회수 요청사항 폼 -->
+                <div class="return-form">
+                    <form id="returnForm">
+                        <!-- 회수지 -->
+                        <div class="form-group">
+                            <label for="returnAddress">상품 회수지</label>
+                            <input type="text" id="returnAddress" name="returnAddress" placeholder="회수지를 입력해주세요"
+                                disabled />
+                        </div>
+
+                        <!-- 회수 예정일 -->
+                        <div class="form-group">
+                            <label for="returnDate">회수 예정일</label>
+                            <input type="date" id="returnDate" name="returnDate" disabled />
+                        </div>
+
+                        <!-- 회수 요청사항 체크박스 -->
+                        <div class="form-group">
+                            <p><strong>회수 요청사항</strong></p>
+                            <label>
+                                <input type="checkbox" id="frontDoor" name="pickupLocation" value="문앞" />
+                                문앞
+                            </label><br />
+                            <label>
+                                <input type="checkbox" id="guardRoom" name="pickupLocation" value="경비실" />
+                                경비실
+                            </label><br />
+                            <label>
+                                <input type="checkbox" id="other" name="pickupLocation" value="기타" />
+                                기타
+                            </label><br />
+
+                            <!-- 기타 입력 필드 -->
+                            <div id="otherInputContainer" style="display: none;">
+                                <label for="otherDetails">기타 사항:</label>
+                                <textarea id="otherDetails" name="otherDetails" placeholder="기타 사항을 입력해주세요"
+                                    rows="3"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 환불 안내 텍스트 -->
+                <div class="refund-guide">
+                    <p><strong>환불 안내</strong></p>
+                    <ul>
+                        <li><strong>상품 금액:</strong> <span id="productPrice">₩100,000</span></li>
+                        <li><strong>배송비:</strong> <span id="shippingFee">₩5,000</span></li>
+                        <li><strong>반품비:</strong> <span id="returnFee">₩3,000</span></li>
+                    </ul>
+                </div>
+
+                <!-- 환불 예상금액 -->
+                <div class="estimated-refund">
+                    <p><strong>환불 예상금액:</strong> <span id="estimatedRefundAmount">₩108000</span></p>
+                </div>
+
+                <button class="prev-step-button" id="prevStepBtnSolution">이전 단계</button>
+                <button class="submit-button" id="submitRequestBtn">신청 하기</button>
+            </div>
+        </div>
+
+        <script>
+
+            // 리뷰 작성하기 버튼 클릭 시 모달 열기
+            const writeReviewBtn = document.getElementById("writeReviewBtn");
+            const reviewModal = document.getElementById("reviewModal");
+            const closeButton = document.querySelector(".close-button");
+
+            // 리뷰 작성 팝업 열기
+            writeReviewBtn.addEventListener("click", function () {
+                reviewModal.style.display = "block";
             });
-        });
 
-        window.addEventListener('click', function(event) {
-            const exchangeModal = document.getElementById('exchangeReturnModal');
-            const reasonModal = document.getElementById('reasonSelectionModal');
-            const solutionModal = document.getElementById('solutionSelectionModal');
-            if (event.target === exchangeModal) {
-                exchangeModal.style.display = 'none';
+            // 모달 닫기
+            closeButton.addEventListener("click", function () {
+                reviewModal.style.display = "none";
+            });
+
+            // 모달 외부 클릭 시 닫기
+            window.addEventListener("click", function (event) {
+                if (event.target === reviewModal) {
+                    reviewModal.style.display = "none";
+                }
+            });
+
+            // 리뷰 제출 폼 처리 (실제 서버로 제출하는 로직은 추가해야 합니다)
+            document.querySelector(".review-form").addEventListener("submit", function (event) {
+                event.preventDefault(); // 페이지 리로딩 방지
+                const reviewText = document.getElementById("reviewText").value;
+                alert("리뷰가 제출되었습니다: " + reviewText);
+                reviewModal.style.display = "none"; // 제출 후 모달 닫기
+            });
+
+            // 교환/반품 신청 모달 열기
+            document.getElementById('exchangeReturnBtn').addEventListener('click', function () {
+                document.getElementById('exchangeReturnModal').style.display = 'block';
+            });
+
+            // 모달 닫기 기능
+            document.querySelectorAll('.close-button').forEach(button => {
+                button.addEventListener('click', function () {
+                    document.getElementById('exchangeReturnModal').style.display = 'none';
+                    document.getElementById('reasonSelectionModal').style.display = 'none';
+                    document.getElementById('solutionSelectionModal').style.display = 'none';
+                });
+            });
+
+            window.addEventListener('click', function (event) {
+                const exchangeModal = document.getElementById('exchangeReturnModal');
+                const reasonModal = document.getElementById('reasonSelectionModal');
+                const solutionModal = document.getElementById('solutionSelectionModal');
+                if (event.target === exchangeModal) {
+                    exchangeModal.style.display = 'none';
+                }
+                if (event.target === reasonModal) {
+                    reasonModal.style.display = 'none';
+                }
+                if (event.target === solutionModal) {
+                    solutionModal.style.display = 'none';
+                }
+            });
+
+            // 이미지 미리보기 함수
+            function previewImage(event, previewId) {
+                const file = event.target.files[0]; // 선택한 파일
+                const reader = new FileReader();
+
+                reader.onload = function () {
+                    const previewElement = document.getElementById(previewId);
+                    previewElement.src = reader.result;
+                    previewElement.style.display = 'block'; // 미리보기 이미지 표시
+                }
+
+                if (file) {
+                    reader.readAsDataURL(file); // 파일을 base64로 변환하여 미리보기
+                }
             }
-            if (event.target === reasonModal) {
-                reasonModal.style.display = 'none';
-            }
-            if (event.target === solutionModal) {
-                solutionModal.style.display = 'none';
-            }
-        });
 
-        // 다음 단계 버튼 클릭 이벤트 (상품 선택에서 사유 선택으로)
-        document.getElementById('nextStepBtn').addEventListener('click', function() {
-            document.getElementById('exchangeReturnModal').style.display = 'none';
-            document.getElementById('reasonSelectionModal').style.display = 'block'; // 사유 선택 모달 열기
-        });
 
-        // 다음 단계 버튼 클릭 이벤트 (사유 선택에서 해결 방법 선택으로)
-        document.getElementById('nextStepAfterReasonBtn').addEventListener('click', function() {
-            document.getElementById('reasonSelectionModal').style.display = 'none';
-            document.getElementById('solutionSelectionModal').style.display = 'block'; // 해결 방법 선택 모달 열기
-        });
+            // 선택된 사유를 저장할 변수
+            let selectedReasons = [];
 
-        // 이전 단계 버튼 클릭 이벤트 (사유 선택으로 돌아가기)
-        document.getElementById('prevStepBtnExchange').addEventListener('click', function() {
-            document.getElementById('exchangeReturnModal').style.display = 'block';
-            document.getElementById('reasonSelectionModal').style.display = 'none';
-        });
+            // 사유 선택 체크박스를 변경할 때마다 선택된 사유 업데이트
+            document.querySelectorAll('.reason-category input[type="checkbox"]').forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    const reasonLabel = this.nextElementSibling.textContent;  // 체크박스 옆의 라벨 텍스트
+                    if (this.checked) {
+                        // 선택되었으면 선택된 사유에 추가
+                        selectedReasons.push(reasonLabel);
+                    } else {
+                        // 선택 해제되었으면 해당 사유 제거
+                        selectedReasons = selectedReasons.filter(reason => reason !== reasonLabel);
+                    }
+                });
+            });
 
-        // 이전 단계 버튼 클릭 이벤트 (상품 선택으로 돌아가기)
-        document.getElementById('prevStepBtnReason').addEventListener('click', function() {
-            document.getElementById('reasonSelectionModal').style.display = 'none';
-            document.getElementById('exchangeReturnModal').style.display = 'block';
-        });
+            // '다음 단계' 버튼 클릭 시 해결 방법 선택 모달에 선택된 사유 표시
+            document.getElementById('nextStepAfterReasonBtn').addEventListener('click', function () {
+                const selectedReasonText = selectedReasons.length > 0 ? selectedReasons.join(', ') : '없음';
+                document.getElementById('selectedReasonText').textContent = selectedReasonText;
 
-        // 이전 단계 버튼 클릭 이벤트 (사유 선택으로 돌아가기)
-        document.getElementById('prevStepBtnSolution').addEventListener('click', function() {
-            document.getElementById('solutionSelectionModal').style.display = 'none';
-            document.getElementById('reasonSelectionModal').style.display = 'block';
-        });
-    </script>
+                // 해결 방법 선택 모달을 표시하려면, 모달을 열도록 추가적인 코드 작성 가능 (예: modal.show())
+                document.getElementById('solutionSelectionModal').style.display = 'block';
+            });
+
+            // 다음 단계 버튼 클릭 이벤트 (상품 선택에서 사유 선택으로)
+            document.getElementById('nextStepBtn').addEventListener('click', function () {
+                document.getElementById('exchangeReturnModal').style.display = 'none';
+                document.getElementById('reasonSelectionModal').style.display = 'block'; // 사유 선택 모달 열기
+            });
+
+            // 다음 단계 버튼 클릭 이벤트 (사유 선택에서 해결 방법 선택으로)
+            document.getElementById('nextStepAfterReasonBtn').addEventListener('click', function () {
+                document.getElementById('reasonSelectionModal').style.display = 'none';
+                document.getElementById('solutionSelectionModal').style.display = 'block'; // 해결 방법 선택 모달 열기
+            });
+
+            // 이전 단계 버튼 클릭 이벤트 (사유 선택으로 돌아가기)
+            document.getElementById('prevStepBtnExchange').addEventListener('click', function () {
+                document.getElementById('exchangeReturnModal').style.display = 'block';
+                document.getElementById('reasonSelectionModal').style.display = 'none';
+            });
+
+            // 이전 단계 버튼 클릭 이벤트 (상품 선택으로 돌아가기)
+            document.getElementById('prevStepBtnReason').addEventListener('click', function () {
+                document.getElementById('reasonSelectionModal').style.display = 'none';
+                document.getElementById('exchangeReturnModal').style.display = 'block';
+            });
+
+            // 이전 단계 버튼 클릭 이벤트 (사유 선택으로 돌아가기)
+            document.getElementById('prevStepBtnSolution').addEventListener('click', function () {
+                document.getElementById('solutionSelectionModal').style.display = 'none';
+                document.getElementById('reasonSelectionModal').style.display = 'block';
+            });
+            // "신청하기" 버튼 클릭 이벤트 처리
+            document.getElementById('submitRequestBtn').addEventListener('click', function () {
+                // 신청이 완료되었음을 알리는 팝업
+                alert('신청이 완료되었습니다.');
+            });
+
+            // "기타" 체크박스가 선택될 때 입력 필드 보이기/숨기기
+            document.getElementById('other').addEventListener('change', function () {
+                var otherInputContainer = document.getElementById('otherInputContainer');
+                if (this.checked) {
+                    otherInputContainer.style.display = 'block'; // 텍스트 입력 필드 보이기
+                } else {
+                    otherInputContainer.style.display = 'none';  // 텍스트 입력 필드 숨기기
+                }
+            });
+        </script>
 </body>
+
 </html>
