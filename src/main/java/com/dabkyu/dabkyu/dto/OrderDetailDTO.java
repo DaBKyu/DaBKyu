@@ -17,19 +17,19 @@ import lombok.Setter;
 public class OrderDetailDTO {
     private Long orderDetailSeqno;
 	private OrderInfoEntity orderSeqno;
-	private OrderProductEntity orderproduct_seqno;
+	private OrderProductEntity orderProductSeqno;
 
     public OrderDetailDTO(OrderDetailEntity entity) {
         this.orderDetailSeqno = entity.getOrderDetailSeqno();
         this.orderSeqno = entity.getOrderSeqno();
-        this.orderproduct_seqno = entity.getOrderproduct_seqno();
+        this.orderProductSeqno = entity.getOrderProductSeqno();
     }
 
     public OrderDetailEntity dtoToEntity(OrderDetailDTO dto) {
         OrderDetailEntity entity = OrderDetailEntity.builder()
                                                     .orderDetailSeqno(dto.getOrderDetailSeqno())
                                                     .orderSeqno(dto.getOrderSeqno())
-                                                    .orderproduct_seqno(dto.getOrderproduct_seqno())
+                                                    .orderProductSeqno(dto.getOrderProductSeqno())
                                                     .build();
         return entity;
     }

@@ -30,8 +30,13 @@ public class AddedRelatedProductEntity {
 	private OrderProductEntity orderProductSeqno;
 
     @Id
-    @Column(name="relatedproduct_seqno")
-	private Long relatedproductSeqno;
+    @ManyToOne(fetch = FetchType.LAZY)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name="relatedproduct_seqno", nullable = false)
+	private RelatedProductEntity relatedProductSeqno;
+
+    @Column(name="amount")
+	private int amount;
 
 
 

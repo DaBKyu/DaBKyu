@@ -28,7 +28,7 @@ public class QuestionFileEntity {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "QUESTIONFILE_SEQ")
 	@SequenceGenerator(name="QUESTIONFILE_SEQ", sequenceName = "question_file_seq", initialValue = 1, allocationSize = 1)
 	@Column(name="questionfile_seqno", nullable=false)
-    private Long questionfileSeqno;
+    private Long questionFileSeqno;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)

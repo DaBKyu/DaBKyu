@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +21,9 @@ import lombok.Setter;
 public class EmailSendListEntity {
 
     @Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EMAILSENDLIST_SEQ")	
+	@SequenceGenerator(name="EMAILSENDLIST_SEQ", sequenceName = "emailsendlist_seq", 
+		initialValue = 1, allocationSize = 1)
 	@Column(name="email_sendlist_seqno")
 	private Long emailSendlistSeqno;
 	

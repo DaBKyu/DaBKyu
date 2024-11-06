@@ -15,13 +15,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder 
 public class QuestionFileDTO {
-    private Long questionfileSeqno;
+    private Long questionFileSeqno;
 	private QuestionEntity queSeqno;
 	private String orgFilename;
 	private String storedFilename;
 
 	public QuestionFileDTO(QuestionFileEntity entity) {
-		this.questionfileSeqno = entity.getQuestionfileSeqno(); 
+		this.questionFileSeqno = entity.getQuestionFileSeqno(); 
 		this.queSeqno = entity.getQueSeqno();
 		this.orgFilename = entity.getOrgFilename();
 		this.storedFilename = entity.getStoredFilename();
@@ -29,7 +29,7 @@ public class QuestionFileDTO {
 
 	public QuestionFileEntity dtoToEntity(QuestionFileDTO dto) {
 		QuestionFileEntity entity = QuestionFileEntity.builder()
-													  .questionfileSeqno(dto.getQuestionfileSeqno())
+													  .questionFileSeqno(dto.getQuestionFileSeqno())
 													  .queSeqno(dto.getQueSeqno())
 													  .orgFilename(dto.getOrgFilename())
 													  .storedFilename(dto.getStoredFilename())

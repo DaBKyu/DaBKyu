@@ -15,13 +15,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder 
 public class ProductFileDTO {
-    private Long productfileSeqno;
+    private Long productFileSeqno;
 	private ProductEntity productSeqno;
 	private String orgFilename;
 	private String storedFilename;
 
     public ProductFileDTO(ProductFileEntity entity) {
-        this.productfileSeqno = entity.getProductfileSeqno();
+        this.productFileSeqno = entity.getProductFileSeqno();
         this.productSeqno = entity.getProductSeqno();
         this.orgFilename = entity.getOrgFilename();
         this.storedFilename = entity.getStoredFilename();
@@ -29,7 +29,7 @@ public class ProductFileDTO {
 
     public ProductFileEntity dtoToEntity(ProductFileDTO dto) {
         ProductFileEntity entity = ProductFileEntity.builder()
-                                                    .productfileSeqno(dto.getProductfileSeqno())
+                                                    .productFileSeqno(dto.getProductFileSeqno())
                                                     .productSeqno(dto.getProductSeqno())
                                                     .orgFilename(dto.getOrgFilename())
                                                     .storedFilename(dto.getOrgFilename())
