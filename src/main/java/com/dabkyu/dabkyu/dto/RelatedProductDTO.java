@@ -14,14 +14,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder 
 public class RelatedProductDTO {
-    private Long relatedproductSeqno;
+    private Long relatedProductSeqno;
 	private ProductEntity productSeqno;
 	private String relatedproductCategory;
 	private String relatedproductName;
 	private int relatedproductPrice;
 	
 	public RelatedProductDTO(RelatedProductEntity entity) {
-		this.relatedproductSeqno = entity.getRelatedproductSeqno();
+		this.relatedProductSeqno = entity.getRelatedProductSeqno();
 		this.productSeqno = entity.getProductSeqno();
 		this.relatedproductCategory = entity.getRelatedproductCategory();
 		this.relatedproductName = entity.getRelatedproductName();
@@ -30,7 +30,7 @@ public class RelatedProductDTO {
 
 	public RelatedProductEntity dtoToEntity(RelatedProductDTO dto) {
 		RelatedProductEntity entity = RelatedProductEntity.builder()
-														  .relatedproductSeqno(dto.getRelatedproductSeqno())
+														  .relatedProductSeqno(dto.getRelatedProductSeqno())
 														  .productSeqno(dto.getProductSeqno())
 														  .relatedproductCategory(dto.getRelatedproductCategory())
 														  .relatedproductName(dto.getRelatedproductName())

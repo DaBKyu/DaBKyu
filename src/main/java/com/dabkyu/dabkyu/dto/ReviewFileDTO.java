@@ -15,13 +15,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder 
 public class ReviewFileDTO {
-    private Long reviewfileSeqno;
+    private Long reviewFileSeqno;
 	private ReviewEntity reviewSeqno;
 	private String orgFilename;
 	private String storedFilename;
 
 	public ReviewFileDTO(ReviewFileEntity entity) {
-		this.reviewfileSeqno = entity.getReviewfileSeqno();
+		this.reviewFileSeqno = entity.getReviewFileSeqno();
 		this.reviewSeqno = entity.getReviewSeqno();
 		this.orgFilename = entity.getOrgFilename();
 		this.storedFilename = entity.getStoredFilename();
@@ -29,7 +29,7 @@ public class ReviewFileDTO {
 
 	public ReviewFileEntity dtoToEntity(ReviewFileDTO dto) {
 		ReviewFileEntity entity = ReviewFileEntity.builder()
-												  .reviewfileSeqno(dto.getReviewfileSeqno())
+												  .reviewFileSeqno(dto.getReviewFileSeqno())
 												  .reviewSeqno(dto.getReviewSeqno())
 												  .orgFilename(dto.getOrgFilename())
 												  .storedFilename(dto.getStoredFilename())

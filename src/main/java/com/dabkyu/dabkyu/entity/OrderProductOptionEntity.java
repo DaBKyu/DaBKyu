@@ -26,7 +26,7 @@ public class OrderProductOptionEntity {
     @ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name="orderproduct_seqno", nullable = false)
-	private OrderProductEntity orderproductSeqno;
+	private OrderProductEntity orderProductSeqno;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)

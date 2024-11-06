@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +25,9 @@ import lombok.Setter;
 public class MemberEntity {
 
     @Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MEMBER_SEQ")	
+	@SequenceGenerator(name="MEMBER_SEQ", sequenceName = "member_seq", 
+		initialValue = 1, allocationSize = 1)
 	@Column(name="email",length=50,nullable=false)
 	private String email;
 
@@ -33,6 +39,12 @@ public class MemberEntity {
 	
 	@Column(name="username",length=20,nullable=false)
 	private String username;
+
+	@Column(name="gender",length=10,nullable=false)
+	private String gender;
+
+	@Column(name="birth_date",nullable=false)
+	private LocalDateTime birthDate;
 	
 	@Column(name="member_grade",length=20,nullable=false)
 	private String memberGrade;
@@ -75,5 +87,7 @@ public class MemberEntity {
 	
     @Column(name="email_recept_date",nullable=true)
 	private LocalDateTime emailReceptDate;
-    
+
+	@Column(name="authkey",length = 200,nullable=true)
+	private String authkey;
 }

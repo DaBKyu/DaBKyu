@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 public class AddedRelatedProductEntityID implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private Long orderproduct_seqno;
-    private Long relatedproduct_seqno;
+    private Long orderProductSeqno;
+    private Long relatedProductSeqno;
 
 }
 

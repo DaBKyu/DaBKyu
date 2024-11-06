@@ -28,7 +28,7 @@ public class ProductFileEntity {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PRODUCTFILE_SEQ")
 	@SequenceGenerator(name="PRODUCTFILE_SEQ", sequenceName = "product_file_seq", initialValue = 1, allocationSize = 1)
     @Column(name="productfile_seqno", nullable=false)
-    private Long productfileSeqno;
+    private Long productFileSeqno;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)
