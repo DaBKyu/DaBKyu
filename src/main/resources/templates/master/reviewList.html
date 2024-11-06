@@ -15,6 +15,7 @@
         th, td {
             border: 1px solid #dddddd;
             text-align: center;
+            vertical-align: middle;
             padding: 8px;
         }
         th {
@@ -66,7 +67,7 @@
         </div>
     </nav>
         
-<div class="container mt-5">     
+<div class="container mt-4">     
     <h2 class="mt-4">리뷰목록</h2>
 
     <!-- 카테고리 선택 -->
@@ -84,48 +85,32 @@
     <table class="table table-hover">
         <thead>
             <tr>
-            <th scope="col"></th>
+            <th scope="col"><input class="form-check-input" type="checkbox" id="checkAll"></th>
             <th scope="col">평가</th>
+            <th scope="col">작성자</th>
             <th scope="col">내용</th>
             <th scope="col">카테고리</th>
-            <th scope="col">작성자</th>
             <th scope="col">작성일</th>
             </tr>
         </thead>
         <tbody class="table-group-divider">
             <tr>
-              <th scope="row"><input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..."></th>
+              <th scope="row"><input class="form-check-input" type="checkbox" id="checkRow"></th>
               <td>5</td>
+              <td>qscd123</td>
               <td>상품 관련 문의 입니다.</td>
               <td>…</td>
-              <td>qscd123</td>
               <td>2024.10.29</td>
             </tr>
-            <tr>
-              <th scope="row"><input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..."></th>
-              <td>5</td>
-              <td>상품 관련 문의 입니다.</td>
-              <td>…</td>
-              <td>qscd123</td>
-              <td>2024.10.29</td>
-            </tr>
-            <tr>
-              <th scope="row"><input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..."></th>
-              <td>5</td>
-              <td>상품 관련 문의 입니다.</td>
-              <td>…</td>
-              <td>qscd123</td>
-              <td>2024.10.29</td>
-            </tr>
-
-            <!-- 빈 행들  -->
-            <tr><td colspan="6"></td></tr> 
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
+            <tr th:each="list : ${list}">
+                <td><input class="form-check-input" type="checkbox" id="checkRow"></th>
+                <td><span th:text="${list.rate}"></span></td>
+                <td><span th:text="${list.rev_writer}"></span></td>
+                <td><img class="p_image" th:src="@{'/p_img/' + ${list.stored_filename}}" style="width:40px; height: 40px"><a id="hypertext" th:href="@{'/master/pReview?rev_writer=' + ${list.rev_writer} + '&page=' + ${page} + '&keyword=' + ${keyword} }" onMouseover='this.style.textDecoration="underline"'  
+                        onmouseout="this.style.textDecoration='none';">&nbsp;<span th:text="${list.rev_content}">123132123123132</span></a></td>
+                <td><span th:text="${list.category_name}"></span></td>
+                <td><span th:text="${#temporals.format(list.rev_date,'yyyy-MM-dd')}"></span></td>
+           </tr>
         </tbody>
         </table>
     </div>
@@ -151,7 +136,7 @@
                 <a class="page-link" href="#">다음</a>
              </li> 
         </ul>
-    </nav>
+        </nav>
 
     </div>
     
