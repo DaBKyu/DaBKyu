@@ -35,6 +35,13 @@
 </head>
 
 <body>
+  <!-- 로그인 여부 확인 -->
+  <script>
+    let email = '[[${session.email}]]';
+    if(email == '' || email == null || email == undefined)
+      document.location.href = '/member/login';
+  </script>
+  
     <!-- 네비게이션 바 -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
