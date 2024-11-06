@@ -28,7 +28,7 @@ public class MemberDTO {
     private String fromSocial;
     private int pwcheck;
     private int point;
-    private String myCategories;
+    // private String myCategories;
     private String role;
     private String notificationYn;
     private String emailRecept;
@@ -51,7 +51,7 @@ public class MemberDTO {
         this.fromSocial = memberEntity.getFromSocial();
         this.pwcheck = memberEntity.getPwcheck();
         this.point = memberEntity.getPoint();
-        this.myCategories = memberEntity.getMyCategories();
+        // this.myCategories = memberEntity.getMyCategories();
         this.role = memberEntity.getRole();
         this.notificationYn = memberEntity.getNotificationYn();
         this.emailRecept = memberEntity.getEmailRecept();
@@ -77,7 +77,7 @@ public class MemberDTO {
                                                 .fromSocial(dto.getFromSocial())
                                                 .pwcheck(dto.getPwcheck())
                                                 .point(dto.getPoint())
-                                                .myCategories(dto.getMyCategories())
+                                                // .myCategories(dto.getMyCategories())
                                                 .role(dto.getRole())
                                                 .notificationYn(dto.getNotificationYn())
                                                 .emailRecept(dto.getEmailRecept())

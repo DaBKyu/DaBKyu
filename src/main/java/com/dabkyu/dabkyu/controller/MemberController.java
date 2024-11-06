@@ -230,7 +230,26 @@ public class MemberController {
         String email = (String) session.getAttribute("email");
         model.addAttribute("member", service.memberInfo(email));
     }
+
+
+    // 관심 카테고리 화면
+    @GetMapping("/mypayge/myCategories")
+    public void getMyCategories(Model model, HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        model.addAttribute("myCategoryList", service.myCategoryList(email));
+        model.addAttribute("isEmpty", service.myCategoryList(email).isEmpty()?"Y":"N");
+    }
     
+
+    // 찜한 상품 화면
+
+    // 내 리뷰 리스트 화면
+
+    // 내 문의 리스트 화면
+
+    // 내 쿠폰 리스트 화면
+
+    // 내 등급 화면
 
     // 아이디 찾기 화면
     @GetMapping("/member/searchID")

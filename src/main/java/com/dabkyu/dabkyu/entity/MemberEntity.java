@@ -63,8 +63,8 @@ public class MemberEntity {
     @Column(name="point",nullable=true)
 	private int point;
 
-    @Column(name="my_categories",length=200,nullable=true)
-	private String myCategories;
+    // @Column(name="my_categories",length=200,nullable=true)
+	// private String myCategories;
 
 	@Column(name="role",length=20,nullable=true)
 	private String role;

@@ -8,5 +8,5 @@ import java.util.List;
 
 
 public interface MemberAddressRepository extends JpaRepository<MemberAddressEntity, Long> {
-    public List<MemberAddressEntity> findByEmail(String email);
+    public List<MemberAddressEntity> findByEmail_Email(String email);
 }

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.entity.AddressEntity;
+import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
@@ -39,6 +40,9 @@ public interface MemberService {
 
 	// 배송지 삭제
 	public void deleteAddress(Long seqno);
+
+	// 내 관심 카테고리 조회
+	public List<Category3Entity> myCategoryList(String email);
 	
 	// 패스워드 변경
 	public void modifyMemberPassword(MemberDTO member);

@@ -2,7 +2,10 @@ package com.dabkyu.dabkyu.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,12 +16,15 @@ import org.springframework.stereotype.Service;
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.entity.AddressEntity;
+import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
+import com.dabkyu.dabkyu.entity.MemberCategoryEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 import com.dabkyu.dabkyu.entity.repository.MemberAddressRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberCategoryRepository;
 //import com.dabkyu.dabkyu.entity.repository.AddressRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
@@ -37,6 +43,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberAddressRepository memberAddressRepository;
 	private final QuestionFileRepository questionFileRepository;
 	private final ReviewFileRepository reviewFileRepository;
+    private final MemberCategoryRepository memberCategoryRepository;
     
     // 회원가입
     @Override
@@ -80,7 +87,7 @@ public class MemberServiceImpl implements MemberService {
     // 배송지 목록 조회
     @Override
 	public List<MemberAddressEntity> addressList(String email) {
-        return memberAddressRepository.findByEmail(email);
+        return memberAddressRepository.findByEmail_Email(email);
     }
 
 	// 배송지 상세 조회
@@ -113,6 +120,18 @@ public class MemberServiceImpl implements MemberService {
 	public void deleteAddress(Long seqno) {
         MemberAddressEntity memberAddressEntity = memberAddressRepository.findById(seqno).get();
         memberAddressRepository.delete(memberAddressEntity);
+    }
+
+    // 내 관심 카테고리 조회
+    @Override
+	public List<Category3Entity> myCategoryList(String email) {
+        
+        List<MemberCategoryEntity> myCategories = memberCategoryRepository.findByEmail_Email(email);
+
+        return myCategories.stream()
+                                         .map(myCategory -> myCategory.getCategory3Seqno())
+                                         .collect(Collectors.toList());
+        
     }
 
     // 회원비밀번호수정
