@@ -14,27 +14,24 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder 
 public class OrderProductDTO {
-    private Long orderproductSeqno;
+    private Long orderProductSeqno;
 	private ProductEntity productSeqno;
 	private String reviewYn;
 	private int amount;
-	private int price;
 
     public OrderProductDTO(OrderProductEntity entity) {
-        this.orderproductSeqno = entity.getOrderProductSeqno();
+        this.orderProductSeqno = entity.getOrderProductSeqno();
         this.productSeqno = entity.getProductSeqno();
         this.reviewYn = entity.getReviewYn();
         this.amount = entity.getAmount();
-        this.price = entity.getPrice();
     }
 
     public OrderProductEntity dtoToEntity(OrderProductDTO dto) {
         OrderProductEntity entity = OrderProductEntity.builder()
-                                                      .orderProductSeqno(dto.getOrderproductSeqno())
+                                                      .orderProductSeqno(dto.getOrderProductSeqno())
                                                       .productSeqno(dto.getProductSeqno())
                                                       .reviewYn(dto.getReviewYn())
                                                       .amount(dto.getAmount())
-                                                      .price(dto.getPrice())
                                                       .build();
         return entity;                                              
     }

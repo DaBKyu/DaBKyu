@@ -36,6 +36,9 @@ public class ProductEntity {
 	@JoinColumn(name="category3_seqno", nullable = false)
 	private Category3Entity category3Seqno;
 
+	@Column(name="product_name",length = 50,nullable=false)
+	private String productName;
+
     @Column(name="product_info",length = 200,nullable=false)
 	private String productInfo;
 

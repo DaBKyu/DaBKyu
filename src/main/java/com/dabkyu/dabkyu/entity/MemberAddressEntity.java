@@ -26,7 +26,7 @@ public class MemberAddressEntity {
 
     @Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MEMBERADDRESS_SEQ")	
-	@SequenceGenerator(name="MEMBERADDRESS_SEQ", sequenceName = "memberAddress_seq", 
+	@SequenceGenerator(name="MEMBERADDRESS_SEQ", sequenceName = "memberaddress_seq", 
 		initialValue = 1, allocationSize = 1)
 	@Column(name="member_address_seqno")
 	private Long memberAddressSeqno;
