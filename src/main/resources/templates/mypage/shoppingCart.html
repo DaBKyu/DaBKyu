@@ -1,11 +1,191 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>장바구니페이지</title>
+    <title>장바구니 페이지</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .cart-container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-header {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+            padding-left: 10px;
+        }
+
+        .item-price {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .quantity-input {
+            width: 40px;
+            padding: 5px;
+            margin-left: 10px;
+            text-align: center;
+        }
+
+        .total-section {
+            text-align: left; /* 총 금액을 왼쪽으로 정렬 */
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .checkout-btn,
+        .cancel-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .checkout-btn:hover,
+        .cancel-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        .checkbox-container input {
+            margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
-    
+
+    <div class="cart-container">
+        <div class="cart-header">
+            <h2>장바구니</h2>
+        </div>
+
+        <!-- 첫 번째 제품 -->
+        <div class="cart-item">
+            <img src="product1.jpg" alt="상품 이미지">
+            <div class="item-details">
+                <div><strong>상품명 1</strong></div>
+                <div class="item-price">
+                    <span>가격: ₩15,000</span>
+                </div>
+            </div>
+            <div class="item-quantity">
+                <label for="quantity1">수량:</label>
+                <input type="number" id="quantity1" class="quantity-input" value="1" min="1">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="product1-checkbox" checked>
+                <label for="product1-checkbox">선택</label>
+            </div>
+        </div>
+
+        <!-- 두 번째 제품 -->
+        <div class="cart-item">
+            <img src="product2.jpg" alt="상품 이미지">
+            <div class="item-details">
+                <div><strong>상품명 2</strong></div>
+                <div class="item-price">
+                    <span>가격: ₩20,000</span>
+                </div>
+            </div>
+            <div class="item-quantity">
+                <label for="quantity2">수량:</label>
+                <input type="number" id="quantity2" class="quantity-input" value="1" min="1">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="product2-checkbox" checked>
+                <label for="product2-checkbox">선택</label>
+            </div>
+        </div>
+
+        <!-- 총 결제 금액 -->
+        <div class="total-section">
+            <div><strong>총 결제 금액: ₩35,000</strong></div>
+        </div>
+
+        <!-- 결제 및 취소 버튼 -->
+        <div class="action-buttons">
+            <button class="checkout-btn" onclick="alert('구매가 완료되었습니다.')">구매하기</button>
+            <button class="cancel-btn" onclick="alert('취소되었습니다.')">취소</button>
+        </div>
+    </div>
+
+    <script>
+        // 총 금액 계산
+        function calculateTotal() {
+            const prices = [15000, 20000]; // 각 상품의 가격
+            const quantities = document.querySelectorAll('.quantity-input');
+            const checkboxes = document.querySelectorAll('.checkbox-container input');
+            let total = 0;
+
+            quantities.forEach((input, index) => {
+                // 체크박스가 선택된 제품만 총 결제 금액에 포함
+                if (checkboxes[index].checked) {
+                    total += prices[index] * input.value;
+                }
+            });
+
+            document.querySelector('.total-section strong').textContent = '총 결제 금액: ₩' + total;
+        }
+
+        // 수량 변경 시 총 금액 재계산
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('input', calculateTotal);
+        });
+
+        // 체크박스 상태 변경 시 총 금액 재계산
+        const checkboxes = document.querySelectorAll('.checkbox-container input');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', calculateTotal);
+        });
+
+        // 페이지 로드 시 총 금액 계산
+        window.onload = calculateTotal;
+    </script>
 </body>
 </html>

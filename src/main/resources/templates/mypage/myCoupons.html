@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>취소/반품/교환/환불 내역</title>
+    <title>할인 쿠폰 페이지</title>
     <link rel="stylesheet" href="/css/mypage.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -28,7 +28,29 @@
             font-weight: bold;
         }
 
-        .order-history {
+        .tab {
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 2px solid #ccc;
+            margin-top: 20px;
+        }
+
+        .tab button {
+            flex: 1;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab button.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .tab-content {
             margin-top: 20px;
         }
 
@@ -87,9 +109,8 @@
             <div>
                 <div>나의 쇼핑</div>
                 <ul>
-                    <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="cancelRefundChange.html" title="취소/반품/교환/">취소/반품/교환/</a></li>
-                    
+                    <li><a href="order.html" title="주문목록/배송현황">주문/배송현황</a></li>
+                    <li><a href="cancelRefundChange.html" title="취소/환불/교환">취소/환불/교환</a></li>
                 </ul>
             </div>
             <div>
@@ -104,6 +125,7 @@
                 <div>나의 관심목록</div>
                 <ul>
                     <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                    <li><a href="myCategory.html" title=" 카테고리 "> 카테고리</a></li>
                 </ul>
             </div>
             <div>
@@ -122,7 +144,7 @@
             </div>
         </nav>
     </div>
-    
+
     <div class="order-list">
         <h2 class="order-list-title">할인 쿠폰 입력</h2>
         <div class="coupon-input">
@@ -130,71 +152,64 @@
             <button id="submitCoupon">입력하기</button>
         </div>
 
-        <div class="order-history">
-            <h3>사용 가능한 쿠폰 목록</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>쿠폰명</th>
-                        <th>할인액</th>
-                        <th>사용조건</th>
-                        <th>유효기간</th>
-                        <th>쿠폰종류</th>
-                        <th>상태</th>
-                    </tr>
-                </thead>
-                <tbody id="couponTableBody">
-                    <tr>
-                        <td>여름 세일 쿠폰</td>
-                        <td>10,000원</td>
-                        <td>3만원 이상 구매 시</td>
-                        <td>2024-12-31</td>
-                        <td>일반</td>
-                        <td>사용가능</td>
-                    </tr>
-                    <tr>
-                        <td>추석 할인 쿠폰</td>
-                        <td>5,000원</td>
-                        <td>5만원 이상 구매 시</td>
-                        <td>2024-09-30</td>
-                        <td>일반</td>
-                        <td>사용완료</td>
-                    </tr>
-                    <tr>
-                        <td>겨울 특가 쿠폰</td>
-                        <td>15,000원</td>
-                        <td>10만원 이상 구매 시</td>
-                        <td>2024-11-15</td>
-                        <td>일반</td>
-                        <td>기간완료</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Tab Menu -->
+        <div class="tab">
+            <button class="active" id="activeTabBtn">사용 가능한 쿠폰</button>
+            <button id="expiredTabBtn">사용 완료/기간 완료</button>
         </div>
 
-        <div class="order-history">
-            <h3>사용 완료/기간 완료 쿠폰 목록</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>쿠폰명</th>
-                        <th>할인액</th>
-                        <th>상태</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>추석 할인 쿠폰</td>
-                        <td>5,000원</td>
-                        <td>사용완료</td>
-                    </tr>
-                    <tr>
-                        <td>겨울 특가 쿠폰</td>
-                        <td>15,000원</td>
-                        <td>기간완료</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <div id="availableCoupons" class="order-history">
+                <h3>사용 가능한 쿠폰 목록</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>쿠폰명</th>
+                            <th>할인액</th>
+                            <th>사용조건</th>
+                            <th>유효기간</th>
+                            <th>쿠폰종류</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody id="couponTableBody">
+                        <tr>
+                            <td>여름 세일 쿠폰</td>
+                            <td>10,000원</td>
+                            <td>3만원 이상 구매 시</td>
+                            <td>2024-12-31</td>
+                            <td>일반</td>
+                            <td>사용가능</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="expiredCoupons" class="order-history" style="display: none;">
+                <h3>사용 완료/기간 완료 쿠폰 목록</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>쿠폰명</th>
+                            <th>할인액</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>추석 할인 쿠폰</td>
+                            <td>5,000원</td>
+                            <td>사용완료</td>
+                        </tr>
+                        <tr>
+                            <td>겨울 특가 쿠폰</td>
+                            <td>15,000원</td>
+                            <td>기간완료</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -204,6 +219,27 @@
             alert(`쿠폰 코드 "${couponCode}"이(가) 입력되었습니다.`);
             document.getElementById('couponCode').value = ''; // 입력 필드 초기화
         });
+
+        // 탭 전환 기능
+        const activeTabBtn = document.getElementById('activeTabBtn');
+        const expiredTabBtn = document.getElementById('expiredTabBtn');
+        const availableCoupons = document.getElementById('availableCoupons');
+        const expiredCoupons = document.getElementById('expiredCoupons');
+
+        activeTabBtn.addEventListener('click', function() {
+            activeTabBtn.classList.add('active');
+            expiredTabBtn.classList.remove('active');
+            availableCoupons.style.display = 'block';
+            expiredCoupons.style.display = 'none';
+        });
+
+        expiredTabBtn.addEventListener('click', function() {
+            expiredTabBtn.classList.add('active');
+            activeTabBtn.classList.remove('active');
+            availableCoupons.style.display = 'none';
+            expiredCoupons.style.display = 'block';
+        });
     </script>
+
 </body>
 </html>

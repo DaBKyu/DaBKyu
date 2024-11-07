@@ -81,6 +81,22 @@
             color: #555;
         }
 
+        /* 관리자만 보이는 답글 버튼 */
+        .admin-reply-btn {
+            display: none;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .admin-reply-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* 모달 스타일 */
         .modal {
             display: none;
             position: fixed;
@@ -112,6 +128,7 @@
             margin-top: 10px;
         }
 
+        /* 문의하기 버튼 */
         .contact-btn {
             position: fixed;
             bottom: 20px;
@@ -123,7 +140,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            z-index: 1000; /* 다른 요소들 위에 표시되도록 */
+            z-index: 1000;
         }
 
         .contact-btn:hover {
@@ -142,14 +159,13 @@
                 <div>나의 쇼핑</div>
                 <ul>
                     <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="cancelRefundChange.html" title="취소/반품/교환/">취소/반품/교환/</a></li>
-                    
+                    <li><a href="cancelRefundChange.html" title="취소/환불/교환">취소/환불/교환</a></li>
                 </ul>
             </div>
             <div>
                 <div>나의 정보</div>
                 <ul>
-                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li> 
+                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li>
                     <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
                     <li><a href="deleteAccount.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
                 </ul>
@@ -158,6 +174,7 @@
                 <div>나의 관심목록</div>
                 <ul>
                     <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                    <li><a href="myCategory.html" title=" 카테고리 "> 카테고리</a></li>
                 </ul>
             </div>
             <div>
@@ -176,43 +193,44 @@
             </div>
         </nav>
     </div>
+
     <div class="reviews-section">
         <h2>문의 게시판</h2>
-        <div class="search-section">
-            <input type="text" id="searchInput" placeholder="문의 게시판">
-            <button id="searchBtn">검색</button>
-        </div>
 
         <div class="review-item" data-title="상품 제목 1" data-author="사용자1" data-date="2024-10-01" data-content="상품 내용 1" data-image="https://via.placeholder.com/300">
-            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image">
+            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image" onclick="openModal(this)">
             <div class="review-details">
                 <p class="review-title">상품 제목 1</p>
                 <p class="review-rating">★ ★ ★ ★ ☆</p>
                 <p class="review-info">작성자: 사용자1 | 등록일: 2024-10-01 | 조회: 10</p>
             </div>
+            <button class="admin-reply-btn">답글 달기</button>
         </div>
 
         <div class="review-item" data-title="상품 제목 2" data-author="사용자2" data-date="2024-10-02" data-content="상품 내용 2" data-image="https://via.placeholder.com/300">
-            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image">
+            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image" onclick="openModal(this)">
             <div class="review-details">
                 <p class="review-title">상품 제목 2</p>
                 <p class="review-rating">★ ★ ★ ★ ★</p>
                 <p class="review-info">작성자: 사용자2 | 등록일: 2024-10-02 | 조회: 5</p>
             </div>
+            <button class="admin-reply-btn">답글 달기</button>
         </div>
 
         <div class="review-item" data-title="상품 제목 3" data-author="사용자3" data-date="2024-10-03" data-content="상품 내용 3" data-image="https://via.placeholder.com/300">
-            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image">
+            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image" onclick="openModal(this)">
             <div class="review-details">
                 <p class="review-title">상품 제목 3</p>
                 <p class="review-rating">★ ★ ★ ☆ ☆</p>
                 <p class="review-info">작성자: 사용자3 | 등록일: 2024-10-03 | 조회: 20</p>
             </div>
+            <button class="admin-reply-btn">답글 달기</button>
         </div>
     </div>
 
     <button id="contactButton" class="contact-btn">문의하기</button>
 
+    <!-- 모달 팝업 -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <h2 id="modalTitle"></h2>
@@ -224,48 +242,36 @@
         </div>
     </div>
 
+    <!-- 스크립트 -->
     <script>
-        document.getElementById('searchBtn').addEventListener('click', function() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const reviews = document.querySelectorAll('.review-item');
+        const isAdmin = true;  // 관리자 여부 (임시 설정, 실제 서버에서 받아와야 한다)
 
-            reviews.forEach(review => {
-                const title = review.querySelector('.review-title').textContent.toLowerCase();
-                review.style.display = title.includes(query) ? 'flex' : 'none';
-            });
+        // 관리자만 답글 버튼 보이기
+        document.querySelectorAll('.admin-reply-btn').forEach(button => {
+            if (isAdmin) {
+                button.style.display = 'inline-block';
+            }
         });
 
-        const reviewItems = document.querySelectorAll('.review-item');
-        reviewItems.forEach(item => {
-            item.addEventListener('click', function() {
-                const title = this.dataset.title;
-                const author = this.dataset.author;
-                const date = this.dataset.date;
-                const content = this.dataset.content;
-                const image = this.dataset.image;
+        // 모달 열기
+        function openModal(image) {
+            const reviewItem = image.closest('.review-item');
+            document.getElementById('modalTitle').textContent = reviewItem.getAttribute('data-title');
+            document.getElementById('modalAuthor').textContent = `작성자: ${reviewItem.getAttribute('data-author')}`;
+            document.getElementById('modalDate').textContent = `등록일: ${reviewItem.getAttribute('data-date')}`;
+            document.getElementById('modalContent').textContent = `내용: ${reviewItem.getAttribute('data-content')}`;
+            document.getElementById('modalImage').src = reviewItem.getAttribute('data-image');
+            document.getElementById('modal').style.display = 'flex';
+        }
 
-                document.getElementById('modalTitle').textContent = title;
-                document.getElementById('modalAuthor').textContent = `작성자: ${author}`;
-                document.getElementById('modalDate').textContent = `등록일: ${date}`;
-                document.getElementById('modalContent').textContent = content;
-                document.getElementById('modalImage').src = image;
-
-                document.getElementById('modal').style.display = 'flex';
-            });
-
-            const image = item.querySelector('.review-image');
-            image.addEventListener('click', function(event) {
-                event.stopPropagation();
-                item.click();
-            });
-        });
-
+        // 모달 닫기
         document.getElementById('closeModal').addEventListener('click', function() {
             document.getElementById('modal').style.display = 'none';
         });
 
+        // 문의하기 버튼
         document.getElementById('contactButton').addEventListener('click', function() {
-            window.location.href = 'contact.html'; // 문의하는 화면으로 이동
+            window.location.href = 'question.html';  // 'question.html' 페이지로 이동
         });
     </script>
 </body>

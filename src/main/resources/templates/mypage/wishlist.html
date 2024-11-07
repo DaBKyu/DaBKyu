@@ -88,6 +88,44 @@
         .close-button:hover {
             color: black;
         }
+
+        /* 장바구니 팝업 스타일 */
+        #cartModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #cartModalContent {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #cartModalContent button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #cartModalContent button:hover {
+            background-color: #218838;
+        }
+
     </style>
 </head>
 <body>
@@ -100,9 +138,8 @@
             <div>
                 <div>나의 쇼핑</div>
                 <ul>
-                    <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
-                    <li><a href="cancelRefundChange.html" title="취소/반품/교환/">취소/반품/교환/</a></li>
-                    
+                    <li><a href="order.html" title="주문목록/배송현황">주문/배송현황</a></li>
+                    <li><a href="cancelRefundChange.html" title="취소/환불/교환">취소/환불/교환</a></li>
                 </ul>
             </div>
             <div>
@@ -117,6 +154,7 @@
                 <div>나의 관심목록</div>
                 <ul>
                     <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                    <li><a href="myCategory.html" title=" 카테고리 "> 카테고리</a></li>
                 </ul>
             </div>
             <div>
@@ -136,7 +174,7 @@
         </nav>
     </div>
     <div class="product-list">
-        <h2>찜한 상품 목록</h2>
+        <h2>찜리스트</h2>
         <div class="select-all">
             <input type="checkbox" id="selectAll"> 전체 선택
             <button id="deleteSelectedBtn">선택 삭제</button>
@@ -162,6 +200,14 @@
             <img src="product3.jpg" alt="상품 이미지">
             <div>상품 이름 3</div>
             <button class="remove-btn">삭제</button>
+        </div>
+    </div>
+
+    <!-- 장바구니 담기 팝업 -->
+    <div id="cartModal" class="modal">
+        <div id="cartModalContent">
+            <h3>상품이 장바구니에 담겼습니다!</h3>
+            <button id="goToCartBtn">장바구니로 이동</button>
         </div>
     </div>
 
@@ -198,36 +244,26 @@
             });
         });
 
-        // 장바구니 담기 버튼 기능
-        const addToCartBtn = document.getElementById('addToCartBtn');
-        addToCartBtn.addEventListener('click', function() {
-            const selectedProducts = [];
-            productCheckboxes.forEach((checkbox, index) => {
-                if (checkbox.checked) {
-                    const productName = `상품 이름 ${index + 1}`;
-                    const productPrice = `${(index + 1) * 10000} 원`; // 예시 가격
-                    const productImage = `product${index + 1}.jpg`; // 예시 이미지 경로
-                    selectedProducts.push({ name: productName, price: productPrice, image: productImage });
-                }
-            });
-            if (selectedProducts.length > 0) {
-                // 모달에 상품 정보 세팅
-                const product = selectedProducts[0]; // 첫 번째 상품만 예시로 표시
-                document.getElementById('modalProductName').textContent = product.name;
-                document.getElementById('modalProductPrice').textContent = product.price;
-                document.getElementById('modalProductImage').src = product.image;
-                document.getElementById('purchaseModal').style.display = 'block'; // 모달 열기
-            } else {
-                alert('선택된 상품이 없습니다.');
-            }
-        });
-
         // 개별 삭제 버튼 기능
         const removeBtns = document.querySelectorAll('.remove-btn');
         removeBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 btn.closest('.product-item').remove();
             });
+        });
+
+        // 장바구니 담기 버튼 클릭 시 팝업 띄우기
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        const cartModal = document.getElementById('cartModal');
+        const goToCartBtn = document.getElementById('goToCartBtn');
+
+        addToCartBtn.addEventListener('click', function() {
+            cartModal.style.display = 'block'; // 장바구니 담기 팝업 띄우기
+        });
+
+        // 장바구니 이동 버튼 클릭 시 장바구니 페이지로 이동
+        goToCartBtn.addEventListener('click', function() {
+            window.location.href = 'shoppingCart.html'; // 장바구니 페이지로 이동
         });
 
         // 모달 닫기 기능
