@@ -93,12 +93,6 @@ public class MemberEntity {
 	@Column(name="authkey",length=200,nullable=false)
 	private String authkey;
 
-	@Column(name="gender",length=20,nullable=false)
-	private String gender;
-
-	@Column(name="birthday",nullable=false)
-	private LocalDateTime birthday;
-
 	public void modifyMemberInfo(MemberDTO dto) {
         this.telno = dto.getTelno();
         this.pay = dto.getPay();
