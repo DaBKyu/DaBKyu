@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관심 카테고리 페이지</title>
+    <link rel="stylesheet" href="/css/mypage.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+        }
+
+        #myMenu {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .order-list {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .order-list-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .tab {
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 2px solid #ccc;
+            margin-top: 20px;
+        }
+
+        .tab button {
+            flex: 1;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab button.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .tab-content {
+            margin-top: 20px;
+        }
+
+        .order-history table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .order-history th, .order-history td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .order-history th {
+            background-color: #f1f1f1;
+        }
+
+        .coupon-input {
+            margin-top: 20px;
+        }
+
+        .coupon-input input {
+            padding: 10px;
+            width: 70%;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .coupon-input button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .coupon-input button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 관심 카테고리 추가 폼 스타일 */
+        .category-form {
+            margin-bottom: 20px;
+        }
+
+        .category-form input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .category-form button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .category-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .category-list {
+            margin-top: 20px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .category-item span {
+            font-size: 1rem;
+        }
+
+        .category-item button {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .category-item button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div id="myMenu">
+        <h2>mypage</h2>
+        <div class="user-icon">
+            <i class="fas fa-user-circle"></i> <!-- 사용자 아이콘 -->
+        </div>
+        <nav>
+            <div>
+                <div>나의 쇼핑</div>
+                <ul>
+                    <li><a href="order.html" title="주문목록/배송현황">주문/배송현황</a></li>
+                    <li><a href="cancelRefundChange.html" title="취소/환불/교환">취소/환불/교환</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 정보</div>
+                <ul>
+                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li> 
+                    <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
+                    <li><a href="deleteAccount.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 관심목록</div>
+                <ul>
+                    <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                    <li><a href="myCategory.html" title="카테고리">카테고리</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 활동</div>
+                <ul>
+                    <li><a href="reviews.html" title="리뷰 모음">리뷰 모음</a></li>
+                    <li><a href="myQuestion.html" title="문의 게시판">문의 게시판</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 혜택</div>
+                <ul>
+                    <li><a href="myCoupons.html" title="할인쿠폰">할인쿠폰</a></li>
+                    <li><a href="membership.html" title="등급">등급페이지</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <div class="order-list">
+        <h3>관심 카테고리 관리</h3>
+
+        <!-- 카테고리 추가 폼 -->
+        <div class="category-form">
+            <input type="text" id="categoryInput" placeholder="새로운 관심 카테고리 입력">
+            <button id="addCategoryBtn">카테고리 추가</button>
+        </div>
+
+        <!-- 관심 카테고리 목록 -->
+        <div class="category-list" id="categoryList">
+            <!-- 카테고리 항목들이 여기에 추가될 것입니다. -->
+        </div>
+    </div>
+
+    <script>
+        // 카테고리 추가 버튼 클릭 시
+        document.getElementById('addCategoryBtn').addEventListener('click', function() {
+            var categoryInput = document.getElementById('categoryInput');
+            var categoryName = categoryInput.value.trim();
+
+            if (categoryName !== '') {
+                addCategoryToList(categoryName);
+                categoryInput.value = ''; // 입력 필드 초기화
+            } else {
+                alert('카테고리 이름을 입력하세요.');
+            }
+        });
+
+        // 카테고리 삭제 함수
+        function deleteCategory(categoryName) {
+            var categoryList = document.getElementById('categoryList');
+            var categories = categoryList.getElementsByClassName('category-item');
+
+            for (var i = 0; i < categories.length; i++) {
+                var item = categories[i];
+                if (item.querySelector('span').textContent === categoryName) {
+                    item.remove();
+                    break;
+                }
+            }
+        }
+
+        // 카테고리 목록에 항목 추가 함수
+        function addCategoryToList(categoryName) {
+            var categoryList = document.getElementById('categoryList');
+
+            // 새 카테고리 항목 생성
+            var categoryItem = document.createElement('div');
+            categoryItem.className = 'category-item';
+
+            var categoryText = document.createElement('span');
+            categoryText.textContent = categoryName;
+
+            var deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '삭제';
+            deleteBtn.addEventListener('click', function() {
+                deleteCategory(categoryName);
+            });
+
+            // 카테고리 항목에 텍스트와 삭제 버튼 추가
+            categoryItem.appendChild(categoryText);
+            categoryItem.appendChild(deleteBtn);
+
+            // 목록에 추가
+            categoryList.appendChild(categoryItem);
+        }
+    </script>
+
+</body>
+</html>

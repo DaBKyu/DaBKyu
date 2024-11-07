@@ -27,6 +27,7 @@ public class OrderInfoDTO {
 	private String resZipcode;
 	private String resTelno;
 	private int totalPrice;
+    private int deliveryPrice;
 
     public OrderInfoDTO(OrderInfoEntity entity) {
         this.orderSeqno = entity.getOrderSeqno();
@@ -41,6 +42,7 @@ public class OrderInfoDTO {
         this.resZipcode = entity.getResZipcode();
         this.resTelno = entity.getResTelno();
         this.totalPrice = entity.getTotalPrice();
+        this.deliveryPrice = entity.getDeliveryPrice();
     }
 
     public OrderInfoEntity dtoToEntity(OrderInfoDTO dto) {
@@ -57,6 +59,7 @@ public class OrderInfoDTO {
                                                 .resZipcode(dto.getResZipcode())
                                                 .resTelno(dto.getResTelno())
                                                 .totalPrice(dto.getTotalPrice())
+                                                .deliveryPrice(dto.getDeliveryPrice())
                                                 .build();
          return entity;                                        
     }

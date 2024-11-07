@@ -1,6 +1,7 @@
 package com.dabkyu.dabkyu.service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,9 +11,12 @@ import org.springframework.stereotype.Service;
 
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.OrderInfoDTO;
+import com.dabkyu.dabkyu.dto.OrderProductDTO;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
+import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
@@ -92,11 +96,7 @@ public class MasterServiceImpl implements MasterService {
 
     /////////주문
     //주문 리스트
-    public Page<OrderInfoEntity> orderList(Long pageNum, int postNum, Long keyword1, String keyword2) throws Exception{
-        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"orderDate"));
-        return orderInfoRepository.findByOrderSeqnoOrEmail_Email(keyword1, keyword2, pageRequest);
-    }
-
+    
 
 
 
@@ -146,7 +146,7 @@ public class MasterServiceImpl implements MasterService {
     //리뷰 리스트 
     @Override
     public Page<ReviewEntity> reviewList(int pageNum, int postNum, Long keyword){
-        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,""));
+        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"revDate"));
 		return reviewRepository.findByReviewSeqnoOrProductSeqno_ProductSeqno(keyword, keyword, pageRequest);
     }
 

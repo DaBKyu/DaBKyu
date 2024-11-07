@@ -18,7 +18,7 @@ import lombok.Setter;
 @Setter
 @Entity(name="shoppingCart")
 @Table(name="shopping_cart")
-@IdClass(ShoppingCartEntity.class)
+@IdClass(ShoppingCartEntityID.class)
 @Builder
 public class ShoppingCartEntity {
 
