@@ -28,7 +28,7 @@ public class ReviewFileEntity {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REVIEWFILE_SEQ")
 	@SequenceGenerator(name="REVIEWFILE_SEQ", sequenceName = "review_file_seq", initialValue = 1, allocationSize = 1)
 	@Column(name="reviewfile_seqno", nullable=false)
-    private Long reviewfileSeqno;
+    private Long reviewFileSeqno;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)

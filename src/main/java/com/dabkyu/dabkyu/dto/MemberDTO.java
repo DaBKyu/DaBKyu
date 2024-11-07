@@ -19,6 +19,8 @@ public class MemberDTO {
     private String password;
     private String telno;
     private String username;
+    private String gender;
+    private LocalDateTime birthDate;
     private String memberGrade;
     private String pay;
     private LocalDateTime regdate;
@@ -33,12 +35,15 @@ public class MemberDTO {
     private String notificationYn;
     private String emailRecept;
     private LocalDateTime emailReceptDate;
+    private String authkey;
     
     public MemberDTO(MemberEntity memberEntity) {
         this.email = memberEntity.getEmail();
         this.password = memberEntity.getEmail();
         this.telno = memberEntity.getTelno();
         this.username = memberEntity.getUsername();
+        this.gender = memberEntity.getGender();
+        this.birthDate = memberEntity.getBirthDate();
         this.memberGrade = memberEntity.getMemberGrade();
         this.pay = memberEntity.getPay();
         this.regdate = memberEntity.getRegdate();
@@ -53,6 +58,7 @@ public class MemberDTO {
         this.notificationYn = memberEntity.getNotificationYn();
         this.emailRecept = memberEntity.getEmailRecept();
         this.emailReceptDate = memberEntity.getEmailReceptDate();
+        this.authkey = memberEntity.getAuthkey();
     }
 
     public MemberEntity dtoEntity(MemberDTO dto) {
@@ -62,6 +68,8 @@ public class MemberDTO {
                                                 .password(dto.getPassword())
                                                 .telno(dto.getTelno())
                                                 .username(dto.getUsername())
+                                                .gender(dto.getGender())
+                                                .birthDate(dto.getBirthDate())
                                                 .memberGrade(dto.getMemberGrade())
                                                 .pay(dto.getPay())
                                                 .regdate(dto.getRegdate())
@@ -76,6 +84,7 @@ public class MemberDTO {
                                                 .notificationYn(dto.getNotificationYn())
                                                 .emailRecept(dto.getEmailRecept())
                                                 .emailReceptDate(dto.getEmailReceptDate())
+                                                .authkey(dto.getAuthkey())
                                                 .build();
         return memberEntity;
     }

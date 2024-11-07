@@ -15,17 +15,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder 
 public class OrderProductOptionDTO {
-    private OrderProductEntity orderproductSeqno;
+    private OrderProductEntity orderProductSeqno;
 	private ProductOptionEntity optionSeqno;
 
     public OrderProductOptionDTO(OrderProductOptionEntity entity) {
-        this.orderproductSeqno = entity.getOrderproductSeqno();
+        this.orderProductSeqno = entity.getOrderProductSeqno();
         this.optionSeqno = entity.getOptionSeqno();
     }
 
     public OrderProductOptionEntity dtoToEntity(OrderProductOptionDTO dto) {
         OrderProductOptionEntity entity = OrderProductOptionEntity.builder()
-                                                                  .orderproductSeqno(dto.getOrderproductSeqno())
+                                                                  .orderProductSeqno(dto.getOrderProductSeqno())
                                                                   .optionSeqno(dto.getOptionSeqno())
                                                                   .build();
         return entity;

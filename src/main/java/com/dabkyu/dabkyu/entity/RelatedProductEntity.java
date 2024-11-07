@@ -6,9 +6,12 @@ import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,8 +25,11 @@ import lombok.Setter;
 public class RelatedProductEntity {
     
     @Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RELATEDPRODUCT_SEQ")	
+	@SequenceGenerator(name="RELATEDPRODUCT_SEQ", sequenceName = "relatedproduct_seq", 
+		initialValue = 1, allocationSize = 1)
     @Column(name="relatedproduct_seqno",nullable=false)
-	private Long relatedproductSeqno;
+	private Long relatedProductSeqno;
 
     @ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)

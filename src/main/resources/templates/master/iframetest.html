@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script>
+    const popupButton = document.getElementById('popupButton');
+    const popup = document.getElementById('popup');
+    const closeButton = document.getElementById('closeButton');
+
+    const popupContents = popup.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+
+    const enableTabindex = () => {
+      popupContents.forEach((content) => {
+        content.setAttribute('tabindex', '0');
+      })
+    }
+
+    const disableTabindex = () => {
+      popupContents.forEach((content) => {
+        content.removeAttribute('tabindex');
+      })
+    }
+
+    popupButton.addEventListener('click', () => {
+      popup.style.display = 'block';
+      popupButton.setAttribute('aria-expanded', 'true');
+      enableTabindex();
+      closeButton.focus();
+    });
+
+    closeButton.addEventListener('click', () => {
+      popup.style.display = 'none';
+      popupButton.setAttribute('aria-expanded', 'false');
+      disableTabindex();
+    });
+
+    //tabindex 설정
+    popup.addEventListener('keydown', (e) => {
+      const lastElement = popupContents[popupContents.length - 1];
+      if (e.key === 'Tab') {
+        if (e.target === lastElement) {
+          e.preventDefault();
+          popupContents[0].focus();
+        }
+      }
+});
+  </script>
+</head>
+<body>
+<!-- 알림버튼 aria-expanded/ aria-haspopup "menu"-->
+<!-- 창 띄울 div aria-hidden:false /position: absolute, top, right/ z-index, 크기 설정 -->
+<!-- iframe 직접 표시하는 div height:100% overflow:hidden -->
+<!-- -->
+
+  <button id="popupButton" aria-haspopup="menu" aria-expanded="false">팝업 열기</button>
+  <div id="popup" role="dialog" aria-labelledby="popupHeading" aria-hidden="false" tabindex="-1">
+    <div style="width: 420px; height: 740px;">
+      <iframe src="https://m.notify.naver.com/benefits?from=pcmain" title="test" style="width: 100%; height: 100%;"></iframe>
+    </div>
+    <button id="closeButton">닫기</button>
+  </div>
+  
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
