@@ -24,3 +24,17 @@ ol, ul{padding: 0;}
 li{
     list-style: none;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #dddddd;
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+}
+th {
+    background-color: #f2f2f2;
+}

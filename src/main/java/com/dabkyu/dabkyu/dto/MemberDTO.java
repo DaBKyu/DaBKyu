@@ -36,7 +36,6 @@ public class MemberDTO {
     private String emailRecept;
     private LocalDateTime emailReceptDate;
     private String authkey;
-    private String gender;
     private LocalDateTime birthday;
     
     public MemberDTO(MemberEntity memberEntity) {

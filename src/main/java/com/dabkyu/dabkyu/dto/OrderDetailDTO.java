@@ -29,7 +29,6 @@ public class OrderDetailDTO {
         OrderDetailEntity entity = OrderDetailEntity.builder()
                                                     .orderDetailSeqno(dto.getOrderDetailSeqno())
                                                     .orderSeqno(dto.getOrderSeqno())
-                                                    .orderproductSeqno(dto.getOrderproduct_seqno())
                                                     .orderProductSeqno(dto.getOrderProductSeqno())
                                                     .build();
         return entity;
