@@ -30,16 +30,18 @@ public class MemberDTO {
     private String fromSocial;
     private int pwcheck;
     private int point;
-    private String myCategories;
+    // private String myCategories;
     private String role;
     private String notificationYn;
     private String emailRecept;
     private LocalDateTime emailReceptDate;
     private String authkey;
+    private String gender;
+    private LocalDateTime birthday;
     
     public MemberDTO(MemberEntity memberEntity) {
         this.email = memberEntity.getEmail();
-        this.password = memberEntity.getEmail();
+        this.password = memberEntity.getPassword();
         this.telno = memberEntity.getTelno();
         this.username = memberEntity.getUsername();
         this.gender = memberEntity.getGender();
@@ -51,14 +53,16 @@ public class MemberDTO {
         this.lastlogoutDate = memberEntity.getLastlogoutDate();
         this.lastpwDate = memberEntity.getLastpwDate();
         this.fromSocial = memberEntity.getFromSocial();
-        this.pwcheck = memberEntity.getPoint();
+        this.pwcheck = memberEntity.getPwcheck();
         this.point = memberEntity.getPoint();
-        this.myCategories = memberEntity.getMyCategories();
+        // this.myCategories = memberEntity.getMyCategories();
         this.role = memberEntity.getRole();
         this.notificationYn = memberEntity.getNotificationYn();
         this.emailRecept = memberEntity.getEmailRecept();
         this.emailReceptDate = memberEntity.getEmailReceptDate();
         this.authkey = memberEntity.getAuthkey();
+        this.gender = memberEntity.getGender();
+        this.birthday = memberEntity.getBirthday();
     }
 
     public MemberEntity dtoEntity(MemberDTO dto) {
@@ -79,12 +83,14 @@ public class MemberDTO {
                                                 .fromSocial(dto.getFromSocial())
                                                 .pwcheck(dto.getPwcheck())
                                                 .point(dto.getPoint())
-                                                .myCategories(dto.getMyCategories())
+                                                // .myCategories(dto.getMyCategories())
                                                 .role(dto.getRole())
                                                 .notificationYn(dto.getNotificationYn())
                                                 .emailRecept(dto.getEmailRecept())
                                                 .emailReceptDate(dto.getEmailReceptDate())
                                                 .authkey(dto.getAuthkey())
+                                                .gender(dto.getGender())
+                                                .birthday(dto.getBirthday())
                                                 .build();
         return memberEntity;
     }

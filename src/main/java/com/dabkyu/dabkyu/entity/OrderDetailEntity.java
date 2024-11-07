@@ -41,5 +41,4 @@ public class OrderDetailEntity {
 	@JoinColumn(name="orderproduct_seqno", nullable = false)
 	private OrderProductEntity orderProductSeqno;
 
-
 }

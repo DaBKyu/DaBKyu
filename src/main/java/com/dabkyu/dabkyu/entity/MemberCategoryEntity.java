@@ -2,6 +2,7 @@ package com.dabkyu.dabkyu.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -15,11 +16,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name="memberCoupon")
-@Table(name="member_coupon")
-@IdClass(MemberCouponEntityID.class)
+@Entity(name="memberCategory")
+@Table(name="member_category")
+@IdClass(MemberCategoryEntityID.class)
 @Builder
-public class MemberCouponEntity {
+public class MemberCategoryEntity {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,7 +31,7 @@ public class MemberCouponEntity {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JoinColumn(name="coupon_seqno", nullable = false)
-	private CouponEntity couponSeqno;
-	
+	@JoinColumn(name="category3_seqno", nullable = false)
+	private Category3Entity category3Seqno;
+
 }

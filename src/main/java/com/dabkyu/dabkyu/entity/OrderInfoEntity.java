@@ -70,4 +70,5 @@ public class OrderInfoEntity {
 
 	@Column(name="delivery_price", nullable=false)
 	private int deliveryPrice;
+  
 }

@@ -16,25 +16,34 @@ import lombok.Setter;
 public class MemberAddressDTO {
 	private Long memberAddressSeqno;
 	private MemberEntity email;
+	private String addrName;
 	private String address;
 	private String zipcode;
 	private String detailAddr;
+	private String request;
+	private String isBasic;
 
 	public MemberAddressDTO(MemberAddressEntity entity) {
 		this.memberAddressSeqno = entity.getMemberAddressSeqno();
+		this.addrName = entity.getAddrName();
 		this.email = entity.getEmail();
 		this.address = entity.getAddress();
 		this.zipcode = entity.getZipcode();
 		this.detailAddr = entity.getDetailAddr();
+		this.request = entity.getRequest();
+		this.isBasic = entity.getIsBasic();
 	}
 
 	public MemberAddressEntity dtoToEntity(MemberAddressDTO dto) {
 		MemberAddressEntity entity = MemberAddressEntity.builder()
 														.memberAddressSeqno(dto.getMemberAddressSeqno())
 														.email(dto.getEmail())
+														.addrName(dto.getAddrName())
 														.address(dto.getAddress())
 														.zipcode(dto.getZipcode())
 														.detailAddr(dto.getDetailAddr())
+														.request(dto.getRequest())
+														.isBasic(dto.getIsBasic())
 														.build();
 		return entity;
 	}

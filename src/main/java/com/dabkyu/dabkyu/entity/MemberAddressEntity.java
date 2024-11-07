@@ -36,6 +36,9 @@ public class MemberAddressEntity {
 	@JoinColumn(name="email", nullable = false)
 	private MemberEntity email;
 
+	@Column(name="addrName", length=20,nullable=false)
+	private String addrName;
+
     @Column(name="address", length=200, nullable=false)
 	private String address;
 
@@ -45,7 +48,9 @@ public class MemberAddressEntity {
     @Column(name="detail_addr", length=20, nullable=false)
 	private String detailAddr;
 
-	
+	@Column(name="request",length=200,nullable=true)
+	private String request;
 
-
+	@Column(name="isBasic",length=2,nullable=false)
+	private String isBasic;
 }
