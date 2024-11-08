@@ -8,7 +8,7 @@ import org.springframework.data.util.Streamable;
 
 import com.dabkyu.dabkyu.entity.MemberEntity;
 
-public interface MasterRepository extends JpaRepository<MemberEntity, Long> {
+public interface MasterRepository extends JpaRepository<MemberEntity, String> {
 
     public Page<MemberEntity> findByEmailContainingOrUsernameContaing
             (String keyword1,String keyword2,Pageable pageable);
