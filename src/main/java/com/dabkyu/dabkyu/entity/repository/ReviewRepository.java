@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 
-public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long>{
+public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
 
     // 전체 리뷰 목록 보기
     Page<ReviewEntity> findByEmailContainingOrRevContentContaining(String keyword, String keyword2, PageRequest pageRequest);
