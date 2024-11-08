@@ -35,7 +35,7 @@ public class MemberDTO {
     private String notificationYn;
     private String emailRecept;
     private LocalDateTime emailReceptDate;
-    private String authkey
+    private String authkey;
     private int totalPvalue;
     
     public MemberDTO(MemberEntity memberEntity) {
