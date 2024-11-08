@@ -41,7 +41,7 @@ public class PageUtil {
 		}
 		return pageList;
 	}
-	
+
     public String getPageList(int pageNum, int postNum, int pageListCount, int totalCount, String keyword) {
 		
 		//pageNum : 현재 페이지 번호
