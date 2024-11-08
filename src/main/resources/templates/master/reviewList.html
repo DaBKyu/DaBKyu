@@ -4,24 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>리뷰목록페이지</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-    <link rel="stylesheet" href="../../static/css/master.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #dddddd;
-            text-align: center;
-            vertical-align: middle;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/master.css" th:href="@{/css/master.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 
 <body>
@@ -51,7 +38,7 @@
                     </li>
                     <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="../master/mailLog.html">메일 발송 목록</a></li>
+                            <li><a class="dropdown-item" href="../master/mailList.html">메일 발송 목록</a></li>
                             <li><a class="dropdown-item" href="../master/mailSend.html">메일 발송</a></li>
                           </ul>
                     </li>
@@ -67,78 +54,132 @@
         </div>
     </nav>
         
-<div class="container mt-4">     
-    <h2 class="mt-4">리뷰목록</h2>
+    <div class="container mt-4">     
+        <h2 class="mt-4">리뷰목록</h2>
 
-    <!-- 카테고리 선택 -->
-    <div class="d-flex justify-content-end mb-2">
-        <select class="form-select w-auto" aria-label="카테고리 선택">
-            <option selected>카테고리</option>
-            <option value="1">카테고리 1</option>
-            <option value="2">카테고리 2</option>
-            <option value="3">카테고리 3</option>
-        </select>
-    </div>
+        <!-- 카테고리 선택 -->
+        <div class="d-flex justify-content-end mb-2">
+            <select class="form-select w-auto" id="categorySelect" aria-label="카테고리 선택">
+                <option value="">전체 카테고리</option>
+                <option th:each="category : ${categories}" 
+                        th:value="${category.id}" 
+                        th:text="${category.name}"></option>
+            </select>
+        </div>
 
-    <!-- 리뷰 목록 테이블 -->
-    <div class="table-responsive">
-    <table class="table table-hover">
-        <thead>
-            <tr>
-            <th scope="col"><input class="form-check-input" type="checkbox" id="checkAll"></th>
-            <th scope="col">평가</th>
-            <th scope="col">작성자</th>
-            <th scope="col">내용</th>
-            <th scope="col">카테고리</th>
-            <th scope="col">작성일</th>
-            </tr>
-        </thead>
-        <tbody class="table-group-divider">
-            <tr>
-              <th scope="row"><input class="form-check-input" type="checkbox" id="checkRow"></th>
-              <td>5</td>
-              <td>qscd123</td>
-              <td>상품 관련 문의 입니다.</td>
-              <td>…</td>
-              <td>2024.10.29</td>
-            </tr>
-            <tr th:each="list : ${list}">
-                <td><input class="form-check-input" type="checkbox" id="checkRow"></th>
-                <td><span th:text="${list.rate}"></span></td>
-                <td><span th:text="${list.rev_writer}"></span></td>
-                <td><img class="p_image" th:src="@{'/p_img/' + ${list.stored_filename}}" style="width:40px; height: 40px"><a id="hypertext" th:href="@{'/master/pReview?rev_writer=' + ${list.rev_writer} + '&page=' + ${page} + '&keyword=' + ${keyword} }" onMouseover='this.style.textDecoration="underline"'  
-                        onmouseout="this.style.textDecoration='none';">&nbsp;<span th:text="${list.rev_content}">123132123123132</span></a></td>
-                <td><span th:text="${list.category_name}"></span></td>
-                <td><span th:text="${#temporals.format(list.rev_date,'yyyy-MM-dd')}"></span></td>
-           </tr>
-        </tbody>
-        </table>
-    </div>
+        <!-- 리뷰 목록 테이블 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                        <th scope="col">평가</th>
+                        <th scope="col">작성자</th>
+                        <th scope="col">내용</th>
+                        <th scope="col">카테고리</th>
+                        <th scope="col">작성일</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr th:each="review : ${reviews}">
+                        <td><input class="form-check-input" type="checkbox" th:value="${review.id}"></td>
+                        <td th:text="${review.rate}">5</td>
+                        <td th:text="${review.rev_writer}">qscd123</td>
+                        <td>
+                            <img class="p_image" th:src="@{'/p_img/' + ${review.stored_filename}}" style="width:40px; height: 40px">
+                            <a th:href="@{'/master/pReview'(rev_writer=${review.rev_writer}, page=${page}, keyword=${keyword})}" 
+                               onmouseover="this.style.textDecoration='underline'" 
+                               onmouseout="this.style.textDecoration='none';">
+                                <span th:text="${review.rev_content}">상품 관련 문의 입니다.</span>
+                            </a>
+                        </td>
+                        <td th:text="${review.category_name}">카테고리명</td>
+                        <td th:text="${#temporals.format(review.rev_date, 'yyyy-MM-dd')}">2024.10.29</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <!-- 삭제버튼 -->
-        <button type="button" class="btn btn-danger">삭제</button>
+        <button type="button" class="btn btn-danger" id="deleteButton">삭제</button>
 
         <!-- 페이지네이션 -->
-        <nav aria-label="Page navigation example" class="pagination-custom">
-        <ul class="pagination justify-content-center">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1">이전</a>
-            </li>
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center"
+                th:with="startNumber=${T(Math).floor(reviews.number/10)}*10+1, endNumber=(${reviews.totalPages} > ${startNumber}+9) ? ${startNumber}+9 : ${reviews.totalPages}">
+                
+                <li class="page-item" th:classappend="${reviews.first}?'disabled':''">
+                    <a class="page-link" th:href="@{/reviewList(page=${reviews.number})}" tabindex="-1">이전</a>
+                </li>
 
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item" th:each="page : ${#numbers.sequence(startNumber, endNumber)}" 
+                    th:classappend="${page == reviews.number+1}?'active':''">
+                    <a class="page-link" th:href="@{/reviewList(page=${page-1})}" th:text="${page}">1</a>
+                </li>
 
-            <li class="page-item"><span class="page-link">...</span></li> 
-
-            <li class="page-item"><a class="page-link" href="#">9</a></li> 
-            
-             <li class="page-item">
-                <a class="page-link" href="#">다음</a>
-             </li> 
-        </ul>
+                <li class="page-item" th:classappend="${reviews.last}?'disabled':''">
+                    <a class="page-link" th:href="@{/reviewList(page=${reviews.number+2})}">다음</a>
+                </li>
+            </ul>
         </nav>
-
     </div>
     
+    <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var categorySelect = document.getElementById('categorySelect');
+        var checkAll = document.getElementById('checkAll');
+        var deleteButton = document.getElementById('deleteButton');
+
+        categorySelect.addEventListener('change', function() {
+            var categoryId = this.value;
+            window.location.href = '/reviewList?category=' + categoryId;
+        });
+
+        checkAll.addEventListener('change', function() {
+            var checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = checkAll.checked;
+            });
+        });
+
+        deleteButton.addEventListener('click', function() {
+            var selectedReviews = Array.from(document.querySelectorAll('tbody input[type="checkbox"]:checked'))
+                                       .map(cb => cb.value);
+            if (selectedReviews.length > 0) {
+                if (confirm('선택한 리뷰를 삭제하시겠습니까?')) {
+                    deleteReviews(selectedReviews);
+                }
+            } else {
+                alert('삭제할 리뷰를 선택해주세요.');
+            }
+        });
+    });
+
+    function deleteReviews(reviewIds) {
+        fetch('/master/reviews/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify({ ids: reviewIds })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('리뷰 삭제 성공:', data);
+            alert('리뷰 삭제에 성공했습니다.');
+            window.location.reload();
+        })
+        .catch((error) => {
+            console.error('리뷰 삭제 실패:', error);
+            alert('리뷰 삭제에 실패했습니다. 다시 시도해 주세요.');
+        });
+    }
+    </script>
 </body>
 </html>
