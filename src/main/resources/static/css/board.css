@@ -255,7 +255,7 @@ a:active { color: red; }
     width: 70px; /* 원하는 너비 */
     height: 40px; /* 원하는 높이 */
     border: 1px solid #e3e3e3; /* 테두리 */
-	margin-left: 50px;
+	  margin-left: 50px;
     margin-top: 10px;
    	margin-bottom: 1px;
     display: flex; /* 내용 정렬을 위한 flexbox */
