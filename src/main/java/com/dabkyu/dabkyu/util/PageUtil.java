@@ -119,6 +119,7 @@ public class PageUtil {
 		}
 		return pageList;
 	}
+
 	
 	public String getPageAddress(int pageNum, int postNum, int pageListCount, int totalCount, String keyword) {
 		

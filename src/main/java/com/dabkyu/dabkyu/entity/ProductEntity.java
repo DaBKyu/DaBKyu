@@ -60,4 +60,6 @@ public class ProductEntity {
     @Column(name="info_stored_image",length = 200,nullable=true)
 	private String infoStoredImage;
 
+	@Column(name="secret_yn",length = 2,nullable=false)
+	private String secretYn;
 }

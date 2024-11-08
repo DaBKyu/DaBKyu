@@ -1,15 +1,18 @@
 package com.dabkyu.dabkyu.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.OrderProductDTO;
+import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
@@ -18,6 +21,7 @@ import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductOptionEntity;
+import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.RelatedProductEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
 import com.dabkyu.dabkyu.entity.repository.AddedRelatedProductRepository;
@@ -173,8 +177,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         // 회원 정보 가져오기
         MemberEntity memberEntity = memberRepository.findById(email).get();
 
+        // 총 가격
         Map<String,Object> calculateResult = calculatePrice(toPayOrderProductList);
-                
+
         // 주문 정보 생성
         OrderInfoEntity orderInfoEntity = OrderInfoEntity.builder()
                                                           .email(memberEntity)
@@ -307,6 +312,34 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         orderInfoRepository.save(orderInfo);
     }
 
-    
-    
+
+    // 환불 신청 처리 
+    public void refundRequest(String email, List<Long> orderProductSeqnos) {
+        // 주문 상품 조회
+        List<OrderProductEntity> orderProducts = orderProductRepository.findByEmailAndSeqnos(email, orderProductSeqnos);
+
+        // 환불 처리
+        orderProducts.forEach(orderProduct -> {
+            orderProduct.setReviewYn("N");  // 환불 시 리뷰 상태 초기화
+            orderProductRepository.save(orderProduct);
+
+            // 주문 상세 정보 업데이트 (환불 상태로 변경)
+            OrderDetailEntity orderDetail = orderDetailRepository.findByOrderProductSeqno(orderProduct.getOrderProductSeqno());
+            orderDetail.setOrderProductSeqno(orderProduct);
+            orderDetailRepository.save(orderDetail);
+        });
+
+        // 첫 번째 주문 상품의 orderSeqno로 주문 정보 업데이트 (환불 상태로 변경)
+        Long orderSeqno = orderProducts.get(0).getOrderProductSeqno();
+        OrderInfoEntity orderInfo = orderInfoRepository.findByEmailAndOrderSeqno(email, orderSeqno);
+
+        if (orderInfo == null) {
+            throw new IllegalArgumentException("해당 주문 정보가 없습니다.");
+        }
+
+        orderInfo.setOrderStatus("환불 신청");
+        orderInfoRepository.save(orderInfo);
+    }
+
 }
+   

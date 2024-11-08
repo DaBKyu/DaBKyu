@@ -93,6 +93,9 @@ public class MemberEntity {
 	@Column(name="authkey",length=200,nullable=false)
 	private String authkey;
 
+	@Column(name="total_pvalue",nullable=true)
+	private int totalPvalue;
+	
 	public void modifyMemberInfo(MemberDTO dto) {
         this.telno = dto.getTelno();
         this.pay = dto.getPay();

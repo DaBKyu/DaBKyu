@@ -18,11 +18,15 @@ public class OrderDetailDTO {
     private Long orderDetailSeqno;
 	private OrderInfoEntity orderSeqno;
 	private OrderProductEntity orderProductSeqno;
+    private String cancelYn;
+    private String refundYn;
 
     public OrderDetailDTO(OrderDetailEntity entity) {
         this.orderDetailSeqno = entity.getOrderDetailSeqno();
         this.orderSeqno = entity.getOrderSeqno();
         this.orderProductSeqno = entity.getOrderProductSeqno();
+        this.cancelYn = entity.getCancelYn();
+        this.refundYn = entity.getRefundYn();
     }
 
     public OrderDetailEntity dtoToEntity(OrderDetailDTO dto) {
@@ -30,6 +34,8 @@ public class OrderDetailDTO {
                                                     .orderDetailSeqno(dto.getOrderDetailSeqno())
                                                     .orderSeqno(dto.getOrderSeqno())
                                                     .orderProductSeqno(dto.getOrderProductSeqno())
+                                                    .cancelYn(dto.getCancelYn())
+                                                    .refundYn(dto.getRefundYn())
                                                     .build();
         return entity;
     }

@@ -16,6 +16,6 @@ public interface QuestionFileRepository extends JpaRepository<QuestionFileEntity
     + "WHERE q.email.email=:email")
     public List<QuestionFileEntity> findByEmail(@Param("email") String email);
 
-    public List<QuestionFileEntity> findByQueSeqno(Long queSeqno);
+    public List<QuestionFileEntity> findByQueSeqno(Long queFileSeqno);
     
 }

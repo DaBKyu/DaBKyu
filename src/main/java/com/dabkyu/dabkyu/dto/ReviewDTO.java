@@ -1,6 +1,8 @@
 package com.dabkyu.dabkyu.dto;
 
 import java.time.LocalDateTime;
+
+import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ import lombok.Setter;
 public class ReviewDTO {
     private Long reviewSeqno;
 	private ProductEntity productSeqno;
+	private MemberEntity email;
 	private String revWriter;
 	private String revContent;
 	private LocalDateTime revDate;
@@ -27,7 +30,7 @@ public class ReviewDTO {
 	public ReviewDTO(ReviewEntity entity) {
 		this.reviewSeqno = entity.getReviewSeqno();
 		this.productSeqno = entity.getProductSeqno();
-		this.revWriter = entity.getRevWriter();
+		this.email = entity.getEmail();
 		this.revContent = entity.getRevContent();
 		this.revDate = entity.getRevDate();
 		this.likecnt = entity.getLikecnt();
@@ -39,7 +42,7 @@ public class ReviewDTO {
 		ReviewEntity entity = ReviewEntity.builder()
 										  .reviewSeqno(dto.getReviewSeqno())
 										  .productSeqno(dto.getProductSeqno())
-										  .revWriter(dto.getRevWriter())
+										  .email(dto.getEmail())
 										  .revContent(dto.getRevContent())
 										  .revDate(dto.getRevDate())
 										  .likecnt(dto.getLikecnt())

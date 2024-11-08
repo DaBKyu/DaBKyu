@@ -15,6 +15,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, 
     // 특정 주문 상품에 해당하는 주문 상세 정보 조회
     List<OrderDetailEntity> findByOrderProductSeqno(OrderProductEntity orderProduct);
 
+    OrderDetailEntity findByOrderProductSeqno(Long orderProductSeqno);
 
 
 }
