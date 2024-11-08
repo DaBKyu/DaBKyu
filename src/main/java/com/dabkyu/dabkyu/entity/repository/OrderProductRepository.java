@@ -29,4 +29,6 @@ public interface OrderProductRepository extends JpaRepository<OrderProductEntity
     //주문 상품 조회
     public List<OrderProductEntity> findByOrderSeqno(OrderInfoEntity orderSeqno);
 
+    public List<OrderProductEntity> findByEmailAndSeqnos(String email, List<Long> orderProductSeqnos);
+
 }

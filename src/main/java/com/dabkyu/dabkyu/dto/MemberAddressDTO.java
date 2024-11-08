@@ -20,6 +20,8 @@ public class MemberAddressDTO {
 	private String address;
 	private String zipcode;
 	private String detailAddr;
+	private String receiverName;
+	private String receiverTelno;
 	private String request;
 	private String isBasic;
 
@@ -30,6 +32,8 @@ public class MemberAddressDTO {
 		this.address = entity.getAddress();
 		this.zipcode = entity.getZipcode();
 		this.detailAddr = entity.getDetailAddr();
+		this.receiverName = entity.getReceiverName();
+		this.receiverTelno = entity.getReceiverTelno();
 		this.request = entity.getRequest();
 		this.isBasic = entity.getIsBasic();
 	}
@@ -42,6 +46,8 @@ public class MemberAddressDTO {
 														.address(dto.getAddress())
 														.zipcode(dto.getZipcode())
 														.detailAddr(dto.getDetailAddr())
+														.receiverName(dto.getReceiverName())
+														.receiverTelno(dto.getReceiverTelno())
 														.request(dto.getRequest())
 														.isBasic(dto.getIsBasic())
 														.build();

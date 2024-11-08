@@ -43,9 +43,6 @@ public class ReviewEntity {
 	@JoinColumn(name="product_seqno", nullable = false)
 	private ProductEntity productSeqno;
 
-    @Column(name="rev_writer",length=50,nullable=false)
-	private String revWriter;
-
     @Column(name="rev_content",length=2000,nullable=false)
 	private String revContent;
 

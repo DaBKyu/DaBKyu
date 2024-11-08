@@ -18,4 +18,6 @@ public interface ReviewFileRepository extends JpaRepository<ReviewFileEntity, Lo
     public List<ReviewFileEntity> findByEmail(@Param("email") String email);
 
     public List<ReviewFileEntity> findByReviewSeqno(ReviewEntity review);
+
+	public List<ReviewFileEntity> findBySeqno(Long reviewFileSeqno);
 }
