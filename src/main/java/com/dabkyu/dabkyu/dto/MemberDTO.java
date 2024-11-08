@@ -43,6 +43,8 @@ public class MemberDTO {
         this.password = memberEntity.getPassword();
         this.telno = memberEntity.getTelno();
         this.username = memberEntity.getUsername();
+        this.gender = memberEntity.getGender();
+        this.birthDate = memberEntity.getBirthDate();
         this.memberGrade = memberEntity.getMemberGrade();
         this.pay = memberEntity.getPay();
         this.regdate = memberEntity.getRegdate();
@@ -58,8 +60,6 @@ public class MemberDTO {
         this.emailRecept = memberEntity.getEmailRecept();
         this.emailReceptDate = memberEntity.getEmailReceptDate();
         this.authkey = memberEntity.getAuthkey();
-        this.gender = memberEntity.getGender();
-        this.birthday = memberEntity.getBirthday();
         this.totalPvalue = memberEntity.getTotalPvalue();
     }
 
@@ -70,6 +70,8 @@ public class MemberDTO {
                                                 .password(dto.getPassword())
                                                 .telno(dto.getTelno())
                                                 .username(dto.getUsername())
+                                                .gender(dto.getGender())
+                                                .birthDate(dto.getBirthDate())
                                                 .memberGrade(dto.getMemberGrade())
                                                 .pay(dto.getPay())
                                                 .regdate(dto.getRegdate())
@@ -85,8 +87,6 @@ public class MemberDTO {
                                                 .emailRecept(dto.getEmailRecept())
                                                 .emailReceptDate(dto.getEmailReceptDate())
                                                 .authkey(dto.getAuthkey())
-                                                .gender(dto.getGender())
-                                                .birthday(dto.getBirthday())
                                                 .totalPvalue(dto.getTotalPvalue())
                                                 .build();
         return memberEntity;
