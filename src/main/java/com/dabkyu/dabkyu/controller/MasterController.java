@@ -78,26 +78,51 @@ public class MasterController{
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
-		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword));
+		model.addAttribute("pageList", page.getPageClient(pageNum, postNum, pageListCount,totalCount,keyword));
 
     }
 
     //고객페이지 상세보기 >> 필요?
 
+
     //고객 삭제 기능..? 
+    @Transactional
+    @GetMapping("/manageBack/clientdelete")
+    public String deleteClient(@RequestParam("email") String email) throws Exception{
+ 
+		
+		masterService.clientDelete(email); 
 
-    //고객정보 수정 화면보기
-    @GetMapping("/manageBack/clientmodify")
-    public void modifyViewClient() {}
-
-    //고객정보 수정 (등급) >> 따로 화면? OR 리스트에서 바로 수정 가능? 
-    @PostMapping("/manageBack/clientmodify")
-    public void modifyClient() {
-        //아직
+		return "redirect:/manageBack/client";
 
     }
 
+    //고객정보 수정 화면보기
+    @GetMapping("/manageBack/clientmodify")
+    public void modifyViewClient() {
+
+
+    }
+
+    //고객정보 수정 (등급) >> 따로 화면? OR 리스트에서 바로 수정 가능? 
+    //수동? 자동? 
+    //수동 > 직접 수정 가능하게... ???????
+    //자동 > 기간, 소비금액 총액 계산 후 자동 변경 기능... ?????
+    //수정필요
+    @PostMapping("/manageBack/clientmodify")
+    public String modifyClient(@RequestParam("email") String email,
+                            @RequestParam("memberGrade") String memberGrade) throws Exception {
+
+        MemberEntity memberEntity = masterService.getMemberByEmail(email);
+        memberEntity.setMemberGrade(memberGrade);
+        masterService.saveMemberGrade(memberEntity);
+
+        return "redirect:/manageBack/client";
+        
+    }
+
     //적립금 관리.. > 등급별로 설정 가능하게..? 
+    //등급 <-> 적립금 % 조절 가능하게..? 
     @PostMapping("manageBack/point")
     public String modifyPoint() {
 
@@ -117,33 +142,50 @@ public class MasterController{
     //이메일 발송 
     
     //상품 리스트 화면보기
+    //수정필요
+    //원본제품설명이미지?? 이미지파일 불러와야함. .
+    /*
     @GetMapping("/manageBack/productlist")
-    public void getProductPost(Model model,@RequestParam("page") int pageNum,
-			                @RequestParam(name="keyword1",defaultValue="",required=false) Long keyword1,
-                            @RequestParam(name="keyword2",defaultValue="",required=false) String keyword2) 
-                            throws Exception{
-                                int postNum = 10; 
-                                int pageListCount = 10; 
-                                
-                                PageUtil page = new PageUtil();
-                                Page<ProductEntity> productList = masterService.productList(pageNum, postNum, keyword1, keyword2);
-                                int totalCount = (int)productList.getTotalElements();
-                        
-                                model.addAttribute("productList", productList);
-                                model.addAttribute("listIsEmpty", productList.hasContent()?"N":"Y");
-                                model.addAttribute("totalElement", totalCount);
-                                model.addAttribute("postNum", postNum);
-                                model.addAttribute("page", pageNum);
-                                model.addAttribute("keyword", keyword1);
-                                model.addAttribute("keyword", keyword2);
-                                model.addAttribute("pageList", page.getPageList1(pageNum, postNum, pageListCount,totalCount,keyword1, keyword2));
-    }
+    public void getProductPost(
+        Model model,
+        @RequestParam("page")
+        int pageNum,
+		@RequestParam(name="keyword1",defaultValue="",required=false)
+        Long keyword1,
+        @RequestParam(name="keyword2",defaultValue="",required=false)
+        String keyword2
+    ) throws Exception{
+
+        int postNum = 10; 
+        int pageListCount = 10; 
+        
+        PageUtil page = new PageUtil();
+        Page<ProductEntity> productList = masterService.productList(pageNum, postNum, keyword1, keyword2);
+        int totalCount = (int)productList.getTotalElements();
+
+        model.addAttribute("productList", productList);
+        model.addAttribute("listIsEmpty", productList.hasContent()?"N":"Y");
+        model.addAttribute("totalElement", totalCount);
+        model.addAttribute("postNum", postNum);
+        model.addAttribute("page", pageNum);
+        model.addAttribute("keyword", keyword1);
+        model.addAttribute("keyword", keyword2);
+        model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,keyword1, keyword2));
+
+
+
+
+}
+ */
+
+    //상품 이미지 보기...? 
+
 
     //상품 등록 화면보기 
     @GetMapping("/manageBack/productpost") 
     public void getProduct() {}
 
-    //상품 수정 화면보기
+    //상품 수정 화면보기 >> 수정 눌렀을 때
     @GetMapping("/manageBack/productmodify")
     public void modifyProduct() {}
 
@@ -184,6 +226,7 @@ public class MasterController{
     @Transactional
 	@GetMapping("/manageBack/productdelete") 
     public String productDelete(@RequestParam("productSeqno") Long productSeqno) throws Exception {
+
         Map<String, Object> data = new HashMap<>();
 		data.put("kind", "B");
 		data.put("seqno", productSeqno);
@@ -196,18 +239,15 @@ public class MasterController{
 
     //주문내역 리스트 화면보기  ///수정수정수정서웅ㅇ서줭수정써ㅜㅈ엇
     //추가상품 정보 O -> 추가
-        //제품 옵션 정보 O -> 추가 
+    //제품 옵션 정보 O -> 추가 
     @GetMapping("/manageBack/order")
-    public List<OrderInfoDTO> getOrder() {
+    public void getOrder(@RequestParam("orderSeqno") Long orderSeqno,Model model) {
+
+
 
 
 
         
-
-        
-
-
-
     }
 
     //주문내역 상세보기... 
@@ -283,7 +323,7 @@ public class MasterController{
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
-		model.addAttribute("pageList", page.getPageList2(pageNum, postNum, pageListCount,totalCount,keyword));
+		model.addAttribute("pageList", page.getPageReview(pageNum, postNum, pageListCount,totalCount,keyword));
 
     }
 
@@ -305,26 +345,26 @@ public class MasterController{
     }
 
     //쿠폰 리스트보기
+    //couponCategory -> coupon_seqno , category3seqno
+    //couponTarget -> coupon_seqno, product_seqno
     @GetMapping("/manageBack/coupon")
     public void getCoupon(Model model,@RequestParam("page") int pageNum,
                         @RequestParam(name="keyword",defaultValue="",required=false) String keyword) 
                         throws Exception {
-        int postNum = 10; 
+        int postNum = 15; 
         int pageListCount = 10; 
         
         PageUtil page = new PageUtil();
-        Page<CouponEntity> couponList = masterService.couponList(pageNum, postNum, keyword);
-        int totalCount = (int)couponList.getTotalElements();
+        Page<Map<String, Object>> couponPage = masterService.couponList(pageNum,postNum,keyword);
+        int totalCount = (int) couponPage.getTotalElements();
 
-        model.addAttribute("list", couponList);
-        model.addAttribute("listIsEmpty", couponList.hasContent()?"N":"Y");
+        model.addAttribute("couponPage", couponPage);
+		model.addAttribute("listIsEmpty", couponPage.hasContent()?"N":"Y");
         model.addAttribute("totalElement", totalCount);
         model.addAttribute("postNum", postNum);
         model.addAttribute("page", pageNum);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword));
-
-        //쿠폰명, 사용가능 등급, 사용가능 카테고리.상품명
+        model.addAttribute("pageList", page.getPageCoupon(pageNum, postNum, pageListCount,totalCount,keyword));
 
     }
 
@@ -337,6 +377,7 @@ public class MasterController{
     public void getModifyCoupon() {}
 
     //쿠폰 등록, 수정
+    //수정필요
     @ResponseBody
     @PostMapping("/manageBack/couponpost")
     public void postCoupon(CouponDTO coupon, @RequestParam("kind") String kind) throws Exception{
@@ -345,7 +386,7 @@ public class MasterController{
             masterService.writeCoupon(coupon);
 
             //쿠폰 적용 범위를 카테고리 검색으로. 검색도 가능. 여러개 선택도 가능... 
-            //권한설정 > 맴버등급으로.
+            //권한설정: coupon_role > 맴버등급으로.
             //사용옵션: 추가 할인 가능 >> 이건 뭐지?? 체크표시... 
 
         }
@@ -364,6 +405,8 @@ public class MasterController{
 
 
     //쿠폰 삭제
+    //수정필요. >> 삭제가 아니라 사용만료, 기간만료에 들어가게 됨. 
+    //             사용조건이 맞지 않더라도 위치 옮김. (특정 등급 제한 쿠폰일 경우, 기간 만료 전 등급이 변경됐을 때 etc.)
     @GetMapping("/manageBack/coupondelete")
     public String deleteCoupon(@RequestParam("couponSeqno") Long couponSeqno) throws Exception{
         Map<String, Object> data = new HashMap<>();
