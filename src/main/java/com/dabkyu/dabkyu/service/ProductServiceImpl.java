@@ -30,15 +30,16 @@ public class ProductServiceImpl implements ProductService{
 	public Page<ProductEntity> list(int pageNum, int postNum, String keyword, Long category1Seqno, Long category2Seqno, Long category3Seqno) throws Exception {
 		PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"productSeqno"));
 		 // 대분류, 중분류, 소분류 순으로 필터링
-		 if (category1Seqno != null) {
+		 //if (category1Seqno != null) {
             // 대분류 카테고리가 선택된 경우
-            return productRepository.findByCategory1SeqnoAndProductNameContaining(category1Seqno, keyword, pageRequest);
-        } else if (category2Seqno != null) {
+            //return productRepository.findByCategory1SeqnoAndProductNameContaining(category1Seqno, keyword, pageRequest);
+        //} else if (category2Seqno != null) {
             // 중분류 카테고리가 선택된 경우
-            return productRepository.findByCategory2SeqnoAndProductNameContaining(category2Seqno, keyword, pageRequest);
-        } else if (category3Seqno != null) {
+            //return productRepository.findByCategory2SeqnoAndProductNameContaining(category2Seqno, keyword, pageRequest);
+        //} else if (category3Seqno != null) {
+		if (category3Seqno != null) {
             // 소분류 카테고리가 선택된 경우
-            return productRepository.findByCategory3SeqnoAndProductNameContaining(category3Seqno, keyword, pageRequest);
+            return productRepository.findByCategory3Seqno_Category3SeqnoAndProductNameContaining(category3Seqno, keyword, pageRequest);
         } else {
             // 카테고리가 선택되지 않은 경우 전체 상품 목록 조회
             return productRepository.findByProductNameContaining(keyword, pageRequest);

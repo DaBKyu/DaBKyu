@@ -21,7 +21,7 @@ public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
     // 상품 이전 보기
 	@Query("select max(r.reviewSeqno) from review r " 
     + "where r.reviewSeqno < :reviewSeqno and "
-    + "(r.email like %:keyword1% or r.revContent like $:keyword2%)")
+    + "(r.email.email like %:keyword1% or r.revContent like %:keyword2%)")
   public Long pre_seqno(@Param("reviewSeqno") Long reviewSeqno, 
         @Param("keyword1") String keyword1,
         @Param("keyword2") String keyword2);
@@ -29,7 +29,7 @@ public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
     // 상품 다음 보기
     @Query("select min(r.reviewSeqno) from review r "
         + "where r.reviewSeqno < :reviewSeqno and "
-        + "r.email like %:keyword1% or r.revContent like $:keyword2%)")
+        + "(r.email.email like %:keyword1% or r.revContent like %:keyword2%)")
   public Long next_seqno(@Param("reviewSeqno") Long reviewSeqno, 
         @Param("keyword1") String keyword1,
         @Param("keyword2") String keyword2);

@@ -84,10 +84,10 @@ public class ReviewServiceImpl implements ReviewService {
 	
 	//리뷰 상세 페이지에서 첨부된 파일 목록 보기
 	@Override
-	public List<ReviewFileDTO> fileListView(Long reviewFileSeqno) throws Exception{
+	public List<ReviewFileDTO> fileListView(Long reviewSeqno) throws Exception{
 		List<ReviewFileDTO> fileDTOs = new ArrayList<>();
 
-		reviewFileRepository.findBySeqno(reviewFileSeqno).stream().forEach(list-> fileDTOs.add(new ReviewFileDTO(list)));
+		reviewFileRepository.findByReviewSeqno(reviewRepository.findById(reviewSeqno).get()).stream().forEach(list-> fileDTOs.add(new ReviewFileDTO(list)));
 		return fileDTOs;
 	}
 	
@@ -107,7 +107,7 @@ public class ReviewServiceImpl implements ReviewService {
 		List<ReviewFileEntity> fileEntities = null;
 		
 		if(data.get("kind").equals("B")) { //전체파일삭제
-			fileEntities = reviewFileRepository.findBySeqno((Long)data.get("reviewFileSeqno"));	
+			fileEntities = reviewFileRepository.findByReviewSeqno(reviewRepository.findById((Long)data.get("reviewSeqno")).get());	
 			if (fileEntities != null && !fileEntities.isEmpty()) {
 				reviewFileRepository.deleteAll(fileEntities);
 			}

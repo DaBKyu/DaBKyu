@@ -19,7 +19,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name="reviewfile")
+@Entity(name="reviewFile")
 @Table(name="review_file")
 @Builder
 public class ReviewFileEntity {

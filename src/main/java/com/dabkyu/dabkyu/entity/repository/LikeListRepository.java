@@ -14,7 +14,7 @@ import com.dabkyu.dabkyu.entity.ProductEntity;
 public interface LikeListRepository extends JpaRepository<LikeListEntity,LikeListEntityID> {
     
     // 회원이 찜한 상품 날짜 내림차순 조회
-    @Query("SELECT l.productSeqno FROM likelist l " +
+    @Query("SELECT l.productSeqno FROM likeList l " +
                   "WHERE l.email=:email " +
                   "ORDER BY l.likeDate DESC")
     public Page<ProductEntity> findLikedProductByEmail(

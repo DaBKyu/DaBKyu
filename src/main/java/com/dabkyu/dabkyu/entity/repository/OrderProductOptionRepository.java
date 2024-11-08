@@ -11,6 +11,6 @@ import com.dabkyu.dabkyu.entity.OrderProductOptionEntityID;
 
 public interface OrderProductOptionRepository extends JpaRepository<OrderProductOptionEntity, OrderProductOptionEntityID> {
 
-    @Query("Select opo from orderproductoption opo where orderProductSeqno=:orderProductSeqno")
+    @Query("Select opo from orderProductOption opo where orderProductSeqno=:orderProductSeqno")
     public List<OrderProductOptionEntity> findByOrderProductSeqno(@Param("orderProductSeqno") Long orderProductSeqno);
 }

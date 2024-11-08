@@ -15,7 +15,7 @@ import com.dabkyu.dabkyu.entity.MemberEntity;
 public interface MemberCouponRepository extends JpaRepository<MemberCouponEntity,MemberCouponEntityID> {
 
     // 회원 쿠폰조회(쿠폰 종료일 오름차순 조회)
-    @Query("SELECT mc.couponSeqno FROM membercoupon mc " +
+    @Query("SELECT mc.couponSeqno FROM memberCoupon mc " +
                    "JOIN mc.couponSeqno c " +
                    "WHERE mc.email=:email " +
                    "ORDER BY c.couponEndDate ASC")

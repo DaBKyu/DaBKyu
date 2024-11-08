@@ -51,10 +51,10 @@ public class MemberAddressEntity {
 	@Column(name="request",length=200,nullable=true)
 	private String request;
 
-	@Column(name="request",length=20,nullable=true)
+	@Column(name="receiver_name",length=20,nullable=true)
 	private String receiverName;
 
-	@Column(name="request",length=20,nullable=true)
+	@Column(name="receiver_telno",length=20,nullable=true)
 	private String receiverTelno;
 
 	@Column(name="isBasic",length=2,nullable=false)

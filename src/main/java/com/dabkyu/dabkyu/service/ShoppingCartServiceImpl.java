@@ -312,7 +312,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         orderInfoRepository.save(orderInfo);
     }
 
-
+/*
     // 환불 신청 처리 
     public void refundRequest(String email, List<Long> orderProductSeqnos) {
         // 주문 상품 조회
@@ -340,6 +340,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         orderInfo.setOrderStatus("환불 신청");
         orderInfoRepository.save(orderInfo);
     }
-
+*/
 }
    
