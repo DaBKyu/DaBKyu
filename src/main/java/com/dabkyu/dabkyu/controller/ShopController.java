@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.OrderProductDTO;
+import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
 import com.dabkyu.dabkyu.service.MemberService;
@@ -180,7 +181,27 @@ public class ShopController {
 	
     // 상품 리뷰
 
+	// 리뷰 신고 화면
+	@GetMapping("/purchase/report")
+	public void getReport(
+		@RequestParam(name="reviewSeqno")
+		Long reviewSeqno,
+		Model model
+	) {
+		model.addAttribute("reviewSeqno", reviewSeqno);
+	}
+	
+	// 리뷰 신고
+	@PostMapping("/purchase/report")
+	public String postReport(
+		ReportDTO report
+	) throws Exception {
 
+		productService.report(report);
+		
+		return "{\"message\":\"good\"}";
+	}
+	
 }
     
 
