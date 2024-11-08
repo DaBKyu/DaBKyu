@@ -1,5 +1,6 @@
 package com.dabkyu.dabkyu.service;
 
+import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
 import com.dabkyu.dabkyu.entity.MemberCategoryEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
+import com.dabkyu.dabkyu.entity.MemberLogEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
@@ -28,6 +30,7 @@ import com.dabkyu.dabkyu.entity.repository.LikeListRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberAddressRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberLogRepository;
 //import com.dabkyu.dabkyu.entity.repository.AddressRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
@@ -53,6 +56,7 @@ public class MemberServiceImpl implements MemberService {
     private final ReviewRepository reviewRepository;
     private final QuestionRepository questionRepository;
     private final MemberCouponRepository memberCouponRepository;
+    private final MemberLogRepository memberLogRepository;
     
     // 회원가입
     @Override
@@ -214,11 +218,20 @@ public class MemberServiceImpl implements MemberService {
                                                 .get();
     }
 
-    // 로그인, 로그아웃, 패스워드 변경 시간 업데이트
+    // 로그인, 로그아웃, 패스워드 변경 시간 업데이트, 로그인/로그아웃 로그 등록
     @Override
     public void lastdateUpdate(String email, String status) {
         
         MemberEntity memberEntity = memberRepository.findById(email).get();
+
+        if (status == "login" || status == "logout") {
+            MemberLogEntity memberLogEntity = MemberLogEntity.builder()
+                                                                                                        .email(memberEntity)
+                                                                                                        .inouttime(LocalDateTime.now())
+                                                                                                        .status(status)
+                                                                                                        .build();
+            memberLogRepository.save(memberLogEntity);
+        }
 
         switch (status) {
             case "login":
@@ -226,6 +239,7 @@ public class MemberServiceImpl implements MemberService {
                 break;
             case "logout":
                 memberEntity.setLastlogoutDate(LocalDateTime.now());
+                break;
             case "password":
                 memberEntity.setLastpwDate(LocalDateTime.now());
         }
