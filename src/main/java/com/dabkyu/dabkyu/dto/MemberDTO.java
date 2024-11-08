@@ -19,8 +19,6 @@ public class MemberDTO {
     private String password;
     private String telno;
     private String username;
-    private String gender;
-    private LocalDateTime birthDate;
     private String memberGrade;
     private String pay;
     private LocalDateTime regdate;
@@ -38,14 +36,14 @@ public class MemberDTO {
     private String authkey;
     private String gender;
     private LocalDateTime birthday;
+    private int totalPvalue;
+    //누적구매금액
     
     public MemberDTO(MemberEntity memberEntity) {
         this.email = memberEntity.getEmail();
         this.password = memberEntity.getPassword();
         this.telno = memberEntity.getTelno();
         this.username = memberEntity.getUsername();
-        this.gender = memberEntity.getGender();
-        this.birthDate = memberEntity.getBirthDate();
         this.memberGrade = memberEntity.getMemberGrade();
         this.pay = memberEntity.getPay();
         this.regdate = memberEntity.getRegdate();
@@ -63,6 +61,7 @@ public class MemberDTO {
         this.authkey = memberEntity.getAuthkey();
         this.gender = memberEntity.getGender();
         this.birthday = memberEntity.getBirthday();
+        this.totalPvalue = memberEntity.getTotalPvalue();
     }
 
     public MemberEntity dtoEntity(MemberDTO dto) {
@@ -72,8 +71,6 @@ public class MemberDTO {
                                                 .password(dto.getPassword())
                                                 .telno(dto.getTelno())
                                                 .username(dto.getUsername())
-                                                .gender(dto.getGender())
-                                                .birthDate(dto.getBirthDate())
                                                 .memberGrade(dto.getMemberGrade())
                                                 .pay(dto.getPay())
                                                 .regdate(dto.getRegdate())
@@ -91,6 +88,7 @@ public class MemberDTO {
                                                 .authkey(dto.getAuthkey())
                                                 .gender(dto.getGender())
                                                 .birthday(dto.getBirthday())
+                                                .totalPvalue(dto.getTotalPvalue())
                                                 .build();
         return memberEntity;
     }

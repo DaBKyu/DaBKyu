@@ -9,5 +9,7 @@ import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 public interface OrderInfoRepository extends JpaRepository<OrderInfoEntity, Long> {
 
     List<OrderInfoEntity> findByEmail(String email);
+    
+    OrderInfoEntity findByEmailAndOrderSeqno(String email, Long orderSeqno);
 
  }

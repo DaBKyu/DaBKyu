@@ -10,7 +10,7 @@ import com.dabkyu.dabkyu.entity.ProductEntity;
 
 public interface ProductService {
     //상품 목록 보기
-	public Page<ProductEntity> list(int pageNum, int postNum, String keyword) throws Exception;
+	public Page<ProductEntity> list(int pageNum, int postNum, String keyword, Long category1Seqno, Long category2Seqno, Long category3Seqno) throws Exception;
 
     //상품 상세 보기
 	public ProductDTO view(Long productSeqno) throws Exception;

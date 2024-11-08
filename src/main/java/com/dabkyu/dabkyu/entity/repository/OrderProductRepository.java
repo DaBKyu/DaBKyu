@@ -1,5 +1,7 @@
 package com.dabkyu.dabkyu.entity.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,5 +24,7 @@ public interface OrderProductRepository extends JpaRepository<OrderProductEntity
         @Param("keyword") String keyword,
         Pageable pageable
     );
+
+    List<OrderProductEntity> findByEmailAndSeqnos(String email, List<Long> orderProductSeqnos);
 
 }

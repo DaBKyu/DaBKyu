@@ -24,6 +24,7 @@ public class ProductDTO {
 	private int likecnt;
 	private String infoOrgImage;
 	private String infoStoredImage;
+    private String secretYn;
 
     public ProductDTO(ProductEntity entity) {
         this.productSeqno = entity.getProductSeqno();
@@ -36,6 +37,7 @@ public class ProductDTO {
         this.likecnt = entity.getLikecnt();
         this.infoOrgImage = entity.getInfoOrgImage();
         this.infoStoredImage = entity.getInfoStoredImage(); 
+        this.secretYn = entity.getSecretYn();
     }
 
     public ProductEntity dtoToEntity(ProductDTO dto) {
@@ -50,6 +52,7 @@ public class ProductDTO {
                                             .likecnt(dto.getLikecnt())
                                             .infoOrgImage(dto.getInfoOrgImage())
                                             .infoStoredImage(dto.getInfoStoredImage())
+                                            .secretYn(dto.getSecretYn())
                                             .build();
         return entity;
     }

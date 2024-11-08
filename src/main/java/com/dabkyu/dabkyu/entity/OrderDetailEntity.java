@@ -41,4 +41,11 @@ public class OrderDetailEntity {
 	@JoinColumn(name="orderproduct_seqno", nullable = false)
 	private OrderProductEntity orderProductSeqno;
 
+	@Column(name="cancel_yn", length=2, nullable=false)
+	private String cancelYn;
+
+	@Column(name="refund_yn", length=2, nullable=false)
+	private String refundYn;
+
+
 }

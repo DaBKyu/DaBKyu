@@ -41,12 +41,6 @@ public class MemberEntity {
 	
 	@Column(name="username",length=20,nullable=false)
 	private String username;
-
-	@Column(name="gender",length=10,nullable=false)
-	private String gender;
-
-	@Column(name="birth_date",nullable=false)
-	private LocalDateTime birthDate;
 	
 	@Column(name="member_grade",length=20,nullable=false)
 	private String memberGrade;
@@ -99,6 +93,10 @@ public class MemberEntity {
 	@Column(name="birthday",nullable=false)
 	private LocalDateTime birthday;
 
+	@Column(name="total_pvalue",nullable=true)
+	private int totalPvalue;
+	
+	
 	public void modifyMemberInfo(MemberDTO dto) {
         this.telno = dto.getTelno();
         this.pay = dto.getPay();
