@@ -13,6 +13,10 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 	// 대분류 카테고리 필터링
 	public Page<ProductEntity> findByCategory1SeqnoAndProductNameContaining(Long category1Seqno, String productName, Pageable pageable);
 
+	//관리자 페이지 상품 리스트(상품코드, 상품명)
+	public Page<ProductEntity> findByProductSeqnoOrProductNameContaining
+		(Long seqno,String keyword,Pageable pageable);
+
 	// 중분류 카테고리 필터링
 	public Page<ProductEntity> findByCategory2SeqnoAndProductNameContaining(Long category2Seqno, String productName, Pageable pageable);
 

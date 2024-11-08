@@ -11,15 +11,18 @@ import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 
 public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
+  
+  public Page<ReviewEntity> findByReviewSeqnoOrProductSeqno_ProductSeqno
+            (Long keyword1,Long keyword2,Pageable pageable);
 
     // 전체 리뷰 목록 보기
-    Page<ReviewEntity> findByEmailContainingOrRevContentContaining(String keyword, String keyword2, PageRequest pageRequest);
+  public Page<ReviewEntity> findByEmailContainingOrRevContentContaining(String keyword, String keyword2, PageRequest pageRequest);
 
     // 상품 이전 보기
 	@Query("select max(r.reviewSeqno) from review r " 
     + "where r.reviewSeqno < :reviewSeqno and "
     + "(r.email like %:keyword1% or r.revContent like $:keyword2%)")
-    public Long pre_seqno(@Param("reviewSeqno") Long reviewSeqno, 
+  public Long pre_seqno(@Param("reviewSeqno") Long reviewSeqno, 
         @Param("keyword1") String keyword1,
         @Param("keyword2") String keyword2);
 
@@ -27,7 +30,7 @@ public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
     @Query("select min(r.reviewSeqno) from review r "
         + "where r.reviewSeqno < :reviewSeqno and "
         + "r.email like %:keyword1% or r.revContent like $:keyword2%)")
-    public Long next_seqno(@Param("reviewSeqno") Long reviewSeqno, 
+  public Long next_seqno(@Param("reviewSeqno") Long reviewSeqno, 
         @Param("keyword1") String keyword1,
         @Param("keyword2") String keyword2);
 
