@@ -24,3 +24,48 @@ ol, ul{padding: 0;}
 li{
     list-style: none;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #dddddd;
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+}
+th {
+    background-color: #f2f2f2;
+}
+
+/* 파일 업로드 관련 스타일 */
+.file-drop-area {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+.file-preview {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+.file-preview-item {
+    position: relative;
+    margin: 5px;
+}
+.file-preview-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+.file-preview-item .remove-file {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    cursor: pointer;
+}

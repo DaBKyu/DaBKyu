@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>환불 완료 페이지</title>
+<link rel="stylesheet" href="/src/main/resources/static/css/shopHeader.css">
+<style>
+.rectangle {
+    width: 500px; /* 원하는 너비 */
+    height: 40px; /* 원하는 높이 */
+    display: flex; /* 내용 정렬을 위한 flexbox */
+    margin: 100px auto;
+    align-items: center; /* 세로 중앙 정렬 */
+    font-size: 30px; /* 글자 크기 */
+    justify-content: center;
+    text-align: center; /* 텍스트 중앙 정렬 */
+}
+.rectangle1 {
+    width: 70px; /* 원하는 너비 */
+    height: 40px; /* 원하는 높이 */
+    border: 1px solid #e3e3e3; /* 테두리 */
+	margin-left: 50px;
+    margin-top: 10px;
+   	margin-bottom: 10px;
+    display: flex; /* 내용 정렬을 위한 flexbox */
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center; /* 가로 중앙 정렬 */
+    font-size: 16px; /* 글자 크기 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    font-weight: bold;
+}
+.rectangle2 {
+    width: 70px; /* 원하는 너비 */
+    height: 40px; /* 원하는 높이 */
+    border: 1px solid #e3e3e3; /* 테두리 */
+	margin-left: 50px;
+    margin-top: 10px;
+   	margin-bottom: 1px;
+    display: flex; /* 내용 정렬을 위한 flexbox */
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center; /* 가로 중앙 정렬 */
+    font-size: 16px; /* 글자 크기 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    font-weight: bold;
+}
+.flex-container {
+    display: flex; /* 플렉스 박스 설정 */
+    margin-top: 1px; /* 위쪽 여백 */
+}
+.button-container {
+            display: flex;
+            justify-content: center;
+            margin: 100px auto;
+            align-items: center; /* 세로 중앙 정렬 */
+            text-align: center; /* 텍스트 중앙 정렬 */
+        }
+</style>
+</head>
+<body>
+    <div id="shopHeader"></div>
+   
+     <div class="rectangle">환불이 완료 되었습니다.<br>감사합니다.</div>
+		<div class="button-container">
+        <input type="button" id="" value="환불내역" onclick="window.location.href='/src/main/resources/templates/mypage/cancelRefundChange.html'" style="margin-left:-10px;">
+        <input type="button" id="" value="메인으로" onclick="window.location.href='/src/main/resources/templates/shop/main.html'" style="margin-left:100px;">
+    </div>
+  <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('../layout/Shopheader.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('shopHeader').innerHTML = data;
+        
+                // ShopHeader가 로드된 후 menuToggle.js 기능 실행
+                const menuToggle = document.getElementById('menu-toggle');
+                const asideMenu = document.querySelector('aside');
+        
+                if (menuToggle && asideMenu) {
+                    menuToggle.addEventListener('click', function() {
+                        asideMenu.classList.toggle('open');
+                    });
+                }
+            })
+            .catch(error => console.error('네비게이션 바 로드 오류:', error));
+        });
+        </script>
+<script src="/src/main/resources/static/js/menuToggle.js"></script>
+</body>
+</html>

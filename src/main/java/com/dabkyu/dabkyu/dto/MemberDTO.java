@@ -35,8 +35,8 @@ public class MemberDTO {
     private String notificationYn;
     private String emailRecept;
     private LocalDateTime emailReceptDate;
-    private String authkey;
-    private LocalDateTime birthday;
+    private String authkey
+    private int totalPvalue;
     
     public MemberDTO(MemberEntity memberEntity) {
         this.email = memberEntity.getEmail();
@@ -60,8 +60,7 @@ public class MemberDTO {
         this.emailRecept = memberEntity.getEmailRecept();
         this.emailReceptDate = memberEntity.getEmailReceptDate();
         this.authkey = memberEntity.getAuthkey();
-        this.gender = memberEntity.getGender();
-        this.birthday = memberEntity.getBirthday();
+        this.totalPvalue = memberEntity.getTotalPvalue();
     }
 
     public MemberEntity dtoEntity(MemberDTO dto) {
@@ -88,8 +87,7 @@ public class MemberDTO {
                                                 .emailRecept(dto.getEmailRecept())
                                                 .emailReceptDate(dto.getEmailReceptDate())
                                                 .authkey(dto.getAuthkey())
-                                                .gender(dto.getGender())
-                                                .birthday(dto.getBirthday())
+                                                .totalPvalue(dto.getTotalPvalue())
                                                 .build();
         return memberEntity;
     }
