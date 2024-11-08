@@ -11,16 +11,16 @@ import com.dabkyu.dabkyu.entity.ProductEntity;
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
 	// 대분류 카테고리 필터링
-	Page<ProductEntity> findByCategory1SeqnoAndProductNameContaining(Long category1Seqno, String productName, Pageable pageable);
+	public Page<ProductEntity> findByCategory1SeqnoAndProductNameContaining(Long category1Seqno, String productName, Pageable pageable);
 
 	// 중분류 카테고리 필터링
-	Page<ProductEntity> findByCategory2SeqnoAndProductNameContaining(Long category2Seqno, String productName, Pageable pageable);
+	public Page<ProductEntity> findByCategory2SeqnoAndProductNameContaining(Long category2Seqno, String productName, Pageable pageable);
 
 	// 소분류 카테고리 필터링
-    Page<ProductEntity> findByCategory3SeqnoAndProductNameContaining(Long category3Seqno, String productName, Pageable pageable);
+    public Page<ProductEntity> findByCategory3SeqnoAndProductNameContaining(Long category3Seqno, String productName, Pageable pageable);
 
 	//전체 상품 목록 보기
-    Page<ProductEntity> findByProductNameContaining(String productName, Pageable pageable);
+    public Page<ProductEntity> findByProductNameContaining(String productName, Pageable pageable);
  
     //상품 이전 보기
 	@Query("select max(p.productSeqno) from product p " 
