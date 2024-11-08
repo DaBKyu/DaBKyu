@@ -132,28 +132,28 @@
                         <div class="product">
                             <img src="https://via.placeholder.com/150" alt="Product 1">
                             <div class="product-info">
-                                <h3>카테고리1</h3>
+                                <h3>PC</h3>
 
                             </div>
                         </div>
                         <div class="product">
                             <img src="https://via.placeholder.com/150" alt="Product 2">
                             <div class="product-info">
-                                <h3>카테고리2</h3>
+                                <h3>핸드폰</h3>
                       
                             </div>
                         </div>
                         <div class="product">
                             <img src="https://via.placeholder.com/150" alt="Product 3">
                             <div class="product-info">
-                                <h3>카테고리3</h3>
+                                <h3>모니터</h3>
                         
                             </div>
                         </div>
                         <div class="product">
                             <img src="https://via.placeholder.com/150" alt="Product 4">
                             <div class="product-info">
-                                <h3>카테고리4</h3>
+                                <h3>마우스</h3>
                    
                             </div>
                         </div>
@@ -288,7 +288,8 @@
             <button class="carousel-btn next">▶</button>
         </div>
     </section>
-
+    
+    
 <!-- 알림 모달 -->
 <div class="notification-modal" id="notificationModal">
     <div class="notification-content">
@@ -300,32 +301,6 @@
     </div>  
     </div>
 </div>
-<script>
-// 알림 버튼 및 모달 요소 가져오기
-const notificationBtn = document.getElementById('notificationBtn');
-const notificationModal = document.getElementById('notificationModal');
-
-// 알림 버튼 클릭 시 모달 열기/닫기
-notificationBtn.addEventListener('click', () => {
-    if (notificationModal.style.display === 'block') {
-        // 모달이 이미 열려 있으면 닫기
-        notificationModal.style.display = 'none';
-    } else {
-        // 모달이 닫혀 있으면 열기
-        notificationModal.style.display = 'block';
-    }
-});
-
-// 모달 외부 클릭 시 모달 숨기기
-window.addEventListener('click', (event) => {
-    if (notificationModal.style.display === 'block' && 
-        event.target !== notificationModal && 
-        event.target !== notificationBtn && 
-        !notificationModal.contains(event.target)) {
-            notificationModal.style.display = 'none';
-    }
-});
-</script>
-<script src="/src/main/resources/static/js/menuToggle.js"></script>
+<script src="/src/main/resources/static/js/menuToggle_main.js"></script>
 </body>
 </html>

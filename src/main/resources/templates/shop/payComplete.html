@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+				 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
 <title>상품 구매 완료 페이지</title>
-<link rel="stylesheet" href="/src/main/resources/static/css/shopHeader.css">
+<link rel="stylesheet" type="text/css" href="/src/main/resources/static/css/shopHeader.css">
 <style>
 .rectangle {
     width: 500px; /* 원하는 너비 */
@@ -54,23 +55,59 @@
             align-items: center; /* 세로 중앙 정렬 */
             text-align: center; /* 텍스트 중앙 정렬 */
         }
+.notification-modal {
+    display: none; /* 기본 숨김 */
+    position: fixed;
+    top: 50px;
+    right: 20px;
+    width: 403px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+}
+.notification-content {
+    padding: 0px;
+    font-size: 0.9rem;
+    color: #333;
+}
+#iframeContainer {
+    width: 800px; /* 표시할 화면의 너비 */
+    height: 740px; /* 표시할 화면의 높이 */
+    overflow: hidden;
+    position: relative;
+}
+
+#iframeContainer iframe {
+    width: 1000px; /* 원본 페이지의 너비 */
+    height: 740px; /* iframeContainer와 동일한 높이 */
+    transform: translateX(-69.9%); /* 가로 중앙 기준 */
+    left: 50%;
+    position: relative;
+    border: none;
+}
 </style>
 </head>
 <body>
-    <div id="Shopheader"></div>
-     <div class="rectangle">주문이 완료 되었습니다.<br>감사합니다.</div>
+    <div id="ShopHeader"></div>
+    <br><br><br>
+    <div class="rectangle">주문이 완료 되었습니다.<br>감사합니다.</div>
 		<div class="button-container">
         <input type="button" id="" value="주문내역" onclick="window.location.href='/src/main/resources/templates/mypage/order.html'" style="margin-left:-10px;">
         <input type="button" id="" value="메인으로" onclick="window.location.href='/src/main/resources/templates/shop/main.html'" style="margin-left:100px;">
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-          fetch('/src/main/resources/templates/layout/ShopHeader.html')
-            .then(response => response.text())
-            .then(data => document.getElementById('Shopheader').innerHTML = data)
-            .catch(error => console.error('Error loading navbar:', error));
-        });
-      </script>
-    <script src="/src/main/resources/static/js/menuToggle.js"></script>
+<!-- 알림 모달 -->
+<div class="notification-modal" id="notificationModal">
+    <div class="notification-content">
+        <div id="iframeContainer">
+        <iframe id="myIframe" 
+        src="/src/main/resources/templates/mypage/notice.html" 
+        frameborder="0">
+        </iframe>
+    </div>  
+    </div>
+</div>
+<script src="/src/main/resources/static/js/menuToggle copy.js"></script>
 </body>
 </html>

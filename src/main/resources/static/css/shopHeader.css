@@ -116,3 +116,37 @@ align-items: center;
 padding: 0 10px;
 border: 1px solid #e3e3e3;
 }
+/* 알림 모달 스타일 */
+.notification-modal {
+    display: none; /* 기본 숨김 */
+    position: fixed;
+    top: 50px;
+    right: 20px;
+    width: 403px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.notification-content {
+    padding: 0px;
+    font-size: 0.9rem;
+    color: #333;
+}
+#iframeContainer {
+    width: 800px; /* 표시할 화면의 너비 */
+    height: 740px; /* 표시할 화면의 높이 */
+    overflow: hidden;
+    position: relative;
+}
+
+#iframeContainer iframe {
+    width: 1000px; /* 원본 페이지의 너비 */
+    height: 740px; /* iframeContainer와 동일한 높이 */
+    transform: translateX(-69.9%); /* 가로 중앙 기준 */
+    left: 50%;
+    position: relative;
+    border: none;
+}

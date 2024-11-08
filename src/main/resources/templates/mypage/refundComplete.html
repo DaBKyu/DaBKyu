@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>환불 완료 페이지</title>
-<link rel="stylesheet" href="/src/main/resources/static/css/shopHeader.css">
+<link rel="stylesheet" type="text/css" href="/src/main/resources/static/css/shopHeader.css">
 <style>
 .rectangle {
     width: 500px; /* 원하는 너비 */
@@ -57,33 +57,10 @@
 </style>
 </head>
 <body>
-    <div id="shopHeader"></div>
-   
      <div class="rectangle">환불이 완료 되었습니다.<br>감사합니다.</div>
 		<div class="button-container">
         <input type="button" id="" value="환불내역" onclick="window.location.href='/src/main/resources/templates/mypage/cancelRefundChange.html'" style="margin-left:-10px;">
         <input type="button" id="" value="메인으로" onclick="window.location.href='/src/main/resources/templates/shop/main.html'" style="margin-left:100px;">
     </div>
-  <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('../layout/Shopheader.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('shopHeader').innerHTML = data;
-        
-                // ShopHeader가 로드된 후 menuToggle.js 기능 실행
-                const menuToggle = document.getElementById('menu-toggle');
-                const asideMenu = document.querySelector('aside');
-        
-                if (menuToggle && asideMenu) {
-                    menuToggle.addEventListener('click', function() {
-                        asideMenu.classList.toggle('open');
-                    });
-                }
-            })
-            .catch(error => console.error('네비게이션 바 로드 오류:', error));
-        });
-        </script>
-<script src="/src/main/resources/static/js/menuToggle.js"></script>
 </body>
 </html>
