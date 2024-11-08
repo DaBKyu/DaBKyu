@@ -19,6 +19,8 @@ public class MemberDTO {
     private String password;
     private String telno;
     private String username;
+    private String gender;
+    private LocalDateTime birthDate;
     private String memberGrade;
     private String pay;
     private LocalDateTime regdate;
@@ -33,9 +35,7 @@ public class MemberDTO {
     private String notificationYn;
     private String emailRecept;
     private LocalDateTime emailReceptDate;
-    private String authkey;
-    private String gender;
-    private LocalDateTime birthday;
+    private String authkey
     private int totalPvalue;
     
     public MemberDTO(MemberEntity memberEntity) {
