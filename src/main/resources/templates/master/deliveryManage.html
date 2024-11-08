@@ -4,23 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>배송관리페이지</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-    <link rel="stylesheet" href="../../static/css/master.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #dddddd;
-            text-align: center;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/master.css" th:href="@{/css/master.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 </head>
 
 <body>
@@ -50,7 +36,7 @@
                     </li>
                     <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="../master/mailLog.html">메일 발송 목록</a></li>
+                            <li><a class="dropdown-item" href="../master/mailList.html">메일 발송 목록</a></li>
                             <li><a class="dropdown-item" href="../master/mailSend.html">메일 발송</a></li>
                           </ul>
                     </li>
@@ -69,96 +55,157 @@
 <div class="container mt-5">     
     <h2 class="mt-4">배송관리</h2>
 
-    <!-- 카테고리 선택 -->
-    <div class="d-flex justify-content-end mb-2">
-        <select class="form-select w-auto" aria-label="카테고리 선택">
-            <option selected>카테고리</option>
-            <option value="1">카테고리 1</option>
-            <option value="2">카테고리 2</option>
-            <option value="3">카테고리 3</option>
-        </select>
-    </div>
+        <!-- 카테고리 선택 -->
+        <div class="d-flex justify-content-end mb-2">
+            <select class="form-select w-auto" id="categorySelect" aria-label="카테고리 선택">
+                <option value="">전체 카테고리</option>
+                <option th:each="category : ${categories}" 
+                        th:value="${category.id}" 
+                        th:text="${category.name}"></option>
+            </select>
+        </div>
 
-    <!-- 배송 관리 테이블 -->
-    <div class="table-responsive">
-    <table class="table table-hover">
-        <thead>
-            <tr>
-            <th scope="col">No.</th>
-            <th scope="col">상품명</th>
-            <th scope="col">배송상태</th>
-            <th scope="col">배송일정</th>
-            <th scope="col"></th>
-            <th scope="col">카테고리</th>
-            </tr>
-        </thead>
-        <tbody class="table-group-divider">
-            <tr>
-              <th scope="row">1</th>
-              <td>iPhone 16 pro</td>
-              <td>
-                <div class="d-flex justify-content-center">
-                  <select class="form-select form-select-sm w-auto" aria-label="배송 상태">
-                      <option selected>배송 상태</option>
-                      <option value="1">준비중</option>
-                      <option value="2">배송중</option>
-                      <option value="3">배송완료</option>
-                  </select>
-              </div>
-              </td>
-              <td>2024.10.29</td>
-              <td></td>
-              <td>스마트폰</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>iPhone 16 pro</td>
-              <td></td>
-              <td>2024.10.29</td>
-              <td></td>
-              <td>스마트폰</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>iPhone 16 pro</td>
-              <td></td>
-              <td>2024.10.29</td>
-              <td></td>
-              <td>스마트폰</td>
-            </tr>
-            <!-- 빈 행들 -->
-            <tr><td colspan="6"></td></tr> 
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-        </tbody>
-        </table>
-      </div>
+        <!-- 배송 관리 테이블 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">No.</th>
+                        <th scope="col">상품명</th>
+                        <th scope="col">배송상태</th>
+                        <th scope="col">배송일정</th>
+                        <th scope="col">카테고리</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr th:each="delivery, iterStat : ${deliveries}">
+                        <th scope="row" th:text="${iterStat.count}">1</th>
+                        <td th:text="${delivery.productName}">iPhone 16 pro</td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <select class="form-select form-select-sm w-auto delivery_status" 
+                                        th:data-delivery-id="${delivery.id}"
+                                        aria-label="배송 상태">
+                                    <option value="">배송 상태</option>
+                                    <option value="PREPARING" th:selected="${delivery.status == 'PREPARING'}">준비중</option>
+                                    <option value="SHIPPING" th:selected="${delivery.status == 'SHIPPING'}">배송중</option>
+                                    <option value="DELIVERED" th:selected="${delivery.status == 'DELIVERED'}">배송완료</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td th:text="${#temporals.format(delivery.deliveryDate, 'yyyy.MM.dd')}">2024.10.29</td>
+                        <td th:text="${delivery.category}">스마트폰</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <!-- 페이지네이션 -->
-        <nav aria-label="Page navigation example" class="pagination-custom">
-        <ul class="pagination justify-content-center">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1">이전</a>
-            </li>
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center"
+                th:with="startNumber=${T(Math).floor(deliveries.number/10)}*10+1, endNumber=(${deliveries.totalPages} > ${startNumber}+9) ? ${startNumber}+9 : ${deliveries.totalPages}">
+                
+                <li class="page-item" th:classappend="${deliveries.first}?'disabled':''">
+                    <a class="page-link" th:href="@{/deliveryManage(page=${deliveries.number})}" tabindex="-1">이전</a>
+                </li>
 
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item" th:each="page : ${#numbers.sequence(startNumber, endNumber)}" 
+                    th:classappend="${page == deliveries.number+1}?'active':''">
+                    <a class="page-link" th:href="@{/deliveryManage(page=${page-1})}" th:text="${page}">1</a>
+                </li>
 
-            <li class="page-item"><span class="page-link">...</span></li> 
-
-            <li class="page-item"><a class="page-link" href="#">9</a></li> 
-            
-             <li class="page-item">
-                <a class="page-link" href="#">다음</a>
-             </li> 
-        </ul>
-    </nav>
-
+                <li class="page-item" th:classappend="${deliveries.last}?'disabled':''">
+                    <a class="page-link" th:href="@{/deliveryManage(page=${deliveries.number+2})}">다음</a>
+                </li>
+            </ul>
+        </nav>
     </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            var categorySelect = document.getElementById('categorySelect');
+            categorySelect.addEventListener('change', function() {
+                var categoryId = this.value;
+                window.location.href = '/deliveryManage?category=' + categoryId;
+            });
+    
+            var deliveryStatusSelects = document.querySelectorAll('.delivery_status');
+            deliveryStatusSelects.forEach(function(select) {
+                select.addEventListener('change', function() {
+                    var deliveryId = this.getAttribute('data-delivery-id');
+                    var status = this.value;
+                    updateDeliveryStatus(deliveryId, status);
+                });
+            });
+        });
+    
+        function updateDeliveryStatus(deliveryId, status) {
+            fetch('/master/delivery/' + deliveryId + '/status', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('배송 상태 업데이트 성공:', data);
+                // 성공 시 페이지 새로고침
+                window.location.reload();
+            })
+            .catch((error) => {
+                console.error('배송 상태 업데이트 실패:', error);
+                alert('배송 상태 업데이트에 실패했습니다. 다시 시도해 주세요.');
+            });
+        }
+        </script>
     
 </body>
 </html>
+
+<!-- 백엔드 예시
+@RestController
+@RequestMapping("/master/delivery")
+public class DeliveryApiController {
+
+    @Autowired
+    private DeliveryService deliveryService;
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateDeliveryStatus(@PathVariable Long id, @RequestBody DeliveryStatusUpdateRequest request) {
+        try {
+            DeliveryDTO updatedDelivery = deliveryService.updateDeliveryStatus(id, request.getStatus());
+            return ResponseEntity.ok(updatedDelivery);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("배송 상태 업데이트 실패");
+        }
+    }
+}
+
+@Service
+public class DeliveryService {
+
+    @Autowired
+    private DeliveryRepository deliveryRepository;
+
+    @Transactional
+    public DeliveryDTO updateDeliveryStatus(Long id, String status) {
+        Delivery delivery = deliveryRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("배송 정보를 찾을 수 없습니다."));
+        delivery.setStatus(status);
+        Delivery updatedDelivery = deliveryRepository.save(delivery);
+        return convertToDTO(updatedDelivery);
+    }
+
+    // DTO 변환 메서드
+    private DeliveryDTO convertToDTO(Delivery delivery) {
+        // Delivery 엔티티를 DTO로 변환하는 로직
+    }
+}
+-->

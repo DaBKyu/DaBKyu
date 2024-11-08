@@ -29,6 +29,7 @@ import com.dabkyu.dabkyu.dto.ReviewDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
 import com.dabkyu.dabkyu.entity.MemberReviewLikeEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
+import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
@@ -454,7 +455,27 @@ public class ShopController {
 	}
 
 
+	// 리뷰 신고 화면
+	@GetMapping("/purchase/report")
+	public void getReport(
+		@RequestParam(name="reviewSeqno")
+		Long reviewSeqno,
+		Model model
+	) {
+		model.addAttribute("reviewSeqno", reviewSeqno);
+	}
+	
+	// 리뷰 신고
+	@PostMapping("/purchase/report")
+	public String postReport(
+		ReportDTO report
+	) throws Exception {
 
+		productService.report(report);
+		
+		return "{\"message\":\"good\"}";
+	}
+	
 }
     
 

@@ -1,11 +1,13 @@
 package com.dabkyu.dabkyu.entity.repository;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 
 public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long>{
@@ -33,5 +35,7 @@ public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long>{
 	@Query(value="select max(reviewSeqno) from review where email = :email", 
 			nativeQuery=true)
 	public Long getMaxSeqno(@Param("email") String email);
+  
+  public Page<ReviewEntity> findByEmail(MemberEntity email, Pageable pageable);
 
 }

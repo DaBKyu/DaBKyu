@@ -37,7 +37,6 @@ public class MemberDTO {
     private String gender;
     private LocalDateTime birthday;
     private int totalPvalue;
-    //누적구매금액
     
     public MemberDTO(MemberEntity memberEntity) {
         this.email = memberEntity.getEmail();

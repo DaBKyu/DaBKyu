@@ -19,25 +19,21 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name="likeList")
-@Table(name="likelist")
-@IdClass(LikeListEntityID.class)
+@Entity(name="memberLog")
+@Table(name="member_log")
 @Builder
-public class LikeListEntity {
-
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
+@IdClass(MemberLogEntityID.class)
+public class MemberLogEntity {
+    
+	@Id
+	@ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JoinColumn(name="email", nullable = false)
+	@JoinColumn(name="email")
 	private MemberEntity email;
-
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JoinColumn(name="product_seqno", nullable = false)
-	private ProductEntity productSeqno;
-
-	@Column(name="like_date", nullable = false)
-	private LocalDateTime likeDate;
-
+	
+	@Id
+	private LocalDateTime inouttime;
+	
+	@Column(name="status", length = 10, nullable = false)
+	private String status;
 }

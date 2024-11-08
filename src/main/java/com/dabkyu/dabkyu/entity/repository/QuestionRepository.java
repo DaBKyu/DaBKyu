@@ -44,5 +44,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
 			nativeQuery=true)
 	public Long getMaxSeqno(@Param("email") String email);
 
-    
+    // 내 문의 조회(페이징)
+    public Page<QuestionEntity> findByEmail(MemberEntity member, Pageable pageable);
 }
+

@@ -11,9 +11,13 @@ import org.springframework.ui.Model;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
+import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
+import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.util.PageUtil;
@@ -134,7 +138,7 @@ public class MemberController {
 
         String email = (String) session.getAttribute("email");
 
-        int orderNum = 5;   // 한 번에 보여줄 주문 갯수
+        int orderNum = 10;   // 한 번에 보여줄 주문 갯수
         int pagelistNum = 10;   // 페이지 리스트 갯수
 
         PageUtil pageUtil = new PageUtil();
@@ -242,14 +246,122 @@ public class MemberController {
     
 
     // 찜한 상품 화면
+    @GetMapping("/mypage/myLikeProducts")
+    public void getMyLikeProducts(
+        Model model,
+        HttpSession session,
+        @RequestParam("page")
+        int page
+    ) {
+
+        String email = (String) session.getAttribute("email");
+
+        int productNum = 10;   // 한 번에 보여줄 제품 갯수
+        int pagelistNum = 10;   // 페이지 리스트 갯수
+
+        PageUtil pageUtil = new PageUtil();
+        Page<ProductEntity> myLikeList = service.myLikeList(email, page, productNum);
+        int totalCount = (int) myLikeList.getTotalElements();
+
+        model.addAttribute("myLikeList", myLikeList);
+        model.addAttribute("listIsEmpty", myLikeList.hasContent()?"N":"Y");
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("page", page);
+        model.addAttribute("productNum", productNum);
+        model.addAttribute("pageList", pageUtil.getPageListNoKeyword(page, productNum, pagelistNum, totalCount));
+    }
+    
 
     // 내 리뷰 리스트 화면
+    @GetMapping("/mypage/myReviews")
+    public void getMyReviews(
+        Model model,
+        HttpSession session,
+        @RequestParam("page")
+        int page
+    ) {
+       
+        String email = (String) session.getAttribute("email");
 
+        int reviewNum = 10;   // 한 번에 보여줄 리뷰 갯수
+        int pagelistNum = 10;   // 페이지 리스트 갯수
+
+        PageUtil pageUtil = new PageUtil();
+        Page<ReviewEntity> myReviewList = service.myReviewList(email, page, reviewNum);
+        int totalCount = (int) myReviewList.getTotalElements();
+
+        model.addAttribute("myReviewList", myReviewList);
+        model.addAttribute("listIsEmpty", myReviewList.hasContent()?"N":"Y");
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("page", page);
+        model.addAttribute("reviewNum", reviewNum);
+        model.addAttribute("pageList", pageUtil.getPageListNoKeyword(page, reviewNum, pagelistNum, totalCount));
+
+    }
+    
     // 내 문의 리스트 화면
+    @GetMapping("/mypage/myQuestion")
+    public void getMyQuestion(
+        Model model,
+        HttpSession session,
+        @RequestParam("page")
+        int page
+    ) {
+        
+        String email = (String) session.getAttribute("email");
+
+        int questionNum = 10;   // 한 번에 보여줄 문의 갯수
+        int pagelistNum = 10;   // 페이지 리스트 갯수
+
+        PageUtil pageUtil = new PageUtil();
+        Page<QuestionEntity> myQuestionList = service.myQuestionList(email, page, questionNum);
+        int totalCount = (int) myQuestionList.getTotalElements();
+
+        model.addAttribute("myQuestionList", myQuestionList);
+        model.addAttribute("listIsEmpty", myQuestionList.hasContent()?"N":"Y");
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("page", page);
+        model.addAttribute("questionNum", questionNum);
+        model.addAttribute("pageList", pageUtil.getPageListNoKeyword(page, questionNum, pagelistNum, totalCount));
+
+    }
+    
 
     // 내 쿠폰 리스트 화면
+    @GetMapping("/mypage/myCouponList")
+    public void getMyCouponList(
+        Model model,
+        HttpSession session,
+        @RequestParam("page")
+        int page
+    ) {
+        
+        String email = (String) session.getAttribute("email");
+
+        int couponNum = 10;   // 한 번에 보여줄 쿠폰 갯수
+        int pagelistNum = 10;   // 페이지 리스트 갯수
+
+        PageUtil pageUtil = new PageUtil();
+        Page<CouponEntity> myCouponList = service.myCouponList(email, page, couponNum);
+        int totalCount = (int) myCouponList.getTotalElements();
+
+        model.addAttribute("myCouponList", myCouponList);
+        model.addAttribute("listIsEmpty", myCouponList.hasContent()?"N":"Y");
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("page", page);
+        model.addAttribute("couponNum", couponNum);
+        model.addAttribute("pageList", pageUtil.getPageListNoKeyword(page, couponNum, pagelistNum, totalCount));
+
+    }
+    
 
     // 내 등급 화면
+    @GetMapping("/mypage/myGrade")
+    public void getMyGrade(Model model, HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        model.addAttribute("member", service.memberInfo(email));
+    }
+    
 
     // 아이디 찾기 화면
     @GetMapping("/member/searchID")
@@ -364,9 +476,6 @@ public class MemberController {
         return service.idCheck(email);
     }
     
-
-    // 주소 검색(api로 대체할지 논의 필요)
-
 
     // 회원 탈퇴
     @Transactional

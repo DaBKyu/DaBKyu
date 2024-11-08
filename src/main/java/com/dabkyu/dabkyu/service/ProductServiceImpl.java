@@ -1,5 +1,6 @@
 package com.dabkyu.dabkyu.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -10,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
+import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.repository.ProductRepository;
+import com.dabkyu.dabkyu.entity.repository.ReportRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -20,6 +23,7 @@ import lombok.AllArgsConstructor;
 public class ProductServiceImpl implements ProductService{
 
     private final ProductRepository productRepository;
+    private final ReportRepository reportRepository;
 
 	// 상품 목록 보기
 	@Override
@@ -41,7 +45,7 @@ public class ProductServiceImpl implements ProductService{
         }
     }
 
-    // 상품 상세 보기
+  // 상품 상세 보기
 	@Override
 	public ProductDTO view(Long productSeqno) throws Exception {
 		return productRepository.findById(productSeqno).map(view -> new ProductDTO(view)).get();
@@ -65,7 +69,12 @@ public class ProductServiceImpl implements ProductService{
 		throw new UnsupportedOperationException("Unimplemented method 'fileListView'");
 	}
 
-
+	// 리뷰 신고
+	@Override
+	public void report(ReportDTO report) throws Exception {
+		report.setReportDate(LocalDateTime.now());
+		reportRepository.save(report.dtoToEntity(report));
+	}
 
 
 }

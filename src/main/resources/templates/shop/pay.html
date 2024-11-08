@@ -90,8 +90,9 @@
                </div>	
 	    </div>
     <div class="button-container">
-        <input type="button" id="btn_save" value="결제" onclick="searchAddr()" style="margin-left:50px;">
-        <input type="button" id="btn_cancel" value="취소" onclick="searchAddr()" style="margin-left:20px;">
+        <input type="button" id="btn_save" value="배송지 수정" onclick="window.location.href='/src/main/resources/templates/mypage/address.html'" style="margin-left:50px;">
+        <input type="button" id="btn_save" value="결제" onclick="window.location.href='/src/main/resources/templates/shop/payComplete.html'" style="margin-left:50px;">
+        <input type="button" id="btn_cancel" value="취소" onclick="history.back();" style="margin-left:20px;">
         </div>
  
     </body>
