@@ -2,9 +2,7 @@ package com.dabkyu.dabkyu.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -15,21 +13,28 @@ import org.springframework.stereotype.Service;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
-import com.dabkyu.dabkyu.entity.AddressEntity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
+import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
 import com.dabkyu.dabkyu.entity.MemberCategoryEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
+import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
+import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
+import com.dabkyu.dabkyu.entity.repository.LikeListRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberAddressRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCategoryRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
 //import com.dabkyu.dabkyu.entity.repository.AddressRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionFileRepository;
+import com.dabkyu.dabkyu.entity.repository.QuestionRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewFileRepository;
+import com.dabkyu.dabkyu.entity.repository.ReviewRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -44,6 +49,10 @@ public class MemberServiceImpl implements MemberService {
 	private final QuestionFileRepository questionFileRepository;
 	private final ReviewFileRepository reviewFileRepository;
     private final MemberCategoryRepository memberCategoryRepository;
+    private final LikeListRepository likeListRepository;
+    private final ReviewRepository reviewRepository;
+    private final QuestionRepository questionRepository;
+    private final MemberCouponRepository memberCouponRepository;
     
     // 회원가입
     @Override
@@ -65,7 +74,7 @@ public class MemberServiceImpl implements MemberService {
                                                                                   .emailRecept(member.getEmailRecept())
                                                                                   .emailReceptDate(LocalDateTime.parse("2000-01-01, 00:00:00", formatter))
                                                                                   .gender(member.getGender())
-                                                                                  .birthday(member.getBirthday())
+                                                                                  .birthDate(member.getBirthDate())
                                                                                   .build();
         memberRepository.save(memberEntity);
     }
@@ -133,6 +142,42 @@ public class MemberServiceImpl implements MemberService {
                                          .collect(Collectors.toList());
         
     }
+    
+	// 내 찜한 상품 조회
+    @Override
+	public Page<ProductEntity> myLikeList(String email, int page, int productNum) {
+        PageRequest pageRequest = PageRequest.of(page -1, productNum, Sort.by(Direction.DESC, "likeDate"));
+        MemberEntity member = memberRepository.findById(email).get();
+
+        return likeListRepository.findLikedProductByEmail(member, pageRequest);
+    }
+
+	// 내 리뷰 조회
+    @Override
+	public Page<ReviewEntity> myReviewList(String email, int page, int reviewNum) {
+        PageRequest pageRequest = PageRequest.of(page -1, reviewNum, Sort.by(Direction.DESC, "revDate"));
+        MemberEntity member = memberRepository.findById(email).get();
+
+        return reviewRepository.findByEmail(member, pageRequest);
+    }
+
+    // 내 문의 조회
+    @Override
+	public Page<QuestionEntity> myQuestionList(String email, int page, int questionNum) {
+        PageRequest pageRequest = PageRequest.of(page -1, questionNum, Sort.by(Direction.DESC, "queDate"));
+        MemberEntity member = memberRepository.findById(email).get();
+
+        return questionRepository.findByEmail(member, pageRequest);
+    }
+    
+	// 내 쿠폰 조회
+    @Override
+	public Page<CouponEntity> myCouponList(String email, int page, int couponNum) {
+        PageRequest pageRequest = PageRequest.of(page -1, couponNum, Sort.by(Direction.ASC, "couponEndDate"));
+        MemberEntity member = memberRepository.findById(email).get();
+
+        return memberCouponRepository.findMyCouponByEmail(member, pageRequest);
+    }
 
     // 회원비밀번호수정
     @Override
@@ -159,13 +204,6 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public int idCheck(String email) {
         return memberRepository.findById(email).isEmpty()?0:1;
-    }
-
-    // 주소 검색
-    @Override
-    public Page<AddressEntity> addrSearch(int pageNum, int postNum, String addrSearch) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addrSearch'");
     }
 
     // 회원 정보

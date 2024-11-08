@@ -6,11 +6,14 @@ import org.springframework.data.domain.Page;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
-import com.dabkyu.dabkyu.entity.AddressEntity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
+import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
+import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
+import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 
 public interface MemberService {
@@ -43,6 +46,18 @@ public interface MemberService {
 
 	// 내 관심 카테고리 조회
 	public List<Category3Entity> myCategoryList(String email);
+
+	// 내 찜한 상품 조회
+	public Page<ProductEntity> myLikeList(String email, int page, int productNum);
+	
+	// 내 리뷰 조회
+	public Page<ReviewEntity> myReviewList(String email, int page, int reviewNum);
+
+	// 내 문의 조회
+	public Page<QuestionEntity> myQuestionList(String email, int page, int questionNum);
+
+	// 내 쿠폰 조회
+	public Page<CouponEntity> myCouponList(String email, int page, int couponNum);
 	
 	// 패스워드 변경
 	public void modifyMemberPassword(MemberDTO member);
@@ -55,9 +70,6 @@ public interface MemberService {
 	
 	// 아이디 중복 체크
 	public int idCheck(String email);
-
-	// 주소 검색
-	public Page<AddressEntity> addrSearch(int pageNum, int postNum, String addrSearch);
 	
 	// 회원 정보
 	public MemberDTO memberInfo(String email);
