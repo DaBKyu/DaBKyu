@@ -10,12 +10,12 @@ import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 
 public interface OrderInfoRepository extends JpaRepository<OrderInfoEntity, Long> {
     
-    public List<OrderInfoEntity> findByEmail(String email);
+    public List<OrderInfoEntity> findByEmail_Email(String email);
 
     public Page<OrderInfoEntity> findByOrderSeqnoOrEmail_Email
             (Long keyword1,String keyword2,Pageable pageable);
     
-    public OrderInfoEntity findByEmailAndOrderSeqno(String email, Long orderSeqno);
+    public OrderInfoEntity findByEmail_EmailAndOrderSeqno(String email, Long orderSeqno);
 
     public List<OrderInfoEntity> findByOrderStatus(String orderStatus);
 }

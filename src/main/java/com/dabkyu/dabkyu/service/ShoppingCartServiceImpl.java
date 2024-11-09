@@ -1,18 +1,15 @@
 package com.dabkyu.dabkyu.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.OrderProductDTO;
-import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
@@ -21,7 +18,6 @@ import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductOptionEntity;
-import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.RelatedProductEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
 import com.dabkyu.dabkyu.entity.repository.AddedRelatedProductRepository;
@@ -56,7 +52,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     // 장바구니 보기
     @Override
     public List<ShoppingCartEntity> getCartItems(String email) {
-        return shoppingCartRepository.findByEmail(email);
+        return shoppingCartRepository.findByEmail_Email(email);
     }
 
     
@@ -113,7 +109,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public void updateCartItemQuantity(String email, Long orderProductSeqno, int newQuantity) {
         // 장바구니 항목 가져오기
-        ShoppingCartEntity cartItem = shoppingCartRepository.findByEmailAndOrderProductSeqno(email, orderProductSeqno);
+        ShoppingCartEntity cartItem = shoppingCartRepository.findByEmail_EmailAndOrderProductSeqno_OrderProductSeqno(email, orderProductSeqno);
         
         // 장바구니에 해당 상품이 존재하는지 확인
         if (cartItem == null) {
@@ -134,7 +130,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     // 장바구니에서 특정 상품 삭제
     @Override
     public void removeFromCart(String email, Long orderProductSeqno) {
-        ShoppingCartEntity itemToRemove = shoppingCartRepository.findByEmailAndOrderProductSeqno(email, orderProductSeqno);
+        ShoppingCartEntity itemToRemove = shoppingCartRepository.findByEmail_EmailAndOrderProductSeqno_OrderProductSeqno(email, orderProductSeqno);
         
         // 해당 상품이 장바구니에 존재하는 경우 삭제
         if (itemToRemove != null) {
@@ -147,7 +143,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     // 장바구니에서 모든 상품 삭제
     @Override
     public void clearCart(String email) {
-        List<ShoppingCartEntity> cartItems = shoppingCartRepository.findByEmail(email);
+        List<ShoppingCartEntity> cartItems = shoppingCartRepository.findByEmail_Email(email);
         
         // 모든 상품 삭제
         shoppingCartRepository.deleteAll(cartItems);
@@ -226,7 +222,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
    @Transactional
    @Override
    public void removeProduct(String email) {
-   List<OrderInfoEntity> orderInfoList = orderInfoRepository.findByEmail(email);
+   List<OrderInfoEntity> orderInfoList = orderInfoRepository.findByEmail_Email(email);
 
     for (OrderInfoEntity orderInfo : orderInfoList) {
         // 주문 상태가 "결제 완료"

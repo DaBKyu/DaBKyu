@@ -9,7 +9,7 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 
 public interface MemberReviewLikeRepository extends JpaRepository<MemberReviewLikeEntity, MemberReviewLikeEntityID>{
 
-    public MemberReviewLikeEntity findBySeqnoAndEmail(ReviewEntity review, MemberEntity member);
+    public MemberReviewLikeEntity findByReviewSeqnoAndEmail(ReviewEntity review, MemberEntity member);
 
 
 }

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,7 +19,6 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberReviewLikeRepository;
-import com.dabkyu.dabkyu.entity.repository.QuestionRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewRepository;
 
@@ -41,7 +39,7 @@ public class ReviewServiceImpl implements ReviewService {
 		//페이징 기준을 설정 --> 시작점, 증가분, 정렬 방식
 		// (시작페이지 --> 0부터 시작, 한 화면에 보이는 행의 수, 정렬기준(Sort.by)
 		PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"reviewSeqno"));
-		return reviewRepository.findByEmailContainingOrRevContentContaining(keyword, keyword, pageRequest);
+		return reviewRepository.findByEmail_EmailContainingOrRevContentContaining(keyword, keyword, pageRequest);
 	}
 
 	//리뷰 내용 보기
@@ -122,7 +120,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		ReviewEntity reviewEntity = reviewRepository.findById(reviewSeqno).get();
 		MemberEntity memberEntity = memberRepository.findById(email).get();
-		return memberReviewLikeRepository.findBySeqnoAndEmail(reviewEntity,memberEntity);
+		return memberReviewLikeRepository.findByReviewSeqnoAndEmail(reviewEntity,memberEntity);
 	}
 	
 	//도움이되었어요 체크 등록
@@ -146,7 +144,7 @@ public class ReviewServiceImpl implements ReviewService {
 		ReviewEntity reviewEntity = reviewRepository.findById(seqno).get();
 		MemberEntity memberEntity = memberRepository.findById(email).get();
 		
-		MemberReviewLikeEntity memberReviewLikeEntity = memberReviewLikeRepository.findBySeqnoAndEmail(reviewEntity, memberEntity);
+		MemberReviewLikeEntity memberReviewLikeEntity = memberReviewLikeRepository.findByReviewSeqnoAndEmail(reviewEntity, memberEntity);
 		memberReviewLikeRepository.delete(memberReviewLikeEntity);
 	}
 	

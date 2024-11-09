@@ -1,46 +1,24 @@
 package com.dabkyu.dabkyu.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.dabkyu.dabkyu.dto.AddedRelatedProductDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
-import com.dabkyu.dabkyu.dto.MemberDTO;
-import com.dabkyu.dabkyu.dto.OrderDetailDTO;
-import com.dabkyu.dabkyu.dto.OrderInfoDTO;
-import com.dabkyu.dabkyu.dto.OrderProductDTO;
-import com.dabkyu.dabkyu.dto.OrderProductOptionDTO;
-import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
 import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.CouponTargetEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
-import com.dabkyu.dabkyu.entity.OrderDetailEntity;
-import com.dabkyu.dabkyu.entity.OrderInfoEntity;
-import com.dabkyu.dabkyu.entity.OrderProductEntity;
-import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
-import com.dabkyu.dabkyu.entity.OrderInfoEntity;
-import com.dabkyu.dabkyu.entity.OrderProductEntity;
-import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
-import com.dabkyu.dabkyu.entity.CouponEntity;
-import com.dabkyu.dabkyu.entity.MemberEntity;
-import com.dabkyu.dabkyu.entity.OrderInfoEntity;
-import com.dabkyu.dabkyu.entity.OrderProductEntity;
-import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
-import com.dabkyu.dabkyu.entity.MemberEntity;
-import com.dabkyu.dabkyu.entity.OrderInfoEntity;
-import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
-import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 import com.dabkyu.dabkyu.entity.repository.CouponCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponTargetRepository;
@@ -72,7 +50,7 @@ public class MasterServiceImpl implements MasterService {
     @Override
     public Page<MemberEntity> memberList(int pageNum, int postNum, String keyword) throws Exception {
         PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"username"));
-        return masterRepository.findByEmailContainingOrUsernameContaing(keyword, keyword, pageRequest);
+        return masterRepository.findByEmailContainingOrUsernameContaining(keyword, keyword, pageRequest);
     }
 
     //맴버 상세보기

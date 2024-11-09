@@ -1,8 +1,8 @@
 package com.dabkyu.dabkyu.entity.repository;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,7 +16,7 @@ public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
             (Long keyword1,Long keyword2,Pageable pageable);
 
     // 전체 리뷰 목록 보기
-  public Page<ReviewEntity> findByEmailContainingOrRevContentContaining(String keyword, String keyword2, PageRequest pageRequest);
+  public Page<ReviewEntity> findByEmail_EmailContainingOrRevContentContaining(String keyword, String keyword2, PageRequest pageRequest);
 
     // 상품 이전 보기
 	@Query("select max(r.reviewSeqno) from review r " 
