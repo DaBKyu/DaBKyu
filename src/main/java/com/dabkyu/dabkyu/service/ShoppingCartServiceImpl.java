@@ -54,7 +54,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public List<ShoppingCartEntity> getCartItems(String email) {
         return shoppingCartRepository.findByEmail_Email(email);
     }
-
     
     // 장바구니에 상품 넣기
     @Override
@@ -94,7 +93,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             }
        
         }
-
 
         MemberEntity memberEntity = memberRepository.findById(memberDTO.getEmail()).get();
         ShoppingCartEntity shoppingCartEntity = ShoppingCartEntity.builder()
@@ -282,60 +280,53 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     //결제 취소
     public void cancelToPay(String email, Long orderSeqno) {
+        
         // 주문 정보 조회
         OrderInfoEntity orderInfo = orderInfoRepository.findById(orderSeqno).get();
 
-        // 주문 상태가 이미 취소되었는지 확인
-        if ("취소 완료".equals(orderInfo.getOrderStatus())) {
-            throw new RuntimeException("이미 취소된 주문입니다.");
+        // 주문자가 맞는지 확인
+        if (!orderInfo.getEmail().getEmail().equals(email)) {
+            throw new RuntimeException("이 주문은 해당 회원이 요청할 수 없습니다.");
         }
-    
+
+        // 주문 상태 변경 (결제 취소)
+        orderInfo.setOrderStatus("결제 취소");
+        orderInfo.setExptDate(null);  // 예상 배송 날짜 초기화
+        orderInfo.setDeliveryPrice(0); // 배송비 초기화 (배송 취소된 경우)
+        orderInfoRepository.save(orderInfo);
+
         // 주문 상품 목록 조회
         List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno(orderInfo);
-    
-        // 재고 복원 처리
+
+        // 주문 상세 정보 처리 (상품 개별 취소)
         for (OrderDetailEntity orderDetail : orderDetails) {
+            // 주문 상품 정보
             OrderProductEntity orderProduct = orderDetail.getOrderProductSeqno();
+
+            orderDetail.setCancelYn("Y");
+            orderDetailRepository.save(orderDetail);
+
+            // 주문된 상품의 재고 복구
             ProductEntity product = orderProduct.getProductSeqno();
-    
-            int restoredStock = product.getStockAmount() + orderProduct.getAmount();
-            product.setStockAmount(restoredStock);
+            product.setStockAmount(product.getStockAmount() + orderProduct.getAmount());
             productRepository.save(product);
         }
-    
-        // 주문 상태 업데이트
-        orderInfo.setOrderStatus("취소 완료");
-        orderInfoRepository.save(orderInfo);
     }
 
-/*
     // 환불 신청 처리 
-    public void refundRequest(String email, List<Long> orderProductSeqnos) {
+    public void refundRequest(String email, Long orderSeqno) {
         // 주문 상품 조회
-        List<OrderProductEntity> orderProducts = orderProductRepository.findByEmailAndSeqnos(email, orderProductSeqnos);
+       OrderInfoEntity orderInfo = orderInfoRepository.findByEmail_EmailAndOrderSeqno(email, orderSeqno);
 
-        // 환불 처리
-        orderProducts.forEach(orderProduct -> {
-            orderProduct.setReviewYn("N");  // 환불 시 리뷰 상태 초기화
-            orderProductRepository.save(orderProduct);
+        // 주문 상세 정보 업데이트 (환불 상태로 변경)
+        //OrderDetailEntity orderDetail = orderDetailRepository.findByOrderSeqno_OrderSeqno(orderInfo.getOrderSeqno());
+        //orderDetail.setRefundYn("Y");
 
-            // 주문 상세 정보 업데이트 (환불 상태로 변경)
-            OrderDetailEntity orderDetail = orderDetailRepository.findByOrderProductSeqno(orderProduct.getOrderProductSeqno());
-            orderDetail.setOrderProductSeqno(orderProduct);
-            orderDetailRepository.save(orderDetail);
-        });
-
-        // 첫 번째 주문 상품의 orderSeqno로 주문 정보 업데이트 (환불 상태로 변경)
-        Long orderSeqno = orderProducts.get(0).getOrderProductSeqno();
-        OrderInfoEntity orderInfo = orderInfoRepository.findByEmailAndOrderSeqno(email, orderSeqno);
-
-        if (orderInfo == null) {
-            throw new IllegalArgumentException("해당 주문 정보가 없습니다.");
-        }
-
+        //주문 정보 업데이트 (환불 상태로 변경)
+        //orderInfo = orderInfoRepository.findByOrderSeqno(orderDetail.getOrderSeqno());
         orderInfo.setOrderStatus("환불 신청");
         orderInfoRepository.save(orderInfo);
     }
-*/
+
 }
    

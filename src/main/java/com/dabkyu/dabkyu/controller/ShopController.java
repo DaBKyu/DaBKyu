@@ -1,13 +1,10 @@
 package com.dabkyu.dabkyu.controller;
 
 import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.OrderProductDTO;
@@ -28,7 +24,6 @@ import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.ReviewDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
 import com.dabkyu.dabkyu.entity.MemberReviewLikeEntity;
-import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
@@ -40,10 +35,8 @@ import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.service.ShoppingCartService;
 import com.dabkyu.dabkyu.util.PageUtil;
-
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
-
 
 @Controller
 @AllArgsConstructor
@@ -77,6 +70,8 @@ public class ShopController {
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
+		model.addAttribute("category1Seqno", category1Seqno);  
+    	model.addAttribute("category2Seqno", category2Seqno); 
 		model.addAttribute("category3Seqno", category3Seqno); 
 		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword));
 	}
@@ -97,13 +92,20 @@ public class ShopController {
 		model.addAttribute("fileListView", productService.fileListView(productSeqno));	
     }
     
+    //@GetMapping("/purchase/cart")
+    //public List<ShoppingCartEntity> getCartItems(Model model, HttpSession session) throws Exception {
+        // String email = (String)session.getAttribute("email");
+		// model.addAttribute("list", shoppingCartService.getCartItems(email));
+		// return null;
+    //}
+
 	// 장바구니 보기
-    @GetMapping("/purchase/cart")
-    public List<ShoppingCartEntity> getCartItems(Model model, HttpSession session) throws Exception {
-        String email = (String)session.getAttribute("email");
-		model.addAttribute("list", shoppingCartService.getCartItems(email));
-		return null;
-    }
+	@ResponseBody
+	@GetMapping("/purchase/cart")
+	public List<ShoppingCartEntity> getCartItems(HttpSession session) throws Exception {
+		String email = (String)session.getAttribute("email");
+		return shoppingCartService.getCartItems(email);
+}
 
     // 장바구니에 상품 추가
     @PostMapping("/purchase/addcart")
@@ -163,8 +165,7 @@ public class ShopController {
 		HttpSession session,
 		@RequestParam("toPayOrderProductList")
 		List<Long> toPayOrderProductList,
-		@RequestBody OrderInfoDTO orderInfo
-	) {
+		@RequestParam("orderInfo") OrderInfoDTO orderInfo) {
 		String email = (String)session.getAttribute("email");
 	}
 
@@ -200,18 +201,18 @@ public class ShopController {
 	}
 		 
 	 // 환불 신청
-	//  @PostMapping("/purchase/refundRequest")
-	//  public String requestRefund(
-	// 		 HttpSession session,
-	// 		 @RequestParam List<Long> orderProductSeqnos) { 
-	// 	 String email = (String) session.getAttribute("email");
-	// 	 try {
-	// 		 shoppingCartService.refundRequest(email, orderProductSeqnos);
-	// 		 return "{\"message\":\"good\"}";
-	// 	 } catch (RuntimeException e) {
-	// 		 return e.getMessage();
-	// 	 }
-	//  }
+	 @PostMapping("/purchase/refundRequest")
+	 public String requestRefund(
+			 HttpSession session,
+			 @RequestParam Long orderSeqno) { 
+		 String email = (String) session.getAttribute("email");
+		 try {
+			 shoppingCartService.refundRequest(email,orderSeqno);
+			 return "{\"message\":\"good\"}";
+		 } catch (RuntimeException e) {
+			 return e.getMessage();
+		 }
+	 }
 
 	// 상품 문의 내역 보기
 	@GetMapping("/purchase/questionList")
