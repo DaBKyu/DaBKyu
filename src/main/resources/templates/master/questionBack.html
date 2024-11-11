@@ -1,0 +1,71 @@
+<!-- 서비스 예시
+@Service
+public class QuestionService {
+
+    private final QuestionRepository questionRepository;
+    
+    @Autowired
+    public QuestionService(QuestionRepository questionRepository) {
+        this.questionRepository = questionRepository;
+    }
+
+    // Fetch a single question by its ID
+    public QuestionDto getQuestionById(Long id) {
+        return questionRepository.findById(id)
+                                 .map(QuestionDto::fromEntity)
+                                 .orElseThrow(() -> new IllegalArgumentException("Invalid question ID"));
+    }
+
+    // Save an answer for a specific question
+    public void submitAnswer(Long id, String answerContent) {
+        QuestionEntity question = questionRepository.findById(id)
+                                                    .orElseThrow(() -> new IllegalArgumentException("Invalid question ID"));
+        
+        // Update with new answer content (assuming there's an Answer entity or field)
+        question.setAnswerContent(answerContent);
+        
+        // Update status to 'ANSWERED'
+        question.setStatus("ANSWERED");
+        
+        // Save updated entity
+        questionRepository.save(question);
+    }
+}
+-->
+
+<!-- 컨트롤러 예시
+@Controller
+public class QuestionController {
+
+    private final QuestionService questionService;
+
+    @Autowired
+    public QuestionController(QuestionService questionService) {
+        this.questionService = questionService;
+    }
+
+    // Render the answer page with selected question details
+    @GetMapping("/questionAnswer/{id}")
+    public String getQuestionForAnswer(@PathVariable Long id, Model model) {
+        // Fetch the selected question by ID
+        QuestionDto question = questionService.getQuestionById(id);
+        
+        // Add question data to model
+        model.addAttribute("question", question);
+        
+        return "questionAnswer";  // Render the answer page
+    }
+
+    // Handle answer submission
+    @PostMapping("/submitAnswer")
+    public String submitAnswer(@RequestParam Long id,
+                               @RequestParam String answerContent) {
+        
+        // Save the answer using service layer
+        questionService.submitAnswer(id, answerContent);
+        
+        // Redirect back to question list after submission
+        return "redirect:/questionList";
+    }
+}
+-->
