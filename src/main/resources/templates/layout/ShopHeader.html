@@ -10,7 +10,7 @@
         <div style="display: flex; align-items: center; width: 100%;">
             <!-- 메뉴 토글 아이콘 -->
                 <i class="fi fi-br-menu-burger" href="#" id="menu-toggle" style="font-size: 25px; margin-top: 1.5px;"></i>
-                <a style="margin-left: 70px; font-size: 20px;">DABKYU</a>        
+                <a style="margin-left: 70px; font-size: 20px; text-decoration: none; text-decoration: none; color: inherit;" href="../shop/main.html">DABKYU</a>        
              <!-- 검색창 -->
             <div style="flex-grow: 1; position: relative; max-width: 1000px; margin-left: 300px;">
                 <input type="text" name="keyword" id="keyword" 
@@ -21,15 +21,15 @@
             </div>
             <!-- 아이콘들 -->
             <div style="display: flex; gap: 30px; align-items: center;  margin-left: auto; margin-right: 10px;">
-                <a href="#"><i class="fi fi-rr-user" style="font-size: 20px;"></i></a>
-                <a href="#"><i class="fi fi-rr-shopping-cart" style="font-size: 20px;"></i></a>
-                <a href="#"><i class="fi fi-rs-bell" style="font-size: 20px;"></i></a>
+                <a href="../mypage/order.html" style="text-decoration: none; color: inherit;" ><i class="fi fi-rr-user" style="font-size: 20px;"></i></a>
+                <a href="../mypage/shoppingCart.html" style="text-decoration: none; color: inherit;"><i class="fi fi-rr-shopping-cart" style="font-size: 20px;"></i></a>
+                <a style="text-decoration: none; color: inherit;"><i class="fi fi-rs-bell" id="notificationBtn" style="font-size: 20px;"></i></a>
             </div>
         </div>
     </nav>
     <aside>
         <ul>
-            <li class="dropdown"><a href="#">카테고리1<span>&rsaquo;</span></a>
+            <li class="dropdown"><a onclick="loadContent('mainTest_pc.html')" style="cursor: pointer;">PC<span>&rsaquo;</span></a>
                 <ul>
                     <li class="dropdown_two"><a href="#">카테고리1-1<span>&rsaquo;</span></a>
                         <ul>
@@ -61,7 +61,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="dropdown"><a href="#">카테고리2<span>&rsaquo;</span></a>
+            <li class="dropdown"><a onclick="loadContent('mainTest_mobile.html')" style="cursor: pointer;">모바일<span>&rsaquo;</span></a>
                 <ul>
                     <li class="dropdown_two"><a href="#">카테고리2-1<span>&rsaquo;</span></a>
                         <ul>
@@ -93,7 +93,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="dropdown"><a href="#">카테고리3<span>&rsaquo;</span></a>
+            <li class="dropdown"><a onclick="loadContent('mainTest_keyboard.html')" style="cursor: pointer;">키보드<span>&rsaquo;</span></a>
                 <ul>
                     <li class="dropdown_two"><a href="#">카테고리3-1<span>&rsaquo;</span></a>
                         <ul>
@@ -125,7 +125,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="dropdown"><a href="#">카테고리4<span>&rsaquo;</span></a>
+            <li class="dropdown"><a onclick="loadContent('mainTest_mouse.html')" style="cursor: pointer;">마우스<span>&rsaquo;</span></a>
                 <ul>
                     <li class="dropdown_two"><a href="#">카테고리4-1<span>&rsaquo;</span></a>
                         <ul>
@@ -157,7 +157,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="dropdown"><a href="#">카테고리5<span>&rsaquo;</span></a>
+            <li class="dropdown"><a onclick="loadContent('mainTest_moniter.html')" style="cursor: pointer;">모니터<span>&rsaquo;</span></a>
                 <ul>
                     <li class="dropdown_two"><a href="#">카테고리5-1<span>&rsaquo;</span></a>
                         <ul>
@@ -190,6 +190,17 @@
                 </ul>
             </li>
         </aside>
-<script src="/src/main/resources/static/js/menuToggle.js"></script>
+<!-- 알림 모달 -->
+<div class="notification-modal" id="notificationModal">
+    <div class="notification-content">
+        <div id="iframeContainer">
+        <iframe id="myIframe" 
+        src="/src/main/resources/templates/mypage/notice.html" 
+        frameborder="0">
+        </iframe>
+    </div>  
+    </div>
+</div>
+<script src="/src/main/resources/static/js/menuToggle_ShopHeader.js"></script>
 </body>		
 </html>
