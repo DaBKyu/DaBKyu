@@ -10,12 +10,12 @@ import com.dabkyu.dabkyu.entity.OrderProductEntity;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, Long> {
     // 특정 주문에 해당하는 모든 주문 상세 정보 조회
-    List<OrderDetailEntity> findByOrderSeqno(OrderInfoEntity orderSeqno);
+    public List<OrderDetailEntity> findByOrderSeqno(OrderInfoEntity orderSeqno);
 
     // 특정 주문 상품에 해당하는 주문 상세 정보 조회
-    List<OrderDetailEntity> findByOrderProductSeqno(OrderProductEntity orderProduct);
+    public List<OrderDetailEntity> findByOrderProductSeqno(OrderProductEntity orderProduct);
 
-    OrderDetailEntity findByOrderProductSeqno(Long orderProductSeqno);
+    //public OrderDetailEntity findByOrderProductSeqno(OrderProductEntity orderProduct);
 
 
 }

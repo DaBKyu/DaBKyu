@@ -32,13 +32,13 @@ public class CouponCategoryDTO {
 
     public CouponCategoryDTO(CouponCategoryEntity entity){
         this.couponSeqno = entity.getCouponSeqno();
-        this.category3seqno = entity.getCategory3seqno();
+        this.category3seqno = entity.getCategory3Seqno();
     }
 
     public CouponCategoryEntity dtoToEntity(CouponCategoryDTO dto){
         CouponCategoryEntity entity = CouponCategoryEntity.builder()
                                         .couponSeqno(dto.getCouponSeqno())
-                                        .category3seqno(dto.getCategory3seqno())
+                                        .category3Seqno(dto.getCategory3seqno())
                                         .build();
         return entity;
     }

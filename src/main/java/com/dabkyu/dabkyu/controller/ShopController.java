@@ -200,18 +200,18 @@ public class ShopController {
 	}
 		 
 	 // 환불 신청
-	 @PostMapping("/purchase/refundRequest")
-	 public String requestRefund(
-			 HttpSession session,
-			 @RequestParam List<Long> orderProductSeqnos) { 
-		 String email = (String) session.getAttribute("email");
-		 try {
-			 shoppingCartService.refundRequest(email, orderProductSeqnos);
-			 return "{\"message\":\"good\"}";
-		 } catch (RuntimeException e) {
-			 return e.getMessage();
-		 }
-	 }
+	//  @PostMapping("/purchase/refundRequest")
+	//  public String requestRefund(
+	// 		 HttpSession session,
+	// 		 @RequestParam List<Long> orderProductSeqnos) { 
+	// 	 String email = (String) session.getAttribute("email");
+	// 	 try {
+	// 		 shoppingCartService.refundRequest(email, orderProductSeqnos);
+	// 		 return "{\"message\":\"good\"}";
+	// 	 } catch (RuntimeException e) {
+	// 		 return e.getMessage();
+	// 	 }
+	//  }
 
 	// 상품 문의 내역 보기
 	@GetMapping("/purchase/questionList")

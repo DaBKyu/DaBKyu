@@ -16,13 +16,13 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
     public List<QuestionEntity> findByEmail(MemberEntity member);
 
     //문의 목록 보기
-    public Page<QuestionEntity> findByQueTitleContainingOrQueWriterContainingOrQueContentContaining(
+    public Page<QuestionEntity> findByQueTitleContainingOrEmail_EmailContainingOrQueContentContaining(
         String keyword1, String keyword2, String keyword3, Pageable pageable);
 
     //게시물 이전 보기 --> JPQL
 	@Query("select max(q.queSeqno) from question q " 
     + "where q.queSeqno < :queSeqno and "
-    + "(q.queWriter like %:keyword1% or q.queTitle like %:keyword2% or "
+    + "(q.email.email like %:keyword1% or q.queTitle like %:keyword2% or "
     + "queContent like %:keyword3%)")
     public Long pre_seqno(@Param("queSeqno") Long queSeqno, 
         @Param("keyword1") String keyword1, 
@@ -31,7 +31,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
 
     //게시물 다음 보기 --> JPQL
     @Query("select min(q.queSeqno) from question q "
-        + "where q.queSeqno > :queSeqno and (q.queWriter like %:keyword1% or "
+        + "where q.queSeqno > :queSeqno and (q.email.email like %:keyword1% or "
         + "q.queTitle like %:keyword2% or queContent like %:keyword3%)")
     public Long next_seqno(@Param("queSeqno") Long queSeqno, 
         @Param("keyword1") String keyword1, 

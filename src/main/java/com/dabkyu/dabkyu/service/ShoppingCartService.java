@@ -45,6 +45,6 @@ public interface ShoppingCartService {
     //public void requestExchange(String email, Long orderProductSeqno);
 
     //환불 신청
-    public void refundRequest(String email, List<Long> orderProductSeqnos);
+    //public void refundRequest(String email, List<Long> orderProductSeqnos);
 
 }

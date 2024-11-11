@@ -31,7 +31,7 @@ public class QuestionServiceImpl implements QuestionService {
 	@Override
 	public Page<QuestionEntity> list(int pageNum, int postNum, String keyword) throws Exception {
 		PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"queSeqno"));
-		return questionRepository.findByQueTitleContainingOrQueWriterContainingOrQueContentContaining(keyword, keyword, keyword, pageRequest);
+		return questionRepository.findByQueTitleContainingOrEmail_EmailContainingOrQueContentContaining(keyword, keyword, keyword, pageRequest);
 	}
 
     // 문의 내용 보기
@@ -74,10 +74,11 @@ public class QuestionServiceImpl implements QuestionService {
 	
 	// 문의 상세 페이지에서 첨부된 파일 목록 보기
 	@Override
-	public List<QuestionFileDTO> fileListView(Long questionFileSeqno) throws Exception{
+	public List<QuestionFileDTO> fileListView(Long queSeqno) throws Exception{
 		List<QuestionFileDTO> fileDTOs = new ArrayList<>();
+		QuestionEntity questionEntity = questionRepository.findById(queSeqno).get();
 
-		questionFileRepository.findByQueSeqno(questionFileSeqno).stream().forEach(list-> fileDTOs.add(new QuestionFileDTO(list)));
+		questionFileRepository.findByQueSeqno(questionEntity).stream().forEach(list-> fileDTOs.add(new QuestionFileDTO(list)));
 		return fileDTOs;
 	}
 }

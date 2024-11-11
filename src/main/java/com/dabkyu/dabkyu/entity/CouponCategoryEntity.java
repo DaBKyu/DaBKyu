@@ -32,6 +32,6 @@ public class CouponCategoryEntity {
     @ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name="category3_seqno", nullable = false)
-	private Category3Entity category3seqno;
+	private Category3Entity category3Seqno;
 
 }

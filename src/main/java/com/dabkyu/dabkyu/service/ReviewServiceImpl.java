@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,7 +19,6 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberReviewLikeRepository;
-import com.dabkyu.dabkyu.entity.repository.QuestionRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewRepository;
 
@@ -41,7 +39,7 @@ public class ReviewServiceImpl implements ReviewService {
 		//페이징 기준을 설정 --> 시작점, 증가분, 정렬 방식
 		// (시작페이지 --> 0부터 시작, 한 화면에 보이는 행의 수, 정렬기준(Sort.by)
 		PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"reviewSeqno"));
-		return reviewRepository.findByEmailContainingOrRevContentContaining(keyword, keyword, pageRequest);
+		return reviewRepository.findByEmail_EmailContainingOrRevContentContaining(keyword, keyword, pageRequest);
 	}
 
 	//리뷰 내용 보기
@@ -84,10 +82,10 @@ public class ReviewServiceImpl implements ReviewService {
 	
 	//리뷰 상세 페이지에서 첨부된 파일 목록 보기
 	@Override
-	public List<ReviewFileDTO> fileListView(Long reviewFileSeqno) throws Exception{
+	public List<ReviewFileDTO> fileListView(Long reviewSeqno) throws Exception{
 		List<ReviewFileDTO> fileDTOs = new ArrayList<>();
 
-		reviewFileRepository.findBySeqno(reviewFileSeqno).stream().forEach(list-> fileDTOs.add(new ReviewFileDTO(list)));
+		reviewFileRepository.findByReviewSeqno(reviewRepository.findById(reviewSeqno).get()).stream().forEach(list-> fileDTOs.add(new ReviewFileDTO(list)));
 		return fileDTOs;
 	}
 	
@@ -107,7 +105,7 @@ public class ReviewServiceImpl implements ReviewService {
 		List<ReviewFileEntity> fileEntities = null;
 		
 		if(data.get("kind").equals("B")) { //전체파일삭제
-			fileEntities = reviewFileRepository.findBySeqno((Long)data.get("reviewFileSeqno"));	
+			fileEntities = reviewFileRepository.findByReviewSeqno(reviewRepository.findById((Long)data.get("reviewSeqno")).get());	
 			if (fileEntities != null && !fileEntities.isEmpty()) {
 				reviewFileRepository.deleteAll(fileEntities);
 			}
@@ -122,7 +120,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		ReviewEntity reviewEntity = reviewRepository.findById(reviewSeqno).get();
 		MemberEntity memberEntity = memberRepository.findById(email).get();
-		return memberReviewLikeRepository.findBySeqnoAndEmail(reviewEntity,memberEntity);
+		return memberReviewLikeRepository.findByReviewSeqnoAndEmail(reviewEntity,memberEntity);
 	}
 	
 	//도움이되었어요 체크 등록
@@ -146,7 +144,7 @@ public class ReviewServiceImpl implements ReviewService {
 		ReviewEntity reviewEntity = reviewRepository.findById(seqno).get();
 		MemberEntity memberEntity = memberRepository.findById(email).get();
 		
-		MemberReviewLikeEntity memberReviewLikeEntity = memberReviewLikeRepository.findBySeqnoAndEmail(reviewEntity, memberEntity);
+		MemberReviewLikeEntity memberReviewLikeEntity = memberReviewLikeRepository.findByReviewSeqnoAndEmail(reviewEntity, memberEntity);
 		memberReviewLikeRepository.delete(memberReviewLikeEntity);
 	}
 	
