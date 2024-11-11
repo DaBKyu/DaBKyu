@@ -3,9 +3,15 @@
 				 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
-<title>메인페이지</title>
+<title>ajax 연습</title>
 <link rel="stylesheet" type="text/css" href="/src/main/resources/static/css/shopHeader.css">
 <style>
+.content {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+
 /* 캐러셀 컨테이너 */
 .carousel {
     position: relative;
@@ -120,175 +126,175 @@
 </head>
 <body>
     <div id="ShopHeader"></div>
-    <br><br><br>
-    <section class="shopping-suggestions" style="width: 80%; margin: 0 auto;">
-        <h2>카테고리</h2>
-        <div class="carousel">
-            <button class="carousel-btn prev">◀</button>
-            <div class="carousel-track-container">
-                <ul class="carousel-track">
-                    <!-- 첫 번째 슬라이드 (상품 1~8) -->
-                    <li class="carousel-slide">
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 1">
-                            <div class="product-info">
-                                <h3>카테고리1</h3>
-
+    <div id="content" class="content">
+        <br><br><br>
+        <section class="shopping-suggestions" style="width: 80%; margin: 0 auto;">
+            <h2 style="text-align: center;">카테고리</h2>
+            <div class="carousel">
+                <button class="carousel-btn prev">◀</button>
+                <div class="carousel-track-container">
+                    <ul class="carousel-track">
+                        <!-- 첫 번째 슬라이드 (상품 1~8) -->
+                        <li class="carousel-slide">
+                            <div class="product" onclick="loadContent('mainTest_pc.html')" style="cursor: pointer;">
+                                <img src="https://via.placeholder.com/150" alt="Product 1">
+                                <div class="product-info">
+                                    <h3>PC</h3>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 2">
-                            <div class="product-info">
-                                <h3>카테고리2</h3>
-                      
+                            <div class="product" onclick="loadContent('mainTest_mobile.html')">
+                                <img src="https://via.placeholder.com/150" alt="Product 2">
+                                <div class="product-info">
+                                    <h3>모바일</h3>
+                          
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 3">
-                            <div class="product-info">
-                                <h3>카테고리3</h3>
-                        
+                            <div class="product" onclick="loadContent('mainTest_keyboard.html')">
+                                <img src="https://via.placeholder.com/150" alt="Product 3">
+                                <div class="product-info">
+                                    <h3>키보드</h3>
+                            
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 4">
-                            <div class="product-info">
-                                <h3>카테고리4</h3>
-                   
+                            <div class="product" onclick="loadContent('mainTest_mouse.html')">
+                                <img src="https://via.placeholder.com/150" alt="Product 4">
+                                <div class="product-info">
+                                    <h3>마우스</h3>
+                       
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 5">
-                            <div class="product-info">
-                                <h3>상품 5</h3>
-                                <p class="price">₩30,000</p>
+                            <div class="product" onclick="loadContent('mainTest_moniter.html')">
+                                <img src="https://via.placeholder.com/150" alt="Product 5">
+                                <div class="product-info">
+                                    <h3>모니터</h3>
+                                    <p class="price">₩30,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 6">
-                            <div class="product-info">
-                                <h3>상품 6</h3>
-                                <p class="price">₩35,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 6">
+                                <div class="product-info">
+                                    <h3>상품 6</h3>
+                                    <p class="price">₩35,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 7">
-                            <div class="product-info">
-                                <h3>상품 7</h3>
-                                <p class="price">₩40,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 7">
+                                <div class="product-info">
+                                    <h3>상품 7</h3>
+                                    <p class="price">₩40,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 8">
-                            <div class="product-info">
-                                <h3>상품 8</h3>
-                                <p class="price">₩45,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 8">
+                                <div class="product-info">
+                                    <h3>상품 8</h3>
+                                    <p class="price">₩45,000</p>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                    <!-- 두 번째 슬라이드 (상품 5~8) -->
-                    <li class="carousel-slide">
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 5">
-                            <div class="product-info">
-                                <h3>상품 5</h3>
-                                <p class="price">₩30,000</p>
+                        </li>
+                        <!-- 두 번째 슬라이드 (상품 5~8) -->
+                        <li class="carousel-slide">
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 5">
+                                <div class="product-info">
+                                    <h3>상품 5</h3>
+                                    <p class="price">₩30,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 6">
-                            <div class="product-info">
-                                <h3>상품 6</h3>
-                                <p class="price">₩35,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 6">
+                                <div class="product-info">
+                                    <h3>상품 6</h3>
+                                    <p class="price">₩35,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 7">
-                            <div class="product-info">
-                                <h3>상품 7</h3>
-                                <p class="price">₩40,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 7">
+                                <div class="product-info">
+                                    <h3>상품 7</h3>
+                                    <p class="price">₩40,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 8">
-                            <div class="product-info">
-                                <h3>상품 8</h3>
-                                <p class="price">₩45,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 8">
+                                <div class="product-info">
+                                    <h3>상품 8</h3>
+                                    <p class="price">₩45,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 5">
-                            <div class="product-info">
-                                <h3>상품 5</h3>
-                                <p class="price">₩30,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 5">
+                                <div class="product-info">
+                                    <h3>상품 5</h3>
+                                    <p class="price">₩30,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 6">
-                            <div class="product-info">
-                                <h3>상품 6</h3>
-                                <p class="price">₩35,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 6">
+                                <div class="product-info">
+                                    <h3>상품 6</h3>
+                                    <p class="price">₩35,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 7">
-                            <div class="product-info">
-                                <h3>상품 7</h3>
-                                <p class="price">₩40,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 7">
+                                <div class="product-info">
+                                    <h3>상품 7</h3>
+                                    <p class="price">₩40,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 8">
-                            <div class="product-info">
-                                <h3>상품 8</h3>
-                                <p class="price">₩45,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 8">
+                                <div class="product-info">
+                                    <h3>상품 8</h3>
+                                    <p class="price">₩45,000</p>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                    <!-- 세 번째 슬라이드 (상품 9~12) -->
-                    <li class="carousel-slide">
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 9">
-                            <div class="product-info">
-                                <h3>상품 9</h3>
-                                <p class="price">₩50,000</p>
+                        </li>
+                        <!-- 세 번째 슬라이드 (상품 9~12) -->
+                        <li class="carousel-slide">
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 9">
+                                <div class="product-info">
+                                    <h3>상품 9</h3>
+                                    <p class="price">₩50,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 10">
-                            <div class="product-info">
-                                <h3>상품 10</h3>
-                                <p class="price">₩55,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 10">
+                                <div class="product-info">
+                                    <h3>상품 10</h3>
+                                    <p class="price">₩55,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 11">
-                            <div class="product-info">
-                                <h3>상품 11</h3>
-                                <p class="price">₩60,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 11">
+                                <div class="product-info">
+                                    <h3>상품 11</h3>
+                                    <p class="price">₩60,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 12">
-                            <div class="product-info">
-                                <h3>상품 12</h3>
-                                <p class="price">₩65,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 12">
+                                <div class="product-info">
+                                    <h3>상품 12</h3>
+                                    <p class="price">₩65,000</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="product">
-                            <img src="https://via.placeholder.com/150" alt="Product 12">
-                            <div class="product-info">
-                                <h3>상품 12</h3>
-                                <p class="price">₩65,000</p>
+                            <div class="product">
+                                <img src="https://via.placeholder.com/150" alt="Product 12">
+                                <div class="product-info">
+                                    <h3>상품 12</h3>
+                                    <p class="price">₩65,000</p>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                </ul>
+                        </li>
+                    </ul>
+                </div>
+                <button class="carousel-btn next">▶</button>
             </div>
-            <button class="carousel-btn next">▶</button>
-        </div>
-    </section>
-
+        </section>
+    </div>
 <!-- 알림 모달 -->
 <div class="notification-modal" id="notificationModal">
     <div class="notification-content">
@@ -300,32 +306,61 @@
     </div>  
     </div>
 </div>
-<script>
-// 알림 버튼 및 모달 요소 가져오기
-const notificationBtn = document.getElementById('notificationBtn');
-const notificationModal = document.getElementById('notificationModal');
+<script src="/src/main/resources/static/js/menuToggle_ajax.js"></script>
+    <script>
+   function loadContent(page) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", page, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            document.getElementById("content").innerHTML = xhr.responseText;
 
-// 알림 버튼 클릭 시 모달 열기/닫기
-notificationBtn.addEventListener('click', () => {
-    if (notificationModal.style.display === 'block') {
-        // 모달이 이미 열려 있으면 닫기
-        notificationModal.style.display = 'none';
-    } else {
-        // 모달이 닫혀 있으면 열기
-        notificationModal.style.display = 'block';
-    }
-});
+            // HTML이 로드된 후 요소를 다시 찾고 이벤트 리스너를 추가합니다.
+            const track = document.querySelector('.carousel-track');
+            const slides = Array.from(track.children);
+            const nextButton = document.querySelector('.next');
+            const prevButton = document.querySelector('.prev');
+            let currentSlideIndex = 0;
 
-// 모달 외부 클릭 시 모달 숨기기
-window.addEventListener('click', (event) => {
-    if (notificationModal.style.display === 'block' && 
-        event.target !== notificationModal && 
-        event.target !== notificationBtn && 
-        !notificationModal.contains(event.target)) {
-            notificationModal.style.display = 'none';
-    }
-});
+            if (track && slides.length > 0) {
+                const slideWidth = slides[0].getBoundingClientRect().width;
+
+                const moveToSlide = (index) => {
+                    track.style.transform = `translateX(-${index * slideWidth}px)`;
+                    nextButton.style.display = (index === slides.length - 1) ? 'none' : 'block';
+                    prevButton.style.display = (index === 0) ? 'none' : 'block';
+                };
+
+                nextButton.addEventListener('click', () => {
+                    if (currentSlideIndex < slides.length - 1) {
+                        currentSlideIndex++;
+                    } else {
+                        currentSlideIndex = 0;
+                    }
+                    moveToSlide(currentSlideIndex);
+                });
+
+                prevButton.addEventListener('click', () => {
+                    if (currentSlideIndex > 0) {
+                        currentSlideIndex--;
+                    } else {
+                        currentSlideIndex = slides.length - 1;
+                    }
+                    moveToSlide(currentSlideIndex);
+                });
+
+                // 첫 슬라이드 상태 초기화
+                prevButton.style.display = 'none';
+            } else {
+                console.error("Carousel elements not found.");
+            }
+        }
+    };
+    xhr.send();
+}
+
 </script>
-<script src="/src/main/resources/static/js/menuToggle.js"></script>
+<script src="/src/main/resources/static/js/ajax.js"></script>
+<script src="/src/main/resources/static/js/menuToggle copy.js"></script>
 </body>
 </html>
