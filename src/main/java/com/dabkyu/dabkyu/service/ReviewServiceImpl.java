@@ -140,8 +140,8 @@ public class ReviewServiceImpl implements ReviewService {
 	
 	//도움이되었어요 취소
 	@Override
-	public void likeCheckUpdate(Long seqno, String email) throws Exception{
-		ReviewEntity reviewEntity = reviewRepository.findById(seqno).get();
+	public void likeCheckUpdate(Long reviewSeqno, String email) throws Exception{
+		ReviewEntity reviewEntity = reviewRepository.findById(reviewSeqno).get();
 		MemberEntity memberEntity = memberRepository.findById(email).get();
 		
 		MemberReviewLikeEntity memberReviewLikeEntity = memberReviewLikeRepository.findByReviewSeqnoAndEmail(reviewEntity, memberEntity);
