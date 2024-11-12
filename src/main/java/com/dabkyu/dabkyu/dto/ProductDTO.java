@@ -22,8 +22,8 @@ public class ProductDTO {
 	private int stockAmount;
 	private String deliveryisFree;
 	private int likecnt;
-	private String infoOrgImage;
-	private String infoStoredImage;
+	// private String infoOrgImage;
+	// private String infoStoredImage;
     private String secretYn;
 
     public ProductDTO(ProductEntity entity) {
@@ -35,8 +35,8 @@ public class ProductDTO {
         this.stockAmount = entity.getStockAmount();
         this.deliveryisFree = entity.getDeliveryisFree();
         this.likecnt = entity.getLikecnt();
-        this.infoOrgImage = entity.getInfoOrgImage();
-        this.infoStoredImage = entity.getInfoStoredImage(); 
+        // this.infoOrgImage = entity.getInfoOrgImage();
+        // this.infoStoredImage = entity.getInfoStoredImage(); 
         this.secretYn = entity.getSecretYn();
     }
 
@@ -50,8 +50,8 @@ public class ProductDTO {
                                             .stockAmount(dto.getStockAmount())
                                             .deliveryisFree(dto.getDeliveryisFree())
                                             .likecnt(dto.getLikecnt())
-                                            .infoOrgImage(dto.getInfoOrgImage())
-                                            .infoStoredImage(dto.getInfoStoredImage())
+                                            // .infoOrgImage(dto.getInfoOrgImage())
+                                            // .infoStoredImage(dto.getInfoStoredImage())
                                             .secretYn(dto.getSecretYn())
                                             .build();
         return entity;
