@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.Locale.Category;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,13 +28,15 @@ import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
+import com.dabkyu.dabkyu.dto.QuestionDTO;
+import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
+import com.dabkyu.dabkyu.entity.repository.Category3Repository;
 import com.dabkyu.dabkyu.entity.repository.CouponRepository;
-import com.dabkyu.dabkyu.entity.repository.MasterRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductRepository;
@@ -38,6 +44,7 @@ import com.dabkyu.dabkyu.service.MasterService;
 import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.util.PageUtil;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -50,20 +57,19 @@ public class MasterController{
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
     private final ProductFileRepository productFileRepository;
-    private final MemberService memberService;
-    private final MasterRepository masterRepository;
     private final MasterService masterService;
     private final CouponRepository couponRepository;
+    private final Category3Repository category3Repository;
     
     //리뷰
     //문의
 
     //메인페이지
-    @GetMapping("/manageBack") //manageback??
-    public void getManageback() {}
+    @GetMapping("/master") 
+    public void getMaster() {}
 
     //고객정보페이지
-    @GetMapping("/manageBack/client")
+    @GetMapping("/master/client")
     public void getClient(Model model, @RequestParam("page") int pageNum,
             @RequestParam(name="keyword",defaultValue="",required=false) String keyword) throws Exception {
        
@@ -81,61 +87,38 @@ public class MasterController{
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("pageList", page.getPageClient(pageNum, postNum, pageListCount,totalCount,keyword));
-
     }
 
-    //고객페이지 상세보기 >> 필요?
-
-
-    //고객 삭제 기능..? 
+    //고객 삭제 기능
     @Transactional
-    @GetMapping("/manageBack/clientdelete")
-    public String deleteClient(@RequestParam("email") String email) throws Exception{
+    @GetMapping("/master/deleteClient")
+    public String getDeleteClient(@RequestParam("email") String email) throws Exception{
  
-		
 		masterService.clientDelete(email); 
 
-		return "redirect:/manageBack/client";
-
+		return "redirect:/"; ////
     }
 
     //고객정보 수정 화면보기
-    @GetMapping("/manageBack/clientmodify")
-    public void modifyViewClient() {
+    @GetMapping("/master/modifyClient/{email}")
+    public void getModifyClient(@PathVariable String email, Model model) {
 
-
+        model.addAttribute("member", masterService.getMemberByEmail(email));
     }
 
-    //고객정보 수정 (등급) >> 따로 화면? OR 리스트에서 바로 수정 가능? 
-    //수동? 자동? 
-    //수동 > 직접 수정 가능하게... ???????
-    //자동 > 기간, 소비금액 총액 계산 후 자동 변경 기능... ?????
-    //수정필요
-    @PostMapping("/manageBack/clientmodify")
-    public String modifyClient(@RequestParam("email") String email,
-                            @RequestParam("memberGrade") String memberGrade) throws Exception {
+    //고객정보 수정 
+    @PostMapping("/master/modifyViewClient/{email}")
+    public String postModifyClient(@ModelAttribute MemberDTO memberDTO) throws Exception {
 
-        MemberEntity memberEntity = masterService.getMemberByEmail(email);
-        memberEntity.setMemberGrade(memberGrade);
-        masterService.saveMemberGrade(memberEntity);
+        masterService.memberModify(memberDTO);
 
-        return "redirect:/manageBack/client";
-        
-    }
-
-    //적립금 관리.. > 등급별로 설정 가능하게..? 
-    //등급 <-> 적립금 % 조절 가능하게..? 
-    @PostMapping("manageBack/point")
-    public String modifyPoint() {
-
-        //아직
-        return "redirect:/manageBack/client";
+        return "redirect:/"; ////   
     }
 
     //이메일 작성 화면보기
-    @GetMapping("manageBack/clientemail")
-    public void sendEmail() {
-        //아직
+    @GetMapping("/master/sendEmail")
+    public void getSendEmail() {
+        //
 
     }
 
@@ -144,173 +127,289 @@ public class MasterController{
     //이메일 발송 
     
     //상품 리스트 화면보기
-    //수정필요
-    //원본제품설명이미지?? 이미지파일 불러와야함. .
-    /*
-    @GetMapping("/manageBack/productlist")
-    public void getProductPost(
-        Model model,
-        @RequestParam("page")
-        int pageNum,
-		@RequestParam(name="keyword1",defaultValue="",required=false)
-        Long keyword1,
-        @RequestParam(name="keyword2",defaultValue="",required=false)
-        String keyword2
-    ) throws Exception{
+    @GetMapping("/master/productList")
+    public void getProductList(Model model, 
+                            @RequestParam("page") int pageNum, 
+                            @RequestParam(name="keyword",defaultValue="",required=false) Long keyword1,
+                            @RequestParam(name="keyword",defaultValue="",required=false) String keyword2) throws Exception{
+        int postNum = 10;
+        int pageListCount = 10;
 
-        int postNum = 10; 
-        int pageListCount = 10; 
-        
         PageUtil page = new PageUtil();
-        Page<ProductEntity> productList = masterService.productList(pageNum, postNum, keyword1, keyword2);
+        Page<ProductDTO> productList = masterService.productList(pageNum, postNum, keyword1, keyword2);
         int totalCount = (int)productList.getTotalElements();
 
-        model.addAttribute("productList", productList);
-        model.addAttribute("listIsEmpty", productList.hasContent()?"N":"Y");
-        model.addAttribute("totalElement", totalCount);
-        model.addAttribute("postNum", postNum);
-        model.addAttribute("page", pageNum);
-        model.addAttribute("keyword", keyword1);
-        model.addAttribute("keyword", keyword2);
-        model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,keyword1, keyword2));
-
-
-
-
-}
- */
-
-    //상품 이미지 보기...? 
-
+        model.addAttribute("list", productList);
+		model.addAttribute("listIsEmpty", productList.hasContent()?"N":"Y");
+		model.addAttribute("totalElement", totalCount);
+		model.addAttribute("postNum", postNum);
+		model.addAttribute("page", pageNum);
+		model.addAttribute("keyword1", keyword1);
+        model.addAttribute("keyword2", keyword2);
+		model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,keyword1, keyword2));
+    }
 
     //상품 등록 화면보기 
-    @GetMapping("/manageBack/productpost") 
-    public void getProduct() {}
+    @GetMapping("/master/postProduct") 
+    public void getPostProduct() {
+
+
+    }
 
     //상품 수정 화면보기 >> 수정 눌렀을 때
-    @GetMapping("/manageBack/productmodify")
-    public void modifyProduct() {}
+    @GetMapping("/master/modifyProduct")
+    public void getmMdifyProduct() {
 
-    //상품 등록 
+
+    }
+
+    //상품 등록 및 수정  ////수정 필요. 상품이미지+썸네일
     @ResponseBody
-    @PostMapping("/manageBack/productpost")
-    public String postProduct(ProductDTO productDTO, @RequestParam("kind") String kind,
-                            @RequestParam(name="sendToFileList",required=false) List<MultipartFile> multipartFile,
-                            @RequestParam(name="deleteFileList",required=false) Long[] deleteFileList) throws Exception{
+    @PostMapping("/master/postProduct")
+    public String postProduct(ProductDTO productDTO, 
+                            @RequestParam("kind") String kind,
+                            @RequestParam(name="productImage",required=false) List<MultipartFile> productImages,
+                            @RequestParam(name="detailImage", required=false) MultipartFile detailImage,
+                            @RequestParam(name="deleteProductImages", required=false) Long[] deleteProductImages,
+                            @RequestParam(name="deleteDetailProductImage",required=false) Long[] deleteDetailProductImage,
+                            @RequestParam(name="category1Seqno") Long category1Seqno,
+                            @RequestParam(name="category2Seqno") Long category2Seqno,
+                            @RequestParam(name="category3Seqno") Long category3Seqno) 
+                            throws Exception{
         
         String os = System.getProperty("os.name").toLowerCase();
-		String path;
-		if(os.contains("win"))
-			path = "c:\\Repository\\file\\";
-		else 
-			path = "/home/gladius/Repository/file";
-        
-        File p = new File(path);
+		String productImgPath;
+        String productDetailImgPath;
+
+		if(os.contains("win")){
+            productImgPath = "c:\\Repository\\productfile\\productImages\\";
+            productDetailImgPath = "c:\\Repository\\productfile\\detailimage\\";
+        }else{
+            productImgPath = "/home/gladius/Repository/productfile/productImages/";
+            productDetailImgPath = "/home/gladius/Repository/productfile/detailimage/";
+        }
+			
+        File p = new File(productImgPath);
+        File d = new File(productDetailImgPath);
         if(!p.exists()) p.mkdir();
+        if(!d.exists()) d.mkdir();
         
-        //상품등록 >> 카테고리는???
-        //아직
+        Long seqno = 0L;	
         
-        //상품등록 수정
+        //카테고리 연결
+        Category3Entity category3 = category3Repository.findByCategory3Seqno(category3Seqno);
+        productDTO.setCategory3Seqno(category3);
 
+        //등록
+        if(kind.equals("I")){
+            seqno = masterService.productPost(productDTO);
+        }
+
+        //수정
+        if(kind.equals("U")){
+            masterService.productModify(productDTO);
+            seqno = productDTO.getProductSeqno();
+
+            //상품 파일 삭제
+            if (deleteProductImages != null) {
+                for (Long productFileSeqno : deleteProductImages) {
+                    masterService.deleteProductFile(productFileSeqno); 
+                }
+            }
+
+            //상세보기 파일 삭제
+            if (deleteDetailProductImage != null) {
+                String storedFilename = productDTO.getInfoStoredImage(); 
+                File detailImgDelete = new File(productDetailImgPath + storedFilename);
+                if (detailImgDelete.exists()) {
+                    detailImgDelete.delete(); 
+                }
+                productDTO.setInfoOrgImage(null);
+                productDTO.setInfoStoredImage(null);    
+            }
+        }
         
-        //상품이미지파일 >> 상품 이미지, 상품 상세페이지 이미지 
+        //상품이미지파일 //productfile
+        if(productImages != null){
+            for(MultipartFile mpr:productImages) {
+                String org_filename = mpr.getOriginalFilename();
+                String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));			
+                String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
 
+                try{
+                    File targetFile = new File(productImgPath + stored_filename);				
+					mpr.transferTo(targetFile);
 
-        //상품페이지 미리보기...
+                    ProductFileDTO fileInfo = ProductFileDTO.builder()
+                                            .productFileSeqno(seqno)
+                                            .orgFilename(org_filename)
+                                            .storedFilename(stored_filename)
+                                            .build();
+                    masterService.productImgFile(fileInfo);
 
-        return null; //
-        
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
 
+        //상세보기이미지파일 //product
+        if(detailImage != null){
+            String org_filename = detailImage.getOriginalFilename();
+            String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));			
+            String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
+
+            try{
+                File targetFile = new File(productDetailImgPath + stored_filename);				
+                detailImage.transferTo(targetFile);
+                /* 
+                ProductDTO fileInfo = ProductDTO.builder()
+                                            .infoOrgImage(org_filename)
+                                            .infoStoredImage(stored_filename)
+                                            .build();
+                */
+                productDTO.setInfoOrgImage(org_filename); 
+                productDTO.setInfoStoredImage(stored_filename);
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        return "{\"message\":\"good\"}"; 
     }
 
-    //상품 삭제 /////////////////////////////수정 필요. 활성 비활성))))
-    @Transactional
-	@GetMapping("/manageBack/productdelete") 
-    public String productDelete(@RequestParam("productSeqno") Long productSeqno) throws Exception {
+    
+    //상품 미리보기 화면
 
-        Map<String, Object> data = new HashMap<>();
-		data.put("kind", "B");
-		data.put("seqno", productSeqno);
-		
-		masterService.deleteProductFileList(data);
-		masterService.deleteProductList(productSeqno); 
 
-        return "redirect:/manageBack/productlist";
+    //상품 삭제 (활성 비활성)
+    @ResponseBody
+	@GetMapping("/master/secretProduct") 
+    public  List<ProductDTO> postSecretProduct(@RequestParam("kind") String kind,
+                            @RequestParam(name="role", required=false) String role) throws Exception {
+
+        List<ProductDTO> productList = masterService.getAllProducts();
+
+        if("MASTER".equals(role)){
+            return productList;
+        }
+        return productList.stream().filter(product -> "Y".equals(product.getSecretYn()))
+                                   .collect(Collectors.toList());
     }
 
-    //주문내역 리스트 화면보기  ///수정수정수정서웅ㅇ서줭수정써ㅜㅈ엇
+    //주문내역 리스트 화면보기  ///수정 필요
     //추가상품 정보 O -> 추가
     //제품 옵션 정보 O -> 추가 
-    @GetMapping("/manageBack/order")
-    public void getOrder(@RequestParam("orderSeqno") Long orderSeqno,Model model) {
+    //카테고리 정보, 상품명
+    //검색 > 주문현황 수정필요
+    @GetMapping("/master/order")
+    public void getOrderList(Model model, 
+                            @RequestParam("page") int pageNum, 
+                            @RequestParam(name="keyword",defaultValue="",required=false) String productname,
+                            @RequestParam(name="keyword",defaultValue="",required=false) Long category) 
+                            throws Exception{
+        int postNum = 10; 
+        int pageListCount = 10;                         
+        
+        PageUtil page = new PageUtil();
+        Page<Map<String, Object>> orderList = masterService.orderList(pageNum, postNum, productname, category);                        
+        int totalCount = (int) orderList.getTotalElements(); 
+        
+        model.addAttribute("orderList", orderList);
+        model.addAttribute("listIsEmpty", orderList.hasContent()?"N":"Y");
+        model.addAttribute("totalElements", totalCount);
+        model.addAttribute("postNum", postNum);
+        model.addAttribute("page", pageNum);
+        model.addAttribute("productname", productname);
+        model.addAttribute("category", category);
+        model.addAttribute("pageList", page.getPageOrder(pageNum, postNum, pageListCount,totalCount,productname,category));
+    }
 
-
-
-
-
+    //주문내역 상세보기?
+    //order_detail > order_product, order_info / product>product_name
+    @GetMapping("/master/orederView")
+    public void getOrderView() {
         
     }
 
-    //주문내역 상세보기... 
-    //order_detail > order_product, order_info / product>product_name
-    @GetMapping("/manageBack/orderview")
-    public void getOrderView() {
-        //아직
-    }
-
-    //주문 상태 변경
+    //주문 상태 변경 //newStatus : 상품준비중 - 배송중 - 배송완료?
     @ResponseBody
-    @PostMapping("/manageBack/order")
-    public void modifyOrder() {
-        //아직
+    @PostMapping("/master/modifyOrder")
+    public String postModifyOrder(@RequestParam("orderSeqno") Long orderSeqno,
+                                @RequestParam("newStatus") String newStatus)
+                                throws Exception {
+        masterService.modifyOrderStatus(orderSeqno,newStatus);
 
+        return "redirect:/master/order";
     }
 
     //카테고리 화면보기
-    @GetMapping("/manageBack/category")
-    public void getCategory() {
-        //아직
+    @GetMapping("/master/categoryList")
+    public void getCategoryList() {
+        //
 
     }
 
     //카테고리 추가 화면보기
-    @GetMapping("/manageBack/categorypost")
-    public void postViewCategory() {}
+    @GetMapping("/master/createCategory")
+    public void getCreateCategory() {}
 
     //카테고리 수정 화면보기
-    //아직
+    //
 
     //카테고리 추가 
     @ResponseBody
-    @PostMapping("/manageBack/categorypost")
-    public void postCategory() {
+    @PostMapping("/master/createCategory")
+    public void postCreateCategory() {
         //카테고리 추가
-        //아직
+        //
         //카테고리 수정
 
     }
 
     //카테고리 삭제
     @Transactional
-	@GetMapping("/manageBack/categorydelete") 
-    public String deleteCategory() {
-        //아직
-        return "redirect:/manageBack/category";
+	@GetMapping("/master/deleteCategory") 
+    public String getDeleteCategory() {
+        //
+        return "redirect:/";  /////
     }
 
-    //상품문의 확인, 답변은 링크 타고 들어가게..? 
-    @GetMapping("/manageBack/questionview")
-    public void getQuestion() {
-        //아직
+    // 문의 리스트
+
+    //상품문의 확인, 답변
+    @GetMapping("/master/question")
+    public void getQuestion(Model model, @RequestParam("page") int pageNum, 
+                @RequestParam(name="queType",defaultValue="",required=false) String queType)
+                throws Exception{
+        int postNum = 15;
+        int pageListCount = 10;
+
+        PageUtil page = new PageUtil();
+        Page<Map<String, Object>> questionList = masterService.questionList(pageNum, postNum, queType);                        
+        int totalCount = (int) questionList.getTotalElements(); 
+
+        model.addAttribute("questionList", questionList);
+        model.addAttribute("listIsEmpty", questionList.hasContent() ? "N" : "Y");
+        model.addAttribute("totalElements", totalCount);
+        model.addAttribute("postNum", postNum);
+        model.addAttribute("page", pageNum);
+        model.addAttribute("keyword", queType);
+        model.addAttribute("pageList", page.getPageQuestion(pageNum, postNum, pageListCount, totalCount, queType));
+
 
     }
+
+    //상품문의 삭제 
+    
+
+    //상품문의 답변 //답변 후 상태 변경 (답변전 -> 답변완료)
 
     //리뷰 리스트 화면 
-    @GetMapping("/manageBack/responsereview")
-    public void getReview(Model model, @RequestParam("page") int pageNum, 
-                @RequestParam(name="keyword",defaultValue="",required=false) 
-                Long keyword) throws Exception{
+    @GetMapping("/master/reviewList")
+    public void getReviewList(Model model, @RequestParam("page") int pageNum, 
+                @RequestParam(name="keyword",defaultValue="",required=false) Long keyword) 
+                throws Exception{
         
         int postNum = 10;
         int pageListCount = 10;
@@ -326,15 +425,14 @@ public class MasterController{
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("pageList", page.getPageReview(pageNum, postNum, pageListCount,totalCount,keyword));
-
     }
 
-    //리뷰 상세보기?? > 링크 타고 들어가게? ???????????????
-    //아직
+    //리뷰 상세보기
+  
 
     //리뷰 삭제
-    @GetMapping("/manageBack/reviewdelete")
-    public String deleteResponse(@RequestParam("reviewSeqno") Long reviewSeqno) throws Exception{
+    @GetMapping("/master/deleteReview")
+    public String getDeleteReview(@RequestParam("reviewSeqno") Long reviewSeqno) throws Exception{
 
         Map<String, Object> data = new HashMap<>();
 		data.put("kind", "B");
@@ -343,14 +441,14 @@ public class MasterController{
         masterService.deleteReviewFileList(data);
 		masterService.deleteReview(reviewSeqno); 
 
-        return "redirect:/manageBack/responsereview";
+        return "redirect:/";  ///
     }
 
     //쿠폰 리스트보기
     //couponCategory -> coupon_seqno , category3seqno
     //couponTarget -> coupon_seqno, product_seqno
-    @GetMapping("/manageBack/coupon")
-    public void getCoupon(Model model,@RequestParam("page") int pageNum,
+    @GetMapping("/master/couponList")
+    public void getCouponList(Model model,@RequestParam("page") int pageNum,
                         @RequestParam(name="keyword",defaultValue="",required=false) String keyword) 
                         throws Exception {
         int postNum = 15; 
@@ -367,29 +465,28 @@ public class MasterController{
         model.addAttribute("page", pageNum);
         model.addAttribute("keyword", keyword);
         model.addAttribute("pageList", page.getPageCoupon(pageNum, postNum, pageListCount,totalCount,keyword));
-
     }
 
     //쿠폰 등록 화면보기
-    @GetMapping("/manageBack/couponpost")
-    public void getPostCoupon() {}
+    @GetMapping("/master/createCoupon")
+    public void getCreateCoupon() {}
 
     //쿠폰 수정 화면보기
-    @GetMapping("/manageBack/couponmodify")
+    @GetMapping("/master/modifyCoupon")
     public void getModifyCoupon() {}
 
     //쿠폰 등록, 수정
     //수정필요
     @ResponseBody
-    @PostMapping("/manageBack/couponpost")
-    public void postCoupon(CouponDTO coupon, @RequestParam("kind") String kind) throws Exception{
+    @PostMapping("/master/createCoupon")
+    public void postCreateCoupon(CouponDTO coupon, @RequestParam("kind") String kind) throws Exception{
        
         if(kind.equals("I")){
             masterService.writeCoupon(coupon);
 
             //쿠폰 적용 범위를 카테고리 검색으로. 검색도 가능. 여러개 선택도 가능... 
             //권한설정: coupon_role > 맴버등급으로.
-            //사용옵션: 추가 할인 가능 >> 이건 뭐지?? 체크표시... 
+            //사용옵션: 추가 할인 가능 >> 체크표시?
 
         }
 
@@ -402,43 +499,43 @@ public class MasterController{
     //쿠폰-사용자 배포
     //자동: 특정 회원 지정 발행, 웅영자 지정 대상 자동 발행(신규회원, 첫주문 완료 회원, 생일인 회원)
     //수동: 고객 다운로드, 운영자의 쿠폰코드 생성
-    @PostMapping()
-    //아직
+    //@PostMapping()
+    //
 
 
     //쿠폰 삭제
     //수정필요. >> 삭제가 아니라 사용만료, 기간만료에 들어가게 됨. 
     //             사용조건이 맞지 않더라도 위치 옮김. (특정 등급 제한 쿠폰일 경우, 기간 만료 전 등급이 변경됐을 때 etc.)
-    @GetMapping("/manageBack/coupondelete")
-    public String deleteCoupon(@RequestParam("couponSeqno") Long couponSeqno) throws Exception{
+    @GetMapping("/master/deleteCoupon")
+    public String getDeleteCoupon(@RequestParam("couponSeqno") Long couponSeqno) throws Exception{
         Map<String, Object> data = new HashMap<>();
 		data.put("kind", "B"); //B??
 		data.put("seqno", couponSeqno);
         masterService.deleteCoupon(couponSeqno);
-        return "redirect:/manageBack/coupon";
+        return "redirect:/";  //
     }
 
     
-    //결제취소 확인, 처리 확인  (처리를 어떤식으로 하는가??????)
-    @GetMapping("/manageBack/ordercancel")
-    public void cancelOrder() {
-        //아직
+    //결제취소 확인, 처리 확인  (처리를 어떤식으로 하는가)
+    @GetMapping("/master/cancelOrder")
+    public void getCancelOrder() {
+        //
     }
 
     
 
-    //교환환불 확인, 처리 (처리를 어떤식으로 하는가??????)
-    @GetMapping("/manageBack/orderrefund")
-    public void refundOrder() {
-        //아직
+    //교환환불 확인, 처리 (처리를 어떤식으로 하는가)
+    @GetMapping("/master/refundOrder")
+    public void getRefundOrder() {
+        //
         
     }
 
-    //매출, //통계 (관심카테고리, 찜목록, 구매) ??????????????
-    @GetMapping("/manageBack/status")
+    //매출, //통계 (관심카테고리, 찜목록, 구매) 
+    @GetMapping("/master/Status")
     public void getStatus() {
 
-        //아직
+        //
     }
 
     //전체 회원의 누적구매금액을 조회 후 등급 업데이트

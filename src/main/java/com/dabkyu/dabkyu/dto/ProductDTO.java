@@ -1,5 +1,8 @@
 package com.dabkyu.dabkyu.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import lombok.AllArgsConstructor;
@@ -25,6 +28,7 @@ public class ProductDTO {
 	private String infoOrgImage;
 	private String infoStoredImage;
     private String secretYn;
+    private List<ProductFileDTO> productFiles;
 
     public ProductDTO(ProductEntity entity) {
         this.productSeqno = entity.getProductSeqno();
@@ -38,6 +42,7 @@ public class ProductDTO {
         this.infoOrgImage = entity.getInfoOrgImage();
         this.infoStoredImage = entity.getInfoStoredImage(); 
         this.secretYn = entity.getSecretYn();
+        this.productFiles = new ArrayList<>();
     }
 
     public ProductEntity dtoToEntity(ProductDTO dto) {
