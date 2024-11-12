@@ -169,7 +169,7 @@ public class MasterController{
     public String postProduct(ProductDTO productDTO, 
                             @RequestParam("kind") String kind,
                             @RequestParam(name="productImage",required=false) List<MultipartFile> productImages,
-                            @RequestParam(name="detailImage", required=false) MultipartFile detailImage,
+                            @RequestParam(name="detailImage", required=false) List<MultipartFile> detailImage,
                             @RequestParam(name="deleteProductImages", required=false) Long[] deleteProductImages,
                             @RequestParam(name="deleteDetailProductImage",required=false) Long[] deleteDetailProductImage,
                             @RequestParam(name="category1Seqno") Long category1Seqno,
@@ -216,18 +216,21 @@ public class MasterController{
                     masterService.deleteProductFile(productFileSeqno); 
                 }
             }
-
+            /* 
             //상세보기 파일 삭제
             if (deleteDetailProductImage != null) {
+                for(Long productFileI)
                 String storedFilename = productDTO.getInfoStoredImage(); 
                 File detailImgDelete = new File(productDetailImgPath + storedFilename);
                 if (detailImgDelete.exists()) {
                     detailImgDelete.delete(); 
                 }
+                if()
                 productDTO.setInfoOrgImage(null);
                 productDTO.setInfoStoredImage(null);    
-            }
+            }*/
         }
+
         
         //상품이미지파일 //productfile
         if(productImages != null){
@@ -253,6 +256,7 @@ public class MasterController{
             }
         }
 
+        /* 
         //상세보기이미지파일 //product
         if(detailImage != null){
             String org_filename = detailImage.getOriginalFilename();
@@ -262,12 +266,12 @@ public class MasterController{
             try{
                 File targetFile = new File(productDetailImgPath + stored_filename);				
                 detailImage.transferTo(targetFile);
-                /* 
+                // 
                 ProductDTO fileInfo = ProductDTO.builder()
                                             .infoOrgImage(org_filename)
                                             .infoStoredImage(stored_filename)
                                             .build();
-                */
+                //
                 productDTO.setInfoOrgImage(org_filename); 
                 productDTO.setInfoStoredImage(stored_filename);
 
@@ -275,6 +279,7 @@ public class MasterController{
                 e.printStackTrace();
             }
         }
+        */
         return "{\"message\":\"good\"}"; 
     }
 
