@@ -57,11 +57,11 @@ public class MasterController{
     //문의
 
     //메인페이지
-    @GetMapping("/manageBack") //manageback??
+    @GetMapping("/master") //manageback??
     public void getManageback() {}
 
     //고객정보페이지
-    @GetMapping("/manageBack/client")
+    @GetMapping("/master/userManage")
     public void getClient(Model model, @RequestParam("page") int pageNum,
             @RequestParam(name="keyword",defaultValue="",required=false) String keyword) throws Exception {
        
