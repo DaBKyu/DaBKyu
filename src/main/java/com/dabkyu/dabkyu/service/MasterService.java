@@ -1,5 +1,7 @@
 package com.dabkyu.dabkyu.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -92,7 +94,6 @@ public interface MasterService {
     //리뷰 삭제
 	public void deleteReview(Long reviewSeqno) throws Exception;
 
-    
-
-
+    //전체 회원의 누적구매금액을 조회 후 등급업데이트
+    public void calculateAndUpdateCustomerGrade(LocalDateTime referenceDate);
 }

@@ -51,6 +51,32 @@ public class ProductController {
 
         return "redirect:/productManage";  // Redirect after successful update
     }
+
+    @PostMapping("/productPreview")
+    public String previewProduct(@ModelAttribute ProductDto productDto,
+                                 @RequestParam("imageFiles") MultipartFile[] imageFiles,
+                                 Model model) {
+        
+        // Add product data to model so Thymeleaf can render it in productPreview.html
+        model.addAttribute("product", productDto);
+        
+        // Handle uploaded images (if any)
+        List<String> imageUrls = new ArrayList<>();
+        
+        if (imageFiles != null && imageFiles.length > 0) {
+            for (MultipartFile file : imageFiles) {
+                if (!file.isEmpty()) {
+                    String imageUrl = storageService.store(file);  // Store image and get URL
+                    imageUrls.add(imageUrl);  // Add URL to list
+                }
+            }
+        }
+        
+        model.addAttribute("imageUrls", imageUrls);  // Pass list of image URLs to preview
+
+        return "productPreview";  // Render productPreview.html
+    }
+}
 }
 
 --서비스

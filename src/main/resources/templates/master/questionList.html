@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>리뷰목록페이지</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../static/css/master.css" th:href="@{/css/master.css}">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <title>문의목록페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" >
+    <link rel="stylesheet" href="../../static/css/master.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
@@ -54,111 +54,118 @@
         </div>
     </nav>
         
-    <div class="container mt-4">     
-        <h2 class="mt-4">리뷰목록</h2>
+<div class="container mt-5">     
+    <h2 class="mt-4">문의목록</h2>
 
-        <!-- 카테고리 선택 -->
-        <div class="d-flex justify-content-end mb-2">
-            <select class="form-select w-auto" id="categorySelect" aria-label="카테고리 선택">
-                <option value="">전체 카테고리</option>
-                <option th:each="category : ${categories}" 
-                        th:value="${category.id}" 
-                        th:text="${category.name}"></option>
-            </select>
-        </div>
+    <!-- 문의 타입 선택 -->
+    <div class="d-flex justify-content-end mb-2">
+        <select class="form-select w-auto" id="typeSelect" aria-label="문의 타입 선택">
+            <option value="">문의 타입 선택</option>
+            <option th:each="question : ${questions}" 
+                    th:value="${question.que_type_num}" 
+                    th:text="${question.que_type}"></option>
+        </select>
+    </div>
 
-        <!-- 리뷰 목록 테이블 -->
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col"><input class="form-check-input" type="checkbox" id="checkAll"></th>
-                        <th scope="col">평가</th>
-                        <th scope="col">작성자</th>
-                        <th scope="col">내용</th>
-                        <th scope="col">카테고리</th>
-                        <th scope="col">작성일</th>
-                    </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                    <tr th:each="review : ${reviews}">
-                        <td><input class="form-check-input" type="checkbox" th:value="${review.id}"></td>
-                        <td th:text="${review.rate}">5</td>
-                        <td th:text="${review.rev_writer}">qscd123</td>
-                        <td>
-                            <img class="p_image" alt="" th:src="@{'/p_img/' + ${review.stored_filename}}" style="width:40px; height: 40px">
-                            <span th:text="${review.rev_content}">상품 관련 문의 입니다.</span>
-                        </td>
-                        <td th:text="${review.category_name}">카테고리명</td>
-                        <td th:text="${#temporals.format(review.rev_date, 'yyyy-MM-dd')}">2024.10.29</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <!-- 리뷰 목록 테이블 -->
+    <div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+            <th scope="col"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+            <th scope="col">문의타입</th>
+            <th scope="col">제목</th>
+            <th scope="col">내용</th>
+            <th scope="col">작성자</th>
+            <th scope="col">작성일</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            <tr th:each="question : ${questions}">
+              <td><input class="form-check-input question-checkbox" type="checkbox" value="${question.id}"></td>
+              <td th:text="${question.que_type}">답변전</td>
+              <td th:text="${question.que_title}">문의제목입니다</td>
+              <td>
+                <img th:if="${question.imageUrl != null}" th:src="@{'/q_img/' + ${question.imageUrl}}" alt="" style="width: 40px; height: 40px;">
+                <span th:text="${question.que_content}">문의 내용 입니다.</span></td>
+              <td th:text="${question.que_writer}">qscd123&nbsp;<a class="btn btn-outline-primary" th:href="@{/questionAnswer/{id}(id=${question.id})}">답변</a></td>
+              <td th:text="${#temporals.format(question.que_date, 'yyyy-MM-dd')}">2024.10.29</td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
 
         <!-- 삭제버튼 -->
         <button type="button" class="btn btn-danger" id="deleteButton">삭제</button>
 
+
         <!-- 페이지네이션 -->
         <nav aria-label="Page navigation" class="mt-4">
             <ul class="pagination justify-content-center"
-                th:with="startNumber=${T(Math).floor(reviews.number/10)}*10+1, endNumber=(${reviews.totalPages} > ${startNumber}+9) ? ${startNumber}+9 : ${reviews.totalPages}">
+                th:with="
+                    startNumber=${T(Math).floor(questions.number / 10) * 10 + 1}, 
+                    endNumber=(${questions.totalPages} > startNumber + 9) ? startNumber + 9 : ${questions.totalPages}">
                 
-                <li class="page-item" th:classappend="${reviews.first}?'disabled':''">
-                    <a class="page-link" th:href="@{/reviewList(page=${reviews.number})}" tabindex="-1">이전</a>
+                <li class="page-item" th:classappend="${questions.first} ? 'disabled' : ''">
+                    <a class="page-link" th:href="@{/questionList(page=${questions.number - 1}, type=${selectedType})}" tabindex="-1">이전</a>
+                </li>
+    
+                <li class="page-item" th:each="page : ${#numbers.sequence(startNumber, endNumber)}"
+                    th:classappend="${page == questions.number + 1} ? 'active' : ''">
+                    <a class="page-link" th:href="@{/questionList(page=${page-1}, type=${selectedType})}" th:text="${page}">1</a>
                 </li>
 
-                <li class="page-item" th:each="page : ${#numbers.sequence(startNumber, endNumber)}" 
-                    th:classappend="${page == reviews.number+1}?'active':''">
-                    <a class="page-link" th:href="@{/reviewList(page=${page-1})}" th:text="${page}">1</a>
-                </li>
-
-                <li class="page-item" th:classappend="${reviews.last}?'disabled':''">
-                    <a class="page-link" th:href="@{/reviewList(page=${reviews.number+2})}">다음</a>
+                <li class="page-item" th:classappend="${questions.last} ? 'disabled' : ''">
+                    <a class="page-link" th:href="@{/questionList(page=${questions.number + 1}, type=${selectedType})}">다음</a>
                 </li>
             </ul>
         </nav>
+
+
     </div>
-    
     <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
-        var categorySelect = document.getElementById('categorySelect');
+        var typeSelect = document.getElementById('typeSelect');
         var checkAll = document.getElementById('checkAll');
         var deleteButton = document.getElementById('deleteButton');
+        var answerButton = document.getElementById('answerButton');
 
-        categorySelect.addEventListener('change', function() {
-            var categoryId = this.value;
-            window.location.href = '/reviewList?category=' + categoryId;
+        typeSelect.addEventListener('change', function() {
+            var typeId = this.value;
+            window.location.href = '/questionList?type=' + typeId;
         });
-
+            
         checkAll.addEventListener('change', function() {
-            var checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
-            checkboxes.forEach(function(checkbox) {
-                checkbox.checked = checkAll.checked;
-            });
+                var checkboxes = document.querySelectorAll('.question-checkbox');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = checkAll.checked;
+                });
         });
 
         deleteButton.addEventListener('click', function() {
-            var selectedReviews = Array.from(document.querySelectorAll('tbody input[type="checkbox"]:checked'))
-                                       .map(cb => cb.value);
+            var selectedReviews = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
             if (selectedReviews.length > 0) {
-                if (confirm('선택한 리뷰를 삭제하시겠습니까?')) {
+                if (confirm('선택한 문의를 삭제하시겠습니까?')) {
                     deleteReviews(selectedReviews);
                 }
             } else {
-                alert('삭제할 리뷰를 선택해주세요.');
+                alert('삭제할 문의를 선택해주세요.');
             }
+        });
+
+        answerButton.addEventListener('click', function() {
+            //답변버튼 클릭시 해당 행의 회원에게 답변
         });
     });
 
-    function deleteReviews(reviewIds) {
-        fetch('/master/reviews/delete', {
+    function deleteReviews(questionIds) {
+        fetch('/master/questions/delete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
             },
-            body: JSON.stringify({ ids: reviewIds })
+            body: JSON.stringify({ ids: questionIds })
         })
         .then(response => {
             if (!response.ok) {
@@ -167,13 +174,13 @@
             return response.json();
         })
         .then(data => {
-            console.log('리뷰 삭제 성공:', data);
-            alert('리뷰 삭제에 성공했습니다.');
+            console.log('문의 삭제 성공:', data);
+            alert('문의 삭제에 성공했습니다.');
             window.location.reload();
         })
         .catch((error) => {
             console.error('리뷰 삭제 실패:', error);
-            alert('리뷰 삭제에 실패했습니다. 다시 시도해 주세요.');
+            alert('문의 삭제에 실패했습니다. 다시 시도해 주세요.');
         });
     }
     </script>

@@ -1,5 +1,7 @@
 package com.dabkyu.dabkyu.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -415,5 +417,46 @@ public class MasterServiceImpl implements MasterService {
         
     }
 
-    
+    //전체 회원의 누적 구매금액을 조회 후 총 누적 구매금액 업데이트, 
+    //최근 3년이내의 누적 구매금액을 기준으로 등급 업데이트
+    @Override
+    public void calculateAndUpdateCustomerGrade(LocalDateTime referenceDate) {
+        List<MemberEntity> members = memberRepository.findAll();
+
+        for (MemberEntity member : members) {
+            int totalSpentLast3Years = 0;  // 최근 3년 이내의 누적구매금액
+            LocalDateTime threeYearsAgo = referenceDate.minusYears(3); 
+            List<OrderInfoEntity> orders = orderInfoRepository.findByEmail_Email(member.getEmail());
+
+            for (OrderInfoEntity order : orders) {
+                int orderTotalPrice = order.getTotalPrice();
+
+                // 최근 3년 이내의 누적구매금액 구하기
+                if (order.getOrderDate().isAfter(threeYearsAgo)) {
+                totalSpentLast3Years += orderTotalPrice;
+                }
+            }
+            // 회원의 총 누적구매금액 업데이트
+            member.setTotalPvalue(totalSpentLast3Years);
+
+            //최근 3년 이내의 누적구매 금액에 따라 회원등급 설정
+            String grade;
+            if (totalSpentLast3Years >= 1000000) {
+                grade = "VIP";
+            } else if (totalSpentLast3Years >= 500000) {
+                grade = "Gold";
+            } else if (totalSpentLast3Years >= 100000) {
+                grade = "Silver";
+            } else {
+                grade = "Bronze";
+            }
+
+            //회원 객체의 memberGrade 업데이트 및 저장
+            member.setMemberGrade(grade);
+            //memberRepository.save(member);
+        }   
+        // 모든 회원 정보 한 번에 저장
+        memberRepository.saveAll(members); 
+    }
 }
+    
