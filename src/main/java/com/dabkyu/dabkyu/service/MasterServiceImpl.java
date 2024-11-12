@@ -4,14 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.dabkyu.dabkyu.dto.CouponDTO;
+import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.ProductDTO;
+import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.CouponTargetEntity;
@@ -53,44 +58,113 @@ public class MasterServiceImpl implements MasterService {
         return masterRepository.findByEmailContainingOrUsernameContaining(keyword, keyword, pageRequest);
     }
 
-    //맴버 상세보기
-
-
-
-
-
     //맴버 이메일로 검색
-    public MemberEntity getMemberByEmail(String email){
-        return masterRepository.findByEmail(email);
+    public MemberDTO getMemberByEmail(String email){
+        return memberRepository.findByEmail(email).map((member)->new MemberDTO(member)).get();
     }
    
     //맴버 등급 수정
-    public void saveMemberGrade(MemberEntity memberEntity) {
+    public void memberModify(MemberDTO memberDTO) throws Exception{
+        MemberEntity memberEntity = memberRepository.findByEmail(memberDTO.getEmail()).get();
+        memberEntity.setEmail(memberDTO.getEmail());
+        memberEntity.setUsername(memberDTO.getUsername());
+        memberEntity.setTelno(memberDTO.getTelno());
+        memberEntity.setGender(memberDTO.getGender());
+        memberEntity.setBirthDate(memberDTO.getBirthDate());
+        memberEntity.setMemberGrade(memberDTO.getMemberGrade());
+        memberEntity.setPay(memberDTO.getPay());
+        memberEntity.setPoint(memberDTO.getPoint());
+        memberEntity.setRole(memberDTO.getRole());
+        memberEntity.setEmailRecept(memberDTO.getEmailRecept());
         masterRepository.save(memberEntity);  
     }
-    
-
 
     //맴버 삭제 
     @Override
     public void clientDelete(String email) throws Exception{
-        //MemberEntity memberEntity = masterRepository.findByEmail(email).get();
-        //masterRepository.delete(memberEntity);
+        memberRepository.deleteByEmail(email);
     }
 
     //////////상품
-
-    //상품 리스트 보기 //productEntity,DTO에 productname 없음 
-    //상품 _ + 옵션+추가상품도 출력
-    //수정필요
-    //productList
-
-    //상품삭제
+    //상품 리스트 보기 
     @Override
-    public void deleteProductList(Long productSeqno) throws Exception{
-        ProductEntity productEntity = productRepository.findById(productSeqno).get();
-        productRepository.delete(productEntity);
+    public Page<ProductDTO> productList(int pageNum, int postNum, Long keyword1, String keyword2) throws Exception {
+        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC, "productName"));
+        Page<ProductEntity> productEntities;
+
+        if (keyword1 != null) {
+            //상품이름 + 카테고리
+            productEntities = productRepository.findByCategory3Seqno_Category3SeqnoAndProductNameContaining(keyword1, keyword2, pageRequest);
+        } else {
+            //상품이름
+            productEntities = productRepository.findByProductNameContaining(keyword2, pageRequest);
+        }
+
+        List<ProductDTO> productDTOs = productEntities.stream().map(productEntity -> {
+    
+            List<ProductFileEntity> productFiles = productFileRepository.findByProductSeqno_ProductSeqno(productEntity.getProductSeqno());
+            ProductDTO productDTO = new ProductDTO(productEntity);
+            
+            //productfile 정보 -> productDTO에 추가
+            productFiles.forEach(file -> {
+                ProductFileDTO productFileDTO = new ProductFileDTO(file);
+                productDTO.getProductFiles().add(productFileDTO); 
+            });    
+            return productDTO; 
+        }).collect(Collectors.toList());
+
+        return new PageImpl<>(productDTOs, pageRequest, productEntities.getTotalElements());
     }
+
+    //상품등록
+    @Override
+    public Long productPost(ProductDTO productDTO) throws Exception{
+        return productRepository.save(productDTO.dtoToEntity(productDTO)).getProductSeqno();
+    }
+
+    //상품수정
+    @Override
+    public void productModify(ProductDTO productDTO) throws Exception{
+        ProductEntity productEntity = productRepository.findById(productDTO.getProductSeqno()).get();
+        productEntity.setCategory3Seqno(productDTO.getCategory3Seqno());
+        productEntity.setProductName(productDTO.getProductName());
+        productEntity.setProductInfo(productDTO.getProductInfo());
+        productEntity.setPrice(productDTO.getPrice());
+        productEntity.setStockAmount(productDTO.getStockAmount());
+        productEntity.setDeliveryisFree(productDTO.getDeliveryisFree());
+        productEntity.setSecretYn(productDTO.getSecretYn());
+        productRepository.save(productEntity);
+    }
+
+    //max seqno 구하기
+	// @Override
+	// public Long getMaxSeqno(Long productSeqno) throws Exception{
+	// 	return productRepository.getMaxSeqno(productSeqno);
+	// } 
+
+    //상품 이미지 파일 등록
+    @Override
+    public void productImgFile(ProductFileDTO productFileDTO) throws Exception{
+        productFileRepository.save(productFileDTO.dtoToEntity(productFileDTO));
+    }
+
+    //상품 이미지 삭제
+    @Override
+    public void deleteProductFile(Long productFileSeqno) throws Exception{
+        //ProductEntity productEntity = productRepository.findById(productFileSeqno).get();
+        //productFileRepository.delete(productEntity);
+        productFileRepository.deleteById(productFileSeqno);
+    }
+
+
+    //상품 삭제(활성 비활성)
+    @Override
+    public List<ProductDTO> getAllProducts() throws Exception {
+        List<ProductEntity> productEntities = productRepository.findAll(); // 모든 제품 가져오기
+        return productEntities.stream()
+                            .map(ProductDTO::new)
+                            .collect(Collectors.toList());
+}
 
     //상품첨부파일삭제
     @Override

@@ -40,4 +40,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 	public Long next_seqno(@Param("productSeqno") Long productSeqno, 
 			@Param("keyword") String keyword);
 
+	//max seqno 구하기
+	// @Query(value ="select max(productSeqno) from product where productSeqno =:productSeqno", nativeQuery =true)
+	// public Long getMaxSeqno(@Param("productSeqno") Long productSeqno);
+
 }

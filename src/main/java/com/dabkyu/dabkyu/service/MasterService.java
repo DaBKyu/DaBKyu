@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
+import com.dabkyu.dabkyu.dto.ProductDTO;
+import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
@@ -23,20 +25,34 @@ public interface MasterService {
     //맴버 삭제
     public void clientDelete(String email) throws Exception;
 
-
     //맴버 이메일로 검색
-    public MemberEntity getMemberByEmail(String email);
+    public MemberDTO getMemberByEmail(String email);
 
     //맴버 등급 수정
-    public void saveMemberGrade(MemberEntity memberEntity);
+    public void memberModify(MemberDTO memberDTO) throws Exception;
 
 
     //////////////상품
     //상품 리스트 
-    //productList
+    public Page<ProductDTO> productList(int pageNum, int postNum, Long keyword1, String keyword2) throws Exception;
     
-    //상품 삭제
-    public void deleteProductList(Long productSeqno) throws Exception;
+    //상품등록
+    public Long productPost(ProductDTO productDTO) throws Exception;
+
+    //상품수정
+    public void productModify(ProductDTO productDTO) throws Exception;
+
+    //max seqno 구하기
+	// public Long getMaxSeqno(Long productSeqno) throws Exception;
+
+    //상품 이미지 파일 등록
+    public void productImgFile(ProductFileDTO productFileDTO) throws Exception;
+
+    //상품 이미지 삭제
+    public void deleteProductFile(Long fileseqno) throws Exception;
+
+    //상품 삭제(활성 비활성)
+    public List<ProductDTO> getAllProducts() throws Exception;
 
 	//상품 첨부파일 삭제
 	public void deleteProductFileList(Map<String,Object> data) throws Exception;
