@@ -1,12 +1,14 @@
 package com.dabkyu.dabkyu.controller;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -439,7 +441,16 @@ public class MasterController{
         //아직
     }
 
+    //전체 회원의 누적구매금액을 조회 후 등급 업데이트
+    @PostMapping("/manageBack/gradeUpdate")
+    public String updateCustomerGrade() {
 
+        LocalDateTime referenceDate = LocalDateTime.now();
+
+        masterService.calculateAndUpdateCustomerGrade(referenceDate);
+
+    return "{\"message\":\"good\"}";
+    }
 }
 
 
