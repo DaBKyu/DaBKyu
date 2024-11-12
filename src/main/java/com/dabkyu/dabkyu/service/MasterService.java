@@ -59,8 +59,10 @@ public interface MasterService {
 
     ////////////주문
     //주문 리스트
-    public void orderList() throws Exception;
+    public Page<Map<String, Object>> orderList(int pageNum, int postNum, String productname, Long category) throws Exception;
 
+    //주문 상태 수정
+    public void modifyOrderStatus(Long orderSeqno, String newStatus) throws Exception;
 
     /////////////쿠폰
     //쿠폰 리스트
@@ -74,6 +76,11 @@ public interface MasterService {
 
 	//쿠폰삭제
 	public void deleteCoupon(Long couponSeqno) throws Exception;
+
+    /////////////문의
+    //문의 리스트
+    public Page<Map<String, Object>> questionList(int pageNum, int postNum, String queType) throws Exception;
+
 
     //////////////리뷰
     //리뷰 리스트

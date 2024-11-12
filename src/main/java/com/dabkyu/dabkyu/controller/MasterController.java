@@ -26,6 +26,7 @@ import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
+import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
@@ -160,7 +161,7 @@ public class MasterController{
 
     }
 
-    //상품 등록 및 수정
+    //상품 등록 및 수정  ////수정 필요. 상품이미지+썸네일
     @ResponseBody
     @PostMapping("/master/postProduct")
     public String postProduct(ProductDTO productDTO, 
@@ -297,29 +298,47 @@ public class MasterController{
     //주문내역 리스트 화면보기  ///수정 필요
     //추가상품 정보 O -> 추가
     //제품 옵션 정보 O -> 추가 
+    //카테고리 정보, 상품명
+    //검색 > 주문현황 수정필요
     @GetMapping("/master/order")
-    public void getOrder(@RequestParam("orderSeqno") Long orderSeqno,Model model) {
-
-
-
-
-
+    public void getOrderList(Model model, 
+                            @RequestParam("page") int pageNum, 
+                            @RequestParam(name="keyword",defaultValue="",required=false) String productname,
+                            @RequestParam(name="keyword",defaultValue="",required=false) Long category) 
+                            throws Exception{
+        int postNum = 10; 
+        int pageListCount = 10;                         
         
+        PageUtil page = new PageUtil();
+        Page<Map<String, Object>> orderList = masterService.orderList(pageNum, postNum, productname, category);                        
+        int totalCount = (int) orderList.getTotalElements(); 
+        
+        model.addAttribute("orderList", orderList);
+        model.addAttribute("listIsEmpty", orderList.hasContent()?"N":"Y");
+        model.addAttribute("totalElements", totalCount);
+        model.addAttribute("postNum", postNum);
+        model.addAttribute("page", pageNum);
+        model.addAttribute("productname", productname);
+        model.addAttribute("category", category);
+        model.addAttribute("pageList", page.getPageOrder(pageNum, postNum, pageListCount,totalCount,productname,category));
     }
 
     //주문내역 상세보기?
     //order_detail > order_product, order_info / product>product_name
     @GetMapping("/master/orederView")
     public void getOrderView() {
-        //
+        
     }
 
-    //주문 상태 변경
+    //주문 상태 변경 //newStatus : 상품준비중 - 배송중 - 배송완료?
     @ResponseBody
     @PostMapping("/master/modifyOrder")
-    public void postModifyOrder() {
-        //
+    public String postModifyOrder(@RequestParam("orderSeqno") Long orderSeqno,
+                                @RequestParam("newStatus") String newStatus)
+                                throws Exception {
+        masterService.modifyOrderStatus(orderSeqno,newStatus);
 
+        return "redirect:/master/order";
     }
 
     //카테고리 화면보기
@@ -358,16 +377,37 @@ public class MasterController{
 
     //상품문의 확인, 답변
     @GetMapping("/master/question")
-    public void getQuestion() {
-        //
+    public void getQuestion(Model model, @RequestParam("page") int pageNum, 
+                @RequestParam(name="queType",defaultValue="",required=false) String queType)
+                throws Exception{
+        int postNum = 15;
+        int pageListCount = 10;
+
+        PageUtil page = new PageUtil();
+        Page<Map<String, Object>> questionList = masterService.questionList(pageNum, postNum, queType);                        
+        int totalCount = (int) questionList.getTotalElements(); 
+
+        model.addAttribute("questionList", questionList);
+        model.addAttribute("listIsEmpty", questionList.hasContent() ? "N" : "Y");
+        model.addAttribute("totalElements", totalCount);
+        model.addAttribute("postNum", postNum);
+        model.addAttribute("page", pageNum);
+        model.addAttribute("keyword", queType);
+        model.addAttribute("pageList", page.getPageQuestion(pageNum, postNum, pageListCount, totalCount, queType));
+
 
     }
+
+    //상품문의 삭제 
+    
+
+    //상품문의 답변 //답변 후 상태 변경 (답변전 -> 답변완료)
 
     //리뷰 리스트 화면 
     @GetMapping("/master/reviewList")
     public void getReviewList(Model model, @RequestParam("page") int pageNum, 
-                @RequestParam(name="keyword",defaultValue="",required=false) 
-                Long keyword) throws Exception{
+                @RequestParam(name="keyword",defaultValue="",required=false) Long keyword) 
+                throws Exception{
         
         int postNum = 10;
         int pageListCount = 10;

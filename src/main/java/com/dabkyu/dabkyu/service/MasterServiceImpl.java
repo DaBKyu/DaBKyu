@@ -15,23 +15,37 @@ import org.springframework.stereotype.Service;
 
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.OrderInfoDTO;
+import com.dabkyu.dabkyu.dto.OrderProductDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
+import com.dabkyu.dabkyu.dto.QuestionDTO;
+import com.dabkyu.dabkyu.dto.QuestionFileDTO;
+import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
 import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.CouponTargetEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
+import com.dabkyu.dabkyu.entity.OrderDetailEntity;
+import com.dabkyu.dabkyu.entity.OrderInfoEntity;
+import com.dabkyu.dabkyu.entity.OrderProductEntity;
+import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
+import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
+import com.dabkyu.dabkyu.entity.repository.AddedRelatedProductRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponTargetRepository;
 import com.dabkyu.dabkyu.entity.repository.MasterRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
+import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderInfoRepository;
+import com.dabkyu.dabkyu.entity.repository.OrderProductOptionRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductRepository;
+import com.dabkyu.dabkyu.entity.repository.QuestionRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewRepository;
 
 import lombok.AllArgsConstructor;
@@ -50,6 +64,11 @@ public class MasterServiceImpl implements MasterService {
     private final ProductFileRepository productFileRepository;
     private final ReviewRepository reviewRepository;
     private final OrderInfoRepository orderInfoRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final AddedRelatedProductRepository addedRelatedProductRepository;
+    private final OrderProductOptionRepository orderProductOptionRepository;
+    private final QuestionRepository questionRepository;
+    private final QuestionService questionService;
 
     //맴버 리스트 보기
     @Override
@@ -179,7 +198,7 @@ public class MasterServiceImpl implements MasterService {
         if(data.get("kind").equals("B")){
             productFileEntities = productFileRepository.findByProductSeqno_ProductSeqno((Long)data.get("productSeqno"));
             for(ProductFileEntity file:productFileEntities){
-                //수정어어어엉어어어어어엉어엉
+                //수정필요
                 //file.setProductSeqno((Long)data.get("productSeqno"));
                 productFileRepository.save(file);
             }
@@ -188,16 +207,75 @@ public class MasterServiceImpl implements MasterService {
     }
 
     /////////주문
-    //주문 리스트
+    //주문 리스트 //검색 > 주문현황으로 가능하게 추가해야함. 
     @Override
-    public void orderList() throws Exception{
+    public Page<Map<String, Object>> orderList(int pageNum, int postNum, String productname, Long category) throws Exception{
+        
+        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by("orderDate").descending());
+        Page<OrderDetailEntity> orderDetailPage = orderDetailRepository.findAll(pageRequest);
 
+        /*
+        검색기능 구현해야함
+        if (category != null) {
+            orderDetailPage = orderDetailRepository.findByCategoryAndProductNameContaining(category, productname, pageRequest);
+        } else {
+            orderDetailPage = orderDetailRepository.findByProductNameContaining(productname, pageRequest);
+        }
+         */
+
+        return orderDetailPage.map(orderDetail -> {
+        Map<String, Object> result = new HashMap<>();
+
+        // 주문 정보 
+        OrderInfoEntity orderInfoEntity = orderDetail.getOrderSeqno(); 
+        OrderInfoDTO orderInfoDTO = new OrderInfoDTO(orderInfoEntity);
+        result.put("orderInfo", orderInfoDTO); 
+
+        // 주문 상품 정보 
+        OrderProductEntity orderProductEntity = orderDetail.getOrderProductSeqno(); 
+        ProductEntity productEntity = orderProductEntity.getProductSeqno();
+        result.put("productName", productEntity.getProductName()); 
+        result.put("productPrice", productEntity.getPrice());
+
+        // 카테고리 정보 
+        String category1Name = orderProductEntity.getProductSeqno().getCategory3Seqno().getCategory2Seqno().getCategory1Seqno().getCategory1Name();
+        String category2Name = orderProductEntity.getProductSeqno().getCategory3Seqno().getCategory2Seqno().getCategory2Name();
+        String category3Name = orderProductEntity.getProductSeqno().getCategory3Seqno().getCategory3Name();
+        result.put("category1Name", category1Name);
+        result.put("category2Name", category2Name);
+        result.put("category3Name", category3Name);
+
+        // 취소 여부, 환불 여부
+        result.put("cancelYn", orderDetail.getCancelYn());
+        result.put("refundYn", orderDetail.getRefundYn());
+
+        // 추가 상품
+        List<AddedRelatedProductEntity> relatedProducts = addedRelatedProductRepository.findByOrderProductSeqno(orderProductEntity.getOrderProductSeqno());
+        if(!relatedProducts.isEmpty()){
+            result.put("relatedProducts", relatedProducts);
+        }
+
+        // 옵션
+        List<OrderProductOptionEntity> productOptions = orderProductOptionRepository.findByOrderProductSeqno(orderProductEntity.getOrderProductSeqno());
+        if (productOptions != null && !productOptions.isEmpty()) {
+            result.put("productOptions", productOptions); 
+        }
+
+        return result; // 최종 결과 반환
+        });
+    }
+
+    //주문 상태 수정
+    @Override
+    public void modifyOrderStatus(Long orderSeqno, String newStatus) throws Exception{
+        OrderInfoEntity orderInfoEntity = orderInfoRepository.findByOrderSeqno(orderSeqno);
+        orderInfoEntity.setOrderStatus(newStatus);
+        orderInfoRepository.save(orderInfoEntity);
     }
 
 
-
     //////////쿠폰
-    //쿠폰 리스트 ???????????? 
+    //쿠폰 리스트 
     //!!확인 필요!!
     @Override
     public Page<Map<String,Object>> couponList(int pageNum, int postNum, String keyword) throws Exception{
@@ -244,8 +322,6 @@ public class MasterServiceImpl implements MasterService {
     }
     
 
-
-
     //쿠폰 등록
     //수정필요
     @Override
@@ -276,6 +352,46 @@ public class MasterServiceImpl implements MasterService {
             couponRepository.delete(couponEntity);
     }
 
+    /////////////문의
+    //문의 리스트
+    @Override
+    public Page<Map<String, Object>> questionList(int pageNum, int postNum, String queType) throws Exception{
+        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC, "queDate"));
+        Page<QuestionEntity> questionEntities;
+
+        if (!queType.isEmpty()) {
+            questionEntities = questionRepository.findByQueType(queType, pageRequest);
+        } else {
+            questionEntities = questionRepository.findAll(pageRequest);
+        }
+
+        return questionEntities.map(questionEntity -> {
+            Map<String, Object> result = new HashMap<>();
+            QuestionDTO questionDTO = new QuestionDTO(questionEntity);
+
+            // 문의 정보
+            result.put("question", questionDTO);
+            
+            // 첨부 파일
+            List<QuestionFileDTO> questionFiles = new ArrayList<>();
+            try {
+                questionFiles = questionService.fileListView(questionEntity.getQueSeqno());
+            } catch (Exception e) {
+                questionFiles = new ArrayList<>();
+            }
+            if (!questionFiles.isEmpty()) {
+                result.put("questionFiles", questionFiles);
+            } else {
+                result.put("questionFiles", new ArrayList<>()); 
+            }
+            
+            return result;
+        });
+        
+    }
+
+
+    
     /////////////리뷰
     //리뷰 리스트 
     @Override
