@@ -19,12 +19,14 @@ public class ProductFileDTO {
 	private ProductEntity productSeqno;
 	private String orgFilename;
 	private String storedFilename;
+    private String isThumb;
 
     public ProductFileDTO(ProductFileEntity entity) {
         this.productFileSeqno = entity.getProductFileSeqno();
         this.productSeqno = entity.getProductSeqno();
         this.orgFilename = entity.getOrgFilename();
         this.storedFilename = entity.getStoredFilename();
+        this.isThumb = entity.getIsThumb();
     }
 
     public ProductFileEntity dtoToEntity(ProductFileDTO dto) {
@@ -33,7 +35,8 @@ public class ProductFileDTO {
                                                     .productSeqno(dto.getProductSeqno())
                                                     .orgFilename(dto.getOrgFilename())
                                                     .storedFilename(dto.getOrgFilename())
+                                                    .isThumb(dto.getIsThumb())
                                                     .build();
-        return entity;                                 
+        return entity;
     }
 }

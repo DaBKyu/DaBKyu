@@ -19,16 +19,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name="productFile")
-@Table(name="product_file")
+@Entity(name="productInfoFile")
+@Table(name="product_info_file")
 @Builder
-public class ProductFileEntity {
+public class ProductInfoFileEntity {
 
     @Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PRODUCTFILE_SEQ")
-	@SequenceGenerator(name="PRODUCTFILE_SEQ", sequenceName = "product_file_seq", initialValue = 1, allocationSize = 1)
-    @Column(name="productfile_seqno", nullable=false)
-    private Long productFileSeqno;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PRODUCTINFOFILE_SEQ")
+	@SequenceGenerator(name="PRODUCINFOTFILE_SEQ", sequenceName = "product_info_file_seq", initialValue = 1, allocationSize = 1)
+    @Column(name="productinfofile_seqno", nullable=false)
+    private Long productInfoFileSeqno;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)
@@ -40,8 +40,4 @@ public class ProductFileEntity {
 	
 	@Column(name="stored_filename", length=200, nullable=false)
 	private String storedFilename;
-
-	@Column(name="is_thumb", length=2,nullable=false)
-	private String isThumb;
-
 }
