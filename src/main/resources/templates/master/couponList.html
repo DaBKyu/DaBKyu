@@ -54,15 +54,15 @@
       
   <div class="container mt-3">    
     <div class="d-flex justify-content-between">
-      <div class="p-2"><a href="" class="headtext">쿠폰생성</a></div>
-      <div class="p-2"><a href="" class="headtext">생성된 쿠폰 리스트</a></div>
+      <div class="p-2"><a href="couponMake.html" class="headtext">쿠폰생성</a></div>
+      <div class="p-2"><a href="couponList.html" class="headtext">쿠폰목록페이지</a></div>
       <div class="p-2"></div>
     </div>
     <hr>
 
     <!-- 삭제버튼 -->
     <div class="d-flex justify-content-end mb-2">
-        <button type='button' class='btn btn-danger'>삭제</button>
+        <button type='button' class='btn btn-danger' id="deleteButton">삭제</button>
     </div>
 
     <!-- 쿠폰 목록 테이블 -->
@@ -72,65 +72,42 @@
             <tr>
               <th scope="col">No.</th>
               <th scope="col">쿠폰명</th>
+              <th scope="col">쿠폰설명</th>
               <th scope="col">사용 가능 등급</th>
-              <th scope="col">사용 가능 카테고리/상품</th>
-              <th scope="col"></th>
+              <th scope="col">사용 기한</th>
             </tr>
         </thead>
         <tbody class="table-group-divider">
-            <tr onclick="location.href='../master/couponInfo.html'">
-              <th scope="row">1</th>
-              <td>20,000원 할인 쿠폰</td>
-              <td>플래티넘</td>
-              <td>카테고리 1</td>
-              <td><input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..."></td>
+            <tr th:each="coupon, iterStat : ${coupons}">
+              <td th:text="${iterStat.index + 1}">1</td>
+              <td><a th:href="@{'/coupons/' + ${coupon.id}}" th:text="${coupon.name}">2만원 할인쿠폰</a></td>
+              <td th:text="${coupon.coupon_role}">플래티넘</td>
+              <td th:text="${coupon.coupon_info}">쿠폰설명</td>
+              <td th:text="${#temporals.format(coupon.coupon_end_date, 'yyyy.MM.dd')}">2024.11.11</td>
             </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>20,000원 할인 쿠폰</td>
-              <td>플래티넘</td>
-              <td>카테고리 2</td>
-              <td><input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..."></td>
-            </tr>            
-            <tr>
-              <th scope="row">3</th>
-              <td>10,000원 할인 쿠폰</td>
-              <td>골드</td>
-              <td>iPhone 16 pro, 갤럭시s24</td>
-              <td><input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="..."></td>
-            </tr>
-
-            <!-- 빈 행들 -->
-            <tr><td colspan="6"></td></tr> 
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
-            <tr><td colspan="6"></td></tr>
         </tbody>
         </table>
       </div>
 
         <!-- 페이지네이션 -->
-      <nav aria-label="Page navigation example" class="pagination-custom">
-        <ul class="pagination justify-content-center">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1">이전</a>
-            </li>
+        <nav aria-label="Page navigation" class="mt-4">
+          <ul class="pagination justify-content-center"
+              th:with="startNumber=${T(Math).floor(coupons.number/10)}*10+1, endNumber=(${coupons.totalPages} > ${startNumber}+9) ? ${startNumber}+9 : ${coupons.totalPages}">
+              
+              <li class="page-item" th:classappend="${coupons.first}?'disabled':''">
+                  <a class="page-link" th:href="@{/couponList(page=${coupons.number})}" tabindex="-1">이전</a>
+              </li>
 
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item" th:each="page : ${#numbers.sequence(startNumber, endNumber)}" 
+                  th:classappend="${page == coupons.number+1}?'active':''">
+                  <a class="page-link" th:href="@{/couponList(page=${page-1})}" th:text="${page}">1</a>
+              </li>
 
-            <li class="page-item"><span class="page-link">...</span></li> 
-
-            <li class="page-item"><a class="page-link" href="#">9</a></li> 
-            
-             <li class="page-item">
-                <a class="page-link" href="#">다음</a>
-             </li> 
-        </ul>
-    </nav>
+              <li class="page-item" th:classappend="${coupons.last}?'disabled':''">
+                  <a class="page-link" th:href="@{/couponList(page=${coupons.number+2})}">다음</a>
+              </li>
+          </ul>
+        </nav>
 
     </div>
 </body>

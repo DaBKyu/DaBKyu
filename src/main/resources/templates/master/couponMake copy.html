@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="../../static/css/master.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
     <style>
-        .category-tag {
+        .selected-tag {
             display: inline-block;
             background-color: #e9ecef;
             padding: 0.25rem 0.5rem;
             margin: 0.25rem;
             border-radius: 0.25rem;
         }
-        .category-tag .close {
+        .selected-tag .close {
             margin-left: 0.5rem;
             cursor: pointer;
         }
@@ -82,27 +82,20 @@
         <div class="mb-3">
             <label for="" class="form-label" style="display: inline-block;">쿠폰 적용 범위</label>
             <div class="input-group mb-3" >
-              <div class="dropdown">
+              <div class="dropdown" id="categoryContainer">
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">카테고리1</a></li>
-                  <li><a class="dropdown-item" href="#">카테고리2</a></li>
-                  <li><a class="dropdown-item" href="#">카테고리3</a></li>
-                  <li class="dropend">
-                    <a class="dropdown-toggle dropdown-item" href="#"  data-bs-toggle="dropdown" aria-expanded="false">카테고리4</a>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="#">중간카테고리</a></li>
-                      <li><a class="dropdown-item" href="#">중간카테고리</a></li>
-                      <li>
-                        <a class="dropend" href="#">중간카테고리</a>
-                        <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="#">세부카테고리</a></li>
-                          <li><a class="dropdown-item" href="#">세부카테고리</a></li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
+                <ul class="dropdown-menu" id="mainCategoryList">
+                  <li th:each="category : ${categories}" th:text="${category.name}" th:data-id="${category.id}" class="dropdown-item">카테고리 이름</li>
+                  <li data-id="1">전자제품</li>
+                  <li data-id="2">의류</li>
+                  <li data-id="3">가구</li>
                 </ul>
+
+                <!-- 중간 카테고리 -->
+                <ul class="category-list subcategory" id="midCategoryList"></ul>
+
+                <!-- 세부 카테고리 -->
+                <ul class="category-list subsubcategory" id="subCategoryList"></ul>
               </div>
               <input type="text" class="form-control" aria-label="Text input with dropdown button" placeholder="모든상품">
             </div>
@@ -223,5 +216,97 @@
     </div>
 
   </div>
+  <script>
+    // 카테고리 데이터 (서버에서 받아온다고 가정)
+    const categories = {
+        1: { name: "전자제품", subcategories: { 
+                11: { name: "노트북", subcategories: { 111: "게이밍 노트북", 112: "울트라북" } },
+                12: { name: "스마트폰", subcategories: { 121: "안드로이드", 122: "iOS" } }
+            }
+        },
+        2: { name: "의류", subcategories: { 
+                21: { name: "남성 의류", subcategories: { 211: "셔츠", 212: "바지" } },
+                22: { name: "여성 의류", subcategories: { 221: "원피스", 222: "블라우스" } }
+            }
+        },
+        3: { name: "가구", subcategories: { 
+                31: { name: "침실 가구", subcategories: { 311: "침대", 312: "옷장" } },
+                32: { name: "거실 가구", subcategories: { 321: "소파", 322: "책장" } }
+            }
+        }
+    };
+    let hideTimeout;
+    
+    // 메인 카테고리에 마우스를 올리면 중간 카테고리가 표시되고, 마우스를 벗어나면 숨김
+    document.getElementById('mainCategoryList').addEventListener('mouseover', function(event) {
+        const mainCategoryId = event.target.getAttribute('data-id');
+        
+        if (mainCategoryId) {
+            clearTimeout(hideTimeout); // 타이머 초기화
+            const midCategoryList = document.getElementById('midCategoryList');
+            midCategoryList.innerHTML = ''; // 초기화
+            midCategoryList.style.display = 'block';
+    
+            const midCategories = categories[mainCategoryId].subcategories;
+    
+            for (const midCatId in midCategories) {
+                const li = document.createElement('li');
+                li.textContent = midCategories[midCatId].name;
+                li.setAttribute('data-id', midCatId);
+                
+                // 중간 카테고리에 마우스를 올리면 세부 카테고리가 표시되고, 마우스를 벗어나면 숨김
+                li.addEventListener('mouseover', function() {
+                    clearTimeout(hideTimeout); // 타이머 초기화
+                    const subCategoryList = document.getElementById('subCategoryList');
+                    subCategoryList.innerHTML = ''; // 초기화
+                    subCategoryList.style.display = 'block';
+    
+                    const subCategories = midCategories[midCatId].subcategories;
+    
+                    for (const subCatId in subCategories) {
+                        const subLi = document.createElement('li');
+                        subLi.textContent = subCategories[subCatId];
+                        subLi.setAttribute('data-id', subCatId);
+    
+                        // 세부 카테고리를 클릭하면 태그로 저장
+                        subLi.addEventListener('click', function() {
+                            addTag(categories[mainCategoryId].name + ' > ' + midCategories[midCatId].name + ' > ' + subCategories[subCatId]);
+                        });
+    
+                        subCategoryList.appendChild(subLi);
+                    }
+                });
+    
+                midCategoryList.appendChild(li);
+            }
+        }
+    });
+    
+    // 마우스가 전체 컨테이너를 벗어났을 때 하위 카테고리를 숨김
+    document.getElementById('categoryContainer').addEventListener('mouseleave', function() {
+        hideTimeout = setTimeout(function() {
+            document.getElementById('midCategoryList').style.display = 'none';
+            document.getElementById('subCategoryList').style.display = 'none';
+        }, 30); // 딜레이 추가 (300ms)
+    });
+    
+    // 선택된 카테고리를 태그로 표시하는 함수
+    function addTag(categoryPath) {
+        const selectedTagsDiv = document.getElementById('selectedTags');
+        
+        const tag = document.createElement('span');
+        tag.className = 'selected-tag';
+        
+        // 태그에 X 버튼 추가
+        tag.innerHTML = categoryPath + '<span class="close">&times;</span>';
+        
+        // X 버튼 클릭 시 해당 태그 삭제
+        tag.querySelector('.close').addEventListener('click', function() {
+            selectedTagsDiv.removeChild(tag);
+        });
+    
+        selectedTagsDiv.appendChild(tag);
+    }
+    </script>
 </body>
 </html>
