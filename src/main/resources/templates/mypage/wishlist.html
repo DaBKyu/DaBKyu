@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -125,9 +126,9 @@
         #cartModalContent button:hover {
             background-color: #218838;
         }
-
     </style>
 </head>
+
 <body>
     <div id="myMenu">
         <h2>mypage</h2>
@@ -145,9 +146,9 @@
             <div>
                 <div>나의 정보</div>
                 <ul>
-                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li> 
+                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li>
                     <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
-                    <li><a href="deleteAccount.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
+                   
                 </ul>
             </div>
             <div>
@@ -162,6 +163,7 @@
                 <ul>
                     <li><a href="reviews.html" title="리뷰 모음">리뷰 모음</a></li>
                     <li><a href="myQuestion.html" title="문의 게시판">문의 게시판</a></li>
+                    <li><a href="report.html" title="신고 게시판">신고 게시판</a></li>
                 </ul>
             </div>
             <div>
@@ -211,24 +213,12 @@
         </div>
     </div>
 
-    <!-- 구매하기 모달 -->
-    <div id="purchaseModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="closeModal">&times;</span>
-            <h3>상품 구매하기</h3>
-            <img id="modalProductImage" src="" alt="상품 이미지" style="width: 100%; max-width: 200px; margin-bottom: 10px;">
-            <div id="modalProductName"></div>
-            <div id="modalProductPrice"></div>
-            <button id="confirmPurchaseBtn">구매하기</button>
-        </div>
-    </div>
-
     <script>
         // 전체 선택 체크박스 기능
         const selectAllCheckbox = document.getElementById('selectAll');
         const productCheckboxes = document.querySelectorAll('.product-checkbox');
 
-        selectAllCheckbox.addEventListener('change', function() {
+        selectAllCheckbox.addEventListener('change', function () {
             productCheckboxes.forEach(checkbox => {
                 checkbox.checked = selectAllCheckbox.checked;
             });
@@ -236,7 +226,7 @@
 
         // 선택 삭제 버튼 기능
         const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-        deleteSelectedBtn.addEventListener('click', function() {
+        deleteSelectedBtn.addEventListener('click', function () {
             productCheckboxes.forEach(checkbox => {
                 if (checkbox.checked) {
                     checkbox.closest('.product-item').remove();
@@ -247,7 +237,7 @@
         // 개별 삭제 버튼 기능
         const removeBtns = document.querySelectorAll('.remove-btn');
         removeBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 btn.closest('.product-item').remove();
             });
         });
@@ -257,35 +247,22 @@
         const cartModal = document.getElementById('cartModal');
         const goToCartBtn = document.getElementById('goToCartBtn');
 
-        addToCartBtn.addEventListener('click', function() {
+        addToCartBtn.addEventListener('click', function () {
             cartModal.style.display = 'block'; // 장바구니 담기 팝업 띄우기
         });
 
         // 장바구니 이동 버튼 클릭 시 장바구니 페이지로 이동
-        goToCartBtn.addEventListener('click', function() {
+        goToCartBtn.addEventListener('click', function () {
             window.location.href = 'shoppingCart.html'; // 장바구니 페이지로 이동
         });
 
-        // 모달 닫기 기능
-        const closeModal = document.getElementById('closeModal');
-        closeModal.addEventListener('click', function() {
-            document.getElementById('purchaseModal').style.display = 'none'; // 모달 닫기
-        });
-
-        // 모달 외부 클릭 시 모달 닫기
-        window.onclick = function(event) {
-            const modal = document.getElementById('purchaseModal');
-            if (event.target == modal) {
-                modal.style.display = "none";
+        // 모달 외부 클릭 시 찜리스트 페이지로 이동
+        window.onclick = function (event) {
+            if (event.target === cartModal) {
+                window.location.href = 'wishlist.html'; // 찜리스트 화면으로 이동
             }
         };
-
-        // 구매하기 버튼 기능 (추가 필요시)
-        const confirmPurchaseBtn = document.getElementById('confirmPurchaseBtn');
-        confirmPurchaseBtn.addEventListener('click', function() {
-            alert('구매가 완료되었습니다.');
-            document.getElementById('purchaseModal').style.display = 'none'; // 모달 닫기
-        });
     </script>
 </body>
+
 </html>

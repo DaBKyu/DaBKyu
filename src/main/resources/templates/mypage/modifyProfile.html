@@ -98,6 +98,29 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        .delete-account-section {
+            margin-top: 20px;
+        }
+
+        /* 회원탈퇴 버튼 스타일 */
+        .delete-account-button {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 9999; /* 우선순위 높은 z-index 추가 */
+        }
+
+        .delete-account-button:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -119,7 +142,6 @@
                 <ul>
                     <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li> 
                     <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
-                    <li><a href="deleteAccount.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
                 </ul>
             </div>
             <div>
@@ -134,6 +156,7 @@
                 <ul>
                     <li><a href="reviews.html" title="리뷰 모음">리뷰 모음</a></li>
                     <li><a href="myQuestion.html" title="문의 게시판">문의 게시판</a></li>
+                    <li><a href="report.html" title="신고 게시판">신고 게시판</a></li>
                 </ul>
             </div>
             <div>
@@ -165,21 +188,18 @@
         <div class="form-section">
             <label for="address">기본 배송지:</label>
             <input type="text" id="address" class="modal-input" placeholder="배송지 입력">
-            <!-- 배송지 변경을 위한 링크 추가 -->
             <a href="address.html">
                 <button>변경</button>
             </a>
         </div>
 
-        <!-- 이벤트와 혜택 수신 여부 질문 추가 -->
+        <!-- 이벤트와 혜택 수신 여부 질문을 기본 배송지 밑으로 이동 -->
         <div class="form-section">
             <label>이벤트와 혜택에 대한 속시 안내를 이메일로 받으시겠습니까?</label>
-            </label>
         </div>
 
         <!-- 이메일 수신 여부 수정 -->
         <div class="form-section">
-            
             <label for="emailOptInYes">
                 <input type="radio" id="emailOptInYes" name="emailOptIn" value="yes">
                 수신 동의
@@ -190,6 +210,7 @@
             </label>
         </div>
 
+        <!-- 회원정보 수정 버튼을 회원탈퇴 링크 바로 위로 이동 -->
         <div class="form-section">
             <button id="editProfileLink">회원정보 수정</button>
         </div>
@@ -225,6 +246,9 @@
             <button id="confirmPasswordChangeBtn">비밀번호 변경</button>
         </div>
     </div>
+
+    <!-- 회원탈퇴 버튼 -->
+    <button class="delete-account-button" onclick="window.location.href='deleteAccount.html'">회원탈퇴</button>
 
     <script>
         // 이메일 변경 버튼 클릭 시 모달 열기
