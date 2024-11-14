@@ -58,12 +58,13 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            text-align: center;
         }
 
         .order-history th, .order-history td {
             border: 1px solid #ccc;
             padding: 10px;
-            text-align: left;
+            text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -97,6 +98,11 @@
         .coupon-input button:hover {
             background-color: #0056b3;
         }
+
+        /* 가운데 정렬을 위한 추가 스타일 */
+        .order-history table {
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -118,7 +124,7 @@
                 <ul>
                     <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li> 
                     <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
-                    <li><a href="deleteAccount.html" title="회원정보 탈퇴" id="deleteAccountBtn">회원정보 탈퇴</a></li>
+                 
                 </ul>
             </div>
             <div>
@@ -133,6 +139,7 @@
                 <ul>
                     <li><a href="reviews.html" title="리뷰 모음">리뷰 모음</a></li>
                     <li><a href="myQuestion.html" title="문의 게시판">문의 게시판</a></li>
+                    <li><a href="report.html" title="신고 게시판">신고 게시판</a></li>
                 </ul>
             </div>
             <div>
@@ -166,11 +173,10 @@
                     <thead>
                         <tr>
                             <th>쿠폰명</th>
-                            <th>할인액</th>
+                            <th>할인액(율)</th>
                             <th>사용조건</th>
                             <th>유효기간</th>
                             <th>쿠폰종류</th>
-                            <th>상태</th>
                         </tr>
                     </thead>
                     <tbody id="couponTableBody">
@@ -178,9 +184,8 @@
                             <td>여름 세일 쿠폰</td>
                             <td>10,000원</td>
                             <td>3만원 이상 구매 시</td>
-                            <td>2024-12-31</td>
+                            <td>2024-12-31 23:59</td> <!-- 시간 추가 -->
                             <td>일반</td>
-                            <td>사용가능</td>
                         </tr>
                     </tbody>
                 </table>
@@ -192,7 +197,7 @@
                     <thead>
                         <tr>
                             <th>쿠폰명</th>
-                            <th>할인액</th>
+                            <th>할인액(율)</th>
                             <th>상태</th>
                         </tr>
                     </thead>
