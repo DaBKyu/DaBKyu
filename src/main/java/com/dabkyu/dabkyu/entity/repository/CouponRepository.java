@@ -16,5 +16,7 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long> {
    public Page<CouponEntity> findAll(Pageable pageable);
    //public Page<CouponEntity> findAll(
    //    org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable pageable);
+
+   public CouponEntity findByCouponSeqno(Long couponSeqno);
     
 }

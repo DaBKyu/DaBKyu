@@ -23,4 +23,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
                 + "where email = :email) + 1 where email =:email",
                 nativeQuery = true)
     public void modifyPasswordAfter30(@Param("email") String email);
+
+    public MemberEntity findByEmail(String email);
 }

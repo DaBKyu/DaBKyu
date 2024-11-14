@@ -18,5 +18,7 @@ public interface OrderInfoRepository extends JpaRepository<OrderInfoEntity, Long
             (Long keyword1,String keyword2,Pageable pageable);
     
     public OrderInfoEntity findByOrderSeqno(OrderInfoEntity orderInfoEntity);
+
+    public List<OrderInfoEntity> findByOrderStatusIn(List<String> statuses);
     
 }

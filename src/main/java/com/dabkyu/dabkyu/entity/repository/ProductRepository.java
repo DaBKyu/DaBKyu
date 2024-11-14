@@ -1,5 +1,7 @@
 package com.dabkyu.dabkyu.entity.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +11,10 @@ import org.springframework.data.repository.query.Param;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
-
+	
+	//전체 상품 목록 보기
+    public Page<ProductEntity> findByProductNameContaining(String productName, Pageable pageable);
+   
 	//public Page<ProductEntity> findByCategory1SeqnoAndProductNameContaining(Long category1Seqno, String productName, Pageable pageable);
 	// 대분류 카테고리 필터링
 	// Category1Seqno를 통해 ProductEntity 필터링
@@ -23,7 +28,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             @Param("category1Seqno") Long category1Seqno, 
             @Param("productName") String productName, 
             Pageable pageable);
-
+	
 	//관리자 페이지 상품 리스트(상품코드, 상품명)
 	public Page<ProductEntity> findByProductSeqnoOrProductNameContaining
 		(Long seqno,String keyword,Pageable pageable);
@@ -39,12 +44,9 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 			@Param("category2Seqno") Long category2Seqno, 
 			@Param("productName") String productName, 
 			Pageable pageable);
-
+	
 	// 소분류 카테고리 필터링
     public Page<ProductEntity> findByCategory3Seqno_Category3SeqnoAndProductNameContaining(Long category3Seqno, String productName, Pageable pageable);
-
-	//전체 상품 목록 보기
-    public Page<ProductEntity> findByProductNameContaining(String productName, Pageable pageable);
  
     //상품 이전 보기
 	@Query("select max(p.productSeqno) from product p " 
@@ -59,5 +61,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 			+ "(p.productName like %:keyword%)")
 	public Long next_seqno(@Param("productSeqno") Long productSeqno, 
 			@Param("keyword") String keyword);
+
+	public List<ProductEntity> findByCategory3Seqno_Category3Seqno(Long category3Seqno);
+
 
 }
