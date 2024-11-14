@@ -11,46 +11,7 @@
 
 <body>
     <!-- 네비게이션 바 -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Admin</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown" aria-expanded="false">상품관리</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="../master/productManage.html">상품관리</a></li>
-                            <li><a class="dropdown-item" href="../master/categoryManage.html">카테고리 관리</a></li>
-                            <li><a class="dropdown-item" href="../master/productUpload.html">상품 등록</a></li>
-                          </ul>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="../master/userManage.html">회원관리</a></li>
-                    <li class="nav-item"><a class="nav-link" href="../master/deliveryManage.html">배송관리</a></li>
-                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">문의/리뷰목록</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="../master/qnaList.html">문의 목록</a></li>
-                            <li><a class="dropdown-item" href="../master/reviewList.html">리뷰 목록</a></li>
-                          </ul>
-                    </li>
-                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="../master/mailList.html">메일 발송 목록</a></li>
-                            <li><a class="dropdown-item" href="../master/mailSend.html">메일 발송</a></li>
-                          </ul>
-                    </li>
-                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">쿠폰</a>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="../master/couponMake.html">쿠폰 생성</a></li>
-                        <li><a class="dropdown-item" href="../master/couponList.html">생성된 쿠폰 리스트</a></li>
-                      </ul>
-                    </li>
-                </ul>
-                <span class="navbar-text">Admin01</span>
-            </div>
-        </div>
-    </nav>
+    <div th:insert="~{layout/masterNav :: master-nav}"></div>
         
     <div class="container mt-5">     
         <h2 class="mt-4">회원관리</h2>
