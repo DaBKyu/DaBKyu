@@ -458,45 +458,26 @@
           <img src="../../static/images/알림아이콘.jpg" width="30" height="24">
         </a>
       </div>
-    </div>
-  </nav>
-  <div class="rectangle">문의 하기</div>
-  <div class="dropdown-label">
-  </div>
-  <div class="dropdown">
-    <button class="dropbtn">
-      <span class="dropbtn_icon"></span>
-      <span class="dropbtn_content">문의 유형을 선택해주세요.</span>
-      <span class="dropbtn_click" style="font-family: Material Icons; font-size : 16px; color : #3b3b3b; float:right;"
-        onclick="dropdown()">▽</span>
-    </button>
-    <div class="dropdown-content">
-      <div class="fastfood" onclick="showMenu(this.innerText)">배송문의</div>
-      <div class="fastfood" onclick="showMenu(this.innerText)">상품문의</div>
-      <div class="fastfood" onclick="showMenu(this.innerText)">일반문의</div>
-    </div>
-  </div>
-  <div class="flex-container">
-    <div class="rectangle2">제목</div>
-    <input type="text" name="keyword" id="keyword"
-      style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;" placeholder=""
-      onkeydown="press()">
-  </div>
-  <input type="text" name="keyword" id="keyword"
-    style="width:870px;height: 500px;font-size: 16px; margin-left:50px; margin-top: 10px; border: 1px solid #e3e3e3;"
-    placeholder="내용을 입력해주세요." onkeydown="press()">
+      <div class="flex-container">
+        <div class="rectangle2">제목</div>   	
+           <input type="text" name="keyword" id="keyword" 
+                style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;"
+                placeholder="" onkeydown="press()">
+       </div>
+       <input type="text" name="keyword" id="keyword" 
+         			style="width:870px;height: 500px;font-size: 16px; margin-left:50px; margin-top: 10px; border: 1px solid #e3e3e3;"
+         			placeholder="내용을 입력해주세요." onkeydown="press()">
 
-  <div class="fileuploadForm">
-    <input type="file" id="inputFile" name="uploadFile" style="display:none" multiple>
-    <div class="fileZone" id="fileZone">파일첨부를 하기 위해서는 클릭하거나 여기로 파일을 드래그 하세요.<br>
-      첨부 파일은 최대 5개까지 등록이 가능합니다.
-    </div>
-    <div class="fileUploadList" id="fileUploadList"></div>
-  </div>
-  <div class="button-container">
-    <input type="button" class="btn_write" value="등록" onclick="registerForm()" style="margin-left:50px;">
-    <input type="button" class="btn_cancel" value="취소" onclick="history.back()" style="margin-left:20px;">
-  </div>
-</body>
-
+      <div class="fileuploadForm">
+            		<input type="file" id="inputFile" name="uploadFile" style="display:none" multiple>
+            		<div class="fileZone" id="fileZone">파일첨부를 하기 위해서는 클릭하거나 여기로 파일을 드래그 하세요.<br>
+            			 첨부 파일은 최대 5개까지 등록이 가능합니다.
+            		</div>
+            		<div class="fileUploadList" id="fileUploadList"></div>
+            </div>
+            <div class="button-container">
+            <input type="button" class="btn_write" value="등록" onclick="history.back()" style="margin-left:50px;">
+            <input type="button" class="btn_cancel" value="취소" onclick="history.back()" style="margin-left:20px;">
+          </div>
+          </body>
 </html>

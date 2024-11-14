@@ -19,7 +19,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name="productfile")
+@Entity(name="productFile")
 @Table(name="product_file")
 @Builder
 public class ProductFileEntity {
@@ -39,7 +39,9 @@ public class ProductFileEntity {
 	private String orgFilename;
 	
 	@Column(name="stored_filename", length=200, nullable=false)
-
 	private String storedFilename;
+
+	@Column(name="is_thumb", length=2,nullable=false)
+	private String isThumb;
 
 }

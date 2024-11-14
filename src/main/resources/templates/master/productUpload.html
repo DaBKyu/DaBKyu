@@ -3,101 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상품등록페이지</title>
+    <title>상품수정페이지</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" >
     <link rel="stylesheet" href="../../static/css/master.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            //파일첨부 이벤트
-            $('.filebox .upload-hidden').on('change', function(){  			
-                if(window.FileReader){
-                    var filename = $(this)[0].files[0].name;
-                    if(!validFileType(filename)){
-                        alert("허용하지 않는 확장자 파일입니다.");
-                        return false;
-                    }else{
-                        if(!validFileSize($(this)[0].files[0])){
-                            alert("파일 사이즈가 10MB를 초과합니다.");
-                            return false;
-                        }else{
-                            if(!validFileNameSize(filename)){
-                                alert("파일명이 30자를 초과합니다.");
-                                return false;
-                            }
-                        }
-                    }
-                } else {
-                    var filename = $(this).val().split('/').pop().split('\\').pop();
-                }
-                $(this).prev().val(filename); //input upload-name 에 파일명 설정해주기
-    
-                readImage($(this)[0]); //미리보기
-            });
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var fileDropArea = document.getElementById('fileDropArea');
+    var fileInput = document.getElementById('fileInput');
+    var filePreview = document.getElementById('filePreview');
+    var uploadedFiles = [];
+
+    //첨부박스 관련 기능
+    fileDropArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    fileDropArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileDropArea.style.backgroundColor = '#f0f0f0';
+    });
+
+    fileDropArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        fileDropArea.style.backgroundColor = '';
+    });
+
+    fileDropArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileDropArea.style.backgroundColor = '';
+        handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', function() {
+        handleFiles(this.files);
+    });
+
+    // 업로드 관련
+    function handleFiles(files) {
+        if (uploadedFiles.length + files.length > 10) {
+            alert('최대 10개의 파일만 업로드할 수 있습니다.');
+            return;
+        }
+        
+        Array.from(files).forEach(file => {
+            if (file.size > 20 * 1024 * 1024) {
+                alert(file.name + '의 크기가 20MB를 초과합니다.');
+                return;
+            }
+            
+            uploadedFiles.push(file);
+            previewFile(file);
         });
-    
-        function validFileType(filename) {
-            const fileTypes = ["png", "jpg", "jpeg"];
-            return fileTypes.indexOf(filename.substring(filename.lastIndexOf(".")+1, filename.length).toLowerCase()) >= 0;
-        }
+    }
+
+    // 미리보기
+    function previewFile(file) {
+        var reader = new FileReader();
         
-        function validFileSize(file){
-            if(file.size > 10000000){ //10MB
-                return false;
-            }else{
-                return true;
-            }
-        }
-    
-        function validFileNameSize(filename){
-            if(filename.length > 30){ //30자
-                return false;
-            }else{
-                return true;
-            }
-        }
-    
-        //이미지 띄우기
-        function readImage(input) {
-            if(input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e){
-                    const previewImage = document.getElementById("preview");
-                    previewImage.src = e.target.result;
-                   }
-                
-                // reader가 이미지 읽도록 하기
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        // function imageChange(event){
-        // let i = event.target.files.length-1;
-        // for(let image of event.target.files){
-        //     let img = document.createElement("img");
-        //     const reader = new FileReader();
-        //     reader.onload = function(event){
-        //         img.setAttribute("preview", event.target.result);
-        //     }
-        //     reader.readAsDataURL(event.target.files[i--]);  
-        //     document.querySelector(".filebox").appendChild(img);
-        // }
-    //    }
+        reader.onload = function(e) {
+            var div = document.createElement('div');
+            div.className = 'file-preview-item';
+            
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="${file.name}" style='width: 100px; height: 100px;'>
+                <button type='button' class='remove-file'>&times;</button>`;
+            
+            div.querySelector('.remove-file').addEventListener('click', function() {
+                var index = uploadedFiles.indexOf(file);
+                if (index > -1) {
+                    uploadedFiles.splice(index, 1);
+                }
+                div.remove();
+            });
+            
+            filePreview.appendChild(div);
+        };
         
-        //이미지 원본 팝업 띄우기
-        function popImage(url) {
-            var img = new Image();
-            img.src = url;
-            var img_width = img.width;
-            var win_width = img.width + 25;
-            var img_height = img.height;
-            var win = img.height + 30;
-            var popup = window.open('', '_blank', 'width=' + img_width + ', height=' + img_height + ', menubars=no, scrollbars=auto');
-            popup.document.write("<style>body{margin:0px;}</style><img src='"+url+"' width='"+win_width+"'>");
-        }
-    </script>
-    <style>
-         img#preview{cursor:pointer;max-height:100px; max-width:100%;display:block;}
-    </style>
+        reader.readAsDataURL(file);
+    }
+
+});
+</script>
 </head>
 
 <body>
@@ -127,7 +114,7 @@
                     </li>
                     <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="../master/mailLog.html">메일 발송 목록</a></li>
+                            <li><a class="dropdown-item" href="../master/mailList.html">메일 발송 목록</a></li>
                             <li><a class="dropdown-item" href="../master/mailSend.html">메일 발송</a></li>
                           </ul>
                     </li>
@@ -143,75 +130,131 @@
         </div>
     </nav>
         
-        <div class="container mt-5">
-          <h2 class="mb-4">상품 등록</h2>
-          <form>
-              <!-- 상품명 -->
-              <div class="mb-3">
-                  <label for="productName" class="form-label">상품명</label>
-                  <input type="text" class="form-control" id="productName" placeholder="Value">
-              </div>
-  
-              <!-- 상품 이미지 등록 -->
-              <div class="mb-3 filebox">
-                  <label for="productImage" class="form-label">상품 이미지 등록</label>
-                  <input type="file" class="form-control upload-hidden" id="productImage" multiple>
-                  <div><img id="preview" onclick="popImage(this.src)"/></div>
-              </div>
-  
-              <!-- 상품 설명 -->
-              <div class="mb-3">
-                  <label for="productDescription" class="form-label">상품 설명</label>
-                  <textarea class="form-control" id="productDescription" rows="5" placeholder="가격, 스펙, 속성등"></textarea>
-              </div>
-  
-              <!-- 카테고리 선택 -->
-              <div class="mb-3 row">
-                  <div class="col-md-4">
-                      <label for="mainCategory" class="form-label">메인 카테고리</label>
-                      <select class="form-select" id="mainCategory">
-                          <option selected>선택하세요</option>
-                      </select>
-                  </div>
-                  <div class="col-md-4">
-                      <label for="middleCategory" class="form-label">중간 카테고리</label>
-                      <select class="form-select" id="middleCategory">
-                          <option selected>선택하세요</option>
-                      </select>
-                  </div>
-                  <div class="col-md-4">
-                      <label for="subCategory" class="form-label">세부 카테고리</label>
-                      <select class="form-select" id="subCategory">
-                          <option selected>선택하세요</option>
-                      </select>
-                  </div>
-              </div>
-  
-              <!-- 파일 첨부 -->
-              <div class="mb-3 filebox">
-                  <label for="fileAttachment" class="form-label">파일 첨부</label>
-                  <input type="file" class="form-control upload-hidden" id="fileAttachment" multiple>
-              </div>
-  
-              <!-- 첨부 내용 -->
-              <div class="mb-3">
-                  <label for="attachmentContent" class="form-label">첨부 내용</label>
-                  <img id="preview" onclick="popImage(this.src)"/>
-              </div>
-  
-              <!-- 버튼들 -->
-              <div class="d-flex justify-content-between mt-4">
-                  <!-- 상품 페이지 미리보기 버튼 -->
-                  <button type="button" class="btn btn-success" onclick="location.href='#'">상품 페이지 미리보기</button>
-  
-                  <!-- 작성 취소 및 상품 등록 버튼들 -->
-                  <div>
-                      <button type="reset" class="btn btn-secondary me-2">작성 취소</button>
-                      <button type="submit" class="btn btn-dark">상품 등록</button>
-                  </div>
-              </div>
-          </form>
-      </div>
+    <div class="container mt-3">
+        <h2 class="mb-4">상품 등록</h2>
+
+    <!-- 상품 수정 폼 -->
+    <form id="productForm" action="/createProduct" method="post" enctype="multipart/form-data">
+
+        <!-- 상품명 -->
+        <div class="mb-3">
+            <label for="productName" class="form-label">상품명</label>
+            <input type="text" class="form-control" id="productName" name="name" placeholder="상품명 입력">
+        </div>
+
+        <!-- 상품 가격 -->
+        <div class="mb-3">
+            <label for="price" class="form-label">가격</label>
+            <input type="number" class="form-control" id="price" name="price" placeholder="가격 입력">
+        </div>
+
+            <!-- 상품 이미지 업로드 -->
+            <div class="mb-3">
+                <label for="attachment" class="form-label">상품이미지 업로드</label>
+                <div id="fileDropArea" class="file-drop-area"> 파일을 여기에 드래그하거나 클릭하여 업로드하세요 (최대 10개, 각 20MB)</div>
+                <input type="file" id="fileInput" name="imageFiles[]" style="display: none;" multiple>
+                <div id="filePreview" class="file-preview"></div>
+            </div>
+
+            <!-- 상품 설명 -->
+            <div class="mb-3">
+                <label for="productDescription" class ="form-label">상품 설명</label> 
+                <!-- <button type ="button"id ="uploadDescriptionImageBtn"class ="btn btn-secondary mb-2">이미지 첨부</button>  -->
+                <!-- <input type ="file"id ="descriptionImageInput "style ="display:none;"accept =".jpg,.jpeg,.png,.gif "multiple>  -->
+                <textarea class ="form-control"id ="productDescription"name ="description "rows ="5 "placeholder ="상품 설명 입력 "></textarea> 
+            </div>
+
+        <!-- 카테고리 선택 -->
+        <div class="mb-3 row">
+            <div class="col-md-4">
+                <label for="mainCategory" class="form-label">메인 카테고리</label>
+                <select class="form-select" id="mainCategory" name="mainCategory">
+                    <!-- 카테고리 -->
+                    <option selected>선택하세요</option>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="middleCategory" class="form-label">중간 카테고리</label>
+                <select class="form-select" id="middleCategory" name="middleCategory">
+                    <!-- 중간 카테고리 -->
+                    <option selected>선택하세요</option>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="subCategory" class="form-label">세부 카테고리</label>
+                <select class="form-select" id="subCategory" name="subCategory">
+                    <!-- 세부 카테고리 -->
+                    <option selected>선택하세요</option>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 기타 옵션 -->
+        <div class="mb-3 row">
+            <!-- 재고 수량 -->
+            <div class="col-md-4">
+                <label for="stockQuantity" class="form-label">재고 수량</label>
+                <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" placeholder="재고 수량 입력">
+            </div>
+
+            <!-- 무료배송 여부 -->
+            <div class="col-md-4">
+                <label for="isFreeShipping" class="form-label">무료배송 여부</label>
+                <select class="form-select" id="isFreeShipping" name="isFreeShipping">
+                    <option value="true">예</option>
+                    <option value="false">아니오</option>
+                </select>
+            </div>
+
+            <!-- 제품 숨김 여부 -->
+            <div class="col-md-4">
+                <label for="isHidden" class="form-label">제품 숨김 여부</label>
+                <select class="form-select" id="isHidden" name="isHidden">
+                    <option value="true">숨김</option>
+                    <option value="false">공개</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 버튼들 -->
+        <div class="d-flex justify-content-between mt-4 mb-4">
+            <!-- 상품 페이지 미리보기 버튼 -->
+            <button type="button" id="previewButton" class="btn btn-success">상품 페이지 미리보기</button>
+
+            <!-- 작성 취소 및 상품 등록 버튼들 -->
+            <div>
+                <button type="submit" class="btn btn-dark">상품 등록</button>
+                <button type="reset" class="btn btn-danger me-2">작성 취소</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<script>
+    // '상품 페이지 미리보기' 버튼 클릭시
+    document.getElementById('previewButton').addEventListener('click', function() {
+        var form = document.getElementById('productForm');
+        
+        var formData = new FormData(form);
     
+        // Send form data via POST request using fetch API
+        fetch('/productPreview', {
+            method: 'POST',
+            body: formData
+        }).then(response => response.text())
+          .then(html => {
+              // 새탭에서 열기
+              var previewWindow = window.open();
+              previewWindow.document.write(html);
+          }).catch(error => {
+              console.error('Error during preview:', error);
+          });
+    });
+</script>
 </body>
 </html>

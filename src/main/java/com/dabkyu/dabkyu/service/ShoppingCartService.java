@@ -3,6 +3,8 @@ package com.dabkyu.dabkyu.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.OrderProductDTO;
@@ -39,6 +41,10 @@ public interface ShoppingCartService {
     // 결제 취소
     public void cancelToPay(String email, Long orderSeqno);
 
- 
+    //교환 신청
+    //public void requestExchange(String email, Long orderProductSeqno);
+
+    //환불 신청
+    public void refundRequest(String email, Long orderSeqno);
 
 }

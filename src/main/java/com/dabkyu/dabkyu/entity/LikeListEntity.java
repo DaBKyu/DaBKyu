@@ -1,8 +1,11 @@
 package com.dabkyu.dabkyu.entity;
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -33,5 +36,8 @@ public class LikeListEntity {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name="product_seqno", nullable = false)
 	private ProductEntity productSeqno;
+
+	@Column(name="like_date", nullable = false)
+	private LocalDateTime likeDate;
 
 }

@@ -8,96 +8,37 @@
     <link rel="stylesheet" href="../../static/css/master.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            //파일첨부 이벤트
-            $('.filebox .upload-hidden').on('change', function(){  			
-                if(window.FileReader){
-                    var filename = $(this)[0].files[0].name;
-                    if(!validFileType(filename)){
-                        alert("허용하지 않는 확장자 파일입니다.");
-                        return false;
-                    }else{
-                        if(!validFileSize($(this)[0].files[0])){
-                            alert("파일 사이즈가 10MB를 초과합니다.");
-                            return false;
-                        }else{
-                            if(!validFileNameSize(filename)){
-                                alert("파일명이 30자를 초과합니다.");
-                                return false;
-                            }
-                        }
-                    }
-                } else {
-                    var filename = $(this).val().split('/').pop().split('\\').pop();
-                }
-                $(this).prev().val(filename); //input upload-name 에 파일명 설정해주기
-    
-                readImage($(this)[0]); //미리보기
-            });
-        });
-    
-        function validFileType(filename) {
-            const fileTypes = ["png", "jpg", "jpeg"];
-            return fileTypes.indexOf(filename.substring(filename.lastIndexOf(".")+1, filename.length).toLowerCase()) >= 0;
-        }
-        
-        function validFileSize(file){
-            if(file.size > 10000000){ //10MB
-                return false;
-            }else{
-                return true;
-            }
-        }
-    
-        function validFileNameSize(filename){
-            if(filename.length > 30){ //30자
-                return false;
-            }else{
-                return true;
-            }
-        }
-    
-        //이미지 띄우기
-        function readImage(input) {
-            if(input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e){
-                    const previewImage = document.getElementById("preview");
-                    previewImage.src = e.target.result;
-                   }
-                
-                // reader가 이미지 읽도록 하기
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        // function imageChange(event){
-        // let i = event.target.files.length-1;
-        // for(let image of event.target.files){
-        //     let img = document.createElement("img");
-        //     const reader = new FileReader();
-        //     reader.onload = function(event){
-        //         img.setAttribute("preview", event.target.result);
-        //     }
-        //     reader.readAsDataURL(event.target.files[i--]);  
-        //     document.querySelector(".filebox").appendChild(img);
-        // }
-    //    }
-        
-        //이미지 원본 팝업 띄우기
-        function popImage(url) {
-            var img = new Image();
-            img.src = url;
-            var img_width = img.width;
-            var win_width = img.width + 25;
-            var img_height = img.height;
-            var win = img.height + 30;
-            var popup = window.open('', '_blank', 'width=' + img_width + ', height=' + img_height + ', menubars=no, scrollbars=auto');
-            popup.document.write("<style>body{margin:0px;}</style><img src='"+url+"' width='"+win_width+"'>");
-        }
-    </script>
     <style>
-         img#preview{cursor:pointer;max-height:100px; max-width:100%;display:block;}
+        .recipient-tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            margin: 0.25rem;
+            border-radius: 0.25rem;
+        }
+        .recipient-tag .close {
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+        .more-recipients {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+        #fullRecipientList {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 
@@ -144,89 +85,234 @@
         </div>
     </nav>
 
-    <!-- 메일 발송 폼 -->
     <div class="container mt-5">
-        <h2>메일 발송</h2>
+        <h2 class="mt-4">메일 발송</h2>
 
-        <!-- 발송 범위 설정 -->
-        <form class="card p-4 mb-4">
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="emailCategory" class="form-label">발송 범위 설정</label>
-                    <select id="emailCategory" class="form-select">
-                        <option>전체</option>
-                        <option>카테고리</option>
-                        <option>상품</option>
-                    </select>
+        <form id="mailForm">
+            <div class="mb-3">
+                <label for="recipients" class="form-label">수신자</label>
+                <div id="recipientTags" class="border p-2 rounded">
+                    <!-- 수신자 태그들이 여기에 추가됨 -->
                 </div>
-
-                <!-- 카테고리 검색 -->
-                <div class="col-md-4">
-                    <label for="categorySearch" class="form-label">카테고리 검색</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="카테고리 검색" aria-label="categorySearch" aria-describedby="button-addon2">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
-                    </div>
-                </div>
-
-                <!-- 상품 검색 -->
-                <div class="col-md-4">
-                    <label for="productSearch" class="form-label">상품 검색</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="상품 검색" aria-label="productSearch" aria-describedby="button-addon2">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
-                    </div>
-                </div>
-
-                <!-- 선택된 카테고리, 상품 확인 -->
-                <div class="col-md-6 mt-2">
-                    <ul class="form-control mb-2 border p-2 select_list" >
-                        <li>
-                            <span>test</span>
-                            <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
-                        </li>
-                        <li>
-                            <span>test</span>
-                            <button type="button" class="btn-close btn-close-sm" aria-label="Close"></button>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-md-6 mt-2">
-                    <ul class="form-control mb-2 border p-2">
-                        <li>
-                            <span>test</span>
-                            <button type="button" class="btn-close" aria-label="Close"></button>
-                        </li>
-                    </ul>
+                <input type="hidden" id="recipients" name="recipients">
+                <div id="fullRecipientList" style="display: none;">
+                    <h3>전체 수신자 목록</h3>
+                    <div id="fullRecipientTags"></div>
+                    <button type="button" class="btn btn-secondary">닫기</button>
                 </div>
             </div>
-
-            <!-- 제목 입력 -->
             <div class="mb-3">
                 <label for="subject" class="form-label">제목</label>
-                <input type="text" id="subject" placeholder="" class="form-control">
+                <input type="text" class="form-control" id="subject" name="subject" required>
             </div>
-
-            <!-- 내용 입력 -->
             <div class="mb-3">
                 <label for="content" class="form-label">내용</label>
-                <textarea id="content" rows='5' placeholder="" class='form-control'></textarea>
+                <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
             </div>
-
-            <!-- 파일 첨부 -->
-            <div class='mb-3'>
-                <label for='fileUpload' class='form-label'>파일첨부</label>
-                <input type='file' id='fileUpload' class='form-control' multiple>
+            <div class="mb-3">
+                <label for="attachment" class="form-label">파일첨부</label>
+                <div id="fileDropArea" class="file-drop-area">
+                    파일을 여기에 드래그하거나 클릭하여 업로드하세요 (최대 10개, 각 20MB)
+                </div>
+                <input type="file" id="fileInput" style="display: none;" multiple>
+                <div id="filePreview" class="file-preview"></div>
             </div>
-
-            <!-- 버튼 -->
-            <div class="d-grid gap-2 d-md-block">
-                <button type='button' class='btn btn-primary'>메일 보내기</button>
-                <button type='button' class='btn btn-secondary'>작성 취소</button>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end" role="group">
+                <button type="submit" class="btn btn-primary">메일 보내기</button>
+                <button type="button" class="btn btn-secondary" onclick="history.back()">작성 취소</button>
             </div>
-
         </form>
     </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            var mailForm = document.getElementById('mailForm');
+            var recipientTags = document.getElementById('recipientTags');
+            var recipientsInput = document.getElementById('recipients');
+            var fileDropArea = document.getElementById('fileDropArea');
+            var fileInput = document.getElementById('fileInput');
+            var filePreview = document.getElementById('filePreview');
+            var uploadedFiles = [];
     
+            // 서버에서 전달받은 수신자 정보 (예시)
+            var recipients = /*[[${recipients}]]*/ [
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user1@example.com', name: '김철수', membershipLevel: 'GOLD'},
+                {email: 'user2@example.com', name: '이영희', membershipLevel: 'SILVER'}
+            ];
+    
+            function updateRecipientTags() {
+                recipientTags.innerHTML = '';
+                fullRecipientTags.innerHTML = '';
+
+                recipients.forEach((recipient, index) => {
+                    if (index < 10) {
+                        createRecipientTag(recipient, recipientTags);
+                    }
+                    createRecipientTag(recipient, fullRecipientTags);
+                });
+
+                if (recipients.length > 10) {
+                    var moreTag = document.createElement('span');
+                    moreTag.className = 'more-recipients';
+                    moreTag.textContent = `... 외 ${recipients.length - 10}명`;
+                    moreTag.addEventListener('click', showFullList);
+                    recipientTags.appendChild(moreTag);
+                }
+            }
+
+            function createRecipientTag(recipient, container) {
+                var tag = document.createElement('span');
+                tag.className = 'recipient-tag';
+                tag.innerHTML = `${recipient.email} <span class="close">&times;</span>`;
+                tag.title = `<${recipient.membershipLevel}> ${recipient.name}`;
+                tag.querySelector('.close').addEventListener('click', function() {
+                    var index = recipients.findIndex(r => r.email === recipient.email);
+                    if (index > -1) {
+                        recipients.splice(index, 1);
+                    }
+                    updateRecipientTags();
+                    updateRecipientsInput();
+                });
+                container.appendChild(tag);
+            }
+
+            function updateRecipientsInput() {
+                recipientsInput.value = recipients.map(r => r.email).join(',');
+            }
+
+            function showFullList() {
+                fullRecipientList.style.display = 'block';
+            }
+
+            function closeFullList() {
+                fullRecipientList.style.display = 'none';
+            }
+
+            // 초기 수신자 태그 생성
+            updateRecipientTags();
+            updateRecipientsInput();
+
+            // 전체 목록 닫기 버튼에 이벤트 리스너 추가
+            document.querySelector('#fullRecipientList button').addEventListener('click', closeFullList);
+    
+            // 파일 첨부 관련 코드
+            fileDropArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+    
+            fileDropArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                fileDropArea.style.backgroundColor = '#f0f0f0';
+            });
+    
+            fileDropArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                fileDropArea.style.backgroundColor = '';
+            });
+    
+            fileDropArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                fileDropArea.style.backgroundColor = '';
+                handleFiles(e.dataTransfer.files);
+            });
+    
+            fileInput.addEventListener('change', function() {
+                handleFiles(this.files);
+            });
+    
+            function handleFiles(files) {
+                if (uploadedFiles.length + files.length > 10) {
+                    alert('최대 10개의 파일만 업로드할 수 있습니다.');
+                    return;
+                }
+    
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    if (file.size > 20 * 1024 * 1024) {
+                        alert(file.name + '의 크기가 20MB를 초과합니다.');
+                        continue;
+                    }
+                    uploadedFiles.push(file);
+                    previewFile(file);
+                }
+            }
+    
+            function previewFile(file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var div = document.createElement('div');
+                    div.className = 'file-preview-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <button type="button" class="remove-file">&times;</button>
+                    `;
+                    div.querySelector('.remove-file').addEventListener('click', function() {
+                        var index = uploadedFiles.indexOf(file);
+                        if (index > -1) {
+                            uploadedFiles.splice(index, 1);
+                        }
+                        div.remove();
+                    });
+                    filePreview.appendChild(div);
+                }
+                reader.readAsDataURL(file);
+            } //첨부파일 관련 끝
+    
+            mailForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                sendMail();
+            });
+    
+            function sendMail() {
+                var formData = new FormData(mailForm);
+                uploadedFiles.forEach(function(file, index) {
+                    formData.append('attachments', file);
+                });
+    
+                fetch('/api/send-mail', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('메일 발송 성공:', data);
+                    alert('메일이 성공적으로 발송되었습니다.');
+                    window.location.href = '/user-management';
+                })
+                .catch((error) => {
+                    console.error('메일 발송 실패:', error);
+                    alert('메일 발송에 실패했습니다. 다시 시도해 주세요.');
+                });
+            }
+        });
+        </script>
 </body>
 </html>
+
+<!-- 백엔드 예시사항
+List<Map<String, String>> recipients = selectedUsers.stream()
+    .map(user -> Map.of("name", user.getName(), "email", user.getEmail(), "membership", user.membership()))
+    .collect(Collectors.toList());
+model.addAttribute("recipients", recipients);
+-->

@@ -12,7 +12,7 @@ import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 public interface ReviewFileRepository extends JpaRepository<ReviewFileEntity, Long> {
 
     // 사용자 이메일로 리뷰 검색
-    @Query("SELECT rf FROM REVIEWFILE rf "
+    @Query("SELECT rf FROM reviewFile rf "
                 + "JOIN rf.reviewSeqno r "
                 + "WHERE r.email.email=:email")
     public List<ReviewFileEntity> findByEmail(@Param("email") String email);

@@ -44,9 +44,6 @@ public class QuestionEntity {
     @Column(name="que_title",length = 200, nullable=false)
 	private String queTitle;
 
-    @Column(name="que_writer",length = 50, nullable=false)
-	private String queWriter;
-
     @Column(name="que_content",length = 2000, nullable=false)
 	private String queContent;
 
