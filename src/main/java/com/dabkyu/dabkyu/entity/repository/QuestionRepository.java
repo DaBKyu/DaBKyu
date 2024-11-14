@@ -46,5 +46,8 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
 
     // 내 문의 조회(페이징)
     public Page<QuestionEntity> findByEmail(MemberEntity member, Pageable pageable);
+
+    //문의 타입 검색
+    public Page<QuestionEntity> findByQueType(String queType, Pageable pageable);
 }
 

@@ -149,7 +149,7 @@
 
         <!-- 결제 및 취소 버튼 -->
         <div class="action-buttons">
-            <button class="checkout-btn" onclick="alert('구매가 완료되었습니다.')">구매하기</button>
+            <button class="checkout-btn" onclick="goToPaymentPage()">구매하기</button>
             <button class="cancel-btn" onclick="alert('취소되었습니다.')">취소</button>
         </div>
     </div>
@@ -186,6 +186,11 @@
 
         // 페이지 로드 시 총 금액 계산
         window.onload = calculateTotal;
+
+        // 구매하기 버튼 클릭 시 shop 폴더의 pay.html로 이동
+        function goToPaymentPage() {
+            window.location.href = '../shop/pay.html'; // 상대 경로로 shop 폴더의 pay.html로 이동
+        }
     </script>
 </body>
 </html>

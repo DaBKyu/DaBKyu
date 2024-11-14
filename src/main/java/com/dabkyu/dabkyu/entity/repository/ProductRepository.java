@@ -64,5 +64,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
 	public List<ProductEntity> findByCategory3Seqno_Category3Seqno(Long category3Seqno);
 
+	//max seqno 구하기
+	// @Query(value ="select max(productSeqno) from product where productSeqno =:productSeqno", nativeQuery =true)
+	// public Long getMaxSeqno(@Param("productSeqno") Long productSeqno);
 
 }
