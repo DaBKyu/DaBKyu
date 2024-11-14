@@ -25,8 +25,9 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             Pageable pageable);
 
 	//관리자 페이지 상품 리스트(상품코드, 상품명)
-	public Page<ProductEntity> findByProductSeqnoOrProductNameContaining
-		(Long seqno,String keyword,Pageable pageable);
+	//public Page<ProductEntity> findByProductSeqnoOrProductNameContaining
+	//	(Long seqno,String keyword,Pageable pageable);
+	public ProductEntity findByProductSeqno(Long productSeqno);
 
 	//public Page<ProductEntity> findByCategory2SeqnoAndProductNameContaining(Long category2Seqno, String productName, Pageable pageable);
 	// 중분류 카테고리 필터링
@@ -60,8 +61,21 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 	public Long next_seqno(@Param("productSeqno") Long productSeqno, 
 			@Param("keyword") String keyword);
 
-	//max seqno 구하기
-	// @Query(value ="select max(productSeqno) from product where productSeqno =:productSeqno", nativeQuery =true)
-	// public Long getMaxSeqno(@Param("productSeqno") Long productSeqno);
+
+	//관리자페이지 상품리스트
+	@Query("SELECT p FROM ProductEntity p " +
+           "JOIN p.category3Seqno c3 " +
+           "JOIN c3.category2Seqno c2 " +
+           "JOIN c2.category1Seqno c1 " +
+           "WHERE c1.category1Seqno = :category1Seqno " +
+           "AND c2.category2Seqno = :category2Seqno " +
+           "AND c3.category3Seqno = :category3Seqno " +
+           "AND p.productName LIKE %:productName%")
+    Page<ProductEntity> findByAllCategories(
+            @Param("category1Seqno") Long category1Seqno,
+            @Param("category2Seqno") Long category2Seqno,
+            @Param("category3Seqno") Long category3Seqno,
+            @Param("productName") String productName,
+            Pageable pageable);
 
 }

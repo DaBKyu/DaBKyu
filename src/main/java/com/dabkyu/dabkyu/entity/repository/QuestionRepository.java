@@ -49,5 +49,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
 
     //문의 타입 검색
     public Page<QuestionEntity> findByQueType(String queType, Pageable pageable);
+
+    public QuestionEntity findByQueSeqno(Long queSeqno);
 }
 

@@ -175,29 +175,29 @@ public class PageUtil {
 	}
 
 	//관리자페이지 상품리스트
-	public String getPageProduct(int pageNum, int postNum, int pageListCount, int totalCount, Long keyword1, String keyword2){
+	public String getPageProduct(int pageNum, int postNum, int pageListCount, int totalCount, String keyword){
 
 		int totalPage = (int)Math.ceil(totalCount/(double)postNum);
 		int totalSection = (int)Math.ceil(totalPage/(double)pageListCount);
 		int section = (int)Math.ceil(pageNum/(double)pageListCount);
 		String pageList = "";
 		if(totalPage != 1) {
+			
 			for(int i=1;i<=pageListCount;i++) {
 
 				if(section >1 && i ==1)
 					pageList += " <a href=/manageBack/productlist?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
-					+ "&addrSearch1=" + keyword1 + "&addrSearch2=" + keyword2 +">◀</a>";
+					+ "&addrSearch=" + keyword + ">◀</a>";
 				if(totalPage < (section-1)*pageListCount+i) { break; } 
 				if(pageNum != (section-1)*pageListCount +i)
-						pageList += " <a href=/manageBack/productlist?page=" + Integer.toString((section-1)*pageListCount+i) 
-								+ "&addrSearch=" + keyword1 + "&addrSearch2=" + keyword2 +">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
-					else 
-						pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
-					if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
-						pageList += " <a href=/manageBack/productlist?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword1 + "&addrSearch2=" + keyword2 +">▶</a>";				
-			
+					pageList += " <a href=/manageBack/productlist?page=" + Integer.toString((section-1)*pageListCount+i) 
+							+ "&addrSearch=" + keyword + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
+				else 
+					pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
+				if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
+					pageList += " <a href=/manageBack/productlist?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
 			}			
-		}
+		}		
 		return pageList;
 	}
 
@@ -213,16 +213,16 @@ public class PageUtil {
 			for(int i=1;i<=pageListCount;i++) {
 
 				if(section >1 && i ==1)
-					pageList += " <a href=/manageBack/productlist?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
+					pageList += " <a href=/manageBack/orderlist?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
 					+ "&addrSearch1=" + keyword1 + "&addrSearch2=" + keyword2 +">◀</a>";
 				if(totalPage < (section-1)*pageListCount+i) { break; } 
 				if(pageNum != (section-1)*pageListCount +i)
-						pageList += " <a href=/manageBack/productlist?page=" + Integer.toString((section-1)*pageListCount+i) 
+						pageList += " <a href=/manageBack/orderlist?page=" + Integer.toString((section-1)*pageListCount+i) 
 								+ "&addrSearch=" + keyword1 + "&addrSearch2=" + keyword2 +">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
 					else 
 						pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
 					if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
-						pageList += " <a href=/manageBack/productlist?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword1 + "&addrSearch2=" + keyword2 +">▶</a>";				
+						pageList += " <a href=/manageBack/orderlist?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword1 + "&addrSearch2=" + keyword2 +">▶</a>";				
 			}			
 		}		
 		return pageList;
@@ -282,6 +282,33 @@ public class PageUtil {
 		return pageList;
 	}
 
+	//관리자페이지 리뷰신고리스트
+	public String getPageRoport(int pageNum, int postNum, int pageListCount, int totalCount, String keyword){
+
+		int totalPage = (int)Math.ceil(totalCount/(double)postNum);
+		int totalSection = (int)Math.ceil(totalPage/(double)pageListCount);
+		int section = (int)Math.ceil(pageNum/(double)pageListCount);
+		String pageList = "";
+		if(totalPage != 1) {
+			
+			for(int i=1;i<=pageListCount;i++) {
+
+				if(section >1 && i ==1)
+					pageList += " <a href=/master/reviewReport?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
+					+ "&addrSearch=" + keyword + ">◀</a>";
+				if(totalPage < (section-1)*pageListCount+i) { break; } 
+				if(pageNum != (section-1)*pageListCount +i)
+					pageList += " <a href=/master/reviewReport?page=" + Integer.toString((section-1)*pageListCount+i) 
+							+ "&addrSearch=" + keyword + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
+				else 
+					pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
+				if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
+					pageList += " <a href=/master/reviewReport?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
+			}			
+		}		
+		return pageList;
+	}
+
    	//관리자페이지 쿠폰리스트
 	public String getPageCoupon(int pageNum, int postNum, int pageListCount, int totalCount, String keyword) {
 		
@@ -294,16 +321,16 @@ public class PageUtil {
 			for(int i=1;i<=pageListCount;i++) {
 
 				if(section >1 && i ==1)
-					pageList += " <a href=/manageBack/coupon?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
+					pageList += " <a href=/master/coupon?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
 					+ "&addrSearch=" + keyword + ">◀</a>";
 				if(totalPage < (section-1)*pageListCount+i) { break; } 
 				if(pageNum != (section-1)*pageListCount +i)
-					pageList += " <a href=/manageBack/coupon?page=" + Integer.toString((section-1)*pageListCount+i) 
+					pageList += " <a href=/master/coupon?page=" + Integer.toString((section-1)*pageListCount+i) 
 							+ "&addrSearch=" + keyword + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
 				else 
 					pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
 				if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
-					pageList += " <a href=/manageBack/coupon?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
+					pageList += " <a href=/master/coupon?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
 			}			
 		}		
 		return pageList;
