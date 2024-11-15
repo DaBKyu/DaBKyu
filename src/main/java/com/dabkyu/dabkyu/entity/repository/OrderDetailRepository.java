@@ -24,7 +24,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, 
     @Query("SELECT od FROM OrderDetailEntity od " +
        "JOIN od.orderProductSeqno op " +
        "JOIN op.productSeqno p " +
-       "WHERE (:category IS NULL OR p.category3Seqno.category2Seqno.category1Seqno.category1Seqno = :category) " +
+       "WHERE (p.category3Seqno.category2Seqno.category1Seqno.category1Seqno = :category) " +
        "AND (p.productName LIKE %:productName%)")
     public Page<OrderDetailEntity> findByCategoryAndProductNameContaining(@Param("category") Long category, 
                                                                @Param("productName") String productName);
@@ -32,7 +32,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, 
     @Query("SELECT od FROM OrderDetailEntity od " +
            "JOIN od.orderProductSeqno op " +
            "JOIN op.productSeqno p " +
-           "WHERE (:category IS NULL OR p.category3Seqno.category2Seqno.category1Seqno.category1Seqno = :category)")
+           "WHERE (p.category3Seqno.category2Seqno.category1Seqno.category1Seqno = :category)")
     public Page<OrderDetailEntity> findByCategory(@Param("category") Long category);
 
     public Page<OrderDetailEntity> findByProductNameContaining(String productname);
