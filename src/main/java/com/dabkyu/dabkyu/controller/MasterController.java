@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -150,10 +149,13 @@ public class MasterController{
 
 
 
-    //이메일 
-
-
-
+    //이메일 발송
+    // @PostMapping("/send")
+    // public String sendEmail(@RequestBody EmailRequest emailRequest) {
+    //     emailService.sendEmail(emailRequest.getTo(), emailRequest.getSubject(), emailRequest.getBody());
+    //     return "Email sent successfully!";
+    // } 
+  
     
     //상품 리스트 화면보기 
     @GetMapping("/master/productList")
@@ -206,6 +208,7 @@ public class MasterController{
     //상품 등록 화면보기 
     @GetMapping("/master/postProduct") 
     public void getPostProduct() {}
+
 
     //상품 수정 화면보기 >> 수정 눌렀을 때 
     @GetMapping("/master/modifyProduct")
@@ -768,37 +771,54 @@ public class MasterController{
     }
 
     
-    //결제취소 확인, 처리 확인  (처리를 어떤식으로 하는가)
-    @GetMapping("/master/cancelOrder")
-    public void getCancelOrder() {
-        //
-    }
-
+     // 결제 취소 및 환불 신청 내역 보기
+    @GetMapping("/master/paymentCancelAndRefund")
+    public List<OrderDetailEntity> getCancelAndRefund() {
     
-
-    //교환환불 확인, 처리 (처리를 어떤식으로 하는가)
-    @GetMapping("/master/refundOrder")
-    public void getRefundOrder() {
-        //
-        
+        return masterService.getCancelAndRefundDetails();
     }
+
+
+    // 결제 취소 처리
+    @PostMapping("/master/paymentCancel")
+    public String getCancelOrder(
+        @RequestParam Long orderDetailSeqno,
+        @RequestParam(value = "couponSeqno", required = false) Long couponSeqno,
+        @RequestParam(value = "point", required = false) int point
+    ) {
+        masterService.cancelOrRefundOrder(orderDetailSeqno,couponSeqno, point, false);
+
+        return "{\"message\":\"good\"}";
+    }
+
+  
+    // 환불 처리
+    @PostMapping("/master/paymentRefund")
+    public String getRefundOrder(
+        @RequestParam Long orderDetailSeqno,
+	      @RequestParam(value = "couponSeqno", required = false) Long couponSeqno,
+	      @RequestParam(value = "point", required = false) int point
+    ) {
+        masterService.cancelOrRefundOrder(orderDetailSeqno, couponSeqno, point, true);
+
+        return "{\"message\":\"good\"}";
+      
 
     //매출, //통계 (관심카테고리, 찜목록, 구매) 
     @GetMapping("/master/Status")
     public void getStatus() {
 
-        //
     }
+      
 
     //전체 회원의 누적구매금액을 조회 후 등급 업데이트
-    @PostMapping("/manageBack/gradeUpdate")
+    @PostMapping("/master/gradeUpdate")
     public String updateCustomerGrade() {
-
         LocalDateTime referenceDate = LocalDateTime.now();
-
+        
         masterService.calculateAndUpdateCustomerGrade(referenceDate);
 
-    return "{\"message\":\"good\"}";
+        return "{\"message\":\"good\"}";
     }
 }
 

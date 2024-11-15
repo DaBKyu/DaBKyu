@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>문의 게시판</title>
+    <title>신고 게시판</title>
     <link rel="stylesheet" href="/css/mypage.css">
     <style>
         body {
@@ -18,11 +18,10 @@
             background-color: #f8f9fa;
         }
 
-        .reviews-section {
+        .report-section {
             flex: 1;
             padding: 20px;
             position: relative;
-            /* 위치를 조정하기 위해 부모 요소에 relative 추가 */
         }
 
         .search-section {
@@ -50,7 +49,7 @@
             background-color: #0056b3;
         }
 
-        .review-item {
+        .report-item {
             display: flex;
             align-items: center;
             border: 1px solid #ccc;
@@ -60,26 +59,22 @@
             cursor: pointer;
         }
 
-        .review-item img {
+        .report-item img {
             width: 50px;
             height: 50px;
             margin-right: 10px;
         }
 
-        .review-details {
+        .report-details {
             flex: 1;
         }
 
-        .review-title {
+        .report-title {
             font-weight: bold;
             margin: 0;
         }
 
-        .review-rating {
-            color: #ffcc00;
-        }
-
-        .review-info {
+        .report-info {
             font-size: 0.9rem;
             color: #555;
         }
@@ -115,24 +110,6 @@
             color: #007bff;
             margin-top: 10px;
         }
-
-        /* 문의하기 버튼 위치 수정 */
-        .contact-btn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .contact-btn:hover {
-            background-color: #0056b3;
-        }
     </style>
 </head>
 
@@ -155,14 +132,14 @@
                 <ul>
                     <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li>
                     <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
-                   
+                    <li><a href="deleteAccount.html" title="회원탈퇴" id="deleteAccountBtn">회원탈퇴</a></li>
                 </ul>
             </div>
             <div>
                 <div>나의 관심목록</div>
                 <ul>
                     <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
-                    <li><a href="myCategory.html" title=" 카테고리 "> 카테고리</a></li>
+                    <li><a href="myCategory.html" title="카테고리">카테고리</a></li>
                 </ul>
             </div>
             <div>
@@ -183,85 +160,88 @@
         </nav>
     </div>
 
-    <div class="reviews-section">
-        <h2>문의 게시판</h2>
+    <!-- 신고 게시판 섹션 -->
+    <div class="report-section">
+        <h2>신고 게시판</h2>
 
-        <div class="review-item" data-title="상품 제목 1" data-author="사용자1" data-date="2024-10-01" data-content="상품 내용 1"
-            data-image="https://via.placeholder.com/300">
-            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image" onclick="openModal(this)">
-            <div class="review-details">
-                <p class="review-title">상품 제목 1</p>
-                <p class="review-rating">★ ★ ★ ★ ☆</p>
-                <p class="review-info">작성자: 사용자1 | 등록일: 2024-10-01 | 조회: 10</p>
+        <!-- 신고된 항목들 -->
+        <div class="report-item" data-id="1">
+            <img src="path/to/image1.jpg" alt="상품 이미지 1">
+            <div class="report-details">
+                <p class="report-title">상품 제목 1</p>
+                <p class="report-info">2024-10-01 | 상태: 처리 대기</p>
+                <p>신고 내용: 상품에 대한 불만 제기</p>
+            </div>
+            <div class="report-actions">
+                <button onclick="viewReport(1)">상세보기</button>
+                <button onclick="deleteReport(1)">삭제</button>
             </div>
         </div>
 
-        <div class="review-item" data-title="상품 제목 2" data-author="사용자2" data-date="2024-10-02" data-content="상품 내용 2"
-            data-image="https://via.placeholder.com/300">
-            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image" onclick="openModal(this)">
-            <div class="review-details">
-                <p class="review-title">상품 제목 2</p>
-                <p class="review-rating">★ ★ ★ ★ ★</p>
-                <p class="review-info">작성자: 사용자1 | 등록일: 2024-10-02 | 조회: 5</p>
+        <div class="report-item" data-id="2">
+            <img src="path/to/image2.jpg" alt="상품 이미지 2">
+            <div class="report-details">
+                <p class="report-title">상품 제목 2</p>
+                <p class="report-info">2024-10-02 | 상태: 처리 완료</p>
+                <p>신고 내용: 상품 설명에 오류가 포함됨</p>
+            </div>
+            <div class="report-actions">
+                <button onclick="viewReport(2)">상세보기</button>
+                <button onclick="deleteReport(2)">삭제</button>
             </div>
         </div>
 
-        <div class="review-item" data-title="상품 제목 3" data-author="사용자3" data-date="2024-10-03" data-content="상품 내용 3"
-            data-image="https://via.placeholder.com/300">
-            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image" onclick="openModal(this)">
-            <div class="review-details">
-                <p class="review-title">상품 제목 3</p>
-                <p class="review-rating">★ ★ ★ ☆ ☆</p>
-                <p class="review-info">작성자: 사용자1 | 등록일: 2024-10-03 | 조회: 20</p>
+        <div class="report-item" data-id="3">
+            <img src="path/to/image3.jpg" alt="상품 이미지 3">
+            <div class="report-details">
+                <p class="report-title">상품 제목 3</p>
+                <p class="report-info">2024-11-11 | 상태: 처리 대기</p>
+                <p>신고 내용: 관련 없는 내용</p>
+            </div>
+            <div class="report-actions">
+                <button onclick="viewReport(3)">상세보기</button>
+                <button onclick="deleteReport(3)">삭제</button>
             </div>
         </div>
-
-
-        <button id="contactButton" class="contact-btn">문의하기</button>
     </div>
 
     <!-- 모달 팝업 -->
     <div class="modal" id="modal">
         <div class="modal-content">
-            <h2 id="modalTitle"></h2>
-            <p id="modalAuthor"></p>
-            <p id="modalDate"></p>
+            <h2>신고 내용 상세</h2>
             <p id="modalContent"></p>
-            <img id="modalImage" src="" alt="상품 이미지">
             <div class="close" id="closeModal">닫기</div>
         </div>
     </div>
 
-    <!-- 스크립트 -->
     <script>
-        // 모달 열기
-        function openModal(image) {
-            const reviewItem = image.closest('.review-item'); // 부모 .review-item을 찾음
-            const title = reviewItem.getAttribute('data-title');
-            const author = reviewItem.getAttribute('data-author');
-            const date = reviewItem.getAttribute('data-date');
-            const content = reviewItem.getAttribute('data-content');
-            const imgSrc = reviewItem.getAttribute('data-image');
-
-            // 모달에 데이터 설정
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalAuthor').textContent = `작성자: ${author}`;
-            document.getElementById('modalDate').textContent = `등록일: ${date}`;
-            document.getElementById('modalContent').textContent = `내용: ${content}`;
-            document.getElementById('modalImage').src = imgSrc;
-
-            // 모달 팝업 표시
+        // 신고 상세보기 팝업 열기
+        function viewReport(reportId) {
+            const reportContent = getReportContentById(reportId); // 신고 내용 불러오기
+            document.getElementById('modalContent').textContent = reportContent;
             document.getElementById('modal').style.display = 'flex';
+        }
+
+        // 신고 삭제
+        function deleteReport(reportId) {
+            const reportItem = document.querySelector(`.report-item[data-id="${reportId}"]`);
+            reportItem.remove(); // DOM에서 해당 신고 항목 삭제
+            alert("신고가 삭제되었습니다.");
+        }
+
+        // 신고 내용을 저장하는 예시 (실제 데이터는 서버에서 받아와야 함)
+        function getReportContentById(reportId) {
+            const reports = {
+                1: "상품 제목 1에 대한 신고 내용: 불만 사항이 있습니다.",
+                2: "상품 제목 2에 대한 신고 내용: 상품 설명에 오류가 있습니다.",
+                3: "상품 제목 3에 대한 신고 내용: 관련 없는 내용."
+            };
+            return reports[reportId] || "신고 내용이 없습니다.";
         }
 
         // 모달 닫기
         document.getElementById('closeModal').addEventListener('click', function () {
             document.getElementById('modal').style.display = 'none';
-        });
-
-        // 문의하기 버튼
-        document.getElementById('contactButton').addEventListener('click', function () {
-            window.location.href = 'question.html';  // 'question.html' 페이지로 이동
         });
     </script>
 </body>

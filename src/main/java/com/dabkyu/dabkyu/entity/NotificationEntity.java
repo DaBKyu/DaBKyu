@@ -28,7 +28,7 @@ public class NotificationEntity {
 	private Long notificationSeqno;
 
     @Column(name="notification_name",nullable=false)
-	private Long notificationName;
+	private String notificationName;
 
     @Column(name="notification_date",nullable=false)
 	private LocalDateTime notificationDate;

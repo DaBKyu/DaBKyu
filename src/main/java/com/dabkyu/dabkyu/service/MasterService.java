@@ -1,11 +1,8 @@
 package com.dabkyu.dabkyu.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -200,4 +197,11 @@ public interface MasterService {
 
     //전체 회원의 누적구매금액을 조회 후 등급업데이트
     public void calculateAndUpdateCustomerGrade(LocalDateTime referenceDate);
+
+    //결제 취소 및 환불 신청 내역 보기
+    public List<OrderDetailEntity> getCancelAndRefundDetails();
+
+    //결제 취소 및 환불 처리
+    public void cancelOrRefundOrder(Long orderDetailSeqno, Long couponSeqno, int point, boolean isRefund);
+
 }

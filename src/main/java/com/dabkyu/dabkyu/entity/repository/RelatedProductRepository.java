@@ -9,4 +9,5 @@ import com.dabkyu.dabkyu.entity.RelatedProductEntity;
 public interface RelatedProductRepository extends JpaRepository<RelatedProductEntity, Long>{
 
     public List<RelatedProductEntity> findByProductSeqno_ProductSeqno(Long productSeqno);
+
 }
