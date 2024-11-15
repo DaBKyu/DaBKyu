@@ -269,7 +269,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     if (couponSeqno != null) {
     // 쿠폰 정보를 DB에서 가져오고, 할인 금액을 계산하는 로직을 추가
-    MemberEntity member = memberRepository.findByEmail(email);
+    MemberEntity member = memberRepository.findById(email).get();
     MemberCouponEntity memberCoupon = memberCouponRepository.findById(new MemberCouponEntityID(member.getEmail(), couponSeqno)) 
             .orElseThrow(() -> new RuntimeException("유효한 쿠폰이 아닙니다."));
 
