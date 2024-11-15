@@ -12,4 +12,6 @@ public interface MemberCategoryRepository extends JpaRepository<MemberCategoryEn
 
     public List<MemberCategoryEntity> findByEmail_Email(String email);
 
+    public List<MemberCategoryEntity> findByCategory3Seqno_Category3Seqno(Long category3Seqno);
+
 }
