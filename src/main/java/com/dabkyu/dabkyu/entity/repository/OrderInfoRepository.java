@@ -1,5 +1,6 @@
 package com.dabkyu.dabkyu.entity.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -22,5 +23,7 @@ public interface OrderInfoRepository extends JpaRepository<OrderInfoEntity, Long
     public List<OrderInfoEntity> findByOrderStatusIn(List<String> statuses);
     
     public List<OrderInfoEntity> findByOrderStatus(String orderStatus);
+
+    public List<OrderInfoEntity> findByOrderDateBefore(LocalDateTime date);
 
 }

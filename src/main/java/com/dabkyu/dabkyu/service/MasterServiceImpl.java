@@ -1,7 +1,5 @@
 package com.dabkyu.dabkyu.service;
 
-import java.io.File;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +8,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -24,7 +21,6 @@ import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.CouponTargetDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
-import com.dabkyu.dabkyu.dto.OrderProductDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
@@ -42,8 +38,6 @@ import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.CouponTargetEntity;
-import com.dabkyu.dabkyu.entity.MemberCouponEntity;
-import com.dabkyu.dabkyu.entity.MemberCouponEntityID;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.MemberNotificationEntity;
 import com.dabkyu.dabkyu.entity.NotificationEntity;
@@ -52,7 +46,6 @@ import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
-import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.ProductOptionEntity;
 import com.dabkyu.dabkyu.entity.QuestionCommentEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
@@ -68,14 +61,12 @@ import com.dabkyu.dabkyu.entity.repository.CouponCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponTargetRepository;
 import com.dabkyu.dabkyu.entity.repository.MasterRepository;
-import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberNotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.NotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderInfoRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductOptionRepository;
-import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductInfoFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductOptionRepository;
@@ -87,14 +78,13 @@ import com.dabkyu.dabkyu.entity.repository.RelatedProductRepository;
 import com.dabkyu.dabkyu.entity.repository.ReportRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewRepository;
-import jakarta.websocket.OnClose;
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
 public class MasterServiceImpl implements MasterService {
-
 
     private final MemberRepository memberRepository;
     private final MasterRepository masterRepository;
@@ -111,7 +101,6 @@ public class MasterServiceImpl implements MasterService {
     private final ReportRepository reportRepository;
     private final OrderInfoRepository orderInfoRepository;
     private final OrderDetailRepository orderDetailRepository;
-    private final OrderProductRepository orderProductRepository;
     private final NotificationRepository notificationRepository;
     private final MemberNotificationRepository memberNotificationRepository;
     private final AddedRelatedProductRepository addedRelatedProductRepository;
@@ -162,11 +151,12 @@ public class MasterServiceImpl implements MasterService {
     }
 
     //////////상품
-    //상품 리스트 보기 
+    //상품 리스트 보기  
     @Override
-    public Page<ProductEntity> productList(Long category1Seqno, Long category2Seqno, Long category3Seqno, String keyword, PageRequest pageable) {
-        return productRepository.findByAllCategories(category1Seqno, category2Seqno, category3Seqno, keyword, pageable);
+    public Page<ProductEntity> productList(Long category1Seqno, Long category2Seqno, Long category3Seqno, String keyword, PageRequest pageRequest) {
+        return productRepository.findByAllCategories(category1Seqno, category2Seqno, category3Seqno, keyword, pageRequest);
     }
+    
 
     //상품 상세보기
     //productSeqno로 상품 정보 가져오기
@@ -285,19 +275,20 @@ public class MasterServiceImpl implements MasterService {
 
     /////////주문
     //주문 리스트 
+    
     @Override
     public Page<Map<String, Object>> orderList(int pageNum, int postNum, String productname, Long category) throws Exception{
         
-        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by("orderDate").descending());
+        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC, "orderDate"));
         Page<OrderDetailEntity> orderDetailPage;
 
         //검색기능 
         if (category != null && productname != null) {
-            orderDetailPage = orderDetailRepository.findByCategoryAndProductNameContaining(category, productname);
+            orderDetailPage = orderDetailRepository.findByCategoryAndProductNameContaining(category, productname, pageRequest);
         } else if(category == null && productname != null){
-            orderDetailPage = orderDetailRepository.findByProductNameContaining(productname);
+            orderDetailPage = orderDetailRepository.findByOrderProductSeqno_ProductSeqno_ProductNameContaining(productname, pageRequest);
         } else if(category != null && productname == null){
-            orderDetailPage = orderDetailRepository.findByCategory(category);
+            orderDetailPage = orderDetailRepository.findByCategory(category, pageRequest);
         } else{
             orderDetailPage = orderDetailRepository.findAll(pageRequest);
         }
@@ -343,6 +334,7 @@ public class MasterServiceImpl implements MasterService {
         return result; // 최종 결과 반환
         });
     }
+        
 
     //주문 상태 수정
     @Override
@@ -361,13 +353,13 @@ public class MasterServiceImpl implements MasterService {
     @Override
     public List<OrderDetailEntity> getOrderDetails(Long orderSeqno) throws Exception{
         OrderInfoEntity orderInfoEntity = orderInfoRepository.findById(orderSeqno).get();
-        return orderDetailRepository.findByOrderSeqno(orderInfoEntity);
+        return orderDetailRepository.findByOrderSeqno_OrderSeqno(orderInfoEntity);
     }
     //OrderProduct찾기
     @Override
     public List<OrderProductEntity> getOrderProducts(Long orderSeqno) throws Exception{
         OrderInfoEntity orderInfoEntity = orderInfoRepository.findById(orderSeqno).get();
-        return orderDetailRepository.findByOrderSeqno(orderInfoEntity).stream()
+        return orderDetailRepository.findByOrderSeqno_OrderSeqno(orderInfoEntity).stream()
             .map(OrderDetailEntity::getOrderProductSeqno) 
             .collect(Collectors.toList());
     }
@@ -698,35 +690,34 @@ public class MasterServiceImpl implements MasterService {
     /////////////리뷰
     //리뷰 리스트 
     @Override
-    public Page<Map<String, Object>> reviewList(int pageNum, int postNum, Long category) throws Exception{
-        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"revDate"));
-		Page<ReviewEntity> reviewEntities;
+    public Page<Map<String, Object>> reviewList(int pageNum, int postNum, Long category) throws Exception {
+        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC, "revDate"));
+        Page<ReviewEntity> reviewEntities;
 
-        if(category != null){
+        // 카테고리 값이 있을 경우, 카테고리 기준으로 리뷰 조회
+        if (category != null) {
             reviewEntities = reviewRepository.findByCategory(category, pageRequest);
-        }else{
+        } else {
             reviewEntities = reviewRepository.findAll(pageRequest);
         }
-        
-        return reviewEntities.map(reviewEntity  ->{
+
+        return reviewEntities.map(reviewEntity -> {
             Map<String, Object> result = new HashMap<>();
             ReviewDTO reviewDTO = new ReviewDTO(reviewEntity);
 
             // 리뷰 정보
             result.put("review", reviewDTO);
 
-            // 첨부 파일
+            // 첨부 파일 조회
             List<ReviewFileDTO> reviewFiles = new ArrayList<>();
             try {
                 reviewFiles = reviewService.fileListView(reviewEntity.getReviewSeqno());
             } catch (Exception e) {
                 reviewFiles = new ArrayList<>();
             }
-            if(!reviewFiles.isEmpty()){
-                result.put("reviewFiles", reviewFiles); 
-            }else{
-                result.put("reviewFiles", new ArrayList<>());
-            }
+
+            // 파일이 존재하면 추가, 없으면 빈 리스트 반환
+            result.put("reviewFiles", reviewFiles.isEmpty() ? new ArrayList<>() : reviewFiles);
             return result;
         });
     }
@@ -819,7 +810,7 @@ public class MasterServiceImpl implements MasterService {
         // 각 주문에 대해 orderDetail 리스트 반환
         List<OrderDetailEntity> orderDetails = new ArrayList<>();
         for (OrderInfoEntity order : orders) {
-            orderDetails.addAll(orderDetailRepository.findByOrderSeqno(order));
+            orderDetails.addAll(orderDetailRepository.findByOrderSeqno_OrderSeqno(order));
         }
 
         return orderDetails;
@@ -843,7 +834,7 @@ public class MasterServiceImpl implements MasterService {
         orderInfoRepository.save(orderInfo);
 
         // 주문 상품 목록 조회
-        List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno(orderInfo);
+        List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno_OrderSeqno(orderInfo);
 
         // 주문 상세 정보 처리 
         for (OrderDetailEntity orderDetailEntity : orderDetails) {
@@ -906,7 +897,25 @@ public class MasterServiceImpl implements MasterService {
 
     }
 
-    //관리자가 쿠폰종료일이 지난 쿠폰들 24시에 isExpired를 "Y"로 업데이트 구현필요
+    //관리자가 쿠폰종료일이 지난 쿠폰들 isExpired를 "Y"로 업데이트 
+    @Override
+    public void setExpiredCouponsToExpired(LocalDateTime referenceDate) {
+
+        // 만료된 쿠폰만 조회
+        List<CouponEntity> coupons = couponRepository.findByCouponEndDateBefore(referenceDate);
+
+        // 만료된 쿠폰을 업데이트
+        for (CouponEntity coupon : coupons) {
+            // 쿠폰 종료일이 현재 날짜보다 이전이고, 아직 만료되지 않은 쿠폰인 경우
+            if ("N".equals(coupon.getIsExpire())) {
+                // 만료된 쿠폰의 isExpired를 "Y"로 설정
+                coupon.setIsExpire("Y");
+            }
+        }
+    
+        // 만료된 쿠폰 정보 저장
+        couponRepository.saveAll(coupons);
+    }
 
 }
 
