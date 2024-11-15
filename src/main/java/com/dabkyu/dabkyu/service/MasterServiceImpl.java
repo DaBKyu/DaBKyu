@@ -540,7 +540,7 @@ public class MasterServiceImpl implements MasterService {
         if (couponSeqno != null) {
             //쿠폰 상태 업데이트 (사용 가능 상태로 변경)
             //MemberCouponEntity memberCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqno(couponSeqno);
-            CouponEntity coupon = couponRepository.findByCouponSeqno(couponSeqno);
+            CouponEntity coupon = couponRepository.findById(couponSeqno).get();
             coupon.setIsExpire("N");
         }
 
