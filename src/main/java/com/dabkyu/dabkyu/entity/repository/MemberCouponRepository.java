@@ -23,4 +23,6 @@ public interface MemberCouponRepository extends JpaRepository<MemberCouponEntity
         @Param("email") MemberEntity member,
         Pageable pageable
         );
+
+    public MemberCouponEntity findByCouponSeqno_CouponSeqno(Long couponSeqno);
 }

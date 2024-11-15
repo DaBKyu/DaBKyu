@@ -26,6 +26,9 @@ public class CouponDTO {
     private LocalDateTime couponEndDate;
     private int minOrder;
     private String couponRole;
+    private String isDupl;
+    private String isExpire;
+
 
     public CouponDTO(CouponEntity entity) {
         this.couponSeqno = entity.getCouponSeqno();
@@ -39,6 +42,8 @@ public class CouponDTO {
         this.couponEndDate = entity.getCouponEndDate();
         this.minOrder= entity.getMinOrder();
         this.couponRole= entity.getCouponRole();
+        this.isDupl = entity.getIsDupl();
+        this.isExpire = entity.getIsExpire();
     }
 
     public CouponEntity dtoToEntity(CouponDTO dto) {
@@ -52,6 +57,10 @@ public class CouponDTO {
                                           .amountDiscount(dto.getAmountDiscount())
                                           .couponStartDate(dto.getCouponStartDate())                                           
                                           .couponEndDate(dto.getCouponEndDate())
+                                          .minOrder(dto.getMinOrder())
+                                          .couponRole(dto.getCouponRole())
+                                          .isDupl(dto.getIsDupl())
+                                          .isExpire(dto.getIsExpire())
                                           .build();
         return entity;
     }

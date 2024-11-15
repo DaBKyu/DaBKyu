@@ -11,6 +11,9 @@ import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.OrderProductDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
+import com.dabkyu.dabkyu.entity.CouponEntity;
+import com.dabkyu.dabkyu.entity.MemberCouponEntity;
+import com.dabkyu.dabkyu.entity.MemberCouponEntityID;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
@@ -21,6 +24,8 @@ import com.dabkyu.dabkyu.entity.ProductOptionEntity;
 import com.dabkyu.dabkyu.entity.RelatedProductEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
 import com.dabkyu.dabkyu.entity.repository.AddedRelatedProductRepository;
+import com.dabkyu.dabkyu.entity.repository.CouponRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderInfoRepository;
@@ -48,6 +53,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final MemberRepository memberRepository;
     private final RelatedProductRepository relatedProductRepository;
     private final ProductRepository productRepository;
+    private final MemberCouponRepository memberCouponRepository;
+    private final CouponRepository couponRepository;
     
     // 장바구니 보기
     @Override
@@ -151,7 +158,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     // 결제
     @Transactional
     @Override
-    public void pay(String email, List<Long> toPayOrderProductList, OrderInfoDTO orderInfo) {
+    public void pay(String email, List<Long> toPayOrderProductList,Long couponSeqno, int point, OrderInfoDTO orderInfo) {
 
         //결제할때 재고 확인 방법 고민..
         // 재고 수량 확인
@@ -166,17 +173,54 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 throw new RuntimeException("재고가 부족합니다: " + product.getProductName() + "의 재고 수량이 충분하지 않습니다.");
             }
         }
-
-    
         // 회원 정보 가져오기
-        MemberEntity memberEntity = memberRepository.findById(email).get();
+        MemberEntity member = memberRepository.findById(email).get();
 
-        // 총 가격
-        Map<String,Object> calculateResult = calculatePrice(toPayOrderProductList);
+        //적립금 적립, 사용 확인 및 적용
 
+        // 총 가격에서 적립할 금액 구하기(적립은 총 가격에서 포인트, 배송비,쿠폰 할인금액 제한 금액(결제금액)에만 적용)
+        Map<String, Object> calculateResult = calculatePrice(toPayOrderProductList, point, couponSeqno, email);
+        int totalPrice = (int) calculateResult.get("totalPrice");
+        int totalShippingFee = (int) calculateResult.get("totalShippingFee");
+        int couponDiscount = (int) calculateResult.get("couponDiscount");
+        //적립할 금액(포인트,배송,쿠폰할인금액 제한 금액)
+        int amountAfterDiscounts = (int) calculateResult.get("amountAfterDiscounts");
+      
+        // 쿠폰 사용 확인 및 적용
+        if (couponSeqno != null) {
+            MemberCouponEntity memberCoupon = memberCouponRepository.findById(new MemberCouponEntityID(email, couponSeqno))
+                    .orElseThrow(() -> new RuntimeException("유효한 쿠폰이 아닙니다."));
+            // 쿠폰 만료처리
+            CouponEntity coupon = couponRepository.findById(couponSeqno).get();
+            coupon.setIsExpire("Y");
+        }
+
+        // 포인트 적립 금액 계산
+        int rewardPoints = 0;
+        if ("Platinum".equals(member.getMemberGrade())) {
+            rewardPoints = (int) (amountAfterDiscounts * 0.05); // Platinum 등급은 5% 적립
+        } else if ("Gold".equals(member.getMemberGrade())) {
+            rewardPoints = (int) (amountAfterDiscounts * 0.03); // Gold 등급은 3% 적립
+        } else if ("Silver".equals(member.getMemberGrade())) {
+            rewardPoints = (int) (amountAfterDiscounts * 0.02); // Silver 등급은 2% 적립
+        } else if ("Bronze".equals(member.getMemberGrade())) {
+            rewardPoints = (int) (amountAfterDiscounts * 0.01); // Bronze 등급은 1% 적립
+        }
+
+        // 포인트 사용 및 적립 적용 (point가 null이 아닐 때만 차감)
+        if (point != 0) {
+            member.setPoint(member.getPoint() - point + rewardPoints);
+        } else {
+            member.setPoint(member.getPoint() + rewardPoints);
+        }
+
+        // 회원 정보 저장
+        memberRepository.save(member);
+    
+      
         // 주문 정보 생성
         OrderInfoEntity orderInfoEntity = OrderInfoEntity.builder()
-                                                          .email(memberEntity)
+                                                          .email(member)
                                                           .orderDate(LocalDateTime.now())
                                                           .orderReq(orderInfo.getOrderReq())
                                                           .orderStatus("결제 완료")
@@ -215,6 +259,85 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             productRepository.save(product);
         }
 }
+ // 총 가격 계산 메서드
+ private Map<String,Object> calculatePrice(List<Long> toPayOrderProductList,int point, Long couponSeqno, String email) {
+    int totalPrice = 0;
+    String isFree = "Y";
+    int totalShippingFee = 0;
+    //int totalDiscount = 0;
+    int couponDiscount = 0;
+
+    if (couponSeqno != null) {
+    // 쿠폰 정보를 DB에서 가져오고, 할인 금액을 계산하는 로직을 추가
+    MemberEntity member = memberRepository.findByEmail(email);
+    MemberCouponEntity memberCoupon = memberCouponRepository.findById(new MemberCouponEntityID(member.getEmail(), couponSeqno)) 
+            .orElseThrow(() -> new RuntimeException("유효한 쿠폰이 아닙니다."));
+
+    CouponEntity coupon = memberCoupon.getCouponSeqno();
+
+     // 최소 주문 금액(minOrder) 확인
+     int minOrder = coupon.getMinOrder();
+     if (totalPrice >= minOrder) {
+         // 퍼센트 할인과 금액 할인 조건에 맞는 계산 처리
+         if (coupon.getPercentDiscount() > 0) {
+             // 퍼센트 할인 적용 (최대 할인 금액 고려)
+             int percentDiscountAmount = totalPrice * coupon.getPercentDiscount() / 100;
+             couponDiscount = Math.min(percentDiscountAmount, coupon.getAmountDiscount());
+         } else if (coupon.getAmountDiscount() > 0) {
+             // 금액 할인 적용
+             couponDiscount = coupon.getAmountDiscount();
+         }
+     }
+ }
+
+
+    for (Long orderProductSeqno : toPayOrderProductList) {
+        
+        OrderProductEntity orderProductEntity = orderProductRepository.findById(orderProductSeqno).get();
+        //배송비 무료 확인
+        ProductEntity productEntity = orderProductEntity.getProductSeqno();
+        if (productEntity.getDeliveryisFree()=="N") isFree = "N";
+        
+        // 제품 가격 + 옵션 가격
+        int productPrice = productEntity.getPrice();
+        List<OrderProductOptionEntity> orderProductOptionEntities = orderProductOptionRepository.findByOrderProductSeqno(orderProductSeqno);
+        if (!orderProductOptionEntities.isEmpty()) {
+            for (OrderProductOptionEntity orderProductOptionEntity : orderProductOptionEntities) {
+                ProductOptionEntity productOptionEntity = orderProductOptionEntity.getOptionSeqno();
+                productPrice += productOptionEntity.getOptPrice();
+            }
+        }
+
+        totalPrice += productPrice * orderProductEntity.getAmount(); // 각 제품의 가격과 장바구니 수량에 따라 총 가격 계산
+
+        // 추가 상품 가격 계산
+        List<AddedRelatedProductEntity> addedRelatedProducts = addedRelatedProductRepository.findByOrderProductSeqno(orderProductSeqno);
+        if (!addedRelatedProducts.isEmpty()) {
+            for (AddedRelatedProductEntity addedProduct : addedRelatedProducts) {
+                RelatedProductEntity relatedProductEntity = addedProduct.getRelatedProductSeqno();
+                int relatedProductPrice = relatedProductEntity.getRelatedproductPrice();
+                totalPrice += relatedProductPrice * addedProduct.getAmount(); // 추가 상품의 가격을 포함
+            }
+        }
+    }
+
+    // 배송비 계산
+    if ("N".equals(isFree)) {
+        totalShippingFee = 3000;
+    }
+
+    // 총 금액에서 포인트와 쿠폰 할인액 차감
+    int amountAfterDiscounts = totalPrice + totalShippingFee - couponDiscount - point;
+
+    Map<String, Object> priceInfo = new HashMap<>();
+    priceInfo.put("totalPrice", totalPrice);
+    priceInfo.put("totalShippingFee", totalShippingFee);
+    priceInfo.put("couponDiscount", couponDiscount);
+    priceInfo.put("amountAfterDiscounts", amountAfterDiscounts);
+    //priceInfo.put("isFree", isFree);
+
+    return priceInfo;
+}
 
    // 결제 완료된 제품만 장바구니에서 삭제
    @Transactional
@@ -226,59 +349,19 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         // 주문 상태가 "결제 완료"
         if ("결제 완료".equals(orderInfo.getOrderStatus())) {
             
-            // 해당 주문에 포함된 상품들을 찾습니다
+            // 해당 주문에 포함된 상품들을 찾기
             List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno(orderInfo);
             
             for (OrderDetailEntity orderDetail : orderDetails) {
-                OrderProductEntity orderProduct = orderDetail.getOrderProductSeqno();
-
-
-                orderProductRepository.delete(orderProduct);
+                //OrderProductEntity orderProduct = orderDetail.getOrderProductSeqno();
+                //orderProductRepository.delete(orderProduct);
+                orderDetailRepository.delete(orderDetail);
                 }
             }
         }
     }      
 
-    // 총 가격 계산 메서드
-    private Map<String,Object> calculatePrice(List<Long> toPayOrderProductList) {
-        int totalPrice = 0;
-        String isFree = "Y";
-        for (Long orderProductSeqno : toPayOrderProductList) {
-            
-            OrderProductEntity orderProductEntity = orderProductRepository.findById(orderProductSeqno).get();
-            //배송비 무료 확인
-            ProductEntity productEntity = orderProductEntity.getProductSeqno();
-            if (productEntity.getDeliveryisFree()=="N") isFree = "N";
-            
-            // 제품 가격 + 옵션 가격
-            int productPrice = productEntity.getPrice();
-            List<OrderProductOptionEntity> orderProductOptionEntities = orderProductOptionRepository.findByOrderProductSeqno(orderProductSeqno);
-            if (!orderProductOptionEntities.isEmpty()) {
-                for (OrderProductOptionEntity orderProductOptionEntity : orderProductOptionEntities) {
-                    ProductOptionEntity productOptionEntity = orderProductOptionEntity.getOptionSeqno();
-                    productPrice += productOptionEntity.getOptPrice();
-                }
-            }
-
-            totalPrice += productPrice * orderProductEntity.getAmount(); // 각 제품의 가격과 장바구니 수량에 따라 총 가격 계산
-
-            // 추가 상품 가격 계산
-            List<AddedRelatedProductEntity> addedRelatedProducts = addedRelatedProductRepository.findByOrderProductSeqno(orderProductSeqno);
-            if (!addedRelatedProducts.isEmpty()) {
-                for (AddedRelatedProductEntity addedProduct : addedRelatedProducts) {
-                    RelatedProductEntity relatedProductEntity = addedProduct.getRelatedProductSeqno();
-                    int relatedProductPrice = relatedProductEntity.getRelatedproductPrice();
-                    totalPrice += relatedProductPrice * addedProduct.getAmount(); // 추가 상품의 가격을 포함
-                }
-            }
-        }
-        Map<String,Object> priceInfo = new HashMap<>();
-        priceInfo.put("totalPrice", totalPrice);
-        priceInfo.put("isFree", isFree);
-        return priceInfo;
-    }
-
-    //결제 취소
+    //결제 취소 신청
     public void cancelToPay(String email, Long orderSeqno) {
         
         // 주문 정보 조회
@@ -290,42 +373,22 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
 
         // 주문 상태 변경 (결제 취소)
-        orderInfo.setOrderStatus("결제 취소");
-        orderInfo.setExptDate(null);  // 예상 배송 날짜 초기화
-        orderInfo.setDeliveryPrice(0); // 배송비 초기화 (배송 취소된 경우)
+        orderInfo.setOrderStatus("결제 취소 신청");
         orderInfoRepository.save(orderInfo);
-
-        // 주문 상품 목록 조회
-        List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno(orderInfo);
-
-        // 주문 상세 정보 처리 (상품 개별 취소)
-        for (OrderDetailEntity orderDetail : orderDetails) {
-            // 주문 상품 정보
-            OrderProductEntity orderProduct = orderDetail.getOrderProductSeqno();
-
-            orderDetail.setCancelYn("Y");
-            orderDetailRepository.save(orderDetail);
-
-            // 주문된 상품의 재고 복구
-            ProductEntity product = orderProduct.getProductSeqno();
-            product.setStockAmount(product.getStockAmount() + orderProduct.getAmount());
-            productRepository.save(product);
-        }
     }
 
-    // 환불 신청 처리 
+    // 환불 신청
     public void refundRequest(String email, Long orderSeqno) {
         // 주문 상품 조회
        OrderInfoEntity orderInfo = orderInfoRepository.findByEmail_EmailAndOrderSeqno(email, orderSeqno);
 
-        // 주문 상세 정보 업데이트 (환불 상태로 변경)
-        //OrderDetailEntity orderDetail = orderDetailRepository.findByOrderSeqno_OrderSeqno(orderInfo.getOrderSeqno());
-        //orderDetail.setRefundYn("Y");
+        // 주문자가 맞는지 확인
+        if (!orderInfo.getEmail().getEmail().equals(email)) {
+        throw new RuntimeException("이 주문은 해당 회원이 요청할 수 없습니다.");
+        }
 
-        //주문 정보 업데이트 (환불 상태로 변경)
-        //orderInfo = orderInfoRepository.findByOrderSeqno(orderDetail.getOrderSeqno());
-        orderInfo.setOrderStatus("환불 신청");
-        orderInfoRepository.save(orderInfo);
+       orderInfo.setOrderStatus("환불 신청");
+       orderInfoRepository.save(orderInfo);
     }
 
 }

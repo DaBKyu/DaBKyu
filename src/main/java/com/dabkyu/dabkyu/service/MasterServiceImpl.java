@@ -1,6 +1,5 @@
 package com.dabkyu.dabkyu.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +26,11 @@ import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
 import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.CouponTargetEntity;
+import com.dabkyu.dabkyu.entity.MemberCouponEntity;
+import com.dabkyu.dabkyu.entity.MemberCouponEntityID;
 import com.dabkyu.dabkyu.entity.MemberEntity;
+import com.dabkyu.dabkyu.entity.MemberNotificationEntity;
+import com.dabkyu.dabkyu.entity.NotificationEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
@@ -41,7 +44,10 @@ import com.dabkyu.dabkyu.entity.repository.CouponCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponTargetRepository;
 import com.dabkyu.dabkyu.entity.repository.MasterRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberNotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
+import com.dabkyu.dabkyu.entity.repository.NotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderInfoRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductOptionRepository;
@@ -50,6 +56,7 @@ import com.dabkyu.dabkyu.entity.repository.ProductRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -67,6 +74,8 @@ public class MasterServiceImpl implements MasterService {
     private final ReviewRepository reviewRepository;
     private final OrderInfoRepository orderInfoRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final NotificationRepository notificationRepository;
+    private final MemberNotificationRepository memberNotificationRepository;
     private final AddedRelatedProductRepository addedRelatedProductRepository;
     private final OrderProductOptionRepository orderProductOptionRepository;
     private final QuestionRepository questionRepository;
@@ -442,7 +451,7 @@ public class MasterServiceImpl implements MasterService {
             //최근 3년 이내의 누적구매 금액에 따라 회원등급 설정
             String grade;
             if (totalSpentLast3Years >= 1000000) {
-                grade = "VIP";
+                grade = "Platinum";
             } else if (totalSpentLast3Years >= 500000) {
                 grade = "Gold";
             } else if (totalSpentLast3Years >= 100000) {
@@ -458,5 +467,106 @@ public class MasterServiceImpl implements MasterService {
         // 모든 회원 정보 한 번에 저장
         memberRepository.saveAll(members); 
     }
+
+    // 결제취소 및 환불 신청 내역 조회
+    @Override
+    public List<OrderDetailEntity> getCancelAndRefundDetails() {
+        // '결제취소신청' 또는 '환불신청'인 주문 상태를 가진 주문 조회
+        List<String> statuses = List.of("결제취소신청", "환불신청");
+        List<OrderInfoEntity> orders = orderInfoRepository.findByOrderStatusIn(statuses);
+
+        // 각 주문에 대해 orderDetail 리스트 반환
+        List<OrderDetailEntity> orderDetails = new ArrayList<>();
+        for (OrderInfoEntity order : orders) {
+            orderDetails.addAll(orderDetailRepository.findByOrderSeqno(order));
+        }
+
+        return orderDetails;
+    }
+
+    // 결제 취소 처리 및 환불 처리(isRefund가 true면 환불, false면 결제취소 처리)
+    @Override
+    @Transactional
+    public void cancelOrRefundOrder(Long orderDetailSeqno, Long couponSeqno, int point, boolean isRefund) {
+        OrderDetailEntity orderDetail = orderDetailRepository.findById(orderDetailSeqno).get();
+
+        // 주문 상세의 orderSeqno를 사용해서 OrderInfoEntity 조회
+        OrderInfoEntity orderInfo = orderInfoRepository.findByOrderSeqno(orderDetail.getOrderSeqno());
+
+        // 결제 취소 또는 환불에 따른 주문 상태 변경
+        String statusMessage = isRefund ? "환불 완료" : "결제 취소 완료";
+        if (orderInfo.getOrderStatus().equals(statusMessage)) {
+            throw new RuntimeException("이미 " + statusMessage + "된 주문입니다.");
+        }
+        orderInfo.setOrderStatus(statusMessage);
+        orderInfoRepository.save(orderInfo);
+
+        // 주문 상품 목록 조회
+        List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno(orderInfo);
+
+        // 주문 상세 정보 처리 
+        for (OrderDetailEntity orderDetailEntity : orderDetails) {
+
+            if (isRefund) {
+                orderDetailEntity.setRefundYn("Y");
+            } else {
+                orderDetailEntity.setCancelYn("Y");
+            }
+            orderDetailRepository.save(orderDetailEntity);
+
+            // 주문 상품 정보
+            OrderProductEntity orderProduct = orderDetailEntity.getOrderProductSeqno();
+
+            // 주문된 상품의 재고 복구
+            ProductEntity product = orderProduct.getProductSeqno();
+            product.setStockAmount(product.getStockAmount() + orderProduct.getAmount());
+            productRepository.save(product);
+        } 
+
+        // 회원정보 불러오기
+        MemberEntity member = memberRepository.findById(orderInfo.getEmail().getEmail()).get();
+
+        // 처리완료 후 회원의 누적 구매 금액에서 해당 주문 금액 차감처리
+        int totalPrice = orderInfo.getTotalPrice();
+        member.setTotalPvalue(member.getTotalPvalue() - totalPrice);
+
+        // 사용한 포인트 및 쿠폰 복구 처리
+        // 포인트 복구 처리
+        if (point != 0) {
+            member.setPoint(member.getPoint() + point); // 환불시 포인트 복구
+        }
+
+        // 쿠폰 복원 처리 (만료처리된 쿠폰 복원)
+        if (couponSeqno != null) {
+            //쿠폰 상태 업데이트 (사용 가능 상태로 변경)
+            //MemberCouponEntity memberCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqno(couponSeqno);
+            CouponEntity coupon = couponRepository.findById(couponSeqno).get();
+            coupon.setIsExpire("N");
+        }
+
+        memberRepository.save(member);  
+
+        //회원 알림 설정
+        String notificationName = isRefund ? "환불 완료" : "결제 취소 완료";
+        NotificationEntity notification = NotificationEntity.builder()
+                                                            .notificationName(notificationName)  
+                                                            .notificationDate(LocalDateTime.now())  
+                                                            .build();
+    
+        // 알림 저장
+        notificationRepository.save(notification);
+
+        // 회원에게 알릴 알림 저장
+        MemberNotificationEntity memberNotification = MemberNotificationEntity.builder()
+                                                                              .email(member)
+                                                                              .notificationSeqno(notification)
+                                                                              .build();
+        memberNotificationRepository.save(memberNotification);
+
+    }
+
+    //관리자가 쿠폰종료일이 지난 쿠폰들 24시에 isExpired를 "Y"로 업데이트 구현필요
+
 }
+
     

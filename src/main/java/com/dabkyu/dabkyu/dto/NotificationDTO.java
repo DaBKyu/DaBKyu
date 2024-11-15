@@ -15,7 +15,7 @@ import lombok.Setter;
 @Builder 
 public class NotificationDTO {
     private Long notificationSeqno;
-	private Long notificationName;
+	private String notificationName;
 	private LocalDateTime notificationDate;
 
     public NotificationDTO(NotificationEntity entity) {

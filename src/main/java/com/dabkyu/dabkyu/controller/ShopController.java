@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.dabkyu.dabkyu.dto.MemberAddressDTO;
+import com.dabkyu.dabkyu.dto.MemberCouponDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.OrderProductDTO;
@@ -48,32 +51,58 @@ public class ShopController {
 	private final QuestionService questionService;
 	private final ReviewService reviewService;
 
-    //상품 목록 보기
-    @GetMapping("/shop/list")
-    public void getList(Model model,@RequestParam("page") int pageNum,
-			@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
-			@RequestParam(name = "category1Seqno",defaultValue = "", required = false) Long category1Seqno,
-			@RequestParam(name = "category2Seqno",defaultValue = "", required = false) Long category2Seqno,
-			@RequestParam(name = "category3Seqno",defaultValue = "", required = false) Long category3Seqno) throws Exception {
-		
-		int postNum = 10; 
-		int pageListCount = 10; 
-		
-		PageUtil page = new PageUtil();
-		Page<ProductEntity> list = productService.list(pageNum, postNum, keyword, category1Seqno, category2Seqno, category3Seqno);
-		
-		int totalCount = (int)list.getTotalElements();
+	@GetMapping("/shop/main")
+    public String getProductList(Model model, 
+                                 @RequestParam(name = "page", defaultValue = "1") int pageNum,
+                                 @RequestParam(name = "keyword", defaultValue = "", required = false) String keyword) throws Exception {
 
+        int postNum = 10; // 한 페이지에 표시할 상품 개수
+        int pageListCount = 10; // 페이지 하단에 표시할 페이지 번호 개수
+
+        // 상품 목록 페이징 처리
+        Page<ProductEntity> productList = productService.findProductList(pageNum, postNum, keyword);
+        int totalCount = (int) productList.getTotalElements(); // 전체 상품 개수
+
+        // 모델에 데이터 추가
+        model.addAttribute("list", productList.getContent()); // 상품 목록
+        model.addAttribute("totalElement", totalCount);
+        model.addAttribute("postNum", postNum);
+        model.addAttribute("page", pageNum);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("pageList", new PageUtil().getMainPageList(pageNum, postNum, pageListCount, totalCount, keyword));
+        
+        return "shop/main"; 
+    }
+
+	//상품 목록 보기(카테고리 조회)
+	@GetMapping("/shop/list")
+	public String getList(Model model, 
+						@RequestParam("page") int pageNum,
+						@RequestParam(name = "keyword", defaultValue = "", required = false) String keyword,
+						@RequestParam(name = "category1Seqno", defaultValue = "", required = false) Long category1Seqno,
+						@RequestParam(name = "category2Seqno", defaultValue = "", required = false) Long category2Seqno,
+						@RequestParam(name = "category3Seqno", defaultValue = "", required = false) Long category3Seqno) throws Exception {
+		
+		int postNum = 10; // 한 페이지에 표시할 상품 개수
+		int pageListCount = 10; // 페이지 하단에 표시할 페이지 번호 개수
+		
+		// 페이징 처리
+		Page<ProductEntity> list = productService.list(pageNum, postNum, keyword, category1Seqno, category2Seqno, category3Seqno);
+		int totalCount = (int) list.getTotalElements(); // 전체 상품 개수
+		
+		// 모델에 데이터 추가
 		model.addAttribute("list", list);
-		model.addAttribute("listIsEmpty", list.hasContent()?"N":"Y");
+		model.addAttribute("listIsEmpty", list.hasContent() ? "N" : "Y");
 		model.addAttribute("totalElement", totalCount);
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
-		model.addAttribute("category1Seqno", category1Seqno);  
-    	model.addAttribute("category2Seqno", category2Seqno); 
-		model.addAttribute("category3Seqno", category3Seqno); 
-		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword));
+		model.addAttribute("category1Seqno", category1Seqno);
+		model.addAttribute("category2Seqno", category2Seqno);
+		model.addAttribute("category3Seqno", category3Seqno);
+		model.addAttribute("pageList", new PageUtil().getProductList(pageNum, postNum, pageListCount, totalCount, keyword, category1Seqno, category2Seqno, category3Seqno));
+		
+		return "shop/list"; 
 	}
     
     //상품 상세 보기
@@ -89,15 +118,12 @@ public class ShopController {
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("pre_seqno", productService.pre_seqno(productSeqno,keyword));		
 		model.addAttribute("next_seqno", productService.next_seqno(productSeqno,keyword));
-		model.addAttribute("fileListView", productService.fileListView(productSeqno));	
+		model.addAttribute("fileListView", productService.fileListView(productSeqno));
+		
+		// 상품의 옵션과 추가상품을 조회하여 추가
+		model.addAttribute("productOptions", productService.getProductOptions(productSeqno));
+		model.addAttribute("relatedProducts", productService.getRelatedProducts(productSeqno));
     }
-    
-    //@GetMapping("/purchase/cart")
-    //public List<ShoppingCartEntity> getCartItems(Model model, HttpSession session) throws Exception {
-        // String email = (String)session.getAttribute("email");
-		// model.addAttribute("list", shoppingCartService.getCartItems(email));
-		// return null;
-    //}
 
 	// 장바구니 보기
 	@ResponseBody
@@ -165,28 +191,32 @@ public class ShopController {
 		HttpSession session,
 		@RequestParam("toPayOrderProductList")
 		List<Long> toPayOrderProductList,
-		@RequestParam("orderInfo") OrderInfoDTO orderInfo) {
-		String email = (String)session.getAttribute("email");
-	}
+		@RequestParam("orderInfo") OrderInfoDTO orderInfo,
+		@RequestParam("memberAddress") MemberAddressDTO memberAddress,
+		@RequestParam("memberCoupon") MemberCouponDTO memberCoupon,
+		@RequestParam("member") MemberDTO member
+		) {}
 
 
 	// 결제 
     @PostMapping("/purchase/pay")
     public String pay(
-			HttpSession session,
-            @RequestParam("toPayOrderProductList")
-			 List<Long> toPayOrderProductList,
-            @RequestBody OrderInfoDTO orderInfo) {
+		HttpSession session,
+		@RequestParam("toPayOrderProductList")
+		List<Long> toPayOrderProductList,
+		@RequestParam(value = "couponSeqno", required = false) Long couponSeqno,
+		@RequestParam(value = "point", required = false) int point,
+		@RequestBody OrderInfoDTO orderInfo) {
 		String email = (String)session.getAttribute("email");
 		try {
-			shoppingCartService.pay(email, toPayOrderProductList, orderInfo);
+			shoppingCartService.pay(email, toPayOrderProductList,couponSeqno, point, orderInfo);
 			return "{\"message\":\"good\"}";
 		} catch (RuntimeException e) {
 			return "결제 실패: " + e.getMessage();
 		}
     }
 
-	// 결제 취소
+	// 결제 취소 신청
 	@PostMapping("/purchase/cancelToPay")
 	public String cancelToPay(
 			HttpSession session,
@@ -232,7 +262,7 @@ public class ShopController {
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
-		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword));
+		model.addAttribute("pageList", page.getQuestionList(pageNum, postNum, pageListCount,totalCount,keyword));
 	
 	}
 
@@ -331,7 +361,7 @@ public class ShopController {
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
-		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword));
+		model.addAttribute("pageList", page.getReviewList(pageNum, postNum, pageListCount,totalCount,keyword));
 	}
 
 	// 상품 리뷰 상세 보기
