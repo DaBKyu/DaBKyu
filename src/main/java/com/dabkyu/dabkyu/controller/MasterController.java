@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -803,6 +804,7 @@ public class MasterController{
         masterService.cancelOrRefundOrder(orderDetailSeqno, couponSeqno, point, true);
 
         return "{\"message\":\"good\"}";
+    }
       
 
     //매출, //통계 (관심카테고리, 찜목록, 구매) 
