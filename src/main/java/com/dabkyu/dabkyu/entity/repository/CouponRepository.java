@@ -15,5 +15,4 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long> {
    //전체 조회..
    public Page<CouponEntity> findAll(Pageable pageable);
    
-   public CouponEntity findByCouponSeqno(Long couponSeqno);
 }

@@ -7,6 +7,4 @@ import com.dabkyu.dabkyu.entity.Category2Entity;
 
 public interface Category2Repository extends JpaRepository<Category2Entity, Long>{
 
-    public Category2Entity findByCategory2Seqno(Long category2Seqno);
-
 }

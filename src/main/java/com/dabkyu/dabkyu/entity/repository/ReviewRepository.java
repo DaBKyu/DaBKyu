@@ -45,7 +45,4 @@ public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
   @Query("SELECT r FROM ReviewEntity r WHERE r.productSeqno.category3Seqno.category2Seqno.category1Seqno.category1Seqno = :category")
   Page<ReviewEntity> findByCategory(@Param("category") Long category, Pageable pageable);
 
-  public ReviewEntity findByReviewSeqno(Long reviewSeqno);
-
-
 }

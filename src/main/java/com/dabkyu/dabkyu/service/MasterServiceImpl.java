@@ -126,13 +126,13 @@ public class MasterServiceImpl implements MasterService {
     //맴버 이메일로 검색
     @Override
     public MemberDTO getMemberByEmail(String email){
-        return memberRepository.findByEmail(email).map((member)->new MemberDTO(member)).get();
+        return memberRepository.findById(email).map((member)->new MemberDTO(member)).get();
     }
    
     //맴버 등급 수정
     @Override
     public void memberModify(MemberDTO memberDTO) throws Exception{
-        MemberEntity memberEntity = memberRepository.findByEmail(memberDTO.getEmail()).get();
+        MemberEntity memberEntity = memberRepository.findById(memberDTO.getEmail()).get();
         memberEntity.setEmail(memberDTO.getEmail());
         memberEntity.setUsername(memberDTO.getUsername());
         memberEntity.setTelno(memberDTO.getTelno());
@@ -149,7 +149,7 @@ public class MasterServiceImpl implements MasterService {
     //맴버 삭제 
     @Override
     public void clientDelete(String email) throws Exception{
-        memberRepository.deleteByEmail(email);
+        memberRepository.deleteById(email);
     }
 
     //////////상품
@@ -163,7 +163,7 @@ public class MasterServiceImpl implements MasterService {
     //productSeqno로 상품 정보 가져오기
     @Override
     public ProductEntity getProductBySeqno(Long productSeqno) throws Exception {
-        return productRepository.findByProductSeqno(productSeqno);
+        return productRepository.findById(productSeqno).get();
     }
     // 상품 옵션 정보 가져오기
     @Override
@@ -185,7 +185,7 @@ public class MasterServiceImpl implements MasterService {
     // 카테고리 정보 가져오기
     @Override
     public Category3Entity getCategory3ByProduct(Long productSeqno) throws Exception {
-        ProductEntity productEntity = productRepository.findByProductSeqno(productSeqno);
+        ProductEntity productEntity = productRepository.findById(productSeqno).get();
         return productEntity.getCategory3Seqno();
     }
     // 상품 파일 정보 가져오기
@@ -256,8 +256,6 @@ public class MasterServiceImpl implements MasterService {
     //상품 이미지 삭제
     @Override
     public void deleteProductFile(Long productFileSeqno) throws Exception{
-        //ProductEntity productEntity = productRepository.findById(productFileSeqno).get();
-        //productFileRepository.delete(productEntity);
         productFileRepository.deleteById(productFileSeqno);
     }
 
@@ -340,7 +338,7 @@ public class MasterServiceImpl implements MasterService {
     //주문 상태 수정
     @Override
     public void modifyOrderStatus(Long orderSeqno, String newStatus) throws Exception{
-        OrderInfoEntity orderInfoEntity = orderInfoRepository.findByOrderSeqno(orderSeqno);
+        OrderInfoEntity orderInfoEntity = orderInfoRepository.findById(orderSeqno).get();
         orderInfoEntity.setOrderStatus(newStatus);
         orderInfoRepository.save(orderInfoEntity);
     }
@@ -348,18 +346,18 @@ public class MasterServiceImpl implements MasterService {
     //OrderSeqno찾기
     @Override
     public OrderInfoEntity getOrderInfo(Long orderSeqno) throws Exception{
-        return orderInfoRepository.findByOrderSeqno(orderSeqno);
+        return orderInfoRepository.findById(orderSeqno).get();
     }
     //OrderDetail찾기
     @Override
     public List<OrderDetailEntity> getOrderDetails(Long orderSeqno) throws Exception{
-        OrderInfoEntity orderInfoEntity = orderInfoRepository.findByOrderSeqno(orderSeqno);
+        OrderInfoEntity orderInfoEntity = orderInfoRepository.findById(orderSeqno).get();
         return orderDetailRepository.findByOrderSeqno(orderInfoEntity);
     }
     //OrderProduct찾기
     @Override
     public List<OrderProductEntity> getOrderProducts(Long orderSeqno) throws Exception{
-        OrderInfoEntity orderInfoEntity = orderInfoRepository.findByOrderSeqno(orderSeqno);
+        OrderInfoEntity orderInfoEntity = orderInfoRepository.findById(orderSeqno).get();
         return orderDetailRepository.findByOrderSeqno(orderInfoEntity).stream()
             .map(OrderDetailEntity::getOrderProductSeqno) 
             .collect(Collectors.toList());
@@ -433,7 +431,7 @@ public class MasterServiceImpl implements MasterService {
     //문의 queSeqno가져오기
     @Override
     public QuestionEntity getQuestionSeqno(Long queSeqno) throws Exception {
-        return questionRepository.findByQueSeqno(queSeqno);
+        return questionRepository.findById(queSeqno).get();
     }
 
     //문의 답변
@@ -467,7 +465,7 @@ public class MasterServiceImpl implements MasterService {
     //문의 첨부파일 삭제
     @Override 
     public void deleteQuestionFile(Long queSeqno) throws Exception{
-        QuestionEntity questionEntity = questionRepository.findByQueSeqno(queSeqno);
+        QuestionEntity questionEntity = questionRepository.findById(queSeqno).get();
         List<QuestionFileEntity> questionFiles = questionFileRepository.findByQueSeqno(questionEntity);
         for(QuestionFileEntity questionFile : questionFiles){
              /* 
@@ -529,7 +527,7 @@ public class MasterServiceImpl implements MasterService {
         }else if("U".equals(kind)){
             // 카테고리 1 수정
             for (Category1DTO category1DTO : category1DTOs) {
-                Category1Entity category1Entity = category1Repository.findByCategory1Seqno(category1DTO.getCategory1Seqno());
+                Category1Entity category1Entity = category1Repository.findById(category1DTO.getCategory1Seqno()).get();
                 if (category1Entity != null) {
                     category1Entity.setCategory1Name(category1DTO.getCategory1Name());
                     category1Repository.save(category1Entity);
@@ -538,7 +536,7 @@ public class MasterServiceImpl implements MasterService {
 
             // 카테고리 2 수정
             for (Category2DTO category2DTO : category2DTOs) {
-                Category2Entity category2Entity = category2Repository.findByCategory2Seqno(category2DTO.getCategory2Seqno());
+                Category2Entity category2Entity = category2Repository.findById(category2DTO.getCategory2Seqno()).get();
                 if (category2Entity != null) {
                     category2Entity.setCategory2Name(category2DTO.getCategory2Name());
                     category2Repository.save(category2Entity);
@@ -547,7 +545,7 @@ public class MasterServiceImpl implements MasterService {
 
             // 카테고리 3 수정
             for (Category3DTO category3DTO : category3DTOs) {
-                Category3Entity category3Entity = category3Repository.findByCategory3Seqno(category3DTO.getCategory3Seqno());
+                Category3Entity category3Entity = category3Repository.findById(category3DTO.getCategory3Seqno()).get();
                 if (category3Entity != null) {
                     category3Entity.setCategory3Name(category3DTO.getCategory3Name());
                     category3Repository.save(category3Entity);
@@ -638,7 +636,7 @@ public class MasterServiceImpl implements MasterService {
     //couponSeqno가져오기
     @Override
     public CouponEntity getCouponSeqno(Long couponSeqno) throws Exception{
-        return couponRepository.findByCouponSeqno(couponSeqno); // 쿠폰 ID로 쿠폰 엔티티 찾기
+        return couponRepository.findById(couponSeqno).get(); 
     }
     //모든 상품 가져오기
     @Override
@@ -733,7 +731,7 @@ public class MasterServiceImpl implements MasterService {
     //리뷰 첨부파일 삭제
     @Override
     public void deleteReviewFile(Long reviewSeqno) throws Exception{
-        ReviewEntity reviewEntity = reviewRepository.findByReviewSeqno(reviewSeqno);
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewSeqno).get();
         List<ReviewFileEntity> reviewFiles = reviewFileRepository.findByReviewSeqno(reviewEntity);
         for (ReviewFileEntity reviewFile : reviewFiles) {
             /* 

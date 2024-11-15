@@ -24,11 +24,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             @Param("productName") String productName, 
             Pageable pageable);
 
-	//관리자 페이지 상품 리스트(상품코드, 상품명)
-	//public Page<ProductEntity> findByProductSeqnoOrProductNameContaining
-	//	(Long seqno,String keyword,Pageable pageable);
-	public ProductEntity findByProductSeqno(Long productSeqno);
-
 	//public Page<ProductEntity> findByCategory2SeqnoAndProductNameContaining(Long category2Seqno, String productName, Pageable pageable);
 	// 중분류 카테고리 필터링
 	@Query("SELECT p FROM product p " +

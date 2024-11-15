@@ -19,6 +19,4 @@ public interface OrderInfoRepository extends JpaRepository<OrderInfoEntity, Long
 
     public List<OrderInfoEntity> findByOrderStatus(String orderStatus);
 
-    public OrderInfoEntity findByOrderSeqno(Long orderSeqno);
-
 }

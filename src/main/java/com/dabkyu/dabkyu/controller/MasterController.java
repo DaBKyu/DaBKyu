@@ -260,9 +260,9 @@ public class MasterController{
         ProductEntity productEntity = productDTO.dtoToEntity(productDTO);
 
         //카테고리 연결
-        Category1Entity category1 = category1Repository.findByCategory1Seqno(category1Seqno);
-        Category2Entity category2 = category2Repository.findByCategory2Seqno(category2Seqno);
-        Category3Entity category3 = category3Repository.findByCategory3Seqno(category3Seqno);
+        Category1Entity category1 = category1Repository.findById(category1Seqno).get();
+        Category2Entity category2 = category2Repository.findById(category2Seqno).get();
+        Category3Entity category3 = category3Repository.findById(category3Seqno).get();
 
         productDTO.setCategory3Seqno(category3);
 

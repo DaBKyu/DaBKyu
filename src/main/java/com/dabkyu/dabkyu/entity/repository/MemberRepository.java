@@ -29,9 +29,4 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
     public Page<MemberEntity> findByEmailContainingOrUsernameContaining
             (String keyword1,String keyword2,Pageable pageable);
     
-    //이메일로 사용자 정보 불러오기
-    public Optional<MemberEntity> findByEmail(String email);
-
-    //이메일로 사용자 정보 삭제하기
-    public void deleteByEmail(String email);
 }
