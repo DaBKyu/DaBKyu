@@ -63,21 +63,22 @@
         </div>
 
         <!-- 페이지네이션 -->
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center"
-                th:with="startNumber=${T(Math).floor(users.number/10)}*10+1, endNumber=(${users.totalPages} > ${startNumber}+9) ? ${startNumber}+9 : ${users.totalPages}">
-                
-                <li class="page-item" th:classappend="${users.first}?'disabled':''">
-                    <a class="page-link" th:href="@{/userManage(page=${users.number})}" tabindex="-1">이전</a>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <!-- 이전 페이지 버튼 -->
+                <li class="page-item" th:classappend="${page == 1 ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/master/client(page=${page - 1}, keyword=${keyword})}">이전</a>
                 </li>
 
-                <li class="page-item" th:each="page : ${#numbers.sequence(startNumber, endNumber)}" 
-                    th:classappend="${page == users.number+1}?'active':''">
-                    <a class="page-link" th:href="@{/userManage(page=${page-1})}" th:text="${page}">1</a>
+                <!-- 페이지 번호 반복 출력 -->
+                <li class="page-item" th:each="i : ${pageList}" th:classappend="${i == page ? 'active' : ''}">
+                    <a class="page-link" th:href="@{/master/client(page=${i}, keyword=${keyword})}" 
+                       th:text="${i}">1</a>
                 </li>
 
-                <li class="page-item" th:classappend="${users.last}?'disabled':''">
-                    <a class="page-link" th:href="@{/userManage(page=${users.number+2})}">다음</a>
+                <!-- 다음 페이지 버튼 -->
+                <li class="page-item" th:classappend="${page == totalElement / postNum ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/master/client(page=${page + 1}, keyword=${keyword})}">다음</a>
                 </li>
             </ul>
         </nav>

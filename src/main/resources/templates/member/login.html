@@ -17,6 +17,109 @@
   border-radius: 10px;
 }
 </style>
+<script>
+    window.onload = async () => {
+        
+        //쿠키 가져 오기 
+        const getCookie = (name) => {
+            
+            const cookies = document.cookie.split(`; `).map((el)=>el.split('='));
+            let getItem = []; 
+            
+            for(let i=0; i<cookies.length;i++){
+                if(cookies[i][0] === name){
+                    getItem.push(cookies[i][1]);
+                    break;
+                }
+            } 
+            if(getItem.length > 0) {
+                return decodeURIComponent(getItem[0]);
+            }
+        }
+        
+        const session_email = '[[${session.email}]]';
+        if(getCookie('remember-me') !== '' && session_email !== '')
+            document.location.href='/board/list?page=1';
+        
+        let email = getCookie('email');
+        let password = getCookie('password');
+                
+        //email 쿠키가 존재하면...
+        if(email !== undefined){
+            document.querySelector('#rememberEmail').checked = true;
+            document.querySelector('#email').value = email;
+        }else {
+            document.querySelector('#rememberEmail').checked = false;
+        }
+        
+    }
+    
+    const login = () => {
+        document.loginForm.action = '/member/login';
+        document.loginForm.submit();
+    }
+    
+    //로그인 처리
+    const loginCheck = async () => {
+        
+        const email = document.querySelector('#email');
+        const password = document.querySelector('#password');
+                
+        if(email.value === ''){
+            alert("아이디를 입력하세요");
+            email.focus();
+            return false;
+        }
+        
+        if(password.value === ''){
+            alert("암호를 입력하세요");
+            password.focus();
+            return false;
+        }
+        
+        let formData = new FormData();
+        formData.append("email", email.value);
+        formData.append("password", password.value);
+        
+        await fetch('/member/loginCheck',{
+            method: "POST",
+            body: formData
+        }).then((response) => response.json())
+            .then((data) => {
+                if(data.message === 'good'){
+                    cookieManage(email.value,password.value);
+                    login();
+                }else if(data.message === 'ID_NOT_FOUND'){
+                    msg.innerHTML = '존재하지 않는 아이디입니다.';
+                }else if(data.message === 'PASSWORD_NOT_FOUND'){
+                    msg.innerHTML = '잘못된 패스워드입니다.';
+                }else {
+                    alert("시스템 장애로 로그인이 실패 했습니다.");
+                }
+            }).catch((error)=> {
+                console.log("error = " + error);
+            })
+    
+    }
+    
+    
+    //쿠키 관리
+    const cookieManage = (email,password) => {
+        
+        //email가 체크되었을 경우
+        if(rememberEmail.checked) {
+            document.cookie = 'email=' + email + '; path=/; expires=Tue, 31, Dec 2024 23:59:59 GMT';
+        }else {
+            document.cookie = 'email=' + email + '; path=/; max-age=0';
+        }
+        		
+    }
+    
+    const press = () => {
+        if(event.keyCode == 13) loginCheck();
+    }	
+        
+    </script>
 </head>
 <body>
 <div class="ModifyForm" align="center">

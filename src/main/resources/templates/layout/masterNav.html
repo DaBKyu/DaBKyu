@@ -12,28 +12,28 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">상품관리</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" th:href="@{/productManage}">상품관리</a></li>
-                                <li><a class="dropdown-item" th:href="@{/categoryManage}">카테고리 관리</a></li>
-                                <li><a class="dropdown-item" th:href="@{/productUpload}">상품 등록</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/productManage}">상품관리</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/categoryManage}">카테고리 관리</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/productUpload}">상품 등록</a></li>
                             </ul>
                         </li>
         
                         <!-- 회원관리 -->
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/userManage}">회원관리</a>
+                            <a class="nav-link" th:href="@{/master/client?page=1}">회원관리</a>
                         </li>
         
                         <!-- 배송관리 -->
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/deliveryManage}">배송관리</a>
+                            <a class="nav-link" th:href="@{/master/deliveryManage}">배송관리</a>
                         </li>
         
                         <!-- 문의/리뷰목록 Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">문의/리뷰목록</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" th:href="@{/qnaList}">문의 목록</a></li>
-                                <li><a class="dropdown-item" th:href="@{/reviewList}">리뷰 목록</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/qnaList}">문의 목록</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/reviewList}">리뷰 목록</a></li>
                             </ul>
                         </li>
         
@@ -41,8 +41,8 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" th:href="@{/mailList}">메일 발송 목록</a></li>
-                                <li><a class="dropdown-item" th:href="@{/mailSend}">메일 발송</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/mailList}">메일 발송 목록</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/mailSend}">메일 발송</a></li>
                             </ul>
                         </li>
         
@@ -50,8 +50,8 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">쿠폰</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" th:href="@{/couponMake}">쿠폰 생성</a></li>
-                                <li><a class="dropdown-item" th:href="@{/couponList}">생성된 쿠폰 리스트</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/couponMake}">쿠폰 생성</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/couponList}">생성된 쿠폰 리스트</a></li>
                             </ul>
                         </li>
         

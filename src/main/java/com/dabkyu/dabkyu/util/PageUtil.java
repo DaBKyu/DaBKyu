@@ -353,16 +353,16 @@ public class PageUtil {
 			for(int i=1;i<=pageListCount;i++) {
 
 				if(section >1 && i ==1)
-					pageList += " <a href=/manageBack/client?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
-					+ "&addrSearch=" + keyword + ">◀</a>";
+					pageList += " <a href=/master/client?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
+					+ "&keyword=" + keyword + ">◀</a>";
 				if(totalPage < (section-1)*pageListCount+i) { break; } 
 				if(pageNum != (section-1)*pageListCount +i)
-					pageList += " <a href=/manageBack/client?page=" + Integer.toString((section-1)*pageListCount+i) 
-							+ "&addrSearch=" + keyword + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
+					pageList += " <a href=/master/client?page=" + Integer.toString((section-1)*pageListCount+i) 
+							+ "&keyword=" + keyword + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
 				else 
 					pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
 				if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
-					pageList += " <a href=/manageBack/client?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
+					pageList += " <a href=/master/client?page=" + Integer.toString(section*pageListCount+1) + "&keyword=" + keyword + ">▶</a>";				
 			}			
 		}		
 		return pageList;
