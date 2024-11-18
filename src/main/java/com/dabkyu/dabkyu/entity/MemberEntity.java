@@ -72,7 +72,7 @@ public class MemberEntity {
     @Column(name="pwcheck",nullable=false)
 	private int pwcheck;
 
-    @Column(name="point",nullable=true)
+    @Column(name="point")
 	private int point;
 
     // @Column(name="my_categories",length=200,nullable=true)
@@ -93,7 +93,7 @@ public class MemberEntity {
 	@Column(name="authkey",length=200,nullable=false)
 	private String authkey;
 
-	@Column(name="total_pvalue",nullable=true)
+	@Column(name="total_pvalue")
 	private int totalPvalue;
 	
 	public void modifyMemberInfo(MemberDTO dto) {

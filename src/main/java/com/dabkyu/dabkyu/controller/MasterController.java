@@ -182,9 +182,9 @@ public class MasterController{
 		    model.addAttribute("postNum", postNum);
 		    model.addAttribute("page", pageNum);
 		    model.addAttribute("productName", productName);
-        model.addAttribute("category1Seqno", category1Seqno);
-        model.addAttribute("category2Seqno", category2Seqno);
-        model.addAttribute("category3Seqno", category3Seqno);
+            model.addAttribute("category1Seqno", category1Seqno);
+            model.addAttribute("category2Seqno", category2Seqno);
+            model.addAttribute("category3Seqno", category3Seqno);
 		    model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,productName));
     }
     
