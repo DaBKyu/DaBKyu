@@ -12,18 +12,47 @@ import org.springframework.stereotype.Service;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ReportDTO;
+import com.dabkyu.dabkyu.entity.Category1Entity;
+import com.dabkyu.dabkyu.entity.Category2Entity;
+import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.repository.Category1Repository;
+import com.dabkyu.dabkyu.entity.repository.Category2Repository;
+import com.dabkyu.dabkyu.entity.repository.Category3Repository;
 import com.dabkyu.dabkyu.entity.repository.ProductRepository;
 import com.dabkyu.dabkyu.entity.repository.ReportRepository;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Service
 @AllArgsConstructor
+@Log4j2
 public class ProductServiceImpl implements ProductService{
 
     private final ProductRepository productRepository;
     private final ReportRepository reportRepository;
+	private final Category1Repository category1Repository;
+	private final Category2Repository category2Repository;
+	private final Category3Repository category3Repository;
+
+	//전체 카테고리1 목록 보기
+	@Override
+	public List<Category1Entity> category1List() throws Exception {
+		return category1Repository.findAll();
+	}
+
+	//전체 카테고리2 목록 보기
+	@Override
+	public List<Category2Entity> category2List() throws Exception {
+		return category2Repository.findAll();
+	}
+
+	//전체 카테고리3 목록 보기
+	@Override
+	public List<Category3Entity> category3List() throws Exception {
+		return category3Repository.findAll();
+	}
 
 	// 상품 목록 보기
 	@Override

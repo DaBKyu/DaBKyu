@@ -1,46 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>로그인 페이지</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <style>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 화면 높이만큼 설정하여 수직 중앙 정렬 */
+    margin: 0;
+}
 .ModifyForm {
-  width:400px;
-  height:auto;
-  margin: auto;
-  padding: 20px, 20px;
-  text-align: left;
-  background-color:#FFFFFF;
-  text-align: center;
-  border:2px solid #adabab;
-  border-radius: 10px;
+    margin: auto;
+    padding: 20px;
+    border:2px solid #adabab;
+    border-radius: 10px;
+    margin-top: 40px;
+}
+.input_field{
+    width: 300px;
+    height: 25px;
+    border-radius: 6px;
+    border:1px solid #adabab;
+    margin-bottom: 10px;
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<script>
+    const loginCheck = async () => {
+		
+		let email = document.querySelector('#email');
+		let password = document.querySelector('#password');
+		let rememberMe = document.querySelector('#rememberMe');
+		
+		if(email.value === ''){
+			alert('이메일을 입력하세요.');
+			email.focus();
+			return false; //false를 안 적으면 함수 실행을 종료
+		}
+		
+	    if(password.value === ''){
+	    	alert('비밀번호를 입력하세요.');
+	    	password.focus();
+	    	return false;
+	    }
+	
+		let autoLoginCheck = rememberMe.checked === true?'O':'X';
+
+		let formData = new FormData();
+		formData.append("email", email.value);
+		formData.append("password", password.value);
+		formData.append("autoLoginCheck", autoLoginCheck);
+
+		fetch('/member/login',{
+			method : 'POST',
+			body : formData
+		}).then((response) => response.json())
+		  .then((data) => {
+			 console.log("data = " + data); 
+			 if(data.message !== ''){
+				
+				 cookieManage(email.value,password.value,data.message,data.authKey);				 
+				 if(data.role === 'USER')
+				 	document.location.href='/shop/main?page=1';
+				 else 
+					document.location.href='/master/main?page=1';
+				 
+			} else if(data.message === 'ID_NOT_FOUND') {
+				 	message.innerHTML = '<br><br>존재하지 않는 이메일입니다.';
+			} else if(data.message === 'PASSWORD_NOT_FOUND') {
+					message.innerHTML = '<br><br>잘못된 패스워드입니다.';
+			} else {
+				alert("시스템 장애로 로그인이 실패 했습니다.");		 
+			}		  
+	    }).catch((error)=> { console.log("error = " + error);} );
+	    
+	}
+    const press = () => {
+		if(event.keyCode == 13) loginCheck(); 
+	}
+</script>
 </head>
 <body>
 <div class="ModifyForm" align="center">
+    
     <div class="WriteForm">
         <h1>로그인</h1>
         <form name="loginForm" id="loginForm" method="post">
             <!-- 아이디 기억 체크박스 -->
-            <input type="checkbox" id="rememberEmail" onclick="checkRememberEmail()" style="margin-left:-207px;">아이디 기억<br>
-            
+            <input type="checkbox" id="rememberEmail" onclick="checkRememberEmail()" style="margin-left:-30px;">아이디 기억
+            <!-- 자동 로그인 체크박스 -->
+            <input type="checkbox" id="rememberMe" onclick="checkRememberMe()" style="margin-left:20px;">로그인 상태 유지<br>
             <!--패스워드 기억 체크박스<input type="checkbox" id="rememberPassword" onclick="checkRememberPassword()">-->
 
             <!-- 이메일 입력란 -->
-            <input type="text" class="input_field" id="email" name="email" placeholder="Email" style="width: 300px; height: 40px; border-radius: 5px; border: 1px solid; margin-bottom: 2px;"><br>
+            <input type="text" class="input_field" id="email" name="email" placeholder="이메일을 입력하세요." style="width: 300px; height: 40px; border-radius: 5px; border: 1px solid; margin-bottom: 5px; margin-top: 5px;"><br>
 
             <!-- 패스워드 입력란 -->
-            <input type="password" class="input_field" id="password" name="password" placeholder="password" style="width: 300px; height: 40px; border-radius: 5px; border: 1px solid;" onkeydown="press()"><br>
-            
-            <!-- 자동 로그인 체크박스 -->
-            <input type="checkbox" id="rememberMe" class="remember" name="remember-me" onclick="checkRememberMe()" style="margin-left:-168px;">로그인 상태 유지<br>
+            <input type="password" class="input_field" id="password" name="password" placeholder="패스워드를 입력하세요." style="width: 300px; height: 40px; border-radius: 5px; border: 1px solid;" onkeydown="press()"><br>
+        
             
             <p id="msg" style="color:red; text-align:center"></p>
             <!-- 로그인 버튼 -->
             <input type="button" id="btn_login" class="btn_login" value="Login" onclick="loginCheck()" style="width: 300px; height: 40px; margin-bottom: 20px; background-color: black; color: white; border-radius: 5px; border: 1px solid black;">
-
             <br>
 
             <a href="/oauth2/authorization/google" class="btn_login" style="display: inline-block; width: 300px; height: 40px; margin-bottom: 5px; text-align: center; line-height: 40px; text-decoration: none; border-radius: 5px; border: 1px solid black;">
@@ -57,11 +122,11 @@
         
         <div class="bottomText">
             <a href="/src/main/resources/templates/member/signup.html" style="text-decoration: none;" onmouseover="this.style.background='#e3e3e3';"
-            onmouseout="this.style.background='white'; this.style.textDecoration='none';">회원가입</a>
+            onmouseout="this.style.background='white'; this.style.textDecoration='none';">회원가입</a><a> | </a>
             <a href="/src/main/resources/templates/member/searchID.html" 
                style="text-decoration: none;" 
                onmouseover="this.style.background='#e3e3e3'; this.style.textDecoration='none';" 
-               onmouseout="this.style.background='white'; this.style.textDecoration='none';">아이디 찾기</a>
+               onmouseout="this.style.background='white'; this.style.textDecoration='none';">아이디 찾기</a><a> | </a>
             <a href="/src/main/resources/templates/member/searchpwd.html" 
                style="text-decoration: none;" 
                onmouseover="this.style.background='#e3e3e3'; this.style.textDecoration='none';" 

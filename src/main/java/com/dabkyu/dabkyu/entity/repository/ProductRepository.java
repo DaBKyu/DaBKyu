@@ -25,7 +25,10 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
 	//전체 상품 목록 보기
     public Page<ProductEntity> findByProductNameContaining(String productName, Pageable pageable);
- 
+
+	
+
+	
     //상품 이전 보기
 	@Query("select max(p.productSeqno) from product p " 
 			+ "where p.productSeqno < :productSeqno and "

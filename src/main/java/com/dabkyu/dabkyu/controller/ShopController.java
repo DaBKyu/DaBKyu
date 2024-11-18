@@ -3,10 +3,12 @@ package com.dabkyu.dabkyu.controller;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -27,6 +29,9 @@ import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.ReviewDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
+import com.dabkyu.dabkyu.entity.Category1Entity;
+import com.dabkyu.dabkyu.entity.Category2Entity;
+import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.MemberReviewLikeEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.dto.ReportDTO;
@@ -43,10 +48,12 @@ import com.dabkyu.dabkyu.util.PageUtil;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 
 @Controller
 @AllArgsConstructor
+@Log4j2
 public class ShopController {
 
     private final ProductService productService;
@@ -54,56 +61,100 @@ public class ShopController {
 	private final MemberService memberService;
 	private final QuestionService questionService;
 	private final ReviewService reviewService;
+	
+	//사이드바 카테고리 목록 보기
+	@GetMapping("/shop/main")
+	public void getMain(Model model) throws Exception {
+		List<Category1Entity> list = productService.category1List();
+		List<Category2Entity> list2 = productService.category2List();
+		List<Category3Entity> list3 = productService.category3List();
 
-    //상품 목록 보기
-    @GetMapping("/shop/list")
-    public void getList(Model model,@RequestParam("page") int pageNum,
-			@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
-			@RequestParam(name = "category1Seqno",defaultValue = "", required = false) Long category1Seqno,
-			@RequestParam(name = "category2Seqno",defaultValue = "", required = false) Long category2Seqno,
-			@RequestParam(name = "category3Seqno",defaultValue = "", required = false) Long category3Seqno) throws Exception {
-		
-		int postNum = 10; 
-		int pageListCount = 10; 
-		
-		PageUtil page = new PageUtil();
-		Page<ProductEntity> list = productService.list(pageNum, postNum, keyword, category1Seqno, category2Seqno, category3Seqno);
-		
-		int totalCount = (int)list.getTotalElements();
+		// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
+    	list2 = list2.stream()
+					.sorted(Comparator.comparingLong(Category2Entity::getCategory2Seqno)) // category2Seqno 기준 오름차순 정렬
+					.collect(Collectors.toList()); // 다시 리스트로 수집
 
 		model.addAttribute("list", list);
-		model.addAttribute("listIsEmpty", list.hasContent()?"N":"Y");
-		model.addAttribute("totalElement", totalCount);
-		model.addAttribute("postNum", postNum);
-		model.addAttribute("page", pageNum);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("category3Seqno", category3Seqno); 
-		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword));
+		model.addAttribute("list2", list2);
+		model.addAttribute("list3", list3);
 	}
-    
-    //상품 상세 보기
+
+
+	//카테고리별 상품 보기
+	@GetMapping("/shop/list")
+	public void getList(Model model) throws Exception {
+		List<Category1Entity> list = productService.category1List();
+		List<Category2Entity> list2 = productService.category2List();
+		List<Category3Entity> list3 = productService.category3List();
+
+		// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
+    	list2 = list2.stream()
+					 .sorted(Comparator.comparingLong(Category2Entity::getCategory2Seqno)) // category2Seqno 기준 오름차순 정렬
+					 .collect(Collectors.toList()); // 다시 리스트로 수집
+
+		model.addAttribute("list", list);
+		model.addAttribute("list2", list2);
+		model.addAttribute("list3", list3);
+	}
+
+	//상품페이지
 	@GetMapping("/shop/view")
-	public void getView(@RequestParam("productSeqno") Long productSeqno, @RequestParam("page") int pageNum,
-			@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
-			Model model, HttpSession session) throws Exception {
+	public void getProduct(Model model) throws Exception {
+		List<Category1Entity> list = productService.category1List();
+		model.addAttribute("list", list);
+	}
+	
+	// //상품 목록 보기
+	// @GetMapping("/shop/list")
+	// public void getList(Model model,@RequestParam("page") int pageNum,
+	// 		@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
+	// 		@RequestParam(name = "category1Seqno",defaultValue = "", required = false) Long category1Seqno,
+	// 		@RequestParam(name = "category2Seqno",defaultValue = "", required = false) Long category2Seqno,
+	// 		@RequestParam(name = "category3Seqno",defaultValue = "", required = false) Long category3Seqno) throws Exception {
+		
+	// 	int postNum = 10; 
+	// 	int pageListCount = 10; 
+		
+	// 	PageUtil page = new PageUtil();
+	// 	Page<ProductEntity> list = productService.list(pageNum, postNum, keyword, category1Seqno, category2Seqno, category3Seqno);
+	// 	log.info(list);
+		
+	// 	int totalCount = (int)list.getTotalElements();
 
-		//String sessionEmail = (String)session.getAttribute("email");
-
-        model.addAttribute("view", productService.view(productSeqno));
-		model.addAttribute("page", pageNum);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("pre_seqno", productService.pre_seqno(productSeqno,keyword));		
-		model.addAttribute("next_seqno", productService.next_seqno(productSeqno,keyword));
-		model.addAttribute("fileListView", productService.fileListView(productSeqno));	
-    }
+	// 	model.addAttribute("list", list);
+	// 	model.addAttribute("listIsEmpty", list.hasContent()?"N":"Y");
+	// 	model.addAttribute("totalElement", totalCount);
+	// 	model.addAttribute("postNum", postNum);
+	// 	model.addAttribute("page", pageNum);
+	// 	model.addAttribute("keyword", keyword);
+	// 	model.addAttribute("category1Seqno", category1Seqno);  
+	// 	model.addAttribute("category2Seqno", category2Seqno); 
+	// 	model.addAttribute("category3Seqno", category3Seqno); 
+	// 	model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword));
+	// }
     
-	// 장바구니 보기
-    @GetMapping("/purchase/cart")
-    public List<ShoppingCartEntity> getCartItems(Model model, HttpSession session) throws Exception {
-        String email = (String)session.getAttribute("email");
-		model.addAttribute("list", shoppingCartService.getCartItems(email));
-		return null;
-    }
+    // //상품 상세 보기
+	// @GetMapping("/shop/view")
+	// public void getView(@RequestParam("productSeqno") Long productSeqno, @RequestParam("page") int pageNum,
+	// 		@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
+	// 		Model model, HttpSession session) throws Exception {
+
+	// 	//String sessionEmail = (String)session.getAttribute("email");
+    //     model.addAttribute("view", productService.view(productSeqno));
+	// 	model.addAttribute("page", pageNum);
+	// 	model.addAttribute("keyword", keyword);
+	// 	model.addAttribute("pre_seqno", productService.pre_seqno(productSeqno,keyword));		
+	// 	model.addAttribute("next_seqno", productService.next_seqno(productSeqno,keyword));
+	// 	model.addAttribute("fileListView", productService.fileListView(productSeqno));	
+    // }
+    
+	// // 장바구니 보기
+    // @GetMapping("/purchase/cart")
+    // public List<ShoppingCartEntity> getCartItems(Model model, HttpSession session) throws Exception {
+    //     String email = (String)session.getAttribute("email");
+	// 	model.addAttribute("list", shoppingCartService.getCartItems(email));
+	// 	return null;
+    // }
 
     // 장바구니에 상품 추가
     @PostMapping("/purchase/addcart")
