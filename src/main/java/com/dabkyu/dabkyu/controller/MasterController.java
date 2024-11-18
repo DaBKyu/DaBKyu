@@ -187,6 +187,7 @@ public class MasterController{
         model.addAttribute("category3Seqno", category3Seqno);
 		    model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,productName));
     }
+    
 
     //상품 상세보기 
     @GetMapping("/master/getProductDetail/{productSeqno}")
@@ -388,6 +389,7 @@ public class MasterController{
     }
 
     //주문내역 리스트
+     
     @GetMapping("/master/order")
     public void getOrderList(Model model, 
                             @RequestParam("page") int pageNum, 
@@ -410,6 +412,7 @@ public class MasterController{
         model.addAttribute("category", category);
         model.addAttribute("pageList", page.getPageOrder(pageNum, postNum, pageListCount,totalCount,productname,category));
     }
+        
 
     //주문내역 상세보기
     @GetMapping("/master/orederView/{orderSeqno}")
@@ -580,7 +583,7 @@ public class MasterController{
         masterService.deleteQueComment(questionEntity); 
     }
 
-    //리뷰 리스트 화면
+    //리뷰 리스트 화면 
     @GetMapping("/master/reviewList")
     public void getReviewList(Model model, @RequestParam("page") int pageNum, 
                 @RequestParam(name="category",defaultValue="",required=false) Long category) 
@@ -599,7 +602,7 @@ public class MasterController{
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", category);
 		model.addAttribute("pageList", page.getPageReview(pageNum, postNum, pageListCount,totalCount,category));
-    }
+    } 
 
     //리뷰 상세보기
     @GetMapping("/master/review/{reviewSeqno}")
@@ -823,6 +826,17 @@ public class MasterController{
 
         return "{\"message\":\"good\"}";
     }
+
+    //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
+    @PostMapping("/master/ExpiredUpdate")
+    public String updateExpiredCoupons() {
+        LocalDateTime referenceDate = LocalDateTime.now();
+        
+        masterService.setExpiredCouponsToExpired(referenceDate);
+
+        return "{\"message\":\"good\"}";
+    }
+
 }
 
 

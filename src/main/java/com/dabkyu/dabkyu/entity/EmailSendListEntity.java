@@ -9,8 +9,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
@@ -18,6 +20,8 @@ import lombok.Setter;
 @Builder
 @Entity(name="emailSendList")
 @Table(name="email_send_list")
+@NoArgsConstructor
+@AllArgsConstructor
 public class EmailSendListEntity {
 
     @Id

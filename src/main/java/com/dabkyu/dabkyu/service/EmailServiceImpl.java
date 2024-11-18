@@ -25,17 +25,10 @@ public class EmailServiceImpl implements EmailService {
     public void sendMail(String[] recipients, String subject, String content, MultipartFile[] attachments) {
         MimeMessage message = emailSender.createMimeMessage();
         try {
-
-            // EmailDataProvider에서 이메일 정보 가져오기
-            //EmailDetails emailDetails = EmailDataProvider.getEmailDetails();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
             // 이메일 내용 설정
-            //helper.setTo(emailDetails.getRecipients());
-            //helper.setSubject(emailDetails.getSubject());
-            //helper.setText(emailDetails.getContent());
-
-            // 이메일 내용 설정
+            helper.setFrom("nayoungtest99@gmail.com");
             helper.setTo(recipients);
             helper.setSubject(subject);
             helper.setText(content);

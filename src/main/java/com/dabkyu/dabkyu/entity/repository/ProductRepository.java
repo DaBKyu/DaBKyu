@@ -59,7 +59,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 			@Param("keyword") String keyword);
 
 	//관리자페이지 상품리스트
-	@Query("SELECT p FROM ProductEntity p " +
+	@Query("SELECT p FROM product p " +
            "JOIN p.category3Seqno c3 " +
            "JOIN c3.category2Seqno c2 " +
            "JOIN c2.category1Seqno c1 " +

@@ -7,8 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
@@ -16,6 +18,8 @@ import lombok.Setter;
 @Entity(name="category1")
 @Table(name="category1")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Category1Entity {
 
     @Id
