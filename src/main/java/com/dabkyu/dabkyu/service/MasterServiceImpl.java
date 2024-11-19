@@ -117,7 +117,7 @@ public class MasterServiceImpl implements MasterService {
     //맴버 리스트 보기
     @Override
     public Page<MemberEntity> memberList(int pageNum, int postNum, String keyword, String memberGrade) throws Exception {
-        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Sort.Direction.DESC, "joinDate"));
+        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Sort.Direction.DESC, "username"));
         if (memberGrade != null && !memberGrade.isEmpty()) {
             return memberRepository.findByMemberGrade(memberGrade.toUpperCase(), pageRequest); // 등급 필터링 추가
         } else {
