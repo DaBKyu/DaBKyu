@@ -102,14 +102,15 @@ public class MasterController{
     @GetMapping("/master/client")
     public void getClient(Model model, 
                 @RequestParam("page") int pageNum,
-                @RequestParam(name="keyword",defaultValue="",required=false) String keyword) 
+                @RequestParam(name="keyword",defaultValue="",required=false) String keyword,
+                @RequestParam(name="memberGrade",defaultValue="",required=false) String memberGrade) 
                 throws Exception {
        
         int postNum = 15; //한 화면에 보여지는 게시물 행의 갯수
 		int pageListCount = 10; //화면 하단에 보여지는 페이지리스트의 페이지 갯수	
 		
 		PageUtil page = new PageUtil();
-		Page<MemberEntity> clientList = masterService.memberList(pageNum, postNum, keyword);
+		Page<MemberEntity> clientList = masterService.memberList(pageNum, postNum, keyword, memberGrade);
 		int totalCount = (int)clientList.getTotalElements();
 
 		model.addAttribute("list", clientList);
@@ -118,6 +119,7 @@ public class MasterController{
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
+		model.addAttribute("memberGrade", memberGrade);
 		model.addAttribute("pageList", page.getPageClient(pageNum, postNum, pageListCount,totalCount,keyword));
     }
 

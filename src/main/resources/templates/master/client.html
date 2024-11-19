@@ -37,12 +37,12 @@
             </div>
             <!-- 등급 선택 -->
             <div class="p-2">
-                <select class="form-select w-auto" id="selectgrade" aria-label="회원등급 선택">
+                <select class="form-select w-auto" id="memberGrade" name="memberGrade" aria-label="회원등급 선택">
                     <option value="">전체 등급</option>
-                    <option value="PLATINUM">PLATINUM</option>
-                    <option value="GOLD">GOLD</option>
-                    <option value="SILVER">SILVER</option>
-                    <option value="BRONZE">BRONZE</option>
+                    <option value="Platinum">Platinum</option>
+                    <option value="Gold">Gold</option>
+                    <option value="Silver">Silver</option>
+                    <option value="Bronze">Bronze</option>
                 </select>
             </div>
         </div>
@@ -90,37 +90,29 @@
         </div>
 
         <!-- 페이지네이션 -->
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <!-- 이전 페이지 버튼 -->
-                <li class="page-item" th:classappend="${page == 1 ? 'disabled' : ''}">
-                    <a class="page-link" th:href="@{/master/client(page=${page - 1}, keyword=${keyword})}">이전</a>
-                </li>
+        <div class="mt-4" th:text="${pageList}"></div>
 
-                <!-- 페이지 번호 반복 출력 -->
-                <li class="page-item" th:each="i : ${pageList}" th:classappend="${i == page ? 'active' : ''}">
-                    <a class="page-link" th:href="@{/master/client(page=${i}, keyword=${keyword})}" 
-                       th:text="${i}">1</a>
-                </li>
-
-                <!-- 다음 페이지 버튼 -->
-                <li class="page-item" th:classappend="${page == totalElement / postNum ? 'disabled' : ''}">
-                    <a class="page-link" th:href="@{/master/client(page=${page + 1}, keyword=${keyword})}">다음</a>
-                </li>
-            </ul>
-        </nav>
     </div>
     
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
-        var selectgrade = document.getElementById('selectgrade');
+        var selectgrade = document.getElementById('memberGrade');
         var checkAll = document.getElementById('checkAll');
         var deleteButton = document.getElementById('deleteButton');
         var sendMailButton = document.getElementById('sendMailButton');
 
         selectgrade.addEventListener('change', function() {
-            var selectedGrade = this.value;
-            window.location.href = '/master/client?page=1&memberGrade=' + selectedGrade;
+            const selectedGrade = this.value;
+            const rows = document.querySelectorAll('table tbody tr');
+            
+            rows.forEach(row => {
+            const grade = row.querySelector('td:nth-child(6)').textContent.trim(); // 6번째 열이 회원등급
+            if (selectedGrade === "" || grade === selectedGrade) {
+                row.style.display = ''; // 등급이 일치하면 보이기
+            } else {
+                row.style.display = 'none'; // 등급이 일치하지 않으면 숨기기
+            }
+            });
         });
 
         checkAll.addEventListener('change', function() {
