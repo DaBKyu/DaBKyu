@@ -162,39 +162,40 @@ public class PageUtil {
 		}
 		return pageList;
 	}
+
+	// 메일발송내역 페이지
+	public String getMailSendPageList(int pageNum, int postNum, int pageListCount, int totalCount, String keyword) {
+
+		int totalPage = (int)Math.ceil(totalCount/(double)postNum);  // 전체 페이지 수
+		int totalSection = (int)Math.ceil(totalPage/(double)pageListCount);  // 전체 섹션 수
+		int section = (int)Math.ceil(pageNum/(double)pageListCount);  // 현재 섹션 번호
+		String pageList = "";
 	
-
-    // 페이지 목록 생성
-    public String getMailSendPageList(int pageNum, int postNum, int pageListCount, long totalCount) {
-        int totalPage = (int) Math.ceil(totalCount / (double) postNum);
-        int totalSection = (int) Math.ceil(totalPage / (double) pageListCount);
-        int section = (int) Math.ceil(pageNum / (double) pageListCount);
-        String pageList = "";
-
-        if (totalPage != 1) {
-            for (int i = 1; i <= pageListCount; i++) {
-                // ◀ 출력조건
-                if (section > 1 && i == 1)
-                    pageList += " <a href=/mailSendList?page=" + Integer.toString((section - 2) * pageListCount + pageListCount) + ">◀</a>";
-                // 페이지 출력 중단
-                if (totalPage < (section - 1) * pageListCount + i) {
-                    break;
-                }
-                // 페이지 번호 출력
-                if (pageNum != (section - 1) * pageListCount + i)
-                    pageList += " <a href=/mailSendList?page=" + Integer.toString((section - 1) * pageListCount + i) + ">" + Integer.toString((section - 1) * pageListCount + i) + "</a>";
-                else
-                    pageList += " <span style='font-weight: bold'>" + Integer.toString((section - 1) * pageListCount + i) + "</span>";
-                // ▶ 출력조건
-                if (i == pageListCount && totalSection > 1 && totalPage >= i + (section - 1) * pageListCount + 1)
-                    pageList += " <a href=/mailSendList?page=" + Integer.toString(section * pageListCount + 1) + ">▶</a>";
-            }
-        }
-
-        return pageList;
-    }
-
-
+		if(totalPage > 1) {
+	
+			for(int i = 1; i <= pageListCount; i++) {
+				// 1. ◀ 출력조건 (section 값이 1보다 커야함)
+				if(section > 1 && i == 1)
+					pageList += " <a href='/mail/mailSendList?page=" + Integer.toString((section - 2) * pageListCount + pageListCount)
+							+ "&keyword=" + keyword + "'>◀</a>";
+	
+				// 2. 페이지 출력 중단 (전체 페이지가 범위를 벗어나면 중단)
+				if(totalPage < (section - 1) * pageListCount + i) { break; }
+	
+				// 3. 현재 페이지와 같으면 링크를 붙이지 않음, 다르면 다른 페이지로 이동할 수 있는 링크를 붙임
+				if(pageNum != (section - 1) * pageListCount + i)
+					pageList += " <a href='/mail/mailSendList?page=" + Integer.toString((section - 1) * pageListCount + i)
+							+ "&keyword=" + keyword + "'>" + Integer.toString((section - 1) * pageListCount + i) + "</a>";
+				else
+					pageList += " <span style='font-weight: bold'>" + Integer.toString((section - 1) * pageListCount + i) + "</span>";
+	
+				// 4. ▶ 출력조건 (section이 1 이상일 때, 페이지리스트의 끝에서 출력)
+				if(i == pageListCount && totalSection > 1 && totalPage >= i + (section - 1) * pageListCount + 1)
+					pageList += " <a href='/mail/mailSendList?page=" + Integer.toString(section * pageListCount + 1) + "&keyword=" + keyword + "'>▶</a>";
+			}
+		}
+		return pageList;
+	}
 
     // 주문 목록 페이지
 	public String getOrderList(int pageNum, int orderNum, int pagelistNum, int totalCount, String keyword) {

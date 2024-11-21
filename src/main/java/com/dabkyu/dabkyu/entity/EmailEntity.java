@@ -18,21 +18,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@Entity(name="emailSendList")
-@Table(name="email_send_list")
+@Entity(name="email")
+@Table(name="email")
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailSendListEntity {
+public class EmailEntity {
 
     @Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EMAILSENDLIST_SEQ")	
-	@SequenceGenerator(name="EMAILSENDLIST_SEQ", sequenceName = "emailsendlist_seq", 
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EMAIL_SEQ")	
+	@SequenceGenerator(name="EMAIL_SEQ", sequenceName = "email_seq", 
 		initialValue = 1, allocationSize = 1)
-	@Column(name="email_sendlist_seqno")
-	private Long emailSendlistSeqno;
-	
-	@Column(name="target_category", length=50, nullable=false)
-	private String targetCategory;
+	@Column(name="email_seqno")
+	private Long emailSeqno;
 
     @Column(name="email_title", length=200, nullable=false)
 	private String emailTitle;

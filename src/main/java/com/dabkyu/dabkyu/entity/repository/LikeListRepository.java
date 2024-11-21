@@ -25,4 +25,10 @@ public interface LikeListRepository extends JpaRepository<LikeListEntity,LikeLis
     );
 
     public List<LikeListEntity> findByProductSeqno_ProductSeqno(Long productSeqno);
+
+    @Query("SELECT DISTINCT ll.email " +
+           "FROM likeList ll " +
+           "WHERE ll.productSeqno.productSeqno IN :productSeqnoList " +
+           "AND ll.email.emailRecept = 'Y'")
+    public List<MemberEntity> findMembersByProductSeqnoList(@Param("productSeqnoList") List<Long> productSeqnoList);
 }
