@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -83,22 +84,15 @@ import oracle.jdbc.proxy.annotation.Post;
 @AllArgsConstructor
 public class MasterController{
 
-    private final MemberRepository memberRepository;
-    private final ProductRepository productRepository;
-    private final ProductFileRepository productFileRepository;
     private final MasterService masterService;
     private final QuestionService questionService;
     private final ReviewService reviewService;
-    private final CouponRepository couponRepository;
-    private final Category1Repository category1Repository;
-    private final Category2Repository category2Repository;
-    private final Category3Repository category3Repository;
     
     //메인페이지
     @GetMapping("/master") 
     public void getMaster() {}
 
-    //고객정보페이지 //등급으로 필터링? 다시 한 번 확인 필요 
+    //고객정보페이지
     @GetMapping("/master/client")
     public void getClient(Model model, 
                 @RequestParam("page") int pageNum,
@@ -128,7 +122,7 @@ public class MasterController{
  
 		masterService.clientDelete(email); 
 
-		return "redirect:/"; ////
+		return "redirect:/master/client"; 
     }
 
     //고객정보 수정 화면보기
@@ -147,18 +141,6 @@ public class MasterController{
         return "redirect:/master/client"; 
     }
 
-
-
-
-
-    //이메일 발송
-    // @PostMapping("/send")
-    // public String sendEmail(@RequestBody EmailRequest emailRequest) {
-    //     emailService.sendEmail(emailRequest.getTo(), emailRequest.getSubject(), emailRequest.getBody());
-    //     return "Email sent successfully!";
-    // } 
-
-    
     //상품 리스트 화면보기 
     @GetMapping("/master/productList")
     public void getProductList(Model model, 
@@ -174,37 +156,51 @@ public class MasterController{
 
         PageUtil page = new PageUtil();
         Page<ProductEntity> productList = masterService.productList(category1Seqno, category2Seqno, category3Seqno, productName, pageRequest);
+
         int totalCount = (int)productList.getTotalElements();
 
-        model.addAttribute("list", productList);
-		    model.addAttribute("listIsEmpty", productList.hasContent()?"N":"Y");
-		    model.addAttribute("totalElement", totalCount);
-		    model.addAttribute("postNum", postNum);
-		    model.addAttribute("page", pageNum);
-		    model.addAttribute("productName", productName);
+        List<ProductFileDTO> thumbnailFiles = new ArrayList<>(); //썸네일 이미지
+        for (ProductEntity product : productList) {
+            List<ProductFileDTO> productFiles = masterService.getProductFiles(product.getProductSeqno());
+            ProductFileDTO thumbnail = null;
+            for (ProductFileDTO file : productFiles) {
+                if ("Y".equals(file.getIsThumb())) {
+                    thumbnail = file;
+                    break; 
+                }
+            }
+            thumbnailFiles.add(thumbnail);
+        }
+
+        model.addAttribute("productList", productList);
+        model.addAttribute("listIsEmpty", productList.hasContent()?"N":"Y");
+        model.addAttribute("totalElement", totalCount);
+        model.addAttribute("postNum", postNum);
+        model.addAttribute("page", pageNum);
+        model.addAttribute("productName", productName);
         model.addAttribute("category1Seqno", category1Seqno);
         model.addAttribute("category2Seqno", category2Seqno);
         model.addAttribute("category3Seqno", category3Seqno);
-		    model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,productName));
+        model.addAttribute("thumbnailFiles", thumbnailFiles);
+		model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,productName));
     }
+
 
     //상품 상세보기 
     @GetMapping("/master/getProductDetail/{productSeqno}")
-    public void getProductDetail(@PathVariable Long productSeqno, Model model) throws Exception {
-     
-        ProductEntity productEntity = masterService.getProductBySeqno(productSeqno);
-        List<ProductFileDTO> productFiles = masterService.getProductFiles(productSeqno); //file
-        List<ProductInfoFileDTO> productInfoFiles = masterService.getProductInfoFiles(productSeqno); //infofile
-        List<ProductOptionDTO> productOptions = masterService.getProductOptions(productSeqno); //상품옵션
-        List<RelatedProductDTO> relatedProducts = masterService.getRelatedProducts(productSeqno); //추가상품
-        Category3Entity category3 = masterService.getCategory3ByProduct(productSeqno); // 카테고리
+    public void getProductDetail(@PathVariable Long productSeqno, 
+                Model model) 
+                throws Exception {
 
-        model.addAttribute("product", new ProductDTO(productEntity));
-        model.addAttribute("productFiles", productFiles);
-        model.addAttribute("productInfoFiles", productInfoFiles);
-        model.addAttribute("productOptions", productOptions);
-        model.addAttribute("relatedProducts", relatedProducts);
-        model.addAttribute("category3", category3);
+        ProductEntity productEntity = masterService.getProductBySeqno(productSeqno); 
+        model.addAttribute("productview", productEntity); // 상품 정보           
+        model.addAttribute("productfileview", masterService.getProductFiles(productSeqno)); //상품 파일 정보 
+        model.addAttribute("productinfofileview", masterService.getProductInfoFiles(productSeqno)); //상품설명 이미지 파일 정보
+        model.addAttribute("optionview", masterService.getProductOptions(productSeqno)); //상품 옵션 정보
+        model.addAttribute("relatedproductview", masterService.getRelatedProducts(productSeqno)); //추가 상품 정보
+        model.addAttribute("category1view", masterService.getCategory1ByProduct(productSeqno)); //카테고리
+        model.addAttribute("category2view", masterService.getCategory2ByProduct(productSeqno)); 
+        model.addAttribute("category3view", masterService.getCategory3ByProduct(productSeqno));          
     }
 
     //상품 등록 화면보기 
@@ -215,34 +211,41 @@ public class MasterController{
     //상품 수정 화면보기 >> 수정 눌렀을 때 
     @GetMapping("/master/modifyProduct")
     public void getmMdifyProduct(@RequestParam("productSeqno") Long productSeqno,
-                @RequestParam("page") int pageNum,
-                @RequestParam(name="productName",defaultValue="",required=false) String productName,
-                Model model) throws Exception{
-        model.addAttribute("page", pageNum);
-        model.addAttribute("productName", productName);            
-        model.addAttribute("productview", masterService.getProductBySeqno(productSeqno));
-        model.addAttribute("productfileview", masterService.getProductFiles(productSeqno));
-        model.addAttribute("productinfofileview", masterService.getProductInfoFiles(productSeqno));
-        model.addAttribute("optionview", masterService.getProductOptions(productSeqno));
-        model.addAttribute("relatedproductview", masterService.getRelatedProducts(productSeqno));
-        model.addAttribute("categoryview", masterService.getCategory3ByProduct(productSeqno));
+                Model model) 
+                throws Exception{
+                
+        ProductEntity productEntity = masterService.getProductBySeqno(productSeqno); 
+        boolean isTemporaryCategory = productEntity.getCategory3Seqno().isTemporary();
+        model.addAttribute("productview", productEntity); // 상품 정보           
+        model.addAttribute("productfileview", masterService.getProductFiles(productSeqno)); //상품 파일 정보 
+        model.addAttribute("productinfofileview", masterService.getProductInfoFiles(productSeqno)); //상품설명 이미지 파일 정보
+        model.addAttribute("optionview", masterService.getProductOptions(productSeqno)); //상품 옵션 정보
+        model.addAttribute("relatedproductview", masterService.getRelatedProducts(productSeqno)); //추가 상품 정보
+        model.addAttribute("category1view", masterService.getCategory1ByProduct(productSeqno)); //기존에 등록한 상품 카테고리 정보   
+        model.addAttribute("category2view", masterService.getCategory2ByProduct(productSeqno)); 
+        model.addAttribute("category3view", masterService.getCategory3ByProduct(productSeqno));          
+        model.addAttribute("allcategory1", masterService.getAllCategories1()); //모든 카테고리 정보
+        model.addAttribute("allcategory2", masterService.getAllCategories2());
+        model.addAttribute("allcategory3", masterService.getAllCategories3());
+        model.addAttribute("needsModification", isTemporaryCategory); //임시 카테고리 //[수정] 알림을 위한
     }
 
     //상품 등록 및 수정  
     @ResponseBody
     @PostMapping("/master/postProduct")
     public String postProduct(ProductDTO productDTO, 
-                  @RequestParam("kind") String kind,
-                  @RequestParam(name="productImage",required=false) List<MultipartFile> productImages,
-                  @RequestParam(name="detailImage", required=false) List<MultipartFile> detailImages,
-                  @RequestParam(name="deleteProductImages", required=false) Long[] deleteProductImages,
-                  @RequestParam(name="deleteDetailProductImage",required=false) Long[] deleteDetailProductImages,
-                  @RequestParam(name="category1Seqno") Long category1Seqno,
-                  @RequestParam(name="category2Seqno") Long category2Seqno,
-                  @RequestParam(name="category3Seqno") Long category3Seqno,
-                  @RequestParam(name="productOptions", required=false) List<ProductOptionDTO> productOptions,
-                  @RequestParam(name="relatedProducts", required=false) List<RelatedProductDTO> relatedProducts)
-                  throws Exception{
+                @RequestParam(name="productImage",required=false) List<MultipartFile> productImages,
+                @RequestParam(name="detailImage", required=false) List<MultipartFile> detailImages,
+                @RequestParam(name="deleteProductImages", required=false) Long[] deleteProductImages,
+                @RequestParam(name="deleteDetailProductImage",required=false) Long[] deleteDetailProductImages,
+                @RequestParam(name="category1Seqno") Long category1Seqno,
+                @RequestParam(name="category2Seqno") Long category2Seqno,
+                @RequestParam(name="category3Seqno") Long category3Seqno,
+                @RequestParam(name="optionMap", required=false) Map<String, String> optionMap,          
+                @RequestParam(name="relatedProductMap", required=false) Map<String, String> relatedProductMap,
+                @RequestParam(name="deleteOptionMap", required=false) Map<String, String> deleteOptionMap,
+                @RequestParam(name="deleteRelatedMap", required=false) Map<String, String> deleteRelatedMap) 
+                throws Exception{
         
         //파일 저장
         String os = System.getProperty("os.name").toLowerCase();
@@ -264,135 +267,171 @@ public class MasterController{
         
         ProductEntity productEntity = productDTO.dtoToEntity(productDTO);
 
-        //카테고리 연결
-        Category1Entity category1 = category1Repository.findById(category1Seqno).get();
-        Category2Entity category2 = category2Repository.findById(category2Seqno).get();
-        Category3Entity category3 = category3Repository.findById(category3Seqno).get();
+        Long seqno = 0L;
 
-        productDTO.setCategory3Seqno(category3);
-
-        if(kind.equals("I")){ //상품 등록하기
-            
-            Long seqno = masterService.productPost(productDTO);
+        //상품 정보
+        if(productDTO.getProductSeqno() == null){
+            seqno = masterService.productPost(productDTO);
             productDTO.setProductSeqno(seqno);
-
-            //상품옵션
-            if(productOptions != null) {
-                for (ProductOptionDTO option : productOptions) {
-                    option.setProductSeqno(productEntity); 
-                    masterService.saveProductOption(option);
-                }
-            }
-            //추가상품
-            if (relatedProducts != null) {
-                for (RelatedProductDTO related : relatedProducts) {
-                    related.setProductSeqno(productEntity); 
-                    masterService.saveRelatedProduct(related);
-                }
-            }
-            //상품이미지파일 //productfile
-            if(productImages != null){
-                for(MultipartFile mpr:productImages){
-                    String org_filename = mpr.getOriginalFilename();
-                    String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));			
-                    String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
-
-                    try{
-                        File targetFile = new File(productImgPath + stored_filename);				
-                        mpr.transferTo(targetFile);
-
-                        ProductFileDTO pImgFile = ProductFileDTO.builder()
-                                                .productFileSeqno(seqno)
-                                                .orgFilename(org_filename)
-                                                .storedFilename(stored_filename)
-                                                .isThumb("Y")
-                                                .build();
-                        masterService.productImgFile(pImgFile);
-
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-            //상세보기이미지파일 //product
-            if(detailImages != null){
-                for(MultipartFile mprd:detailImages){
-                    String org_filename = mprd.getOriginalFilename();
-                    String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));			
-                    String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
-
-                    try{
-                        File targetFile = new File(productDetailImgPath + stored_filename);				
-                        mprd.transferTo(targetFile);
-                        
-                        ProductInfoFileDTO pDImgFile = ProductInfoFileDTO.builder()
-                                                    .productInfoFileSeqno(seqno)
-                                                    .orgFilename(org_filename)
-                                                    .storedFilename(stored_filename)
-                                                    .build();
-                        masterService.productDetailImgFile(pDImgFile);
-
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }else if (kind.equals("U")) { //상품 수정하기
-            
+        }else{ //상품 수정하기
             masterService.productModify(productDTO);
+        }
 
-            // 상품 옵션 수정
-            if (productOptions != null) {
-                for (ProductOptionDTO option : productOptions) {
-                    option.setProductSeqno(productEntity); 
-                    masterService.saveProductOption(option);
-                }
+        //카테고리
+        masterService.setProductCategory(category3Seqno, productDTO);
+
+        //옵션 추가 및 수정
+        List<ProductOptionDTO> productOptionDTOList = new ArrayList<>();
+        if(optionMap != null){ 
+            for(Map.Entry<String,String> entry : optionMap.entrySet()){
+                String[] keys = entry.getKey().split(",");
+                String optCategory = keys[0];
+                String optName = keys[1];
+                int optPrice = Integer.parseInt(entry.getValue());
+
+                ProductOptionDTO optionDTO = new ProductOptionDTO();
+                optionDTO.setProductSeqno(productEntity);
+                optionDTO.setOptCategory(optCategory);
+                optionDTO.setOptName(optName);
+                optionDTO.setOptPrice(optPrice);
+                productOptionDTOList.add(optionDTO);
             }
-            // 관련 상품 수정
-            if (relatedProducts != null) {
-                for (RelatedProductDTO related : relatedProducts) {
-                    related.setProductSeqno(productEntity);
-                    masterService.saveRelatedProduct(related);
-                }
+        }
+
+        //옵션 저장
+        productOptionDTOList.forEach(optionDTO -> {
+            try {
+                masterService.saveProductOption(optionDTO);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            //상품 이미지 파일 삭제
-            if (deleteProductImages != null) {
-                for (Long productFileSeqno : deleteProductImages) {
-                    masterService.deleteProductFile(productFileSeqno); 
-                }
+        });
+
+        //추가상품 추가 및 수정
+        List<RelatedProductDTO> relatedProductDTOList = new ArrayList<>();
+        if(relatedProductMap != null){ 
+            for(Map.Entry<String,String> entry : relatedProductMap.entrySet()){
+                String[] keys = entry.getKey().split(",");
+                String relatedproductCategory = keys[0];
+                String relatedproductName = keys[1];
+                int relatedproductPrice = Integer.parseInt(entry.getValue());
+
+                RelatedProductDTO relatedProductDTO = new RelatedProductDTO();
+                relatedProductDTO.setProductSeqno(productEntity);
+                relatedProductDTO.setRelatedproductCategory(relatedproductCategory);
+                relatedProductDTO.setRelatedproductName(relatedproductName);
+                relatedProductDTO.setRelatedproductPrice(relatedproductPrice);
+                relatedProductDTOList.add(relatedProductDTO);
             }
-            //상세보기 파일 삭제
-            if (deleteDetailProductImages != null){
-                for (Long productInfoFileSeqno : deleteDetailProductImages) {
-                    masterService.deleteProductInfoFile(productInfoFileSeqno);
+        }
+
+        //추가상품 저장
+        relatedProductDTOList.forEach(relatedProductDTO -> {
+            try {
+                masterService.saveRelatedProduct(relatedProductDTO);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        //상품이미지파일 //productfile
+        if(productImages != null){
+            boolean firstImage = true;
+            for(MultipartFile mpr:productImages){
+                String org_filename = mpr.getOriginalFilename();
+                String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));			
+                String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
+
+                try{
+                    File targetFile = new File(productImgPath + stored_filename);				
+                    mpr.transferTo(targetFile);
+
+                    String isThumb = firstImage?"Y":"N"; //썸네일 지정
+                    firstImage = false;
+
+                    ProductFileDTO pImgFile = ProductFileDTO.builder()
+                                            .productFileSeqno(seqno)
+                                            .orgFilename(org_filename)
+                                            .storedFilename(stored_filename)
+                                            .isThumb(isThumb)
+                                            .build();
+                    masterService.productImgFile(pImgFile);
+
+                }catch(Exception e){
+                    e.printStackTrace();
                 }
             }
         }
+
+        //상세보기이미지파일 //product
+        if(detailImages != null){
+            for(MultipartFile mprd:detailImages){
+                String org_filename = mprd.getOriginalFilename();
+                String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));			
+                String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
+
+                try{
+                    File targetFile = new File(productDetailImgPath + stored_filename);				
+                    mprd.transferTo(targetFile);
+                    
+                    ProductInfoFileDTO pDImgFile = ProductInfoFileDTO.builder()
+                                                .productInfoFileSeqno(seqno)
+                                                .orgFilename(org_filename)
+                                                .storedFilename(stored_filename)
+                                                .build();
+                    masterService.productDetailImgFile(pDImgFile);
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        //옵션 삭제
+        if(deleteOptionMap != null){
+            for(Map.Entry<String,String> entry : deleteOptionMap.entrySet()){
+                Long optionSeqno = Long.parseLong(entry.getKey());
+                masterService.deleteProductOption(optionSeqno);
+            }
+        }
+
+        //추가상품 삭제
+        if(deleteRelatedMap != null){
+            for(Map.Entry<String,String> entry : deleteRelatedMap.entrySet()){
+                Long relatedProductSeqno = Long.parseLong(entry.getKey());
+                masterService.deleteRelatedProduct(relatedProductSeqno);
+            }
+        }
+
+        //상품 이미지 파일 삭제
+        if (deleteProductImages != null) {
+            for (Long productFileSeqno : deleteProductImages) {
+                masterService.deleteProductFile(productFileSeqno); 
+            }
+        }
+        //상세보기 파일 삭제
+        if (deleteDetailProductImages != null){
+            for (Long productInfoFileSeqno : deleteDetailProductImages) {
+                masterService.deleteProductInfoFile(productInfoFileSeqno);
+            }
+        }
+
         return "{\"message\":\"good\"}"; 
     }
 
-    //상품 삭제 (활성 비활성) //??? 다시 확인 필요. 
+    //상품 삭제 (활성 비활성) 
     @ResponseBody
 	@GetMapping("/master/secretProduct") 
-    public  List<ProductDTO> postSecretProduct(@RequestParam("kind") String kind,
-                            @RequestParam(name="role", required=false) String role) throws Exception {
-
-        List<ProductDTO> productList = masterService.getAllProducts();
-
-        //관리자: 상품 전체 보기 가능, 사용자: Y처리된 상품만 보기 가능
-        if("MASTER".equals(role)){ 
-            return productList;
-        }
-        return productList.stream().filter(product -> "Y".equals(product.getSecretYn()))
-                                   .collect(Collectors.toList());
+    public void postSecretProduct(@RequestParam("productSeqno") Long productSeqno) throws Exception {
+        masterService.secretYNProduct(productSeqno);
     }
 
     //주문내역 리스트
     @GetMapping("/master/order")
     public void getOrderList(Model model, 
                             @RequestParam("page") int pageNum, 
-                            @RequestParam(name="keyword",defaultValue="",required=false) String productname,
-                            @RequestParam(name="keyword",defaultValue="",required=false) Long category) 
+                            @RequestParam(name="productname",defaultValue="",required=false) String productname,
+                            @RequestParam(name="category",defaultValue="",required=false) Long category) 
                             throws Exception{
         int postNum = 10; 
         int pageListCount = 10;                         
@@ -411,10 +450,10 @@ public class MasterController{
         model.addAttribute("pageList", page.getPageOrder(pageNum, postNum, pageListCount,totalCount,productname,category));
     }
 
-    //주문내역 상세보기
+    //주문내역 상세보기 
     @GetMapping("/master/orederView/{orderSeqno}")
     public void getOrderView(@PathVariable Long orderSeqno, Model model) throws Exception {
-        OrderInfoEntity orderInfoEntity = masterService.getOrderInfo(orderSeqno);
+        OrderInfoEntity orderInfoEntity = masterService.getOrderInfo(orderSeqno); 
         OrderInfoDTO orderInfoDTO = new OrderInfoDTO(orderInfoEntity);
         List<OrderDetailEntity> orderDetailEntities = masterService.getOrderDetails(orderSeqno);
         List<OrderProductEntity> orderProducts = masterService.getOrderProducts(orderSeqno);
@@ -422,21 +461,21 @@ public class MasterController{
         List<OrderProductOptionEntity> orderProductOptions = masterService.getOrderProductOptions(orderProducts);
         List<ProductEntity> products = masterService.getProducts(orderProducts);
 
-        model.addAttribute("orderInfo", orderInfoDTO);
-        model.addAttribute("orderDetails", orderDetailEntities);
-        model.addAttribute("orderProducts", orderProducts);
-        model.addAttribute("addedRelatedProducts", addedRelatedProducts);
-        model.addAttribute("orderProductOptions", orderProductOptions);
-        model.addAttribute("products", products);
+        model.addAttribute("orderInfo", orderInfoDTO);//주문정보
+        model.addAttribute("orderDetails", orderDetailEntities); //주문상세
+        model.addAttribute("orderProducts", orderProducts); //주문제품
+        model.addAttribute("addedRelatedProducts", addedRelatedProducts); //추가상품
+        model.addAttribute("orderProductOptions", orderProductOptions); //옵션
+        model.addAttribute("products", products); //상품정보
     }
 
     //주문 상태 변경 //newStatus : 상품준비중 - 배송중 - 배송완료?
     @ResponseBody
     @PostMapping("/master/modifyOrder")
     public String postModifyOrder(@RequestParam("orderSeqno") Long orderSeqno,
-                                @RequestParam("newStatus") String newStatus)
+                                @RequestParam("orderStatus") String orderStatus)
                                 throws Exception {
-        masterService.modifyOrderStatus(orderSeqno,newStatus);
+        masterService.modifyOrderStatus(orderSeqno,orderStatus);
 
         return "redirect:/master/order";
     }
@@ -461,51 +500,113 @@ public class MasterController{
         model.addAttribute("categories3", masterService.getAllCategories3());
     }
 
-    //카테고리 추가 및 수정
+    //카테고리 추가 및 수정 및 삭제 
+    @Transactional
     @ResponseBody
     @PostMapping("/master/createCategory")
-    public String postCreateCategory(@RequestParam String kind,
-                @RequestBody List<Category1DTO> category1DTOs,
-                @RequestBody List<Category2DTO> category2DTOs,
-                @RequestBody List<Category3DTO> category3DTOs) 
-                throws Exception{
-        masterService.createCategory(kind, category1DTOs, category2DTOs, category3DTOs);
-        return "redirect:/master/categoryList"; 
-    }
-
-    //카테고리 삭제
-    @Transactional
-	@GetMapping("/master/deleteCategory") 
-    public String getDeleteCategory(@RequestParam String categoryType, 
-                @RequestParam Long categorySeqno) 
-                throws Exception{
-        try {
-            switch (categoryType) {
-                case "1": //카테고리1번
-                    masterService.deleteCategory1(categorySeqno);
-                    break;
-                case "2": //카테고리2번
-                    masterService.deleteCategory2(categorySeqno);
-                    break;
-                case "3": //카테고리3번
-                    masterService.deleteCategory3(categorySeqno);
-                    break;
+    public ResponseEntity<String> manageCategory(
+                        @RequestParam(name="category1") Map<String, String> category1Map,
+                        @RequestParam(name="category2") Map<String, String> category2Map,
+                        @RequestParam(name="category3") Map<String, String> category3Map,
+                        @RequestParam(name="deleteCategory1") Map<String, String> deleteCategory1Map,
+                        @RequestParam(name="deleteCategory2") Map<String, String> deleteCategory2Map,
+                        @RequestParam(name="deleteCategory3") Map<String, String> deleteCategory3Map) 
+                        throws Exception{  
+                                            
+        try{
+            List<Category1DTO> category1DTOList = new ArrayList<>();
+            for (Map.Entry<String, String> entry : category1Map.entrySet()) {
+                Long category1Seqno = Long.parseLong(entry.getKey());
+                String category1Name = entry.getValue();
+                category1DTOList.add(new Category1DTO(category1Seqno, category1Name));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }      
-        return "redirect:/master/categoryList";  
-    }
 
-    //모든 카테고리 불러오기
-    @GetMapping("/master/categories")
-    public List<Category3DTO> getCategories() throws Exception {
-        return masterService.getAllCategories(); 
-    }
+            List<Category2DTO> category2DTOList = new ArrayList<>();
+            for(Map.Entry<String, String> entry : category2Map.entrySet()){
+                // entry => "21(2Seqno),13(1Seqno)" : "TV"(name)
+                String[] keys = entry.getKey().split(",");
+                Long category2Seqno = Long.parseLong(keys[0]);    // 21
+                Long category1Seqno = Long.parseLong(keys[1]);    // 13
+                String category2Name = entry.getValue();    // "TV"
+                category2DTOList.add(new Category2DTO(category2Seqno, category1Seqno, category2Name));
+            }
+
+            List<Category3DTO> category3DTOList = new ArrayList<>();
+            for (Map.Entry<String, String> entry : category3Map.entrySet()){
+                String[] keys = entry.getKey().split(",");
+                Long category3Seqno = Long.parseLong(keys[0]);
+                Long category2Seqno = Long.parseLong(keys[1]);
+                String category3Name = entry.getValue();
+                category3DTOList.add(new Category3DTO(category3Seqno, category2Seqno, category3Name));
+            }
+
+            // 카테고리 저장/수정 처리
+            masterService.saveCategories(category1DTOList, category2DTOList, category3DTOList);
+
+            // 카테고리 삭제 처리
+            List<Category1DTO> deleteCategory1List = new ArrayList<>();
+            if (deleteCategory1Map != null){
+                for(Map.Entry<String, String> entry : deleteCategory1Map.entrySet()){
+                    Long category1Seqno = Long.parseLong(entry.getKey());
+                    String category1Name = entry.getValue();
+                    deleteCategory1List.add(new Category1DTO(category1Seqno, category1Name));  
+                }
+            }
+
+            List<Category2DTO> deleteCategory2List = new ArrayList<>();
+            if(deleteCategory2Map != null){
+                for(Map.Entry<String, String> entry : deleteCategory2Map.entrySet()){
+                    String[] keys = entry.getKey().split(",");
+                    Long category2Seqno = Long.parseLong(keys[0]);
+                    Long category1Seqno = Long.parseLong(keys[1]);
+                    String category2Name = entry.getValue();
+                    deleteCategory2List.add(new Category2DTO(category2Seqno, category1Seqno, category2Name ));
+                }
+            }
+            
+            List<Category3DTO> deleteCategory3List = new ArrayList<>();
+            if(deleteCategory3Map != null){
+               for (Map.Entry<String, String> entry : deleteCategory3Map.entrySet()){
+                    String[] keys = entry.getKey().split(",");
+                    Long category3Seqno = Long.parseLong(keys[0]);
+                    Long category2Seqno = Long.parseLong(keys[1]);
+                    String category3Name = entry.getValue();
+                    deleteCategory3List.add(new Category3DTO(category3Seqno, category2Seqno, category3Name));
+                } 
+            }
+            
+            deleteCategory3List.forEach(dto -> {
+                try {
+                    masterService.deleteCategory3(dto.getCategory3Seqno());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            deleteCategory2List.forEach(dto -> {
+                try {
+                    masterService.deleteCategory2(dto.getCategory2Seqno());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            deleteCategory1List.forEach(dto -> {
+                try {
+                    masterService.deleteCategory1(dto.getCategory1Seqno());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+            return ResponseEntity.ok("Categories saved successfully.");
+        }catch(Exception e){
+            return ResponseEntity.status(500).body("Error saving categories: " + e.getMessage());
+        }
+    } 
 
     //문의 리스트 
     @GetMapping("/master/question")
-    public void getQuestion(Model model, @RequestParam("page") int pageNum, 
+    public void getQuestion(Model model, 
+                @RequestParam("page") int pageNum, 
                 @RequestParam(name="queType",defaultValue="",required=false) String queType)
                 throws Exception{
         int postNum = 15;
@@ -515,7 +616,7 @@ public class MasterController{
         Page<Map<String, Object>> questionList = masterService.questionList(pageNum, postNum, queType);                        
         int totalCount = (int) questionList.getTotalElements(); 
 
-        model.addAttribute("list", questionList);
+        model.addAttribute("questionList", questionList);
         model.addAttribute("listIsEmpty", questionList.hasContent() ? "N" : "Y");
         model.addAttribute("totalElements", totalCount);
         model.addAttribute("postNum", postNum);
@@ -527,17 +628,14 @@ public class MasterController{
     //문의 상세보기
     @GetMapping("/master/question/{queSeqno}")
     public void getQuestionView(@PathVariable Long queSeqno, Model model) throws Exception {
-        QuestionDTO question = questionService.view(queSeqno);
-        model.addAttribute("question", question);
-
-        List<QuestionFileDTO> questionFiles = questionService.fileListView(queSeqno);
-        model.addAttribute("questionFiles", questionFiles); 
+        model.addAttribute("question", questionService.view(queSeqno));
+        model.addAttribute("questionFiles", questionService.fileListView(queSeqno)); 
     }
 
     //문의 답변 등록 및 수정
     @ResponseBody
-    @PostMapping("/master/question/reply/{queSeqno}")
-    public void postReply(@PathVariable Long queSeqno,
+    @PostMapping("/master/question/reply")
+    public void postReply(@RequestParam("queSeqno") Long queSeqno,
                 @RequestParam("kind") String kind, 
                 @RequestBody QuestionCommentDTO commentDTO)
                 throws Exception{
@@ -559,15 +657,14 @@ public class MasterController{
     @Transactional
     @GetMapping("/master/question/delete")
     public String deleteQuestion(@RequestParam("queSeqno") Long queSeqno) throws Exception{
-
-        masterService.deleteQuestion(queSeqno); //문의 삭제
-
         List<QuestionFileDTO> questionFiles = questionService.fileListView(queSeqno);
         if(questionFiles != null){
             for(QuestionFileDTO questionFile : questionFiles){
                 masterService.deleteQuestionFile(questionFile.getQuestionFileSeqno()); //문의 파일 삭제
             }  
         }
+        masterService.deleteQuestion(queSeqno); //문의 삭제
+
         return "redirect:/master/question";
     }
 
@@ -592,7 +689,7 @@ public class MasterController{
 		Page<Map<String,Object>> reviewList = masterService.reviewList(pageNum, postNum, category);
 		int totalCount = (int)reviewList.getTotalElements();
 
-		model.addAttribute("list", reviewList);
+		model.addAttribute("reviewList", reviewList);
 		model.addAttribute("listIsEmpty", reviewList.hasContent()?"N":"Y");
 		model.addAttribute("totalElement", totalCount);
 		model.addAttribute("postNum", postNum);
@@ -604,16 +701,14 @@ public class MasterController{
     //리뷰 상세보기
     @GetMapping("/master/review/{reviewSeqno}")
     public void getReviewView(@PathVariable Long reviewSeqno, Model model) throws Exception{
-        ReviewDTO review = reviewService.view(reviewSeqno);
-        model.addAttribute("review", review);
-
-        List<ReviewFileDTO> reviewFiles = reviewService.fileListView(reviewSeqno);
-        model.addAttribute("reviewFiles", reviewFiles);
+        model.addAttribute("review", reviewService.view(reviewSeqno));
+        model.addAttribute("reviewFiles", reviewService.fileListView(reviewSeqno));
     }
 
     //리뷰 신고 리스트
     @GetMapping("/master/reviewReport")
-    public void getReviewReportList(Model model, @RequestParam("page") int pageNum,
+    public void getReviewReportList(Model model, 
+                @RequestParam("page") int pageNum,
                 @RequestParam("reportTitle") String reportTitle)
                 throws Exception{
         int postNum = 10;
@@ -629,7 +724,7 @@ public class MasterController{
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
         model.addAttribute("reportTitle", reportTitle);
-		model.addAttribute("pageList", page.getPageRoport(pageNum, postNum, pageListCount,totalCount,reportTitle));
+		model.addAttribute("pageList", page.getPageRoport(pageNum, postNum, pageListCount, totalCount, reportTitle));
     }
 
     //리뷰 신고 삭제
@@ -644,30 +739,28 @@ public class MasterController{
     @Transactional
     @GetMapping("/master/review/delete")
     public String getDeleteReview(@RequestParam("reviewSeqno") Long reviewSeqno) throws Exception{
-        
-        masterService.deleteReview(reviewSeqno); //리뷰삭제
-
         List<ReviewFileDTO> reviewFiles = reviewService.fileListView(reviewSeqno);
         if (reviewFiles != null) {
             for (ReviewFileDTO reviewFile : reviewFiles) {
                 masterService.deleteReviewFile(reviewFile.getReviewFileSeqno()); //리뷰 파일삭제
             }
         }
+        masterService.deleteReview(reviewSeqno); //리뷰삭제
+
         return "redirect:/master/reviewList";  
     }
 
-    //쿠폰 리스트보기 //수정필요
-    //couponCategory -> coupon_seqno , category3seqno
-    //couponTarget -> coupon_seqno, product_seqno
+    //쿠폰 리스트보기 
     @GetMapping("/master/couponList")
-    public void getCouponList(Model model,@RequestParam("page") int pageNum,
-                        @RequestParam(name="keyword",defaultValue="",required=false) String keyword) 
-                        throws Exception {
+    public void getCouponList(Model model,
+                @RequestParam("page") int pageNum,
+                @RequestParam(name="keyword",defaultValue="",required=false) String keyword) 
+                throws Exception {
         int postNum = 15; 
         int pageListCount = 10; 
         
         PageUtil page = new PageUtil();
-        Page<Map<String, Object>> couponPage = masterService.couponList(pageNum,postNum,keyword);
+        Page<Map<String, Object>> couponPage = masterService.couponList(pageNum, postNum, keyword);
         int totalCount = (int) couponPage.getTotalElements();
 
         model.addAttribute("couponPage", couponPage);
@@ -676,7 +769,7 @@ public class MasterController{
         model.addAttribute("postNum", postNum);
         model.addAttribute("page", pageNum);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("pageList", page.getPageCoupon(pageNum, postNum, pageListCount,totalCount,keyword));
+        model.addAttribute("pageList", page.getPageCoupon(pageNum, postNum, pageListCount, totalCount, keyword));
     }
 
     //쿠폰 등록 화면보기
@@ -685,101 +778,100 @@ public class MasterController{
 
     //쿠폰 수정 화면보기
     @GetMapping("/master/modifyCoupon")
-    public void getModifyCoupon() {
-        //
+    public void getModifyCoupon(@RequestParam("couponSeqno") Long couponSeqno,
+                Model model) 
+                throws Exception{
 
+        model.addAttribute("couponview", masterService.getCouponBySeqno(couponSeqno)); //쿠폰 정보
+        model.addAttribute("existingCategories", masterService.getCouponCategories(couponSeqno)); //기존에 등록한 쿠폰 카테고리
+        model.addAttribute("existingTargets", masterService.getCouponTargets(couponSeqno)); //기존에 등록한 쿠폰 타겟
+        model.addAttribute("allCategories", masterService.getAllCategories3()); //모든 카테고리
+        model.addAttribute("allProducts", masterService.getAllProducts());  //모든 상품
     }
 
     //쿠폰 등록, 수정
-    //수정필요
     //쿠폰 타입 A(전체상품적용), T(특정상품적용(카테고리)), C(단일상품적용) 
     @ResponseBody
     @PostMapping("/master/createCoupon")
     public String postCreateCoupon(CouponDTO couponDTO, 
                 @RequestParam("kind") String kind,
                 @RequestParam(name="couponCategory", required=false) List<Long> couponCategories,
-                @RequestParam(name="couponTarget", required=false) List<Long> couponTargets) 
+                @RequestParam(name="couponTarget", required=false) List<Long> couponTargets,
+                @RequestParam(name="deleteCouponCategory", required=false) List<Long> deleteCouponCategories,
+                @RequestParam(name="deleteCouponTarget", required=false) List<Long> deleteCouponTargets) 
                 throws Exception{
-
+        
+        Long couponSeqno = 0L;
        
         if(kind.equals("I")){
-     
-            //쿠폰 적용 범위를 카테고리 검색으로. 검색도 가능(상품이름). 여러개 선택도 가능... 
-            //coupon_category , coupon_target
 
-            //권한설정: coupon_role > 맴버등급으로.
-            //사용옵션: 추가 할인 가능 >> 체크표시? 중복가능여부 isDupl
-            //
+            couponSeqno = masterService.writeCoupon(couponDTO);
 
-            Long couponSeqno = masterService.writeCoupon(couponDTO);
-
-            if("A".equals(couponDTO.getCouponType())){ //모든 상품 적용
-                List<ProductEntity> allProducts = masterService.getAllProductsA();
-                for (ProductEntity product : allProducts) {
-                    CouponTargetDTO couponTargetDTO = new CouponTargetDTO();
-                    CouponEntity couponEntity = masterService.getCouponSeqno(couponSeqno);
-                    couponTargetDTO.setCouponSeqno(couponEntity);
-                    couponTargetDTO.setProductSeqno(product);
-                    masterService.saveCouponTarget(couponTargetDTO);
-                }
-            }else if("T".equals(couponDTO.getCouponType())){ //특정 상품 적용(카테고리)
-                //List<Category3DTO> categories = masterService.getAllCategories();
-                for (Long categoryId : couponCategories) {
-                CouponCategoryDTO couponCategoryDTO = new CouponCategoryDTO();
-                CouponEntity couponEntity = masterService.getCouponSeqno(couponSeqno);
-                couponCategoryDTO.setCouponSeqno(couponEntity); // 방금 생성한 쿠폰의 ID
-                Category3Entity category3Entity = masterService.getCategory3Seqno(categoryId);
-                couponCategoryDTO.setCategory3seqno(category3Entity); // 카테고리 ID 설정
-                masterService.saveCouponCategory(couponCategoryDTO); // 카테고리 저장 메서드 호출
-                }
-            }else if("C".equals(couponDTO.getCouponType())){ //단일 상품 적용(상품)
-                for (Long productId : couponTargets) {
-                    CouponTargetDTO couponTargetDTO = new CouponTargetDTO();
-                    CouponEntity couponEntity = masterService.getCouponSeqno(couponSeqno);
-                    couponTargetDTO.setCouponSeqno(couponEntity); // 방금 생성한 쿠폰의 ID
-                    ProductEntity productEntity = masterService.getProductBySeqno(productId);
-                    couponTargetDTO.setProductSeqno(productEntity); // 상품 ID 설정
-                    masterService.saveCouponTarget(couponTargetDTO); // 상품 저장 메서드 호출
-                }
-            }
         }else if(kind.equals("U")){
-            //masterService.modifyCoupon(couponDTO);
-
-
-
+            masterService.modifyCoupon(couponDTO); 
+            couponSeqno = couponDTO.getCouponSeqno(); 
+            //카테고리 삭제
+            if(deleteCouponCategories != null){
+                for (Long categorySeqno : deleteCouponCategories) {   
+                    masterService.deleteCouponCategory(couponSeqno, categorySeqno);   
+                } 
+            } 
+            //타겟 삭제
+            if(deleteCouponTargets != null){
+                for (Long targetSeqno : deleteCouponTargets) {
+                    masterService.deleteCouponTarget(couponSeqno, targetSeqno);
+                }
+            } 
+        }
+        if("A".equals(couponDTO.getCouponType())){ //모든 상품 적용
+            List<ProductEntity> allProducts = masterService.getAllProducts(); 
+            for (ProductEntity product : allProducts) {
+                masterService.saveCouponTarget(couponSeqno, product);
+            }
+        }else if("C".equals(couponDTO.getCouponType())){ //특정 상품 적용(카테고리)
+            //List<Category3DTO> categories = masterService.getAllCategories();
+            for (Long categorySeqno : couponCategories) {
+                masterService.saveCouponCategory(couponSeqno, categorySeqno);
+            }
+        }else if("T".equals(couponDTO.getCouponType())){ //단일 상품 적용(상품) // 이름으로 검색?? //수정필요
+            for (Long productSeqno : couponTargets) {
+                ProductEntity productEntity = masterService.getProductBySeqno(productSeqno); //seqno로 받아서 name으로 검색? 
+                masterService.saveCouponTarget(couponSeqno, productEntity);
+            }
         }
         return "{\"message\":\"good\"}"; 
     }
-    
+
+
     //쿠폰-사용자 배포
-    //자동: 특정 회원 지정 발행, 웅영자 지정 대상 자동 발행(신규회원, 첫주문 완료 회원, 생일인 회원)
-    //수동: 고객 다운로드, 운영자의 쿠폰코드 생성
-    //@PostMapping()
-    //
-
-
-    //쿠폰 삭제
-    //수정필요. >> 삭제가 아니라 사용만료, 기간만료에 들어가게 됨. 
-    //             사용조건이 맞지 않더라도 위치 옮김. (특정 등급 제한 쿠폰일 경우, 기간 만료 전 등급이 변경됐을 때 etc.)
-    //isExpire : Y(사용가능), N(사용불가능)
-    @GetMapping("/master/deleteCoupon")
-    public String getDeleteCoupon(@RequestParam("couponSeqno") Long couponSeqno) throws Exception{
+    @PostMapping()
+    public void clientCoupon(@RequestParam("couponSeqno") Long couponSeqno,
+                @RequestParam(name = "isAllMembers", required = false) boolean isAllMembers,
+                @RequestParam(name = "memberGrade", required = false) String memberGrade,
+                @RequestParam(name = "isBirthday", required = false) boolean isBirthday,
+                @RequestParam(name = "isNewMember", required = false) boolean isNewMember) 
+                throws Exception{
+        //자동: 특정 회원 지정 발행, 웅영자 지정 대상 자동 발행(신규회원, 첫주문 완료 회원, 생일인 회원) ///구매한지 1년 후 쿠폰 발급??              
+        masterService.couponToUser(couponSeqno, isAllMembers, memberGrade, isBirthday, isNewMember); 
+        //수동: 고객 다운로드, 운영자의 쿠폰코드 생성
         
+    }
+    
+    //쿠폰 삭제(사용불가)
+    @Transactional
+    @GetMapping("/master/deleteCoupon")
+    public void getDeleteCoupon(@RequestParam("couponSeqno") Long couponSeqno,
+                                @RequestParam("email") String email) throws Exception{
 
-
-
-
-        return "redirect:/master/couponList";  
+        masterService.deleteCoupon(couponSeqno, email);
     }
 
-    
      // 결제 취소 및 환불 신청 내역 보기
     @GetMapping("/master/paymentCancelAndRefund")
     public List<OrderDetailEntity> getCancelAndRefund() {
     
         return masterService.getCancelAndRefundDetails();
     }
-
 
     // 결제 취소 처리
     @PostMapping("/master/paymentCancel")
@@ -792,7 +884,6 @@ public class MasterController{
 
         return "{\"message\":\"good\"}";
     }
-
   
     // 환불 처리
     @PostMapping("/master/paymentRefund")
@@ -804,15 +895,13 @@ public class MasterController{
         masterService.cancelOrRefundOrder(orderDetailSeqno, couponSeqno, point, true);
 
         return "{\"message\":\"good\"}";
-    }
-      
+    }  
 
     //매출, //통계 (관심카테고리, 찜목록, 구매) 
     @GetMapping("/master/Status")
     public void getStatus() {
 
-    }
-      
+    }   
 
     //전체 회원의 누적구매금액을 조회 후 등급 업데이트
     @PostMapping("/master/gradeUpdate")

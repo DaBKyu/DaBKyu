@@ -26,7 +26,9 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
                 nativeQuery = true)
     public void modifyPasswordAfter30(@Param("email") String email);
 
-    public Page<MemberEntity> findByEmailContainingOrUsernameContaining
-            (String keyword1,String keyword2,Pageable pageable);
+    //회원 등급/이름으로 검색
+    public Page<MemberEntity> findByMemberGradeOrUsernameContaining
+                (String keyword1,String keyword2,Pageable pageable);
+    
     
 }
