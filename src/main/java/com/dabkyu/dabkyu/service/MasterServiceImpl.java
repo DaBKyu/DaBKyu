@@ -670,7 +670,6 @@ public class MasterServiceImpl implements MasterService {
         CouponEntity couponEntity = couponRepository.findById(coupon.getCouponSeqno()).get();
         couponEntity.setCouponName(coupon.getCouponName());
         couponEntity.setCouponType(coupon.getCouponType());
-        couponEntity.setCouponTarget(coupon.getCouponTarget());
         couponEntity.setCouponInfo(coupon.getCouponInfo());
         couponEntity.setPercentDiscount(coupon.getPercentDiscount());
         couponEntity.setAmountDiscount(coupon.getAmountDiscount());

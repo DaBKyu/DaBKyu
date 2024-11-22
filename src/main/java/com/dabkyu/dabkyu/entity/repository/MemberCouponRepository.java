@@ -1,5 +1,7 @@
 package com.dabkyu.dabkyu.entity.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +27,14 @@ public interface MemberCouponRepository extends JpaRepository<MemberCouponEntity
         );
 
     public MemberCouponEntity findByCouponSeqno_CouponSeqno(Long couponSeqno);
+
+    //특정 이메일과 쿠폰 번호 목록으로 해당 회원의 쿠폰 리스트를 조회
+    @Query("SELECT mc FROM memberCoupon mc " +
+                   "WHERE mc.couponSeqno.couponSeqno IN :couponSeqnoList " +
+                   "AND mc.email.email = :email")
+    public List<MemberCouponEntity> findByCouponSeqnoListAndEmail(
+        @Param("couponSeqnoList") List<Long> couponSeqnoList, 
+        @Param("email") String email);
+
+
 }

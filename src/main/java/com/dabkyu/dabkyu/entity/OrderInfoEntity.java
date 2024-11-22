@@ -15,8 +15,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
@@ -24,6 +26,8 @@ import lombok.Setter;
 @Entity(name="orderInfo")
 @Table(name="order_info")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderInfoEntity {
 
     @Id

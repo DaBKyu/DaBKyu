@@ -29,10 +29,10 @@ public class LikeListDTO {
 
     public LikeListEntity dtoToEntity(LikeListDTO dto) {
         LikeListEntity likeListEntity = LikeListEntity.builder()
-                                                                           .email(dto.getEmail())
-                                                                           .productSeqno(dto.getProductSeqno())
-                                                                           .likeDate(dto.getLikeDate())
-                                                                           .build();
+                                                      .email(dto.getEmail())
+                                                      .productSeqno(dto.getProductSeqno())
+                                                      .likeDate(dto.getLikeDate())
+                                                      .build();
         return likeListEntity;
     }
 }
