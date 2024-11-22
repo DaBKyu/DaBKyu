@@ -75,12 +75,4 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             Pageable pageable);
 
 	public List<ProductEntity> findByCategory3Seqno_Category3Seqno(Long category3Seqno);
-
-	//임시카테고리 
-	@Query("SELECT p FROM product p " +
-			"JOIN p.category3Seqno c3 " +
-			"WHERE c3.isTemporary = true")
-	public List<ProductEntity> findProductsInTemporaryCategory();
-
-
 }
