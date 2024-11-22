@@ -37,7 +37,7 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 public interface MasterService {
 
     //맴버 리스트
-    public Page<MemberEntity> memberList(int pageNum, int postNum, String keyword) throws Exception;
+    public Page<MemberEntity> memberList(int pageNum, int postNum, String keyword, String memberGrade) throws Exception;
 
     //맴버 이메일로 검색
     public MemberDTO getMemberByEmail(String email);

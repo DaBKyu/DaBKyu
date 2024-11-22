@@ -42,74 +42,50 @@
 
       <!-- 카테고리 선택 -->
       <div class="d-flex justify-content-between mb-2">
-        <select class="form-select w-auto" id="categorySelect" th:onchange="window.location.href='/productManage?category=' + this.value">
+        <select class="form-select w-auto" id="categorySelect" th:onchange="window.location.href='/productList?category1Seqno=' + this.value">
           <option value="">전체 카테고리</option>
           <option th:each="category : ${category1Seqno}" 
-                  th:value="${category.id}" 
-                  th:text="${category.name}"></option>
+                  th:value="${category.category1Seqno}" 
+                  th:text="${category.category1Name}"></option>
         </select>
-          <button class="btn btn-primary" onclick="location.href='../master/productUpload.html'">상품 등록</button>
+          <button class="btn btn-primary" onclick="location.href='/master/productUpload.html'">상품 등록</button>
       </div>
 
     <!-- 상품 카드 리스트 -->
-    <div th:each="product : ${products.content}" class="product-card row align-items-center">
-      <div class="col-md-2 text-center">
-          <img th:src="@{${product.imageUrl}}" alt="${product.name}">
-      </div>
+    <th:block  th:if="${#strings.equals(listIsEmpty,'N')}">
+        <div th:each="product : ${list}" class="product-card row align-items-center">
+            <div class="col-md-2 text-center">
+                <!-- <img th:src="@{${product.imageUrl}}" alt="${product.productName}"> -->
+            </div>
 
-      <div class="col-md-7 product-details">
-          <h4 th:text="${product.name}">상품명</h4>
-          <div class="mt-2 row">
-            <p class="col-md-6">가격: <span th:text="${#numbers.formatDecimal(product.price, 0)}"></span>원</p>
-            <p class="col-md-6">재고 수량: <span th:text="${product.stockQuantity}"></span></p>
-            <p class="col-md-4">무료배송: <span th:text="${product.isFreeShipping ? '예' : '아니오'}"></span></p>
-            <p class="col-md-4">숨김 여부: <span th:text="${product.isHidden ? '숨김' : '공개'}"></span></p>
-            <p class="col-md-4">찜 갯수: <span th:text="${product.likesCount}"></span></p>
-          </div>
+            <div class="col-md-7 product-details">
+                <h4 th:text="${product.productName}">상품명</h4>
+                <div class="mt-2 row">
+                    <p class="col-md-6">가격: <span th:text="${#numbers.formatDecimal(product.price, 0)}"></span>원</p>
+                    <p class="col-md-6">재고 수량: <span th:text="${product.stockAmount}"></span></p>
+                    <p class="col-md-4">무료배송: <span th:text="${product.deliveryisFree ? '예' : '아니오'}"></span></p>
+                    <p class="col-md-4">숨김 여부: <span th:text="${product.secretYn ? '숨김' : '공개'}"></span></p>
+                    <p class="col-md-4">찜 갯수: <span th:text="${product.likecnt}"></span></p>
+                </div>
 
-          <!-- 카테고리 표시 (Category > Subcategory > Detailed Category) -->
-          <p th:text="${product.category.parentCategory.parentCategory.name} + ' > ' + ${product.category.parentCategory.name} + ' > ' + ${product.category.name}">
-              카테고리>중간카테고리>세부카테고리
-          </p>
-      </div>
+                <!-- 카테고리 표시 (Category > Subcategory > Detailed Category) -->
+                <p th:text="${product.category.parentCategory.parentCategory.name} + ' > ' + ${product.category.parentCategory.name} + ' > ' + ${product.category.name}">
+                    카테고리>중간카테고리>세부카테고리
+                </p>
+            </div>
 
-      <!-- 버튼 -->
-      <div class="col-md-3 product-actions text-end">
-          <button class="btn btn-secondary" th:onclick="'location.href=\'/productEdit/' + ${product.id} + '\'" >수정</button>
-      </div>
-  </div>
+            <!-- 버튼 -->
+            <div class="col-md-3 product-actions text-end">
+                <button class="btn btn-secondary" th:onclick="'location.href=\'/productEdit/' + ${product.id} + '\'" >수정</button>
+            </div>
+        </div>
+    </th:block>
+    <th:block th:if="${#strings.equals(listIsEmpty,'Y')}">
+        <td colspan="8" class="text-center">상품 정보가 없습니다.</td>
+    </th:block>
 
         <!-- 페이지네이션 -->
-        <div>[(${pageList})]</div>
-      </div>
-
-      <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            var categorySelect = document.getElementById('categorySelect');
-
-            categorySelect.addEventListener('change', function() {
-                var categoryId = this.value;
-                window.location.href = '/productManage?category=' + categoryId;
-            });
-        });
-      </script>
+        <div th:text="${pageList}"></div>
+</div>
 </body>
 </html>
-
-<!-- 백엔드 예시
-@Controller
-public class ProductController {
-
-    @GetMapping("/productEdit/{id}")
-    public String editProduct(@PathVariable Long id, Model model) {
-        // Fetch product by ID (this is just an example; adjust according to your service layer)
-        Product product = productService.findById(id);
-        
-        // Add product data to model
-        model.addAttribute("product", product);
-        
-        // Return Thymeleaf template for editing
-        return "productEdit";
-    }
-}
--->
