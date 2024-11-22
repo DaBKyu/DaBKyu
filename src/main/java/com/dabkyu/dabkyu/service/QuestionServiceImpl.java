@@ -74,11 +74,13 @@ public class QuestionServiceImpl implements QuestionService {
 	
 	// 문의 상세 페이지에서 첨부된 파일 목록 보기
 	@Override
-	public List<QuestionFileDTO> fileListView(Long queSeqno) throws Exception{
+	public List<QuestionFileDTO> fileListView(Long queSeqno) throws Exception {
+		QuestionEntity questionEntity = questionRepository.findById(queSeqno)
+				.orElseThrow(() -> new IllegalArgumentException("해당 문의를 찾을 수 없습니다: " + queSeqno));
+	
 		List<QuestionFileDTO> fileDTOs = new ArrayList<>();
-		QuestionEntity questionEntity = questionRepository.findById(queSeqno).get();
-
-		questionFileRepository.findByQueSeqno(questionEntity).stream().forEach(list-> fileDTOs.add(new QuestionFileDTO(list)));
+		questionFileRepository.findByQueSeqno(questionEntity)
+				.forEach(file -> fileDTOs.add(new QuestionFileDTO(file)));
 		return fileDTOs;
 	}
 }
