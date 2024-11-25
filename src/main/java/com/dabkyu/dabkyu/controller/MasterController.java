@@ -671,7 +671,7 @@ public class MasterController{
     //리뷰 리스트 화면 
     @GetMapping("/master/reviewList")
     public void getReviewList(Model model, @RequestParam("page") int pageNum, 
-                @RequestParam(name="category",defaultValue="0",required=false) Long category) 
+                @RequestParam(name="category", required=false) Long category) 
                 throws Exception{
         int postNum = 15;
         int pageListCount = 10;
