@@ -61,7 +61,6 @@ import com.dabkyu.dabkyu.entity.repository.CouponCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponTargetRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
-import com.dabkyu.dabkyu.entity.repository.MasterRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberNotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.NotificationRepository;
