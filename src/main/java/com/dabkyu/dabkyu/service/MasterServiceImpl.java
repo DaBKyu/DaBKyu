@@ -327,7 +327,7 @@ public class MasterServiceImpl implements MasterService {
         if (category != null && productname != null) {
             orderDetailPage = orderDetailRepository.findByCategoryAndProductNameContaining(category, productname, pageRequest);
         } else if(category == null && productname != null){
-            orderDetailPage = orderDetailRepository.findByProductNameContaining(productname, pageRequest);
+            //orderDetailPage = orderDetailRepository.findByProductNameContaining(productname, pageRequest);
             orderDetailPage = orderDetailRepository.findByOrderProductSeqno_ProductSeqno_ProductNameContaining(productname, pageRequest);
         } else if(category != null && productname == null){
             orderDetailPage = orderDetailRepository.findByCategory(category, pageRequest);
@@ -617,13 +617,13 @@ public class MasterServiceImpl implements MasterService {
     public void deleteCategory3(Long category3Seqno) throws Exception {
         Category3Entity category3Entity = category3Repository.findById(category3Seqno).get();
 
-        Category3Entity temporaryCategory = category3Repository.findByIsTemporaryTrue();
+        Category3Entity temporaryCategory = category3Repository.findByIsTemporaryTrue(); //
 
         if (temporaryCategory == null) { //임시 카테고리 없다면 생성. 
             temporaryCategory = new Category3Entity();
             temporaryCategory.setCategory3Name("tempCategory");
             temporaryCategory.setCategory2Seqno(category3Entity.getCategory2Seqno()); //기존 카테고리2에 연결
-            temporaryCategory.setTemporary(true);//임시 카테고리로 설정
+            temporaryCategory.setIsTemporary("Y");//임시 카테고리로 설정 Y
             category3Repository.save(temporaryCategory);
         }
 

@@ -19,7 +19,7 @@ public class Category3DTO {
     private Long category3Seqno;
     private Long category2Seqno;
 	private String category3Name;
-    private boolean isTemporary;
+    private String isTemporary;
     
 
     private Category2Repository category2Repository;
@@ -34,7 +34,7 @@ public class Category3DTO {
         this.category3Seqno = entity.getCategory3Seqno();
         this.category2Seqno = entity.getCategory2Seqno().getCategory2Seqno();
         this.category3Name = entity.getCategory3Name();
-        this.isTemporary = entity.isTemporary();
+        this.isTemporary = entity.getIsTemporary();
     }
 
     public Category3Entity dtoToEntity(Category3DTO dto) { 
@@ -42,7 +42,7 @@ public class Category3DTO {
                                                          .category3Seqno(dto.getCategory3Seqno())
                                                          .category2Seqno(category2Repository.findById(dto.getCategory2Seqno()).get())
 	                                                     .category3Name(dto.getCategory3Name())
-                                                         .isTemporary(dto.isTemporary())
+                                                         .isTemporary(dto.getIsTemporary())
                                                          .build();
         return category3Entity;
     }
