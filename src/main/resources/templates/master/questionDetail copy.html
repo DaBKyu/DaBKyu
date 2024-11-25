@@ -9,78 +9,69 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
     <script>
         const submitReply = async () => {
-        const content = document.querySelector('#comContent');
-        const queSeqno = document.querySelector('#queSeqno').value;
+        const comContent = document.querySelector('#comContent').value;
 
-        if (content.value === '') {
+        if (comContent === '') {
             alert('답변을 입력하세요.');
-            content.focus();
+            comContent.focus();
             return false;
         }
 
-        const formData = new FormData();
-        formData.append("comContent", content.value);
-        formData.append("queSeqno", queSeqno);
+        let formData = new FormData(replyForm)
+        await fetch('/master/reply?option=I', {
+            method: 'POST',
+            body: formData,
+        }).then((response)=> response.json())
+		    .then((data)=> {
+                console.log(data);
+	    }).catch((error) => {
+			console.log("error = " + error);
+			alert("시스템 장애로 댓글 등록이 실패했습니다.");
+        });
 
-        try {
-            const response = await fetch('/master/reply?option=I', {
-                method: 'POST',
-                body: formData,
-            });
+        // 답변 내용을 readonly로 변경
+        comContent.setAttribute('readonly', true);
 
-            if (response.ok) {
-                const data = await response.json();
-                alert(data.message);
+        // "수정" 버튼 활성화
+        document.querySelector('#editBtn').classList.remove('d-none');
+        document.querySelector('#submitBtn').classList.add('d-none');
+    }
 
-                // 답변 내용을 readonly로 변경
-                content.setAttribute('readonly', true);
-
-                // "수정" 버튼 활성화
-                document.querySelector('#editBtn').classList.remove('d-none');
-                document.querySelector('#submitBtn').classList.add('d-none');
-            } else {
-                throw new Error('답변 등록 실패');
-            }
-            } catch (error) {
-                console.error('Error:', error);
-                alert("시스템 장애로 답변 등록이 실패했습니다.");
-            }
-        };
         const enableEdit = () => {
-            const content = document.querySelector('#comContent');
+            const comContent = document.querySelector('#comContent');
 
             // readonly 해제
-            content.removeAttribute('readonly');
+            comContent.removeAttribute('readonly');
 
             // "답변 제출" 버튼 활성화
             document.querySelector('#submitBtn').classList.remove('d-none');
             document.querySelector('#editBtn').classList.add('d-none');
         };
         const updateReply = async () => {
-            const content = document.querySelector('#comContent');
+            const comContent = document.querySelector('#comContent').value;
             const queSeqno = document.querySelector('#queSeqno').value;
-            const email = document.querySelector('#email').value;
+            const option = "U";
 
-            if (content.value === '') {
+            if (content === '') {
                 alert('내용을 입력하세요.');
                 content.focus();
                 return false;
             }
 
-            const formData = new FormData();
-            formData.append("comContent", content.value);
-            formData.append("queSeqno", queSeqno);
-            formData.append("email", email);
-
             try {
-                const response = await fetch('/master/reply?option=U', {
+                const response = await fetch('/master/reply?queSeqno=option=U', {
                     method: 'POST',
-                    body: formData,
+                    headers: {
+                    'Content-Type': 'application/json', 
+                    },
+                    body: JSON.stringify({
+                        queSeqno: queSeqno,
+                        comContent: comContent,
+                    }),
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-                    alert(data.message);
+                    alert('답변이 성공적으로 수정되었습니다.');
 
                     // 다시 readonly로 변경
                     content.setAttribute('readonly', true);
@@ -88,8 +79,9 @@
                     // "수정" 버튼 활성화
                     document.querySelector('#editBtn').classList.remove('d-none');
                     document.querySelector('#submitBtn').classList.add('d-none');
+                    window.location.reload();
                 } else {
-                    throw new Error('답변 수정 실패');
+                    alert('답변 수정 중 오류가 발생했습니다.');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -106,15 +98,16 @@
 
             try {
                 const response = await fetch(`/master/question/delete?queSeqno=${queSeqno}`, {
-                    method: 'DELETE',
+                    method: 'GET',
                 });
 
                 if (response.ok) {
-                    alert('문의가 성공적으로 삭제되었습니다.');
-                    window.location.href = '/master/question'; // 목록 페이지로 리다이렉트
+                    const message = await response.text();
+                    alert(message); // 성공 메시지 표시
+                    window.location.href = '/master/question?page=1'; // 목록 페이지로 리다이렉트
                 } else if (response.status === 404) {
                     alert('해당 문의를 찾을 수 없습니다.');
-                } else {
+                } else if (response.status === 500) {
                     alert('문의 삭제 중 오류가 발생했습니다.');
                 }
             } catch (error) {
@@ -135,7 +128,6 @@
     <!-- 문의 정보 표시 -->
     <div class="card mb-4">
         <div class="card-body">
-            <p class="card-text"><small class="text-muted">문의 상태: <span th:text="${question['queType']}"></span></small></p>
             <p class="card-text"><small class="text-muted">작성자: <span th:text="${question['email'].email}"></span></small></p>
             <p class="card-text"><small class="text-muted">작성일: <span th:text="${#temporals.format(question['queDate'], 'yyyy-MM-dd HH:mm')}"></span></small></p>
             <h5 class="card-title">문의 제목: <span th:text="${question['queTitle']}"></span></h5>
@@ -166,6 +158,7 @@
             <label for="comContent" class="form-label">답변 내용:</label>
             <textarea class="form-control" id="comContent" name="comContent" rows="5"></textarea>
             <input type="hidden" id="queSeqno" name="queSeqno" th:value="${question['queSeqno']}">
+            <input type="hidden" id="email" name="email" th:value="${question['email'].email}">
         </div>
         <div>
             <button id="submitBtn" type="button" class="btn btn-primary" onclick="submitReply()">답변 제출</button>
