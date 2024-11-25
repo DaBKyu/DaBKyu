@@ -38,6 +38,7 @@ import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.CouponTargetEntity;
+import com.dabkyu.dabkyu.entity.MemberCouponEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.MemberNotificationEntity;
 import com.dabkyu.dabkyu.entity.NotificationEntity;
