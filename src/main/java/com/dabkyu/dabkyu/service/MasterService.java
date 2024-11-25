@@ -23,7 +23,9 @@ import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
+import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
+import com.dabkyu.dabkyu.entity.CouponTargetEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
@@ -48,22 +50,27 @@ public interface MasterService {
     //맴버 삭제
     public void clientDelete(String email) throws Exception;
 
-    //////////////상품
     //상품 리스트 
-    public Page<ProductEntity> productList(Long category1Seqno, Long category2Seqno, Long category3Seqno, String keyword, PageRequest pageable);
-    
-    //상품 상세보기
+    public Page<ProductEntity> productList(Long category1Seqno, Long category2Seqno, Long category3Seqno, String productName, PageRequest pageable);
+
     //productSeqno로 상품 정보 가져오기
     public ProductEntity getProductBySeqno(Long productSeqno) throws Exception;
-    // 상품 옵션 정보 가져오기
+
+    //상품 옵션 정보 가져오기
     public List<ProductOptionDTO> getProductOptions(Long productSeqno) throws Exception;
-    // 관련 상품 정보 가져오기
+
+    //추가 상품 정보 가져오기
     public List<RelatedProductDTO> getRelatedProducts(Long productSeqno) throws Exception;
-    // 카테고리 정보 가져오기
+
+    //카테고리 정보 가져오기
     public Category3Entity getCategory3ByProduct(Long productSeqno) throws Exception;
-    // 상품 파일 정보 가져오기
+    public Category2Entity getCategory2ByProduct(Long productSeqno) throws Exception;
+    public Category1Entity getCategory1ByProduct(Long productSeqno) throws Exception;
+
+    //상품 파일 정보 가져오기
     public List<ProductFileDTO> getProductFiles(Long productSeqno) throws Exception;
-    // 상세보기 이미지 파일 정보 가져오기
+
+    //상품설명 이미지 파일 정보 가져오기
     public List<ProductInfoFileDTO> getProductInfoFiles(Long productSeqno) throws Exception;
 
     //상품등록
@@ -71,6 +78,9 @@ public interface MasterService {
 
     //상품수정
     public void productModify(ProductDTO productDTO) throws Exception;
+
+    //상품 카테고리 저장
+    public void setProductCategory(Long category3Seqno, ProductDTO productDTO) throws Exception;
 
     //상품 옵션 저장
     public void saveProductOption(ProductOptionDTO productOptionDTO) throws Exception;
@@ -84,36 +94,46 @@ public interface MasterService {
     //상품 상세보기 이미지 파일 등록
     public void productDetailImgFile(ProductInfoFileDTO productInfoFileDTO) throws Exception;
     
+    //옵션 삭제
+    public void deleteProductOption(Long optionSeqno);
+ 
+    //추가상품 삭제
+    public void deleteRelatedProduct(Long relatedProductSeqno);
+
     //상품 이미지 삭제
     public void deleteProductFile(Long fileseqno) throws Exception;
 
     //상품 상세보기 이미지 삭제
     public void deleteProductInfoFile(Long productInfoFileSeqno) throws Exception;
 
-    //상품 삭제(활성 비활성)
-    public List<ProductDTO> getAllProducts() throws Exception;
+    //상품 비활성화
+    public void secretYNProduct(Long productSeqno) throws Exception;
 
     ////////////주문
     //주문 리스트
     public Page<Map<String, Object>> orderList(int pageNum, int postNum, String productname, Long category) throws Exception;
 
     //주문 상태 수정
-    public void modifyOrderStatus(Long orderSeqno, String newStatus) throws Exception;
+    public void modifyOrderStatus(Long orderSeqno, String orderStatus) throws Exception;
 
     //OrderSeqno찾기
     public OrderInfoEntity getOrderInfo(Long orderSeqno) throws Exception;
+
     //OrderDetail찾기
     public List<OrderDetailEntity> getOrderDetails(Long orderSeqno) throws Exception;
+
     //OrderProduct찾기
     public List<OrderProductEntity> getOrderProducts(Long productSeqno) throws Exception;
+
     //AddedRelatedProduct찾기
     public List<AddedRelatedProductEntity> getAddedRelatedProducts(List<OrderProductEntity> orderProducts) throws Exception;
+
     //OrderProductOption찾기
     public List<OrderProductOptionEntity> getOrderProductOptions(List<OrderProductEntity> orderProducts) throws Exception;
+
     //product찾기
     public List<ProductEntity> getProducts(List<OrderProductEntity> orderProducts) throws Exception;
 
-    /////////////문의
     //문의 리스트
     public Page<Map<String, Object>> questionList(int pageNum, int postNum, String queType) throws Exception;
 
@@ -135,50 +155,58 @@ public interface MasterService {
     //문의 답변 삭제   
     public void deleteQueComment(QuestionEntity queSeqno) throws Exception;
 
-    //////////카테고리
     //카테고리 리스트
     public List<Category1Entity> getAllCategories1();
     public List<Category2Entity> getAllCategories2();
     public List<Category3Entity> getAllCategories3();
 
     //카테고리 추가
-    public void createCategory(String kind, List<Category1DTO> category1DTOs, List<Category2DTO> category2DTOs, List<Category3DTO> category3DTOs) throws Exception;
+    public void saveCategories(List<Category1DTO> list1, List<Category2DTO> list2, List<Category3DTO> list3) throws Exception;
 
     //카테고리 삭제
     public void deleteCategory1(Long category1Seqno) throws Exception;
     public void deleteCategory2(Long category2Seqno) throws Exception;
     public void deleteCategory3(Long category3Seqno) throws Exception;
 
-    /////////////쿠폰
     //쿠폰 리스트
     public Page<Map<String,Object>> couponList(int pageNum, int postNum, String keyword) throws Exception;
     
-    //카테고리 전부 불러오기
-    public List<Category3DTO> getAllCategories();
+    //쿠폰 상세보기
+    public CouponEntity getCouponBySeqno(Long couponSeqno) throws Exception;
 
-    //쿠폰등록
-    //
+    //쿠폰 seqno가져오기
     public Long writeCoupon(CouponDTO couponDTO) throws Exception;
-    //couponSeqno가져오기
-    public CouponEntity getCouponSeqno(Long couponSeqno) throws Exception;
-	// 모든 상품 가져오기
-    public List<ProductEntity> getAllProductsA() throws Exception;
-    //카테고리 가져오기
-    public Category3Entity getCategory3Seqno(Long categoryId) throws Exception;
-    //쿠폰 타겟 저장
-    public void saveCouponTarget(CouponTargetDTO couponTargetDTO) throws Exception;
-    //쿠폰 카테고리 저장
-    public void saveCouponCategory(CouponCategoryDTO couponCategoryDTO) throws Exception;
 
-
-
-	//쿠폰수정
+    //쿠폰수정
 	public void modifyCoupon(CouponDTO coupon) throws Exception;
 
-	//쿠폰삭제
-	public void deleteCoupon(Long couponSeqno) throws Exception;
+	// 모든 상품 가져오기
+    public List<ProductEntity> getAllProducts() throws Exception;
+  
+    //쿠폰 카테고리 저장
+    public void saveCouponCategory(Long couponSeqno, Long categoryId) throws Exception;
 
-    //////////////리뷰
+    //특정 쿠폰에 대한 카테고리 불러오기
+    public List<CouponCategoryEntity> getCouponCategories(Long couponSeqno) throws Exception;
+
+    //쿠폰 타겟 저장
+    public void saveCouponTarget(Long couponSeqno, ProductEntity product) throws Exception;
+
+    //특정 쿠폰에 대한 타겟 불러오기
+    public List<CouponTargetEntity> getCouponTargets(Long couponSeqno) throws Exception;
+
+	//쿠폰 카테고리 삭제
+    public void deleteCouponCategory(Long couponSeqno, Long category3Seqno) throws Exception;
+
+    //쿠폰 타겟 삭제
+    public void deleteCouponTarget(Long couponSeqno, Long productSeqno) throws Exception;
+
+    //쿠폰 배포
+    public void couponToUser(Long couponSeqno, boolean isAllMembers, String role, boolean isBirthday, boolean isNewMember) throws Exception;
+
+    //쿠폰 삭제 
+    public void deleteCoupon(Long couponSeqno, String email) throws Exception;
+
     //리뷰 리스트
     public Page<Map<String, Object>> reviewList(int pageNum, int postNum, Long category) throws Exception;
 

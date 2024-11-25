@@ -42,8 +42,10 @@ public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
   public Page<ReviewEntity> findByEmail(MemberEntity email, Pageable pageable);
 
   //관리자페이지 리뷰 카테고리
-  //ReviewRepository에서 카테고리별 리뷰 조회 쿼리
-  @Query("SELECT r FROM review r WHERE r.productSeqno.category3Seqno.category2Seqno.category1Seqno = :category")
-  public Page<ReviewEntity> findByCategory(@Param("category") Long category, Pageable pageable);
+  @Query("SELECT r FROM review r " +
+           "JOIN r.productSeqno p " +              
+           "JOIN p.category3Seqno c3 " +           
+           "WHERE c3.category3Seqno = :category3Seqno")
+  Page<ReviewEntity> findByCategory(@Param("category") Long category, Pageable pageable);
 
 }

@@ -42,4 +42,8 @@ public class Category3Entity {
 	
 	@Column(name="category3_name", length=20, nullable=false)
 	private String category3Name;
+
+	@Column(name="is_temporary", nullable=false, columnDefinition="boolean default false")
+	@Builder.Default
+	private boolean isTemporary = false;
 }
