@@ -39,7 +39,7 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 public interface MasterService {
 
     //맴버 리스트
-    public Page<MemberEntity> memberList(int pageNum, int postNum, String keyword) throws Exception;
+    public Page<MemberEntity> memberList(int pageNum, int postNum, String keyword, String memberGrade) throws Exception;
 
     //맴버 이메일로 검색
     public MemberDTO getMemberByEmail(String email);
@@ -230,5 +230,8 @@ public interface MasterService {
 
     //결제 취소 및 환불 처리
     public void cancelOrRefundOrder(Long orderDetailSeqno, Long couponSeqno, int point, boolean isRefund);
+
+    //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
+    public void setExpiredCouponsToExpired(LocalDateTime referenceDate);
 
 }

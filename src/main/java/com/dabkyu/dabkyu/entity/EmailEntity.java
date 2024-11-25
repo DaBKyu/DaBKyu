@@ -9,26 +9,27 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Builder
-@Entity(name="emailSendList")
-@Table(name="email_send_list")
-public class EmailSendListEntity {
+@Entity(name="email")
+@Table(name="email")
+@NoArgsConstructor
+@AllArgsConstructor
+public class EmailEntity {
 
     @Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EMAILSENDLIST_SEQ")	
-	@SequenceGenerator(name="EMAILSENDLIST_SEQ", sequenceName = "emailsendlist_seq", 
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EMAIL_SEQ")	
+	@SequenceGenerator(name="EMAIL_SEQ", sequenceName = "email_seq", 
 		initialValue = 1, allocationSize = 1)
-	@Column(name="email_sendlist_seqno")
-	private Long emailSendlistSeqno;
-	
-	@Column(name="target_category", length=50, nullable=false)
-	private String targetCategory;
+	@Column(name="email_seqno")
+	private Long emailSeqno;
 
     @Column(name="email_title", length=200, nullable=false)
 	private String emailTitle;

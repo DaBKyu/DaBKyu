@@ -2,126 +2,107 @@ package com.dabkyu.dabkyu.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.dabkyu.dabkyu.entity.Category3Entity;
-import com.dabkyu.dabkyu.entity.LikeListEntity;
-import com.dabkyu.dabkyu.entity.MemberCategoryEntity;
-import com.dabkyu.dabkyu.entity.MemberEntity;
-import com.dabkyu.dabkyu.entity.ProductEntity;
-import com.dabkyu.dabkyu.entity.repository.Category3Repository;
-import com.dabkyu.dabkyu.entity.repository.LikeListRepository;
-import com.dabkyu.dabkyu.entity.repository.MemberCategoryRepository;
-import com.dabkyu.dabkyu.entity.repository.MemberRepository;
-import com.dabkyu.dabkyu.entity.repository.ProductRepository;
-import com.dabkyu.dabkyu.entity.repository.RecentViewRepository;
+import com.dabkyu.dabkyu.entity.EmailEntity;
 import com.dabkyu.dabkyu.service.EmailService;
-import com.dabkyu.dabkyu.service.MailSendService;
 import com.dabkyu.dabkyu.util.PageUtil;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Controller
 @Log4j2
 @AllArgsConstructor
+@RequestMapping("/master")
 public class EmailController {
 
     private final EmailService emailService;
-    private final MailSendService mailSendService;
-    private final LikeListRepository likeListRepository;  
-    private final RecentViewRepository recentViewRepository; 
-    private final MemberRepository memberRepository;  
-    private final MemberCategoryRepository memberCategoryRepository; // MemberCategoryRepository 추가
-    private final Category3Repository category3Repository; 
-    private final ProductRepository productRepository;
+   
+    //이메일 발송 화면 보기
+	@GetMapping("/mail/sendEmail")
+	public void getWrite() { }
 
-    // 카테고리 선택 후 해당 카테고리를 관심 카테고리로 지정한 사람들에게 이메일 발송
-    @PostMapping("/send/categoryInterestMail")
-    public String sendCategoryInterestMail(@RequestParam Long category3Seqno) {
-        // 해당 카테고리를 관심 카테고리로 지정한 사용자들 조회
-        List<MemberCategoryEntity> memberCategories = memberCategoryRepository.findByCategory3Seqno_Category3Seqno(category3Seqno);
+    // 이메일 발송
+    @ResponseBody
+    @PostMapping("/mail/sendEmail")
+    public String sendCategoryInterestMail(
+        @RequestParam(name = "category3SeqnoList", required = false) List<Long> category3SeqnoList,
+        @RequestParam(name = "productSeqnoList", required = false) List<Long> productSeqnoList,
+        @RequestParam(name = "mailFileList", required = false) MultipartFile[] mailFileList,
+        @RequestParam(name = "kind") String kind,
+        @RequestParam(name = "title") String title,
+        @RequestParam(name = "content") String content,
+        @RequestParam(name = "couponSeqnoList", required = false) List<Long> couponSeqnoList
+    ) throws Exception {
 
-        // 이메일 내용 생성
-        String content = createInterestedCategoriesContent(memberCategories);
+        //이메일 발송
+        emailService.sendEmail(title, content, mailFileList, kind, category3SeqnoList, productSeqnoList, couponSeqnoList);
 
-        // 해당 카테고리를 관심 카테고리로 지정한 사용자들에게 이메일 발송
-        for (MemberCategoryEntity memberCategory : memberCategories) {
-            MemberEntity member = memberCategory.getEmail();
-            emailService.sendMail(new String[]{member.getEmail()}, "관심 카테고리의 최신 상품을 확인해보세요!", content, null);
+        // maxSeqno 구하기
+        Long maxSeqno = emailService.getMaxSeqno();
+        
+        //카테고리저장 
+        if(category3SeqnoList != null) {
+          emailService.saveEmailCategory(maxSeqno, category3SeqnoList);
         }
-        return "{\"message\":\"Email sent successfully to interested category members\"}";
-    }
-
-    // 찜한 상품 선택 후 해당 상품을 찜한 사람들에게 이메일 발송
-    @PostMapping("/send/likedItemMail")
-    public String sendLikedItemMail(@RequestParam Long productSeqno) {
-        // 해당 상품을 찜한 사용자들 조회
-        List<LikeListEntity> likedItems = likeListRepository.findByProductSeqno_ProductSeqno(productSeqno);
-
-        // 이메일 내용 생성
-        String content = createLikedItemsContent(likedItems);
-
-        // 해당 상품을 찜한 사용자들에게 이메일 발송
-        for (LikeListEntity likeItem : likedItems) {
-            MemberEntity member = likeItem.getEmail();
-            emailService.sendMail(new String[]{member.getEmail()}, "찜한 상품 할인 소식!", content, null);
+        
+        //찜상품저장
+        if(productSeqnoList != null) {
+           emailService.saveEmailLike(maxSeqno, productSeqnoList);
         }
-        return "{\"message\":\"Email sent successfully to users who liked the item\"}";
-    }
-
-    // 관심 카테고리 이메일 내용 생성 (수정된 부분)
-    private String createInterestedCategoriesContent(List<MemberCategoryEntity> memberCategories) {
-        StringBuilder content = new StringBuilder("관심 있는 카테고리의 최신 상품:\n");
-
-        // 관심 카테고리 목록을 이용해 카테고리 이름을 가져와 이메일 내용 생성
-        for (MemberCategoryEntity memberCategory : memberCategories) {
-            Category3Entity category = memberCategory.getCategory3Seqno();  // 관심 카테고리 정보
-            content.append("- ").append(category.getCategory3Name()).append("\n");
-
-            // 해당 카테고리 내 상품들 조회
-            List<ProductEntity> productsInCategory = productRepository.findByCategory3Seqno_Category3Seqno(category.getCategory3Seqno());
-            for (ProductEntity product : productsInCategory) {
-                content.append("  - ").append(product.getProductName()).append("\n");
-            }
+        
+        //파일 저장
+        if(mailFileList != null) {
+           emailService.saveEmailFile(maxSeqno, mailFileList);
         }
+        
+        return "{\"message\":\"good\"}";
 
-        content.append("새로운 상품들을 지금 바로 만나보세요!");
-        return content.toString();
-    }
+    } 
 
-    // 찜한 상품 이메일 내용 생성
-    private String createLikedItemsContent(List<LikeListEntity> likedItems) {
-        StringBuilder content = new StringBuilder("찜한 상품들이 할인 중입니다:\n");
+    // 메일 발송 내역 보기
+	@GetMapping("/mail/mailSendList")
+	public void getReviewList(Model model,@RequestParam("page") int pageNum,
+			@RequestParam(name="keyword",defaultValue="",required=false) String keyword) throws Exception {
+		
+		int postNum = 10; //한 화면에 보여지는 게시물 행의 갯수
+		int pageListCount = 10; //화면 하단에 보여지는 페이지리스트의 페이지 갯수	
+		
+		PageUtil page = new PageUtil();
+		Page<EmailEntity> list = emailService.list(pageNum, postNum, keyword);
+		int totalCount = (int)list.getTotalElements();
 
-        for (LikeListEntity item : likedItems) {
-            ProductEntity product = item.getProductSeqno();  // 찜한 상품 정보
-            content.append("- ").append(product.getProductName()).append("\n");
-        }
-        content.append("지금 바로 확인하세요!");
-        return content.toString();
-    }
-  
-    // 메일 발송 내역 출력
-    @GetMapping("/mailSendList")
-    public void getMailSendList(
-            Model model,
-            @RequestParam("page") int pageNum,
-            @RequestParam(name = "category", defaultValue = "", required = false) Long category
-    ) {
-        // 페이지네이션
-        int pageSize = 10;  // 한 페이지에 표시할 메일 발송 내역의 개수
-        long totalCount = mailSendService.getTotalMailSendCount();  // 전체 메일 발송 내역 개수
-        PageUtil pageUtil = new PageUtil();
-        String pageList = pageUtil.getMailSendPageList(pageNum, pageSize, 5, totalCount);
+		model.addAttribute("list", list);
+		model.addAttribute("listIsEmpty", list.hasContent()?"N":"Y");
+		model.addAttribute("totalElement", totalCount);
+		model.addAttribute("postNum", postNum);
+		model.addAttribute("page", pageNum);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("pageList", page.getMailSendPageList(pageNum, postNum, pageListCount,totalCount,keyword));
+	}
 
-        // 메일 발송 내역 조회
-        model.addAttribute("mailSendList", mailSendService.getMailSendList(pageSize, pageNum));
-        model.addAttribute("pageList", pageList);
-    }
+	// 메일 내용 상세 보기
+	@GetMapping("/mail/mailView")
+	public void getReviewView(@RequestParam("emailSeqno") Long emailSeqno, @RequestParam("page") int pageNum,
+			@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
+			Model model, HttpSession session) throws Exception {
+		
+		model.addAttribute("view", emailService.view(emailSeqno));
+		model.addAttribute("page", pageNum);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("pre_seqno", emailService.pre_seqno(emailSeqno,keyword));		
+		model.addAttribute("next_seqno", emailService.next_seqno(emailSeqno,keyword));
+		model.addAttribute("fileListView", emailService.fileListView(emailSeqno));	
+	}
+        
 }
-

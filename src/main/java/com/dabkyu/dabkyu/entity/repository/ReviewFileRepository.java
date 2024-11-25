@@ -17,5 +17,6 @@ public interface ReviewFileRepository extends JpaRepository<ReviewFileEntity, Lo
                 + "WHERE r.email.email=:email")
     public List<ReviewFileEntity> findByEmail(@Param("email") String email);
 
+    // 리뷰 상세 페이지에서 첨부된 파일 목록 보기
     public List<ReviewFileEntity> findByReviewSeqno(ReviewEntity review);
 }

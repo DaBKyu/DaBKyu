@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -77,7 +78,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import oracle.jdbc.proxy.annotation.Post;
 
 @Controller
 @Log4j2
@@ -96,14 +96,15 @@ public class MasterController{
     @GetMapping("/master/client")
     public void getClient(Model model, 
                 @RequestParam("page") int pageNum,
-                @RequestParam(name="keyword",defaultValue="",required=false) String keyword) 
+                @RequestParam(name="keyword",defaultValue="",required=false) String keyword,
+                @RequestParam(name="memberGrade",defaultValue="",required=false) String memberGrade) 
                 throws Exception {
        
         int postNum = 15; //한 화면에 보여지는 게시물 행의 갯수
 		int pageListCount = 10; //화면 하단에 보여지는 페이지리스트의 페이지 갯수	
 		
 		PageUtil page = new PageUtil();
-		Page<MemberEntity> clientList = masterService.memberList(pageNum, postNum, keyword);
+		Page<MemberEntity> clientList = masterService.memberList(pageNum, postNum, keyword, memberGrade);
 		int totalCount = (int)clientList.getTotalElements();
 
 		model.addAttribute("list", clientList);
@@ -112,6 +113,7 @@ public class MasterController{
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
+		model.addAttribute("memberGrade", memberGrade);
 		model.addAttribute("pageList", page.getPageClient(pageNum, postNum, pageListCount,totalCount,keyword));
     }
 
@@ -182,8 +184,9 @@ public class MasterController{
         model.addAttribute("category2Seqno", category2Seqno);
         model.addAttribute("category3Seqno", category3Seqno);
         model.addAttribute("thumbnailFiles", thumbnailFiles);
-		model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,productName));
+		    model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,productName));
     }
+    
 
 
     //상품 상세보기 
@@ -427,6 +430,7 @@ public class MasterController{
     }
 
     //주문내역 리스트
+     
     @GetMapping("/master/order")
     public void getOrderList(Model model, 
                             @RequestParam("page") int pageNum, 
@@ -449,6 +453,7 @@ public class MasterController{
         model.addAttribute("category", category);
         model.addAttribute("pageList", page.getPageOrder(pageNum, postNum, pageListCount,totalCount,productname,category));
     }
+        
 
     //주문내역 상세보기 
     @GetMapping("/master/orederView/{orderSeqno}")
@@ -621,15 +626,24 @@ public class MasterController{
         model.addAttribute("totalElements", totalCount);
         model.addAttribute("postNum", postNum);
         model.addAttribute("page", pageNum);
-        model.addAttribute("keyword", queType);
+        model.addAttribute("queType", queType);
         model.addAttribute("pageList", page.getPageQuestion(pageNum, postNum, pageListCount, totalCount, queType));
     }
 
     //문의 상세보기
-    @GetMapping("/master/question/{queSeqno}")
-    public void getQuestionView(@PathVariable Long queSeqno, Model model) throws Exception {
-        model.addAttribute("question", questionService.view(queSeqno));
-        model.addAttribute("questionFiles", questionService.fileListView(queSeqno)); 
+    @GetMapping("/master/questionDetail")
+    public void getQuestionView(@RequestParam("queSeqno") Long queSeqno, @RequestParam("page") int pageNum,
+            @RequestParam(name="queType",defaultValue="",required=false) String queType,
+            Model model) throws Exception {
+
+            model.addAttribute("question", questionService.view(queSeqno));
+    
+            model.addAttribute("questionFiles", questionService.fileListView(queSeqno)); 
+
+            model.addAttribute("queType", queType);
+            model.addAttribute("page", pageNum);
+            model.addAttribute("pre_seqno", questionService.pre_seqno(queSeqno,queType));		
+            model.addAttribute("next_seqno", questionService.next_seqno(queSeqno,queType));
     }
 
     //문의 답변 등록 및 수정
@@ -637,6 +651,9 @@ public class MasterController{
     @PostMapping("/master/question/reply")
     public void postReply(@RequestParam("queSeqno") Long queSeqno,
                 @RequestParam("kind") String kind, 
+    @PostMapping("/master/reply")
+    public void postReply(@RequestParam("queSeqno") Long queSeqno,
+                @RequestParam("option") String option, 
                 @RequestBody QuestionCommentDTO commentDTO)
                 throws Exception{
         
@@ -644,11 +661,11 @@ public class MasterController{
         commentDTO.setQueSeqno(questionEntity);
 
         //등록
-        if(kind.equals("I")){
+        if(option.equals("I")){
             masterService.replyQuestion(commentDTO, questionEntity);
         }
         //수정
-        if(kind.equals("U")){
+        if(option.equals("U")){
             masterService.replyQuestionModify(commentDTO);
         } 
 	}
@@ -677,7 +694,7 @@ public class MasterController{
         masterService.deleteQueComment(questionEntity); 
     }
 
-    //리뷰 리스트 화면
+    //리뷰 리스트 화면 
     @GetMapping("/master/reviewList")
     public void getReviewList(Model model, @RequestParam("page") int pageNum, 
                 @RequestParam(name="category",defaultValue="",required=false) Long category) 
@@ -696,7 +713,7 @@ public class MasterController{
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", category);
 		model.addAttribute("pageList", page.getPageReview(pageNum, postNum, pageListCount,totalCount,category));
-    }
+    } 
 
     //리뷰 상세보기
     @GetMapping("/master/review/{reviewSeqno}")
@@ -912,6 +929,17 @@ public class MasterController{
 
         return "{\"message\":\"good\"}";
     }
+
+    //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
+    @PostMapping("/master/ExpiredUpdate")
+    public String updateExpiredCoupons() {
+        LocalDateTime referenceDate = LocalDateTime.now();
+        
+        masterService.setExpiredCouponsToExpired(referenceDate);
+
+        return "{\"message\":\"good\"}";
+    }
+
 }
 
 
