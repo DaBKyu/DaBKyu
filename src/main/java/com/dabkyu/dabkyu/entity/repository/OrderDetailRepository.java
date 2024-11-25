@@ -40,7 +40,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, 
     public Page<OrderDetailEntity> findByCategory(@Param("category") Long category, Pageable pageable);
 
     //주문리스트 상품명으로 조회
-    public Page<OrderDetailEntity> findByProductNameContaining(String productname, Pageable pageable);
+    //public Page<OrderDetailEntity> findByProductNameContaining(String productname, Pageable pageable);
 
     public Page<OrderDetailEntity> findByOrderProductSeqno_ProductSeqno_ProductNameContaining(String productName, Pageable pageable);
 

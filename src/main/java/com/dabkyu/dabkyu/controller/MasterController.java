@@ -218,7 +218,7 @@ public class MasterController{
                 throws Exception{
                 
         ProductEntity productEntity = masterService.getProductBySeqno(productSeqno); 
-        boolean isTemporaryCategory = productEntity.getCategory3Seqno().isTemporary();
+        String isTemporaryCategory = productEntity.getCategory3Seqno().getIsTemporary();
         model.addAttribute("productview", productEntity); // 상품 정보           
         model.addAttribute("productfileview", masterService.getProductFiles(productSeqno)); //상품 파일 정보 
         model.addAttribute("productinfofileview", masterService.getProductInfoFiles(productSeqno)); //상품설명 이미지 파일 정보
@@ -649,9 +649,6 @@ public class MasterController{
     //문의 답변 등록 및 수정
     @ResponseBody
     @PostMapping("/master/question/reply")
-    public void postReply(@RequestParam("queSeqno") Long queSeqno,
-                @RequestParam("kind") String kind, 
-    @PostMapping("/master/reply")
     public void postReply(@RequestParam("queSeqno") Long queSeqno,
                 @RequestParam("option") String option, 
                 @RequestBody QuestionCommentDTO commentDTO)
