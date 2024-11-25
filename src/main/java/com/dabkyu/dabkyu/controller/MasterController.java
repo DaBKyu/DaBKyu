@@ -650,9 +650,6 @@ public class MasterController{
     @ResponseBody
     @PostMapping("/master/question/reply")
     public void postReply(@RequestParam("queSeqno") Long queSeqno,
-                @RequestParam("kind") String kind, 
-    @PostMapping("/master/reply")
-    public void postReply(@RequestParam("queSeqno") Long queSeqno,
                 @RequestParam("option") String option, 
                 @RequestBody QuestionCommentDTO commentDTO)
                 throws Exception{
