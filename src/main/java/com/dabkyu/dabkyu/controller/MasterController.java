@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,7 +77,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import oracle.jdbc.proxy.annotation.Post;
 
 @Controller
 @Log4j2
@@ -525,25 +525,31 @@ public class MasterController{
         model.addAttribute("totalElements", totalCount);
         model.addAttribute("postNum", postNum);
         model.addAttribute("page", pageNum);
-        model.addAttribute("keyword", queType);
+        model.addAttribute("queType", queType);
         model.addAttribute("pageList", page.getPageQuestion(pageNum, postNum, pageListCount, totalCount, queType));
     }
 
     //문의 상세보기
-    @GetMapping("/master/question/{queSeqno}")
-    public void getQuestionView(@PathVariable Long queSeqno, Model model) throws Exception {
-        QuestionDTO question = questionService.view(queSeqno);
-        model.addAttribute("question", question);
+    @GetMapping("/master/questionDetail")
+    public void getQuestionView(@RequestParam("queSeqno") Long queSeqno, @RequestParam("page") int pageNum,
+            @RequestParam(name="queType",defaultValue="",required=false) String queType,
+            Model model) throws Exception {
 
-        List<QuestionFileDTO> questionFiles = questionService.fileListView(queSeqno);
-        model.addAttribute("questionFiles", questionFiles); 
+            model.addAttribute("question", questionService.view(queSeqno));
+    
+            model.addAttribute("questionFiles", questionService.fileListView(queSeqno)); 
+
+            model.addAttribute("queType", queType);
+            model.addAttribute("page", pageNum);
+            model.addAttribute("pre_seqno", questionService.pre_seqno(queSeqno,queType));		
+            model.addAttribute("next_seqno", questionService.next_seqno(queSeqno,queType));
     }
 
     //문의 답변 등록 및 수정
     @ResponseBody
-    @PostMapping("/master/question/reply/{queSeqno}")
-    public void postReply(@PathVariable Long queSeqno,
-                @RequestParam("kind") String kind, 
+    @PostMapping("/master/reply")
+    public void postReply(@RequestParam("queSeqno") Long queSeqno,
+                @RequestParam("option") String option, 
                 @RequestBody QuestionCommentDTO commentDTO)
                 throws Exception{
         
@@ -551,29 +557,38 @@ public class MasterController{
         commentDTO.setQueSeqno(questionEntity);
 
         //등록
-        if(kind.equals("I")){
+        if(option.equals("I")){
             masterService.replyQuestion(commentDTO, questionEntity);
         }
         //수정
-        if(kind.equals("U")){
+        if(option.equals("U")){
             masterService.replyQuestionModify(commentDTO);
         } 
 	}
 
     //문의 삭제 
     @Transactional
-    @GetMapping("/master/question/delete")
-    public String deleteQuestion(@RequestParam("queSeqno") Long queSeqno) throws Exception{
+    @DeleteMapping("/master/question/delete")
+    public ResponseEntity<?> deleteQuestion(@RequestParam("queSeqno") Long queSeqno) {
+        try {
+            // 1. 문의 삭제
+            masterService.deleteQuestion(queSeqno);
 
-        masterService.deleteQuestion(queSeqno); //문의 삭제
+            // 2. 첨부 파일 삭제
+            List<QuestionFileDTO> questionFiles = questionService.fileListView(queSeqno);
+            for (QuestionFileDTO file : questionFiles) {
+                masterService.deleteQuestionFile(file.getQuestionFileSeqno());
+            }
 
-        List<QuestionFileDTO> questionFiles = questionService.fileListView(queSeqno);
-        if(questionFiles != null){
-            for(QuestionFileDTO questionFile : questionFiles){
-                masterService.deleteQuestionFile(questionFile.getQuestionFileSeqno()); //문의 파일 삭제
-            }  
+            // 3. 성공 응답 반환
+            return ResponseEntity.ok().body("문의가 성공적으로 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            // 데이터가 존재하지 않을 경우
+            return ResponseEntity.status(404).body("해당 문의를 찾을 수 없습니다.");
+        } catch (Exception e) {
+            // 기타 예외 처리
+            return ResponseEntity.status(500).body("문의 삭제 중 오류가 발생했습니다.");
         }
-        return "redirect:/master/question";
     }
 
     //문의 답변 삭제
