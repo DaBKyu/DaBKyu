@@ -169,7 +169,7 @@ public interface MasterService {
     public void deleteCategory3(Long category3Seqno) throws Exception;
 
     //쿠폰 리스트
-    public Page<Map<String,Object>> couponList(int pageNum, int postNum, String keyword) throws Exception;
+    public Page<Map<String,Object>> couponList(int pageNum, int postNum) throws Exception;
     
     //쿠폰 상세보기
     public CouponEntity getCouponBySeqno(Long couponSeqno) throws Exception;
@@ -201,11 +201,14 @@ public interface MasterService {
     //쿠폰 타겟 삭제
     public void deleteCouponTarget(Long couponSeqno, Long productSeqno) throws Exception;
 
-    //쿠폰 배포
+    //쿠폰 배포 (자동-관리자가)
     public void couponToUser(Long couponSeqno, boolean isAllMembers, String role, boolean isBirthday, boolean isNewMember) throws Exception;
 
-    //쿠폰 삭제 
-    public void deleteCoupon(Long couponSeqno, String email) throws Exception;
+    //쿠폰 배포 (수동) - 회원이 다운로드
+    public void downloadCoupon(Long couponSeqno, String email) throws Exception;
+
+    //쿠폰 배포 (수동) - 코드 등록
+    public void getCouponCode(String couponCode, String email) throws Exception;
 
     //리뷰 리스트
     public Page<Map<String, Object>> reviewList(int pageNum, int postNum, Long category) throws Exception;
@@ -232,6 +235,6 @@ public interface MasterService {
     public void cancelOrRefundOrder(Long orderDetailSeqno, Long couponSeqno, int point, boolean isRefund);
 
     //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
-    public void setExpiredCouponsToExpired(LocalDateTime referenceDate);
+    //public void setExpiredCouponsToExpired(LocalDateTime referenceDate);
 
 }

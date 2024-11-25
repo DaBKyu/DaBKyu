@@ -66,7 +66,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 		   "WHERE (:category1Seqno IS NULL OR c1.category1Seqno = :category1Seqno) " +
 		   "AND (:category2Seqno IS NULL OR c2.category2Seqno = :category2Seqno) " +
 		   "AND (:category3Seqno IS NULL OR c3.category3Seqno = :category3Seqno) " +
-		   "AND (:productName IS NULL OR p.productName LIKE %:productName%)")
+		   "AND (:productName = '' OR p.productName LIKE %:productName%)")
     public Page<ProductEntity> findByAllCategories(
             @Param("category1Seqno") Long category1Seqno,
             @Param("category2Seqno") Long category2Seqno,
