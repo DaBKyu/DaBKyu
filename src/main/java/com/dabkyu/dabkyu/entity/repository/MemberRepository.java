@@ -31,11 +31,15 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
                 nativeQuery = true)
     public void modifyPasswordAfter30(@Param("email") String email);
 
+    //회원 등급/이름으로 검색
+    public Page<MemberEntity> findByMemberGradeOrUsernameContaining
+                (String keyword1,String keyword2,Pageable pageable);
+    
     public Page<MemberEntity> findByEmailContainingOrUsernameContaining(
         String keyword1,String keyword2,Pageable pageable
     );
 
     //이메일 수신 동의 멤버 리스트
-    @Query(value="select m from member m where emailRecept = 'Y'")
+    @Query(value="select m from member m where m.emailRecept = 'Y'")
     public List<MemberEntity> findByEmailRecept();
 }

@@ -381,16 +381,16 @@ public class PageUtil {
 			for(int i=1;i<=pageListCount;i++) {
 
 				if(section >1 && i ==1)
-					pageList += " <a href=/manageBack/productlist?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
+					pageList += " <a href=/master/productList?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
 					+ "&addrSearch=" + keyword + ">◀</a>";
 				if(totalPage < (section-1)*pageListCount+i) { break; } 
 				if(pageNum != (section-1)*pageListCount +i)
-					pageList += " <a href=/manageBack/productlist?page=" + Integer.toString((section-1)*pageListCount+i) 
+					pageList += " <a href=/master/productList?page=" + Integer.toString((section-1)*pageListCount+i) 
 							+ "&addrSearch=" + keyword + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
 				else 
 					pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
 				if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
-					pageList += " <a href=/manageBack/productlist?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
+					pageList += " <a href=/master/productList?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
 			}			
 		}		
 		return pageList;
@@ -434,16 +434,16 @@ public class PageUtil {
 			for(int i=1;i<=pageListCount;i++) {
 
 				if(section >1 && i ==1)
-					pageList += " <a href=/manageBack/questionlist?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
+					pageList += " <a href=/master/question?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
 					+ "&addrSearch=" + keyword + ">◀</a>";
 				if(totalPage < (section-1)*pageListCount+i) { break; } 
 				if(pageNum != (section-1)*pageListCount +i)
-					pageList += " <a href=/manageBack/questionlist?page=" + Integer.toString((section-1)*pageListCount+i) 
+					pageList += " <a href=/master/question?page=" + Integer.toString((section-1)*pageListCount+i) 
 							+ "&addrSearch=" + keyword + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
 				else 
 					pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
 				if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
-					pageList += " <a href=/manageBack/questionlist?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
+					pageList += " <a href=/master/question?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
 			}			
 		}		
 		return pageList;
@@ -462,16 +462,16 @@ public class PageUtil {
 			for(int i=1;i<=pageListCount;i++) {
 
 				if(section >1 && i ==1)
-					pageList += " <a href=/manageBack/responsereview?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
+					pageList += " <a href=/master/reviewList?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
 					+ "&addrSearch=" + keyword + ">◀</a>";
 				if(totalPage < (section-1)*pageListCount+i) { break; } 
 				if(pageNum != (section-1)*pageListCount +i)
-					pageList += " <a href=/manageBack/responsereview?page=" + Integer.toString((section-1)*pageListCount+i) 
+					pageList += " <a href=/master/reviewList?page=" + Integer.toString((section-1)*pageListCount+i) 
 							+ "&addrSearch=" + keyword + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
 				else 
 					pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
 				if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
-					pageList += " <a href=/manageBack/responsereview?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
+					pageList += " <a href=/master/reviewList?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
 			}			
 		}		
 		return pageList;
@@ -505,7 +505,7 @@ public class PageUtil {
 	}
 
    	//관리자페이지 쿠폰리스트
-	public String getPageCoupon(int pageNum, int postNum, int pageListCount, int totalCount, String keyword) {
+	public String getPageCoupon(int pageNum, int postNum, int pageListCount, int totalCount) {
 		
 		int totalPage = (int)Math.ceil(totalCount/(double)postNum);
 		int totalSection = (int)Math.ceil(totalPage/(double)pageListCount);
@@ -516,16 +516,16 @@ public class PageUtil {
 			for(int i=1;i<=pageListCount;i++) {
 
 				if(section >1 && i ==1)
-					pageList += " <a href=/master/coupon?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
-					+ "&addrSearch=" + keyword + ">◀</a>";
+					pageList += " <a href=/master/couponList?page=" + Integer.toString((section-2)*pageListCount + pageListCount) 
+				    		 + ">◀</a>";
 				if(totalPage < (section-1)*pageListCount+i) { break; } 
 				if(pageNum != (section-1)*pageListCount +i)
-					pageList += " <a href=/master/coupon?page=" + Integer.toString((section-1)*pageListCount+i) 
-							+ "&addrSearch=" + keyword + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
+					pageList += " <a href=/master/couponList?page=" + Integer.toString((section-1)*pageListCount+i) 
+							 + ">" + Integer.toString((section-1)*pageListCount+i) + "</a>";		
 				else 
 					pageList += " <span style='font-weight: bold'>" + Integer.toString((section-1)*pageListCount+i) + "</span>";
 				if(i==pageListCount && totalSection > 1 && totalPage >= i+(section-1)*pageListCount+1)
-					pageList += " <a href=/master/coupon?page=" + Integer.toString(section*pageListCount+1) + "&addrSearch=" + keyword + ">▶</a>";				
+					pageList += " <a href=/master/couponList?page=" + Integer.toString(section*pageListCount+1) + ">▶</a>";				
 			}			
 		}		
 		return pageList;

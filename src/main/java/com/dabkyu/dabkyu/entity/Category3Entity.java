@@ -42,4 +42,7 @@ public class Category3Entity {
 	
 	@Column(name="category3_name", length=20, nullable=false)
 	private String category3Name;
+
+	@Column(name="is_temporary", length=2 , nullable=true)
+	private String isTemporary;
 }
