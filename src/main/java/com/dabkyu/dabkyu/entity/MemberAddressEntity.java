@@ -21,6 +21,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="memberAddress")
 @Table(name="member_address")
 @Builder

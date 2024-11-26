@@ -17,6 +17,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="notification")
 @Table(name="notification")
 @Builder

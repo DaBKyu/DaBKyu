@@ -21,6 +21,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="memberLog")
 @Table(name="member_log")
 @Builder

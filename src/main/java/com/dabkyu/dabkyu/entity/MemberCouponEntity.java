@@ -19,6 +19,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="memberCoupon")
 @Table(name="member_coupon")
 @IdClass(MemberCouponEntityID.class)

@@ -13,4 +13,5 @@ public interface ShoppingCartRepository extends JpaRepository<ShoppingCartEntity
 
         // 이메일과 OrderProductSeqno를 통해 특정 장바구니 항목 조회
         ShoppingCartEntity findByEmail_EmailAndOrderProductSeqno_OrderProductSeqno(String email, Long orderProductSeqno);
+
 }

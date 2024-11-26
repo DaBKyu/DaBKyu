@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyPageHeader</title>
+<link rel="stylesheet" type="text/css" href="/src/main/resources/static/css/shopHeader.css">
+<style>
+
+.myMenu {
+    width: 250px;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+nav {
+width: 100%;
+height: 64px;
+overflow: hidden;
+background-color: #f8f9fa; /* 배경색 */
+display: flex;
+align-items: center;
+padding: 0 10px;
+border: 1px solid #e3e3e3;
+}
+</style>
+</head>
+
+<body>
+    <div th:fragment="header">
+    <nav>
+        <div style="display: flex; align-items: center; width: 100%;">
+                <a style="margin-left: 70px; font-size: 20px; text-decoration: none; text-decoration: none; color: inherit;" href="/shop/main">DABKYU</a>   
+             <!-- 검색창 -->
+            <div style="flex-grow: 1; position: relative; max-width: 1000px; margin-left: 300px;">
+                <input type="text" name="keyword" id="keyword" 
+                       style="width: 100%; height: 30px; border: 2px solid #e3e3e3; font-size: 16px; border-radius: 20px; padding-left: 10px;"
+                       placeholder="검색어를 입력하세요." onkeydown="press(event)">
+                <i class="fi fi-br-search" onclick="search()"
+                   style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); height: 17px;"></i>
+            </div>
+            <!-- 아이콘들 -->
+            <div style="display: flex; gap: 30px; align-items: center;  margin-left: auto; margin-right: 10px;">
+                <a href="/mypage/memberInfo" style="text-decoration: none; color: inherit;" ><i class="fi fi-rr-user" style="font-size: 20px; cursor: pointer;"></i></a>
+                <a href="/mypage/shoppingCart" style="text-decoration: none; color: inherit;"><i class="fi fi-rr-shopping-cart" style="font-size: 20px; cursor: pointer;"></i></a>
+                <a style="text-decoration: none; color: inherit;"><i class="fi fi-rs-bell" id="notificationBtn" style="font-size: 20px; cursor: pointer;"></i></a>
+            </div>
+        </div>
+    </nav>
+</div>
+</body>
+</html>

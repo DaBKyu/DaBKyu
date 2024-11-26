@@ -21,6 +21,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="productOption")
 @Table(name="product_option")
 @Builder

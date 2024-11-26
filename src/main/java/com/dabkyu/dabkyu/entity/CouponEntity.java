@@ -18,6 +18,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="coupon")
 @Table(name="coupon")
 @AllArgsConstructor

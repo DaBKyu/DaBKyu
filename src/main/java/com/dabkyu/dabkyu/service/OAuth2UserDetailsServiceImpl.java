@@ -87,6 +87,7 @@ public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService {
         log.info("----------세션 username : {}", (String)session.getAttribute("username"));
         log.info("----------세션 FromSocial : {}", (String)session.getAttribute("FromSocial"));
         
+        
         return memberOAuth2DTO;
     }
 

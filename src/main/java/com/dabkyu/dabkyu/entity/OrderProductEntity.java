@@ -19,6 +19,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="orderProduct")
 @Table(name="order_product")
 @Builder

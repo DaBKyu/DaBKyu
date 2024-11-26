@@ -15,6 +15,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="category1")
 @Table(name="category1")
 @Builder

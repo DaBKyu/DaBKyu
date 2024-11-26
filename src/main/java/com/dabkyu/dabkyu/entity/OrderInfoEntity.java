@@ -23,6 +23,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="orderInfo")
 @Table(name="order_info")
 @Builder

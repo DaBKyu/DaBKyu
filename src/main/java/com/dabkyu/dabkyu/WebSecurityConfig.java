@@ -4,9 +4,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
 import com.dabkyu.dabkyu.service.UserDetailsServiceImpl;
 
@@ -98,6 +102,14 @@ public class WebSecurityConfig {
             .permitAll()
         );
 
+        //
+        http.headers((headers-> headers
+                                    .addHeaderWriter(new XFrameOptionsHeaderWriter(
+                                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))));
+
+
+        //
+
         //CSRF, CORS 보안 설정 비활성화
         http.csrf((csrf) -> csrf.disable());
         http.cors((cors) -> cors.disable());
@@ -106,4 +118,14 @@ public class WebSecurityConfig {
 
         return http.build();
     }
+
+    @SuppressWarnings("removal")
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .headers(headers -> headers.frameOptions().disable()) // X-Frame-Options 비활성화
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()); // 모든 요청 허용 (개발용)
+        return http.build();
+    }
 }
+

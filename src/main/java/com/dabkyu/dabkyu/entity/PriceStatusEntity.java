@@ -20,6 +20,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="priceStatus")
 @Table(name="price_status")
 @Builder

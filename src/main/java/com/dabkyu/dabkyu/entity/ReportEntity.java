@@ -23,6 +23,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="report")
 @Table(name="report")
 @Builder
