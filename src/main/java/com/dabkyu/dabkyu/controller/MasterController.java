@@ -34,6 +34,7 @@ import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
 import com.dabkyu.dabkyu.dto.QuestionCommentDTO;
+import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
@@ -645,17 +646,14 @@ public class MasterController{
                 @RequestBody QuestionCommentDTO commentDTO)
                 throws Exception{
         
-        QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
-        commentDTO.setQueSeqno(questionEntity);
-
-        //등록
-        if(option.equals("I")){
-            masterService.replyQuestion(commentDTO, questionEntity);
-        }
-        //수정
-        if(option.equals("U")){
-            masterService.replyQuestionModify(commentDTO);
-        } 
+            QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
+            commentDTO.setQueSeqno(questionEntity);
+    
+            if ("I".equals(option)) {
+                masterService.replyQuestion(commentDTO, questionEntity);
+            } else if("U".equals(option)) {
+                masterService.replyQuestionModify(commentDTO);
+            }
 	}
 
     //문의 삭제 
@@ -683,9 +681,6 @@ public class MasterController{
             // 기타 예외 처리
             return ResponseEntity.status(500).body("문의 삭제 중 오류가 발생했습니다.");
         }
-        masterService.deleteQuestion(queSeqno); //문의 삭제
-
-        return "redirect:/master/question";
     }
 
     //문의 답변 삭제
