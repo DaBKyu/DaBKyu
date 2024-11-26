@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
+import com.dabkyu.dabkyu.dto.ProductOptionDTO;
+import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
@@ -37,6 +39,12 @@ public interface ProductService {
 
     //상품 상세 보기
 	public ProductDTO view(Long productSeqno) throws Exception;
+
+	//상품 옵션 보기
+	public List<ProductOptionDTO> getProductOptions(Long productSeqno);
+
+	//상품 추가상품 보기
+	public List<RelatedProductDTO> getRelatedProducts(Long productSeqno);
 	
 	//상품 이전 보기
 	public Long pre_seqno(Long productSeqno,String keyword) throws Exception;

@@ -28,6 +28,8 @@ import lombok.Setter;
 @Entity(name="questionComment")
 @Table(name="question_comment")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class QuestionCommentEntity {
 
 	@Id

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/master.css" th:href="@{/css/master.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const search = () => {
+            const keyword = document.querySelector('#keyword');
+            document.location.href='/master/client?page=1&keyword=' + keyword.value;
+        }
+
+        const press = () => {
+            if(event.keyCode == 13) search();
+        }
+    </script>
+</head>
+
+<body>
+    <!-- 네비게이션 바 -->
+    <div th:insert="~{layout/masterNav :: master-nav}"></div>
+        
+    <div class="container mt-5">     
+        <h2 class="mt-4">회원관리</h2>
+
+        <!-- 검색 바 -->
+        <div class="d-flex mb-3">
+            <div class="me-auto w-100 p-2">
+                <div class="input-group">
+                    <input type="text" name="keyword" id="keyword" class="form-control" placeholder="이메일 검색" onkeydown="press()">
+                    <button type="button" value="검색" class="btn btn-primary" onclick="search()">검색</button>
+                </div>
+            </div>
+            <!-- 등급 선택 -->
+            <div class="p-2">
+                <select class="form-select w-auto" id="memberGrade" name="memberGrade" aria-label="회원등급 선택">
+                    <option value="">전체 등급</option>
+                    <option value="Platinum">Platinum</option>
+                    <option value="Gold">Gold</option>
+                    <option value="Silver">Silver</option>
+                    <option value="Bronze">Bronze</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 회원 목록 테이블 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                        <th scope="col">번호</th>
+                        <th scope="col">이름</th>
+                        <th scope="col">전화번호</th>
+                        <th scope="col">이메일</th>
+                        <th scope="col">회원등급</th>
+                        <th scope="col">수신동의</th>
+                        <th scope="col">가입일</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <th:block  th:if="${#strings.equals(listIsEmpty,'N')}">
+                        <tr th:each="member, index : ${list}">
+                            <td><input class="form-check-input user-checkbox" type="checkbox" th:value="${member.email}"></td>
+                            <td th:text="${totalElement - (page-1)*postNum - index.count + 1}">1</td>
+                            <td th:text="${member.username}">김민수</td>
+                            <td th:text="${member.telno}">010-1234-5678</td>
+                            <td th:text="${member.email}">email123@email.com</td>
+                            <td th:text="${member.memberGrade}">GOLD</td>
+                            <td th:text="${member.notificationYn == 'Y' ? 'Y' : 'N'}">N</td>
+                            <td th:text="${#temporals.format(member.regdate, 'yyyy-MM-dd')}">2024.10.29</td>
+                        </tr>
+                    </th:block>
+                    <!-- 목록이 비어 있을 경우 -->
+                    <th:block th:if="${#strings.equals(listIsEmpty,'Y')}">
+                        <td colspan="8" class="text-center">회원 정보가 없습니다.</td>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 버튼 그룹 -->
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button type="button" class="btn btn-primary" id="sendMailButton">메일 보내기</button>
+            <button type="button" class="btn btn-danger" id="deleteButton">삭제</button>
+        </div>
+
+
+        <!-- 페이지네이션 -->
+        <div>[(${pageList})]</div>
+
+    </div>
+    
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var selectgrade = document.getElementById('memberGrade');
+        var checkAll = document.getElementById('checkAll');
+        var deleteButton = document.getElementById('deleteButton');
+        var sendMailButton = document.getElementById('sendMailButton');
+
+        selectgrade.addEventListener('change', function() {
+            const selectedGrade = this.value;
+            const rows = document.querySelectorAll('table tbody tr');
+            
+            rows.forEach(row => {
+            const grade = row.querySelector('td:nth-child(6)').textContent.trim(); // 6번째 열이 회원등급
+            if (selectedGrade === "" || grade === selectedGrade) {
+                row.style.display = ''; // 등급이 일치하면 보이기
+            } else {
+                row.style.display = 'none'; // 등급이 일치하지 않으면 숨기기
+            }
+            });
+        });
+
+        checkAll.addEventListener('change', function() {
+            var checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = checkAll.checked;
+            });
+        });
+
+        deleteButton.addEventListener('click', function() {
+            var selectedUsers = getSelectedUsers();
+            if (selectedUsers.length > 0) {
+                if (confirm('선택한 회원을 삭제하시겠습니까?')) {
+                    deleteUsers(selectedUsers);
+                }
+            } else {
+                alert('삭제할 회원을 선택해주세요.');
+            }
+        });
+
+        sendMailButton.addEventListener('click', function() {
+            var selectedUsers = getSelectedUsers();
+            if (selectedUsers.length > 0) {
+                var consentUsers = selectedUsers.filter(function(userId) {
+                    var row = document.querySelector(`tr[data-user-id="${userId}"]`);
+                    return row.querySelector('.receive-consent').textContent === 'Y';
+                });
+                if (consentUsers.length > 0) {
+                    window.location.href = '/mailSend?users=' + consentUsers.join(',');
+                } else {
+                    alert('선택된 회원 중 수신 동의한 회원이 없습니다.');
+                }
+            } else {
+                alert('메일을 보낼 회원을 선택해주세요.');
+            }
+        });
+    });
+
+    function getSelectedUsers() {
+        return Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
+    }
+
+    function deleteUsers(email) {
+
+        fetch('/master/deleteClient', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [header]: token
+            },
+            body: JSON.stringify({ ids: email })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('회원 삭제 성공:', data);
+            alert('회원 삭제에 성공했습니다.');
+            window.location.reload();
+        })
+        .catch((error) => {
+            console.error('회원 삭제 실패:', error);
+            alert('회원 삭제에 실패했습니다. 다시 시도해 주세요.');
+        });
+    }
+</script>
+</body>
+</html>

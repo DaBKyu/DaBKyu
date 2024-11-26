@@ -28,6 +28,8 @@ import lombok.Setter;
 @Entity(name="review")
 @Table(name="review")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewEntity {
 
     @Id

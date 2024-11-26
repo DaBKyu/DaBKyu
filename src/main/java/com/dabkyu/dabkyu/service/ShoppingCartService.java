@@ -33,18 +33,15 @@ public interface ShoppingCartService {
     public void clearCart(String email);
 
     // 결제
-    public void pay(String email, List<Long> toPayOrderProducList, OrderInfoDTO orderInfo);
+    public void pay(String email, List<Long> toPayOrderProducList,Long couponSeqno,int point, OrderInfoDTO orderInfo);
 
     // 장바구니에서 결제 완료된 상품 삭제
     public void removeProduct(String email);
 
-    // 결제 취소
+    // 결제 취소 신청
     public void cancelToPay(String email, Long orderSeqno);
 
-    //교환 신청
-    //public void requestExchange(String email, Long orderProductSeqno);
-
     //환불 신청
-    //public void refundRequest(String email, List<Long> orderProductSeqnos);
+    public void refundRequest(String email, Long orderSeqno);
 
 }

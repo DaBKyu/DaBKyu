@@ -26,6 +26,8 @@ import lombok.Setter;
 @Entity(name="memberAddress")
 @Table(name="member_address")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberAddressEntity {
 
     @Id

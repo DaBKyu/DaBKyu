@@ -51,4 +51,21 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 	public Long next_seqno(@Param("productSeqno") Long productSeqno, 
 			@Param("keyword") String keyword);
 
+	//관리자페이지 상품리스트 //카테고리, 상품명 둘 중 하나만 입력되어도 검색 가능하도록 null값 입력될 시 무시
+	@Query("SELECT p FROM product p " +
+           "JOIN p.category3Seqno c3 " +
+           "JOIN c3.category2Seqno c2 " +
+           "JOIN c2.category1Seqno c1 " +
+		   "WHERE (:category1Seqno IS NULL OR c1.category1Seqno = :category1Seqno) " +
+		   "AND (:category2Seqno IS NULL OR c2.category2Seqno = :category2Seqno) " +
+		   "AND (:category3Seqno IS NULL OR c3.category3Seqno = :category3Seqno) " +
+		   "AND (:productName = '' OR p.productName LIKE %:productName%)")
+    public Page<ProductEntity> findByAllCategories(
+            @Param("category1Seqno") Long category1Seqno,
+            @Param("category2Seqno") Long category2Seqno,
+            @Param("category3Seqno") Long category3Seqno,
+            @Param("productName") String productName,
+            Pageable pageable);
+
+	public List<ProductEntity> findByCategory3Seqno_Category3Seqno(Long category3Seqno);
 }

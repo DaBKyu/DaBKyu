@@ -1,13 +1,6 @@
 a{text-decoration: none; color: #000000;}
+
 .headtext{font-size: 24px; font-weight:bold; font-family: "Noto Sans KR", sans-serif;}
-.dropdown-item {
-    color: #000000;
-    }
-.dropdown .dropdown-menu {
-    display: none;
-    background: #ffffff;
-}
-.dropdown:hover>.dropdown-menu, 
 .dropend:hover>.dropdown-menu {
     display: block;
     margin-left: .1em;
@@ -18,7 +11,6 @@ a{text-decoration: none; color: #000000;}
             top: 0;
             left: 100%;
         }
-
 }
 ol, ul{padding: 0;}
 li{

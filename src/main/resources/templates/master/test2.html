@@ -1,11 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쿠폰 생성 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/master.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .category-tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            margin: 0.25rem;
+            border-radius: 0.25rem;
+        }
+        .category-tag .close {
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  
+    <!-- 네비게이션 바 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+          <a class="navbar-brand" href="#">Admin</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item dropdown"><a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown" aria-expanded="false">상품관리</a>
+                      <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="../master/productManage.html">상품관리</a></li>
+                          <li><a class="dropdown-item" href="../master/categoryManage.html">카테고리 관리</a></li>
+                          <li><a class="dropdown-item" href="../master/productUpload.html">상품 등록</a></li>
+                        </ul>
+                  </li>
+                  <li class="nav-item"><a class="nav-link" href="../master/userManage.html">회원관리</a></li>
+                  <li class="nav-item"><a class="nav-link" href="../master/deliveryManage.html">배송관리</a></li>
+                  <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">문의/리뷰목록</a>
+                      <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="../master/qnaList.html">문의 목록</a></li>
+                          <li><a class="dropdown-item" href="../master/reviewList.html">리뷰 목록</a></li>
+                        </ul>
+                  </li>
+                  <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
+                      <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="../master/mailList.html">메일 발송 목록</a></li>
+                          <li><a class="dropdown-item" href="../master/mailSend.html">메일 발송</a></li>
+                        </ul>
+                  </li>
+                  <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">쿠폰</a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="../master/couponMake.html">쿠폰 생성</a></li>
+                      <li><a class="dropdown-item" href="../master/couponList.html">생성된 쿠폰 리스트</a></li>
+                    </ul>
+                  </li>
+              </ul>
+              <span class="navbar-text">Admin01</span>
+          </div>
+      </div>
+    </nav>
+
+    <!-- 쿠폰 생성 폼 -->
+    <div class="container mt-3">
+        <h2>쿠폰 생성</h2>
+
+    <!-- 쿠폰 적용 범위 -->
+    <div class="mb-3">
+      <label for="category">쿠폰 적용 범위</label>
+      <div class="input-group mb-3">
+      <div class="dropdown me-2">
+          <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">카테고리 선택</button>
+          <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+              <!-- 루트 카테고리 반복 -->
+              <li class="dropend" th:each="category : ${categories}">
+                  <a class="dropdown-item dropdown-toggle" href="#" th:text="${category.name}" data-bs-toggle="dropdown">1</a>
+                  <!-- 중간 및 세부 카테고리 재귀적으로 출력 -->
+                  <ul class="dropdown-menu">
+                      <li  class="dropend" th:each="subCategory : ${category.children}">
+                          <a class="dropdown-item dropdown-toggle" href="#" th:text="${subCategory.name}" data-bs-toggle="dropdown">2</a>
+                          <!-- 세부 카테고리 -->
+                          <ul class="dropdown-menu">
+                              <li th:each="detailCategory : ${subCategory.children}">
+                                  <a class="dropdown-item" href="#" th:text="${detailCategory.name}" onclick="addCategory('${category.name} > ${subCategory.name} > ${detailCategory.name}')">3</a>
+                              </li>
+                          </ul>
+                      </li>
+                  </ul>
+              </li>
+          </ul>
+      </div>
+
+      <!-- 모든 상품에 적용 체크박스 -->
+      <input type="checkbox" id="applyAllProducts" onchange="toggleAllProducts(this)">
+      <label for="applyAllProducts">모든 상품에 적용</label>
+  </div>
+
+            <!-- 선택된 카테고리 태그 표시 영역 -->
+            <div id="selectedCategories" class="border p-2 rounded"></div>
+
+            <!-- 선택된 카테고리 데이터를 전송하기 위한 숨겨진 필드 -->
+            <input type="hidden" id="categoryInput" name="categories">
+        </div>
+
+        <!-- 쿠폰 생성 버튼 -->
+        <button type='submit' class='btn btn-primary'>생성</button>
+    </div>
+
+
+    <!-- JavaScript 코드 -->
+    <script>
+        // 선택된 카테고리를 저장하는 배열
+        let selectedCategories = [];
+
+        // 카테고리 추가 함수
+        function addCategory(category) {
+            // 중복된 카테고리는 추가하지 않음
+            if (!selectedCategories.includes(category)) {
+                selectedCategories.push(category);
+                updateCategoryTags();
+            }
+        }
+
+        // 선택된 카테고리 태그 업데이트 함수
+        function updateCategoryTags() {
+            const categoryContainer = document.getElementById('selectedCategories');
+            categoryContainer.innerHTML = ''; // 기존 태그 초기화
+
+            selectedCategories.forEach((category, index) => {
+                const tag = document.createElement('span');
+                tag.className = 'category-tag';
+                tag.innerHTML = `${category} <span class='close' onclick='removeCategory(${index})'>&times;</span>`;
+                categoryContainer.appendChild(tag);
+            });
+
+            // 숨겨진 필드에 선택된 카테고리 목록을 저장 (서버로 전송)
+            document.getElementById('categoryInput').value = selectedCategories.join(',');
+        }
+
+        // 카테고리 삭제 함수
+        function removeCategory(index) {
+            selectedCategories.splice(index, 1); // 해당 인덱스의 카테고리 삭제
+            updateCategoryTags();
+        }
+
+        // 모든 상품에 적용 체크박스 토글 함수
+        function toggleAllProducts(checkbox) {
+            if (checkbox.checked) {
+                // 모든 상품에 적용 시, 기존의 선택된 카테고리를 초기화
+                selectedCategories = ['모든 상품'];
+                document.getElementById('categoryDropdown').disabled = true; // 드롭다운 비활성화
+                updateCategoryTags();
+            } else {
+                selectedCategories = [];
+                document.getElementById('categoryDropdown').disabled = false; // 드롭다운 활성화
+                updateCategoryTags();
+            }
+        }
+    </script>
+
 </body>
 </html>

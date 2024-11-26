@@ -22,6 +22,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity(name="coupon")
 @Table(name="coupon")
+@AllArgsConstructor
+@NoArgsConstructor  
 public class CouponEntity {
 
     @Id
@@ -37,17 +39,14 @@ public class CouponEntity {
     @Column(name="coupon_type", length=20, nullable = false)
     private String couponType;
 
-    @Column(name="coupon_target", length=2000, nullable = false)
-    private String couponTarget;
-
     @Column(name="coupon_info", length=20, nullable = false)
     private String couponInfo;
 
     @Column(name="percent_discount", nullable = true)
-    private int percentDiscount;
+    private Integer percentDiscount;
 
     @Column(name="amount_discount", nullable = true)
-    private int amountDiscount;
+    private Integer amountDiscount;
 
     @Column(name="coupon_start_date", nullable = false)
     private LocalDateTime couponStartDate;
@@ -60,5 +59,11 @@ public class CouponEntity {
 
     @Column(name="coupon_role", length=20, nullable = false)
     private String couponRole;
+
+    @Column(name="isDupl", length=2, nullable = false)
+    private String isDupl;
+
+    @Column(name="coupon_code", length=20, nullable = false)
+    private String couponCode;
 
 }

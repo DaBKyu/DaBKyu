@@ -26,6 +26,8 @@ import lombok.Setter;
 @Entity(name="product")
 @Table(name="product")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductEntity {
 
     @Id
@@ -58,11 +60,11 @@ public class ProductEntity {
     @Column(name="likecnt",nullable=false)
 	private int likecnt;
 
-    @Column(name="info_org_image",length = 200,nullable=true)
-	private String infoOrgImage;
+    // @Column(name="info_org_image",length = 200,nullable=true)
+	// private String infoOrgImage;
 
-    @Column(name="info_stored_image",length = 200,nullable=true)
-	private String infoStoredImage;
+    // @Column(name="info_stored_image",length = 200,nullable=true)
+	// private String infoStoredImage;
 
 	@Column(name="secret_yn",length = 2,nullable=false)
 	private String secretYn;

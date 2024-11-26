@@ -5,8 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>쿠폰생성페이지</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-    <link rel="stylesheet" href="../../static/css/master.css">
+    <link rel="stylesheet" href="../../static/css/master.css" th:href="@{/css/master.css}">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
+    <style>
+        .category-tag, .product-tag{
+            font-size: 12px;
+            display: inline-block;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            margin: 0.25rem;
+            border-radius: 0.25rem;
+        }
+        .category-tag .close {
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -36,7 +50,7 @@
                   </li>
                   <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
                       <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="../master/mailLog.html">메일 발송 목록</a></li>
+                          <li><a class="dropdown-item" href="../master/mailList.html">메일 발송 목록</a></li>
                           <li><a class="dropdown-item" href="../master/mailSend.html">메일 발송</a></li>
                         </ul>
                   </li>
@@ -54,144 +68,132 @@
 
   <div class="container mt-3">
     <div class="d-flex justify-content-between">
-      <div class="p-2"><a href="" class="headtext">쿠폰생성</a></div>
-      <div class="p-2"><a href="" class="headtext">생성된 쿠폰 리스트</a></div>
+      <div class="p-2"><a href="couponMake.html" class="headtext">쿠폰생성</a></div>
+      <div class="p-2"><a href="couponList.html" class="headtext">생성된 쿠폰 리스트</a></div>
       <div class="p-2"></div>
     </div>
     <hr>
 
+    <form action="/admin/coupon/create" method="post">
     <div class="row">
       <div class="col-lg-6 col-md-12 mb-4">
 
+        <!-- 쿠폰명 및 쿠폰 설명-->
+        <div class="mb-3">
+          <label for="coupon_name" class="form-label">쿠폰명</label> &emsp;
+          <input type="text" id="coupon_name" name="couponName" placeholder='쿠폰명 입력' class='form-control w-50' style="display: inline-block;">
+        </div>
+        <div class="mb-3">
+          <label for="coupon_content" class="form-label">쿠폰설명</label> &emsp;
+          <input type="text" id="coupon_content" name="couponContent" placeholder='쿠폰설명 입력' class='form-control'>
+        </div>
+
         <!-- 쿠폰 적용범위-->
+        <!-- 1.전체적용이나 카테고리 선택하여 설정 -->
+        <!-- 카테고리는 메인>중간>세부카테고리 구조 -->
         <div class="mb-3">
             <label for="" class="form-label" style="display: inline-block;">쿠폰 적용 범위</label>
-            <div class="input-group mb-3" >
-                <input type="text" class="form-control" aria-label="Text input with dropdown button" placeholder="모든상품">
-                <div class="dropdown">
-                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">카테고리1</a></li>
-                    <li><a class="dropdown-item" href="#">카테고리2</a></li>
-                    <li><a class="dropdown-item" href="#">카테고리3</a></li>
-
-                    <li class="dropend">
-                      <a class="dropdown-toggle dropdown-item" href="#"  data-bs-toggle="dropdown" aria-expanded="false">카테고리4</a>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">카테고리1</a></li>
-                        <li><a class="dropdown-item" href="#">카테고리2</a></li>
-                        <li><a class="dropdown-item" href="#">카테고리3</a></li>
-                      </ul>
-                    </li>
+            <div class="input-group mb-3">
+              <div class="dropdown me-2">
+                  <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">카테고리 선택</button>
+                  <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                      <!-- 루트 카테고리 반복 -->
+                      <li class="dropend" th:each="category1 : ${categories}">
+                          <a class="dropdown-item dropdown-toggle" href="#" th:text="${category1.category1_name}" data-bs-toggle="dropdown">1</a>
+                          <!-- 중간 및 세부 카테고리 재귀적으로 출력 -->
+                          <ul class="dropdown-menu">
+                              <li  class="dropend" th:each="category2 : ${category.children}">
+                                  <a class="dropdown-item dropdown-toggle" href="#" th:text="${category2.category2_name}" data-bs-toggle="dropdown">2</a>
+                                  <!-- 세부 카테고리 -->
+                                  <ul class="dropdown-menu">
+                                      <li th:each="category3 : ${category2.children}">
+                                          <a class="dropdown-item" href="#" th:text="${category3.category3_name}" onclick="addCategory('${category1.category1_name} > ${category2.category2_name} > ${category3.category3_name}')">3</a>
+                                          <a class="dropdown-item" href="#" th:text="${category3.category3_name}" onclick="addCategory('PC > 고사양 > AMD')">AMD</a>
+                                      </li>
+                                  </ul>
+                              </li>
+                          </ul>
+                      </li>
                   </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- 상품 검색 -->
-        <div class="mb-3">
-          <label for="productSearch" class="form-label">상품 검색</label>
-          <div class="input-group mb-1">
-            <input type="text" class="form-control" placeholder="" aria-label="productSearch" aria-describedby="button-addon2">
-            <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
+              </div>
+              <!-- 모든 상품에 적용 체크박스 -->
+              <div class="form-check form-check-inline mb-3">                
+                <input class="form-check-input" type="checkbox" id="applyAllProducts" onchange="toggleAllProducts(this)">
+                <label class="form-check-label" for="applyAllProducts">모든 상품에 적용</label>
+              </div>
           </div>
-          <ul class="form-control mb-2 border p-2 select_list" >
-            <li>
-                <span>test</span>
-                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
-            </li>
-            <li>
-                <span>test</span>
-                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
-            </li>
-        </ul>
-        </div>
 
         <!-- 선택된 카테고리 -->
         <div class="mb-3">
-          <label for="" class="form-label">선택된 카테고리</label>
-          <ul class="form-control mb-2 border p-2 select_list" >
-            <li>
-                <span>test</span>
-                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
-            </li>
-            <li>
-                <span>test</span>
-                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
-            </li>
-        </ul>
+          <label for="Category" class="form-label">카테고리</label>
+          <div id="selectedCategories" class="border p-2 rounded"></div>
         </div>
+        <!-- 선택된 카테고리 데이터를 전송하기 위한 숨겨진 필드 -->
+        <input type="hidden" id="categoryInput" name="categories">
 
-        <!-- 선택된 소카테고리 -->
+        <!-- 2.상품을 검색하여 쿠폰 적용범위에 추가 -->
         <div class="mb-3">
-          <label for="" class="form-label">선택된 소카테고리</label>
-          <ul class="form-control mb-2 border p-2 select_list" >
-            <li>
-                <span>test</span>
-                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
-            </li>
-            <li>
-                <span>test</span>
-                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
-            </li>
-        </ul>
+          <label for="productSearch" class="form-label">상품 검색</label>
+          <div class="input-group mb-1">
+            <input type="text" id="productSearchInput" class="form-control" placeholder="상품명을 입력하세요" aria-label="productSearch" aria-describedby="button-addon2">
+            <button class="btn btn-outline-secondary" type="button" id="productSearchButton">검색</button>
+          </div>
         </div>
 
         <!-- 선택된 상품 -->
         <div class="mb-3">
-          <label for="" class="form-label">선택된 상품</label>
-          <ul class="form-control mb-2 border p-2 select_list" >
-            <li>
-                <span>test</span>
-                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
-            </li>
-            <li>
-                <span>test</span>
-                <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
-            </li>
-        </ul>
+          <label for="selectedProduct" class="form-label">선택된 상품</label>
+          <div id="selectedProducts" class="border p-2 rounded"></div>
         </div>
+        <input type="hidden" id="productInput" name="products">
 
+    </div>
+  </div>
+
+  <div class="col-lg-6 col-md-12 mb-4">
+
+    <!-- 사용 혜택 -->
+    <div class="mb-3 row">
+      <label for="" class="form-label">사용 혜택</label>
+      <div class="col-2 w-auto">
+          <!-- 할인 옵션 선택 -->
+          <select id="discountType" class="form-select" aria-label="혜택 옵션 선택" onchange="updateDiscountOptions()">
+              <option value="" selected>옵션 선택</option>
+              <option value="amount">금액 할인</option>
+              <option value="percentage">비율 할인</option>
+          </select>
       </div>
 
-      <!-- 오른쪽 -->
-      <div class="col-lg-6 col-md-12 mb-4">
+      <!-- 금액 또는 비율 입력 필드 -->
+      <div class="col-6 w-50">
+          <input type="text" id="discountValue" name="discountValue" class="form-control" placeholder="할인 값을 입력하세요">
+      </div>
 
-        <!-- 사용 혜택 -->
-        <div class="mb-3 row">
-          <label for="" class="form-label">사용 혜택</label>
-          <div class="col-2 w-auto">
-            <select class="form-select " aria-label="혜택 옵션 선택">
-              <option selected>옵션</option>
-              <option value="1">금액 할인</option>
-              <option value="2">비율 할인</option>
-            </select>
-          </div>
-          <div class="col-6 w-50"><input type="text" class="form-control"></div> 
-          <div class="col-3 w-auto">
-            <select class="form-select" aria-label="옵션 내용 설정">
-              <option selected>화폐설정</option>
-              <option value="1">KRW</option>
-              <option value="2">USD</option>
-              <option value="3">CNY</option>
-              <option value="4">%</option>
-            </select>
-          </div>
-        </div>
+      <!-- 화폐 또는 % 표시 -->
+      <div class="col-3 w-auto">
+          <select id="currencyType" name="currencyType" class="form-select" aria-label="">
+              <!-- 기본적으로 금액 할인을 위한 화폐 설정 -->
+              <option value="" selected>화폐 설정</option>
+              <option value="KRW">KRW</option>
+              <option value="USD">USD</option>
+              <option value="CNY">CNY</option>
+          </select>
+      </div>
+    </div>
 
         <!-- 사용 기간 -->
         <div class="mb-4 row">
           <label for="" class="form-label">사용 기간</label>
-          <div class="col-5"><input type="datetime-local" id="" class="form-control"></div>
+          <div class="col-5"><input type="datetime-local" id="coupon_start_date" name="startDate" class="form-control"></div>
           ~
-          <div class="col-5"><input type="datetime-local" id="" class="form-control"></div>
+          <div class="col-5"><input type="datetime-local" id="coupon_end_date" name="endDate" class="form-control"></div>
         </div>
 
         <div class="mb-3">
           <label for="" class="form-label">사용 옵션</label>&emsp;
           <div class="form-check" style="display: inline-block;">
-            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-            <label class="form-check-label" for="flexCheckDefault">
+            <input class="form-check-input" type="checkbox" value="true" id="isDupl" name="isDupl">
+            <label class="form-check-label" for="isDupl" >
               추가 할인 가능
             </label>
           </div>
@@ -201,15 +203,13 @@
         <!-- 권한 설정 -->
         <div class="">
           <label for="" class="form-label">권한 설정</label> &emsp;
-          <select id="" class="form-select mb-3 w-auto" style="display: inline-block;">
+          <select name="couponRole" id="coupon_role" class="form-select mb-3 w-auto" style="display: inline-block;">
+            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
             <option>플래티넘</option>
             <option>골드</option>
             <option>실버</option>
             <option>브론즈</option>
-          </select><br><br><br><br>
-
-          <label for="" class="form-label">쿠폰명</label> &emsp;
-          <input type="text" id="" placeholder='쿠폰명 입력' class='form-control w-50' style="display: inline-block;">
+          </select>
         </div>
 
       </div> 
@@ -219,6 +219,118 @@
       <button type='submit' class='btn btn-primary'>생성</button>
     </div>
 
+  </form>
   </div>
+
+  <script th:inline="javascript">
+    // 선택된 카테고리, 상품들을 저장하는 배열
+    let selectedCategories = [];
+    let selectedProducts = [];
+
+    // 카테고리 추가 함수
+    function addCategory(category) {
+        // 중복된 카테고리는 추가하지 않음
+        if (!selectedCategories.includes(category)) {
+            selectedCategories.push(category);
+            updateCategoryTags();
+        }
+    }
+
+    // 선택된 카테고리 태그 업데이트 함수
+    function updateCategoryTags() {
+        const categoryContainer = document.getElementById('selectedCategories');
+        categoryContainer.innerHTML = ''; // 기존 태그 초기화
+
+        selectedCategories.forEach((category, index) => {
+            const tag = document.createElement('span');
+            tag.className = 'category-tag';
+            tag.innerHTML = `${category} <span class='close' onclick='removeCategory(${index})'>&times;</span>`;
+            categoryContainer.appendChild(tag);
+        });
+
+        // 숨겨진 필드에 선택된 카테고리 목록을 저장 (서버로 전송)
+        document.getElementById('categoryInput').value = selectedCategories.join(',');
+    }
+
+    // 카테고리 삭제 함수
+    function removeCategory(index) {
+        selectedCategories.splice(index, 1); // 해당 인덱스의 카테고리 삭제
+        updateCategoryTags();
+    }
+
+    // 모든 상품에 적용 체크박스 토글 함수
+    function toggleAllProducts(checkbox) {
+        if (checkbox.checked) {
+            // 모든 상품에 적용 시, 기존의 선택된 카테고리를 초기화
+            selectedCategories = ['모든 상품'];
+            document.getElementById('categoryDropdown').disabled = true; // 드롭다운 비활성화
+            updateCategoryTags();
+        } else {
+            selectedCategories = [];
+            document.getElementById('categoryDropdown').disabled = false; // 드롭다운 활성화
+            updateCategoryTags();
+        }
+    }
+
+        // 상품 검색 버튼 클릭 이벤트
+        document.getElementById('productSearchButton').addEventListener('click', function() {
+        const searchInput = document.getElementById('productSearchInput').value.trim();
+        
+        if (searchInput) {
+            // 간단한 예시로 검색어를 태그로 추가 (실제 구현에서는 서버에서 검색 결과를 받아와야 함)
+            addProductTag(searchInput);
+            document.getElementById('productSearchInput').value = ''; // 입력 필드 초기화
+        }
+    });
+
+    // 상품 태그 추가 함수
+    function addProductTag(productName) {
+        // 중복된 상품은 추가하지 않음
+        if (!selectedProducts.includes(productName)) {
+            selectedProducts.push(productName);
+            updateProductTags();
+        }
+    }
+
+    // 선택된 상품 태그 업데이트 함수
+    function updateProductTags() {
+        const productContainer = document.getElementById('selectedProducts');
+        productContainer.innerHTML = ''; // 기존 태그 초기화
+
+        selectedProducts.forEach((product, index) => {
+            const tag = document.createElement('span');
+            tag.className = 'product-tag';
+            tag.innerHTML = `${product} <span class='close' onclick='removeProduct(${index})'>&times;</span>`;
+            productContainer.appendChild(tag);
+        });
+
+        // 숨겨진 필드에 선택된 상품 목록을 저장 (서버로 전송)
+        document.getElementById('productInput').value = selectedProducts.join(',');
+    }
+
+    // 상품 태그 삭제 함수
+    function removeProduct(index) {
+        selectedProducts.splice(index, 1); // 해당 인덱스의 상품 삭제
+        updateProductTags();
+    }
+
+    // 할인 옵션에 따라 화폐 종류 또는 %를 변경하는 함수
+    function updateDiscountOptions() {
+        const discountType = document.getElementById("discountType").value;
+        const currencyTypeSelect = document.getElementById("currencyType");
+
+        if (discountType === "amount") {
+            // 금액 할인을 선택한 경우: 화폐 설정
+            currencyTypeSelect.innerHTML = `
+                <option value="" selected>화폐 설정</option>
+                <option value="KRW">KRW</option>
+                <option value="USD">USD</option>
+                <option value="CNY">CNY</option>`;
+        } else if (discountType === "percentage") {
+            // 비율 할인을 선택한 경우: %만 표시
+            currencyTypeSelect.innerHTML = `<option value="%">%</option>`;
+        }
+    }
+</script>
 </body>
 </html>

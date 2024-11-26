@@ -24,6 +24,8 @@ import lombok.Setter;
 @Table(name="member_category")
 @IdClass(MemberCategoryEntityID.class)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberCategoryEntity {
 
     @Id

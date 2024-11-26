@@ -14,7 +14,6 @@
             margin-right: 20%; /* 오른쪽 여백 */
         }
 </style>
-
 </head>
 <body>
     <nav>
@@ -35,37 +34,35 @@
         </div>
     </div>
 </div>
-               <div class="flex-container">          
-                <div class="rectangle2">배송지</div>
-                  <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">배송지</div>
-                </div>
-                <div class="flex-container">          
-                    <div class="rectangle2" style="width: 80px; height: 40px;">상세 주소</div>
-                      <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">상세 주소</div>
-                    </div>
-               <div class="flex-container">
-                <div class="rectangle2">이름</div>
-                   <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">이름</div>
-               </div>
-               <div class="flex-container">
-                <div class="rectangle2">연락처</div>
-                   <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">연락처</div>
-               </div>
-               <div class="flex-container">
-                <div class="rectangle2" style="width: 120px; height: 40px; border: 1px solid #e3e3e3; margin-left: 50px; margin-top: 10px;
-                margin-bottom: 1px; display: flex; align-items: center; justify-content: center; font-size: 16px;
-                text-align: center; font-weight: bold;">배송 요청사항</div>
-                   <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">배송 요청사항</div>
-               </div>
-               <div class="flex-container">
-                <div class="rectangle2" style="width: 80px; height: 40px; border: 1px solid #e3e3e3; margin-left: 50px; margin-top: 10px;
-                margin-bottom: 1px; display: flex; align-items: center; justify-content: center; font-size: 16px;
-             text-align: center; font-weight: bold;">카드 번호</div>   	
-                   <input type="text" name="keyword" id="keyword" 
-                        style="width:800px;height:40px;font-size: 16px; margin-top: 10px; margin-bottom: 10px; border: 1px solid #e3e3e3;"
-                        placeholder="" onkeydown="press()">
-               </div>	
-	    </div>
+    <div class="flex-container">          
+        <div class="rectangle2">배송지</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">배송지</div>
+    </div>
+    <div class="flex-container">          
+        <div class="rectangle2" style="width: 80px; height: 40px;">상세 주소</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">상세 주소</div>
+    </div>
+    <div class="flex-container">
+        <div class="rectangle2">이름</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">이름</div>
+    </div>
+    <div class="flex-container">
+        <div class="rectangle2">연락처</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">연락처</div>
+    </div>
+    <div class="flex-container">
+        <div class="rectangle2" style="width: 120px; height: 40px; border: 1px solid #e3e3e3; margin-left: 50px; margin-top: 10px;
+        margin-bottom: 1px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+        text-align: center; font-weight: bold;">배송 요청사항</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">배송 요청사항</div>
+    </div>
+    <div class="flex-container">
+        <div class="rectangle2" style="width: 80px; height: 40px; border: 1px solid #e3e3e3; margin-left: 50px; margin-top: 10px;
+        margin-bottom: 1px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+        text-align: center; font-weight: bold;">카드 번호</div>   
+        <input type="text" name="keyword" id="keyword" 
+            style="width:800px;height:40px;font-size: 16px; margin-top: 10px; margin-bottom: 10px; border: 1px solid #e3e3e3;">
+    </div>
     <div class="button-container">
         <input type="button" id="btn_save" value="배송지 수정" onclick="window.location.href='/src/main/resources/templates/mypage/address.html'" style="margin-left:50px;">
         <input type="button" id="btn_save" value="결제" onclick="window.location.href='/src/main/resources/templates/shop/payComplete.html'" style="margin-left:50px;">

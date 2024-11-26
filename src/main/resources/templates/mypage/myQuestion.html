@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,6 +20,8 @@
         .reviews-section {
             flex: 1;
             padding: 20px;
+            position: relative;
+            /* 위치를 조정하기 위해 부모 요소에 relative 추가 */
         }
 
         .search-section {
@@ -80,21 +83,6 @@
             color: #555;
         }
 
-        /* 관리자만 보이는 답글 버튼 */
-        .admin-reply-btn {
-            display: none;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-
-        .admin-reply-btn:hover {
-            background-color: #0056b3;
-        }
-
         /* 모달 스타일 */
         .modal {
             display: none;
@@ -127,9 +115,9 @@
             margin-top: 10px;
         }
 
-        /* 문의하기 버튼 */
+        /* 문의하기 버튼 위치 수정 */
         .contact-btn {
-            position: fixed;
+            position: absolute;
             bottom: 20px;
             right: 20px;
             padding: 10px 15px;
@@ -139,7 +127,6 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            z-index: 1000;
         }
 
         .contact-btn:hover {
@@ -147,6 +134,7 @@
         }
     </style>
 </head>
+
 <body>
     <th:block th:replace="~{layout/MyPageHeader::header}"></th:block>
     <div class="" style="display: flex; width: 1400px;">
@@ -154,38 +142,39 @@
     <div class="reviews-section" style="margin-left: 200px;">
         <h2>문의 게시판</h2>
 
-        <div class="review-item" data-title="상품 제목 1" data-author="사용자1" data-date="2024-10-01" data-content="상품 내용 1" data-image="https://via.placeholder.com/300">
+        <div class="review-item" data-title="상품 제목 1" data-author="사용자1" data-date="2024-10-01" data-content="상품 내용 1"
+            data-image="https://via.placeholder.com/300">
             <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image" onclick="openModal(this)">
             <div class="review-details">
                 <p class="review-title">상품 제목 1</p>
                 <p class="review-rating">★ ★ ★ ★ ☆</p>
                 <p class="review-info">작성자: 사용자1 | 등록일: 2024-10-01 | 조회: 10</p>
             </div>
-            <button class="admin-reply-btn">답글 달기</button>
         </div>
 
-        <div class="review-item" data-title="상품 제목 2" data-author="사용자2" data-date="2024-10-02" data-content="상품 내용 2" data-image="https://via.placeholder.com/300">
+        <div class="review-item" data-title="상품 제목 2" data-author="사용자2" data-date="2024-10-02" data-content="상품 내용 2"
+            data-image="https://via.placeholder.com/300">
             <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image" onclick="openModal(this)">
             <div class="review-details">
                 <p class="review-title">상품 제목 2</p>
                 <p class="review-rating">★ ★ ★ ★ ★</p>
-                <p class="review-info">작성자: 사용자2 | 등록일: 2024-10-02 | 조회: 5</p>
+                <p class="review-info">작성자: 사용자1 | 등록일: 2024-10-02 | 조회: 5</p>
             </div>
-            <button class="admin-reply-btn">답글 달기</button>
         </div>
 
-        <div class="review-item" data-title="상품 제목 3" data-author="사용자3" data-date="2024-10-03" data-content="상품 내용 3" data-image="https://via.placeholder.com/300">
+        <div class="review-item" data-title="상품 제목 3" data-author="사용자3" data-date="2024-10-03" data-content="상품 내용 3"
+            data-image="https://via.placeholder.com/300">
             <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image" onclick="openModal(this)">
             <div class="review-details">
                 <p class="review-title">상품 제목 3</p>
                 <p class="review-rating">★ ★ ★ ☆ ☆</p>
-                <p class="review-info">작성자: 사용자3 | 등록일: 2024-10-03 | 조회: 20</p>
+                <p class="review-info">작성자: 사용자1 | 등록일: 2024-10-03 | 조회: 20</p>
             </div>
-            <button class="admin-reply-btn">답글 달기</button>
         </div>
-    </div>
 
-    <button id="contactButton" class="contact-btn">문의하기</button>
+
+        <button id="contactButton" class="contact-btn">문의하기</button>
+    </div>
 
     <!-- 모달 팝업 -->
     <div class="modal" id="modal">
@@ -201,28 +190,28 @@
 
     <!-- 스크립트 -->
     <script>
-        const isAdmin = true;  // 관리자 여부 (임시 설정, 실제 서버에서 받아와야 한다)
-
-        // 관리자만 답글 버튼 보이기
-        document.querySelectorAll('.admin-reply-btn').forEach(button => {
-            if (isAdmin) {
-                button.style.display = 'inline-block';
-            }
-        });
-
         // 모달 열기
         function openModal(image) {
-            const reviewItem = image.closest('.review-item');
-            document.getElementById('modalTitle').textContent = reviewItem.getAttribute('data-title');
-            document.getElementById('modalAuthor').textContent = `작성자: ${reviewItem.getAttribute('data-author')}`;
-            document.getElementById('modalDate').textContent = `등록일: ${reviewItem.getAttribute('data-date')}`;
-            document.getElementById('modalContent').textContent = `내용: ${reviewItem.getAttribute('data-content')}`;
-            document.getElementById('modalImage').src = reviewItem.getAttribute('data-image');
+            const reviewItem = image.closest('.review-item'); // 부모 .review-item을 찾음
+            const title = reviewItem.getAttribute('data-title');
+            const author = reviewItem.getAttribute('data-author');
+            const date = reviewItem.getAttribute('data-date');
+            const content = reviewItem.getAttribute('data-content');
+            const imgSrc = reviewItem.getAttribute('data-image');
+
+            // 모달에 데이터 설정
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalAuthor').textContent = `작성자: ${author}`;
+            document.getElementById('modalDate').textContent = `등록일: ${date}`;
+            document.getElementById('modalContent').textContent = `내용: ${content}`;
+            document.getElementById('modalImage').src = imgSrc;
+
+            // 모달 팝업 표시
             document.getElementById('modal').style.display = 'flex';
         }
 
         // 모달 닫기
-        document.getElementById('closeModal').addEventListener('click', function() {
+        document.getElementById('closeModal').addEventListener('click', function () {
             document.getElementById('modal').style.display = 'none';
         });
 
@@ -233,4 +222,5 @@
     </script>
     </div>
 </body>
+
 </html>

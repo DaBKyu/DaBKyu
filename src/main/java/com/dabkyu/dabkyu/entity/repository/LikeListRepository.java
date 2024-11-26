@@ -1,5 +1,7 @@
 package com.dabkyu.dabkyu.entity.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +23,12 @@ public interface LikeListRepository extends JpaRepository<LikeListEntity,LikeLis
         @Param("email") MemberEntity member,
         Pageable pageable
     );
+
+    public List<LikeListEntity> findByProductSeqno_ProductSeqno(Long productSeqno);
+
+    @Query("SELECT DISTINCT ll.email " +
+           "FROM likeList ll " +
+           "WHERE ll.productSeqno.productSeqno IN :productSeqnoList " +
+           "AND ll.email.emailRecept = 'Y'")
+    public List<MemberEntity> findMembersByProductSeqnoList(@Param("productSeqnoList") List<Long> productSeqnoList);
 }

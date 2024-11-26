@@ -26,82 +26,11 @@
             font-weight: bold;
         }
 
-        .tab {
-            display: flex;
-            justify-content: space-around;
-            border-bottom: 2px solid #ccc;
-            margin-top: 20px;
-        }
-
-        .tab button {
-            flex: 1;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border: 1px solid #ccc;
-            border-bottom: none;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .tab button.active {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .tab-content {
-            margin-top: 20px;
-        }
-
-        .order-history table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .order-history th, .order-history td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: left;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .order-history th {
-            background-color: #f1f1f1;
-        }
-
-        .coupon-input {
-            margin-top: 20px;
-        }
-
-        .coupon-input input {
-            padding: 10px;
-            width: 70%;
-            margin-right: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .coupon-input button {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .coupon-input button:hover {
-            background-color: #0056b3;
-        }
-
-        /* 관심 카테고리 추가 폼 스타일 */
         .category-form {
             margin-bottom: 20px;
         }
 
-        .category-form input {
+        .category-form select, .category-form input {
             padding: 10px;
             margin-right: 10px;
             border: 1px solid #ccc;
@@ -129,11 +58,28 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .category-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 20px;
         }
 
         .category-item span {
             font-size: 1rem;
+            flex: 1;
+        }
+
+        .category-item p {
+            font-size: 0.9rem;
+            color: #555;
         }
 
         .category-item button {
@@ -158,7 +104,14 @@
 
         <!-- 카테고리 추가 폼 -->
         <div class="category-form">
-            <input type="text" id="categoryInput" placeholder="새로운 관심 카테고리 입력">
+            <select id="categorySelect">
+                <option value="">관심 카테고리 선택</option>
+                <option value="컴퓨터 부품1">컴퓨터 부품1</option>
+                <option value="컴퓨터 부품2">컴퓨터 부품2</option>
+                <option value="컴퓨터 부품3">컴퓨터 부품3</option>
+                <option value="컴퓨터 부품4">컴퓨터 부품4</option>
+            </select>
+            <input type="text" id="categoryInput" placeholder="또는 카테고리 입력" />
             <button id="addCategoryBtn">카테고리 추가</button>
         </div>
 
@@ -171,14 +124,16 @@
     <script>
         // 카테고리 추가 버튼 클릭 시
         document.getElementById('addCategoryBtn').addEventListener('click', function() {
+            var categorySelect = document.getElementById('categorySelect');
             var categoryInput = document.getElementById('categoryInput');
-            var categoryName = categoryInput.value.trim();
+            var categoryName = categorySelect.value.trim() || categoryInput.value.trim(); // 선택된 값 또는 입력된 값
 
             if (categoryName !== '') {
                 addCategoryToList(categoryName);
-                categoryInput.value = ''; // 입력 필드 초기화
+                categorySelect.value = ''; // 선택 초기화
+                categoryInput.value = ''; // 입력 초기화
             } else {
-                alert('카테고리 이름을 입력하세요.');
+                alert('카테고리를 선택하거나 입력하세요.');
             }
         });
 
@@ -204,17 +159,45 @@
             var categoryItem = document.createElement('div');
             categoryItem.className = 'category-item';
 
+            // 카테고리 이름 텍스트
             var categoryText = document.createElement('span');
             categoryText.textContent = categoryName;
 
+            // 제품 설명 텍스트 (카테고리별로 다르게 설정)
+            var productDesc = document.createElement('p');
+            switch (categoryName) {
+                case '컴퓨터 부품1':
+                    productDesc.textContent = "컴퓨터 부품1: CPU, 메모리, 그래픽 카드 등을 포함한 고성능 부품들.";
+                    break;
+                case '컴퓨터 부품2':
+                    productDesc.textContent = "컴퓨터 부품2: 마더보드, 파워 서플라이, 저장 장치 등을 포함한 필수 부품들.";
+                    break;
+                case '컴퓨터 부품3':
+                    productDesc.textContent = "컴퓨터 부품3: 케이스, 쿨러, 키보드, 마우스 등 주변기기들.";
+                    break;
+                case '컴퓨터 부품4':
+                    productDesc.textContent = "컴퓨터 부품4: 컴퓨터 성능을 높여주는 고급 부품들, 예를 들어 SSD, 고급 GPU 등.";
+                    break;
+                default:
+                    productDesc.textContent = "이 제품은 고품질 컴퓨터 부품입니다. 빠른 속도와 안정성을 자랑합니다.";
+            }
+
+            // 카테고리 이미지
+            var categoryImage = document.createElement('img');
+            categoryImage.src = 'https://via.placeholder.com/80'; // 더미 이미지 (실제 이미지 URL로 교체 가능)
+            categoryImage.alt = categoryName;
+
+            // 삭제 버튼
             var deleteBtn = document.createElement('button');
             deleteBtn.textContent = '삭제';
             deleteBtn.addEventListener('click', function() {
                 deleteCategory(categoryName);
             });
 
-            // 카테고리 항목에 텍스트와 삭제 버튼 추가
+            // 카테고리 항목에 텍스트, 설명, 이미지 및 삭제 버튼 추가
+            categoryItem.appendChild(categoryImage);
             categoryItem.appendChild(categoryText);
+            categoryItem.appendChild(productDesc);
             categoryItem.appendChild(deleteBtn);
 
             // 목록에 추가

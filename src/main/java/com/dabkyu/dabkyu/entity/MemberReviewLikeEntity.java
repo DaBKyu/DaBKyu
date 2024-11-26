@@ -27,6 +27,8 @@ import lombok.Setter;
 @Table(name="member_review_like")
 @IdClass(MemberReviewLikeEntityID.class)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberReviewLikeEntity {
 
     @Id

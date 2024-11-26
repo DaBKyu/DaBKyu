@@ -25,6 +25,8 @@ import lombok.Setter;
 @Entity(name="priceStatus")
 @Table(name="price_status")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PriceStatusEntity {
 
     @Id

@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dabkyu.dabkyu.dto.MemberAddressDTO;
+import com.dabkyu.dabkyu.dto.MemberCouponDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.OrderProductDTO;
@@ -33,7 +35,6 @@ import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.MemberReviewLikeEntity;
-import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
@@ -45,11 +46,9 @@ import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.service.ShoppingCartService;
 import com.dabkyu.dabkyu.util.PageUtil;
-
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-
 
 @Controller
 @AllArgsConstructor
@@ -158,7 +157,7 @@ public class ShopController {
 		List<Category3Entity> list3 = productService.category3List();
 
 		model.addAttribute("list", list);
-		model.addAttribute("listIsEmpty", list.hasContent()?"N":"Y");
+		model.addAttribute("listIsEmpty", list.hasContent() ? "N" : "Y");
 		model.addAttribute("totalElement", totalCount);
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
@@ -245,7 +244,7 @@ public class ShopController {
 		model.addAttribute("list2", list2);
 		model.addAttribute("list3", list3);
     }
-    
+
 	// 장바구니 보기
     @GetMapping("/mypage/shoppingCart")
     public List<ShoppingCartEntity> getCartItems(
@@ -344,29 +343,32 @@ public class ShopController {
 		HttpSession session,
 		@RequestParam("toPayOrderProductList")
 		List<Long> toPayOrderProductList,
-		@RequestBody OrderInfoDTO orderInfo
-	) {
-		String email = (String)session.getAttribute("email");
-	}
+		@RequestParam("orderInfo") OrderInfoDTO orderInfo,
+		@RequestParam("memberAddress") MemberAddressDTO memberAddress,
+		@RequestParam("memberCoupon") MemberCouponDTO memberCoupon,
+		@RequestParam("member") MemberDTO member
+		) {}
 
 
 	// 결제 
     @PostMapping("/shop/pay")
     public String pay(
-			HttpSession session,
-            @RequestParam("toPayOrderProductList")
-			 List<Long> toPayOrderProductList,
-            @RequestBody OrderInfoDTO orderInfo) {
+		HttpSession session,
+		@RequestParam("toPayOrderProductList")
+		List<Long> toPayOrderProductList,
+		@RequestParam(value = "couponSeqno", required = false) Long couponSeqno,
+		@RequestParam(value = "point", required = false) int point,
+		@RequestBody OrderInfoDTO orderInfo) {
 		String email = (String)session.getAttribute("email");
 		try {
-			shoppingCartService.pay(email, toPayOrderProductList, orderInfo);
+			shoppingCartService.pay(email, toPayOrderProductList,couponSeqno, point, orderInfo);
 			return "{\"message\":\"good\"}";
 		} catch (RuntimeException e) {
 			return "결제 실패: " + e.getMessage();
 		}
     }
 
-	// 결제 취소
+	// 결제 취소 신청
 	@PostMapping("/purchase/cancelToPay")
 	public String cancelToPay(
 			HttpSession session,
@@ -381,18 +383,18 @@ public class ShopController {
 	}
 		 
 	 // 환불 신청
-	//  @PostMapping("/purchase/refundRequest")
-	//  public String requestRefund(
-	// 		 HttpSession session,
-	// 		 @RequestParam List<Long> orderProductSeqnos) { 
-	// 	 String email = (String) session.getAttribute("email");
-	// 	 try {
-	// 		 shoppingCartService.refundRequest(email, orderProductSeqnos);
-	// 		 return "{\"message\":\"good\"}";
-	// 	 } catch (RuntimeException e) {
-	// 		 return e.getMessage();
-	// 	 }
-	//  }
+	 @PostMapping("/purchase/refundRequest")
+	 public String requestRefund(
+			 HttpSession session,
+			 @RequestParam Long orderSeqno) { 
+		 String email = (String) session.getAttribute("email");
+		 try {
+			 shoppingCartService.refundRequest(email,orderSeqno);
+			 return "{\"message\":\"good\"}";
+		 } catch (RuntimeException e) {
+			 return e.getMessage();
+		 }
+	 }
 
 	// 상품 문의 내역 보기
 	@GetMapping("/purchase/questionList")
@@ -413,7 +415,7 @@ public class ShopController {
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
-		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword,CateSeqno));
+		model.addAttribute("pageList", page.getQuestionList(pageNum, postNum, pageListCount,totalCount,keyword));
 	
 	}
 
@@ -513,7 +515,7 @@ public class ShopController {
 		model.addAttribute("postNum", postNum);
 		model.addAttribute("page", pageNum);
 		model.addAttribute("keyword", keyword);
-		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword,CateSeqno));
+		model.addAttribute("pageList", page.getReviewList(pageNum, postNum, pageListCount,totalCount,keyword));
 	}
 
 	// 상품 리뷰 상세 보기

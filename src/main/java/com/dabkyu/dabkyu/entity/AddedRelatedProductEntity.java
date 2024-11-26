@@ -25,6 +25,8 @@ import lombok.Setter;
 @Entity(name="addedRelatedProduct")
 @Table(name="added_related_product")
 @IdClass(AddedRelatedProductEntityID.class)
+@NoArgsConstructor
+@AllArgsConstructor
 public class AddedRelatedProductEntity {
 
     @Id

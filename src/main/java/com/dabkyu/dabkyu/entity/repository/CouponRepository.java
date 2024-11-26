@@ -1,5 +1,8 @@
 package com.dabkyu.dabkyu.entity.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +17,10 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long> {
 
    //전체 조회..
    public Page<CouponEntity> findAll(Pageable pageable);
-   //public Page<CouponEntity> findAll(
-   //    org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable pageable);
-    
+
+   //만료된 쿠폰들만 조회하는 쿼리 메서드
+   public List<CouponEntity> findByCouponEndDateBefore(LocalDateTime referenceDate);
+
+   public CouponEntity findByCouponCode(String couponCode);
+   
 }

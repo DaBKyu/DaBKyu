@@ -86,12 +86,8 @@
                         <td th:text="${review.rate}">5</td>
                         <td th:text="${review.rev_writer}">qscd123</td>
                         <td>
-                            <img class="p_image" th:src="@{'/p_img/' + ${review.stored_filename}}" style="width:40px; height: 40px">
-                            <a th:href="@{'/master/pReview'(rev_writer=${review.rev_writer}, page=${page}, keyword=${keyword})}" 
-                               onmouseover="this.style.textDecoration='underline'" 
-                               onmouseout="this.style.textDecoration='none';">
-                                <span th:text="${review.rev_content}">상품 관련 문의 입니다.</span>
-                            </a>
+                            <img class="p_image" alt="" th:src="@{'/p_img/' + ${review.stored_filename}}" style="width:40px; height: 40px">
+                            <span th:text="${review.rev_content}">상품 관련 문의 입니다.</span>
                         </td>
                         <td th:text="${review.category_name}">카테고리명</td>
                         <td th:text="${#temporals.format(review.rev_date, 'yyyy-MM-dd')}">2024.10.29</td>

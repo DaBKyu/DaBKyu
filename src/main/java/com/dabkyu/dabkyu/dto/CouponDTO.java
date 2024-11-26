@@ -3,6 +3,7 @@ package com.dabkyu.dabkyu.dto;
 import java.time.LocalDateTime;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,6 @@ public class CouponDTO {
     private Long couponSeqno;
     private String couponName;
     private String couponType;
-    private String couponTarget;
     private String couponInfo;
     private int percentDiscount;
     private int amountDiscount;
@@ -26,12 +26,13 @@ public class CouponDTO {
     private LocalDateTime couponEndDate;
     private int minOrder;
     private String couponRole;
+    private String isDupl;
+    private String couponCode;
 
     public CouponDTO(CouponEntity entity) {
         this.couponSeqno = entity.getCouponSeqno();
         this.couponName = entity.getCouponName();
         this.couponType = entity.getCouponType();
-        this.couponTarget = entity.getCouponTarget();
         this.couponInfo = entity.getCouponInfo();
         this.percentDiscount = entity.getPercentDiscount();
         this.amountDiscount = entity.getAmountDiscount();
@@ -39,6 +40,8 @@ public class CouponDTO {
         this.couponEndDate = entity.getCouponEndDate();
         this.minOrder= entity.getMinOrder();
         this.couponRole= entity.getCouponRole();
+        this.isDupl = entity.getIsDupl();
+        this.couponCode = entity.getCouponCode();
     }
 
     public CouponEntity dtoToEntity(CouponDTO dto) {
@@ -46,12 +49,15 @@ public class CouponDTO {
                                           .couponSeqno(dto.getCouponSeqno())
                                           .couponName(dto.getCouponName())
                                           .couponType(dto.getCouponType())
-                                          .couponTarget(dto.getCouponTarget())
                                           .couponInfo(dto.getCouponInfo())
                                           .percentDiscount(dto.getPercentDiscount())
                                           .amountDiscount(dto.getAmountDiscount())
                                           .couponStartDate(dto.getCouponStartDate())                                           
                                           .couponEndDate(dto.getCouponEndDate())
+                                          .minOrder(dto.getMinOrder())
+                                          .couponRole(dto.getCouponRole())
+                                          .isDupl(dto.getIsDupl())
+                                          .couponCode(dto.getCouponCode())
                                           .build();
         return entity;
     }

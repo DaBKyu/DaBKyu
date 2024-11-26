@@ -24,6 +24,8 @@ import lombok.Setter;
 @Table(name="shopping_cart")
 @IdClass(ShoppingCartEntityID.class)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShoppingCartEntity {
 
     @Id

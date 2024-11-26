@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,22 +81,6 @@
             color: #555;
         }
 
-        .like-btn {
-            margin-left: 10px;
-            padding: 5px 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .like-count {
-            margin-left: 5px;
-            font-size: 0.9rem;
-            color: #555;
-        }
-
         .modal {
             display: none;
             position: fixed;
@@ -128,51 +113,49 @@
         }
     </style>
 </head>
+
 <body>
     <th:block th:replace="~{layout/MyPageHeader::header}"></th:block>
     <div class="" style="display: flex; width: 1400px;">
     <th:block th:replace="~{layout/SideMenu::SideMenu}"></th:block>
     <div class="reviews-section" style="margin-left: 200px;">
         <h2>리뷰 모음</h2>
-        <div class="search-section">
-            <input type="text" id="searchInput" placeholder="리뷰 제목 검색">
-            <button id="searchBtn">검색</button>
-        </div>
 
-        <div class="review-item" data-title="상품 제목 1" data-author="사용자1" data-date="2024-10-01" data-content="상품 내용 1" data-image="https://via.placeholder.com/300">
+        <!-- 첫 번째 상품 -->
+        <div class="review-item" data-title="상품 제목 1" data-author="사용자1" data-date="2024-10-01" data-content="상품 내용 1"
+            data-image="https://via.placeholder.com/300">
             <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image">
             <div class="review-details">
                 <p class="review-title">상품 제목 1</p>
                 <p class="review-rating">★ ★ ★ ★ ☆</p>
                 <p class="review-info">작성자: 사용자1 | 등록일: 2024-10-01 | 조회: 10</p>
-                <button class="like-btn" data-likes="0">좋아요</button>
-                <span class="like-count">0</span>
             </div>
         </div>
 
-        <div class="review-item" data-title="상품 제목 2" data-author="사용자2" data-date="2024-10-02" data-content="상품 내용 2" data-image="https://via.placeholder.com/300">
+        <!-- 두 번째 상품 -->
+        <div class="review-item" data-title="상품 제목 2" data-author="사용자1" data-date="2024-10-02" data-content="상품 내용 2"
+            data-image="https://via.placeholder.com/300">
             <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image">
             <div class="review-details">
                 <p class="review-title">상품 제목 2</p>
                 <p class="review-rating">★ ★ ★ ★ ★</p>
                 <p class="review-info">작성자: 사용자2 | 등록일: 2024-10-02 | 조회: 5</p>
-                <button class="like-btn" data-likes="0">좋아요</button>
-                <span class="like-count">0</span>
             </div>
         </div>
 
-        <div class="review-item" data-title="상품 제목 3" data-author="사용자3" data-date="2024-10-03" data-content="상품 내용 3" data-image="https://via.placeholder.com/300">
+        <!-- 세 번째 상품 -->
+        <div class="review-item" data-title="상품 제목 3" data-author="사용자1" data-date="2024-10-03" data-content="상품 내용 3"
+            data-image="https://via.placeholder.com/300">
             <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image">
             <div class="review-details">
                 <p class="review-title">상품 제목 3</p>
                 <p class="review-rating">★ ★ ★ ☆ ☆</p>
                 <p class="review-info">작성자: 사용자3 | 등록일: 2024-10-03 | 조회: 20</p>
-                <button class="like-btn" data-likes="0">좋아요</button>
-                <span class="like-count">0</span>
             </div>
         </div>
     </div>
 
+    <!-- 모달 팝업 -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <h2 id="modalTitle"></h2>
@@ -185,19 +168,10 @@
     </div>
 
     <script>
-        document.getElementById('searchBtn').addEventListener('click', function() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const reviews = document.querySelectorAll('.review-item');
-
-            reviews.forEach(review => {
-                const title = review.querySelector('.review-title').textContent.toLowerCase();
-                review.style.display = title.includes(query) ? 'flex' : 'none';
-            });
-        });
-
+        // 리뷰 항목 클릭 시 모달 열기
         const reviewItems = document.querySelectorAll('.review-item');
         reviewItems.forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function () {
                 const title = this.dataset.title;
                 const author = this.dataset.author;
                 const date = this.dataset.date;
@@ -213,29 +187,20 @@
                 document.getElementById('modal').style.display = 'flex';
             });
 
-            // 이미지 클릭 시 모달 열리도록 추가
+            // 이미지 클릭 시 모달 열리도록 이벤트 추가
             const image = item.querySelector('.review-image');
-            image.addEventListener('click', function(event) {
+            image.addEventListener('click', function (event) {
                 event.stopPropagation(); // 리뷰 클릭 이벤트 방지
                 item.click(); // 리뷰 아이템 클릭 처리
             });
         });
 
-        const likeButtons = document.querySelectorAll('.like-btn');
-        likeButtons.forEach(btn => {
-            btn.addEventListener('click', function(event) {
-                event.stopPropagation(); // 리뷰 클릭 이벤트 방지
-                let likes = parseInt(this.dataset.likes);
-                likes++;
-                this.dataset.likes = likes;
-                this.nextElementSibling.textContent = likes; // 좋아요 수 업데이트
-            });
-        });
-
-        document.getElementById('closeModal').addEventListener('click', function() {
+        // 모달 닫기
+        document.getElementById('closeModal').addEventListener('click', function () {
             document.getElementById('modal').style.display = 'none';
         });
     </script>
     </div>
 </body>
+
 </html>
