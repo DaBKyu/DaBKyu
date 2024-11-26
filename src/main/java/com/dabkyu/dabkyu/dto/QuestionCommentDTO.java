@@ -17,6 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder 
 public class QuestionCommentDTO {
+    private Long questionCommentSeqno;
     private QuestionEntity queSeqno;
     private MemberEntity email;
 	private String comWriter;
@@ -24,6 +25,7 @@ public class QuestionCommentDTO {
 	private LocalDateTime comDate;
 
     public QuestionCommentDTO(QuestionCommentEntity entity) {
+        this.questionCommentSeqno = entity.getQuestionCommentSeqno();
         this.queSeqno = entity.getQueSeqno();
         this.email = entity.getEmail();
         this.comContent = entity.getComContent();
@@ -32,6 +34,7 @@ public class QuestionCommentDTO {
 
     public QuestionCommentEntity dtoToEntity(QuestionCommentDTO dto) {
         QuestionCommentEntity entity = QuestionCommentEntity.builder()
+                                                            .questionCommentSeqno(dto.getQuestionCommentSeqno())
                                                             .queSeqno(dto.getQueSeqno())
                                                             .email(dto.getEmail())
                                                             .comContent(dto.getComContent())

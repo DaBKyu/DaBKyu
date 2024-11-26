@@ -32,7 +32,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">문의/리뷰목록</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" th:href="@{/master/question}">문의 목록</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/question?page=1}">문의 목록</a></li>
                                 <li><a class="dropdown-item" th:href="@{/master/reviewList}">리뷰 목록</a></li>
                             </ul>
                         </li>
@@ -41,8 +41,8 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" th:href="@{/master/mailList}">메일 발송 목록</a></li>
-                                <li><a class="dropdown-item" th:href="@{/master/mailSend}">메일 발송</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/mail/mailSendList?page=1}">메일 발송 목록</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/mail/sendEmail}">메일 발송</a></li>
                             </ul>
                         </li>
         
