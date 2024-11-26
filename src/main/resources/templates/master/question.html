@@ -42,7 +42,7 @@
         </thead>
         <tbody class="table-group-divider">
             <th:block  th:if="${#strings.equals(listIsEmpty,'N')}">
-                <tr th:each="entry : ${list}">
+                <tr th:each="entry : ${questionList}">
                     <td><input class="form-check-input question-checkbox" type="checkbox" value=""></td>
                     <td th:text="${entry['question'].queType}">답변전</td>
                     <td th:text="${entry['question'].queTitle}">문의제목입니다</td>

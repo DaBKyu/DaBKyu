@@ -641,7 +641,7 @@ public class MasterController{
     //문의 답변 등록 및 수정
     @ResponseBody
     @PostMapping("/master/question/reply")
-    public void postReply(@RequestParam("queSeqno") Long queSeqno,
+    public void postReply(@RequestParam(value = "queSeqno", required = false) Long queSeqno,
                 @RequestParam("option") String option, 
                 @RequestBody QuestionCommentDTO commentDTO)
                 throws Exception{

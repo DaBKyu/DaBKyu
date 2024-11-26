@@ -10,38 +10,31 @@
     <script>
         // 답변 제출
         const submitReply = async () => {
-            const content = document.querySelector('#comContent').value;
+            const content = document.querySelector('#comContent');
             const queSeqno = document.querySelector('#queSeqno').value;
 
-            if (content.trim() === '') {
+            if (content.value === '') {
                 alert('답변을 입력하세요.');
                 content.focus();
                 return;
             }
-
-            try {
-                const response = await fetch('/master/reply?option=I', {
+            await fetch('/master/question/reply?option=I', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ queSeqno, comContent: content }),
-                });
+                }).then((response)=> response.json())
+                    .then((data)=>{
+                        alert(data.message);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    alert(data.message);
+                        content.setAttribute('readonly', true);
 
-                    content.setAttribute('readonly', true);
-
-                    document.querySelector('#editBtn').classList.remove('d-none');
-                    document.querySelector('#deleteBtn').classList.remove('d-none');
-                    document.querySelector('#submitBtn').classList.add('d-none');
-                } else {
-                    throw new Error('답변 등록 실패');
-                }
-            } catch (error) {
+                        document.querySelector('#editBtn').classList.remove('d-none');
+                        document.querySelector('#deleteBtn').classList.remove('d-none');
+                        document.querySelector('#submitBtn').classList.add('d-none');
+                    }). catch((error)=> {
                 console.error('Error:', error);
                 alert("시스템 장애로 답변 등록이 실패했습니다.");
-            }
+            });
         };
 
         // 답변 수정 활성화
@@ -58,7 +51,7 @@
             const content = document.querySelector('#comContent');
             const queSeqno = document.querySelector('#queSeqno').value;
 
-            if (content.value.trim() === '') {
+            if (content.value === '') {
                 alert('내용을 입력하세요.');
                 content.focus();
                 return;
@@ -69,12 +62,12 @@
             formData.append("queSeqno", queSeqno);
 
             try {
-                const response = await fetch('/master/reply?option=U', {
+                const response = await fetch('/master/question/reply?option=U', {
                     method: 'POST',
                     body: formData,
                 });
 
-                if (response.ok) {
+
                     const data = await response.json();
                     alert(data.message);
 
@@ -82,9 +75,7 @@
 
                     document.querySelector('#editBtn').classList.remove('d-none');
                     document.querySelector('#submitBtn').classList.add('d-none');
-                } else {
-                    throw new Error('답변 수정 실패');
-                }
+
             } catch (error) {
                 console.error('Error:', error);
                 alert("시스템 장애로 답변 수정이 실패했습니다.");
