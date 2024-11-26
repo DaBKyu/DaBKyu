@@ -20,5 +20,7 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long> {
 
    //만료된 쿠폰들만 조회하는 쿼리 메서드
    public List<CouponEntity> findByCouponEndDateBefore(LocalDateTime referenceDate);
+
+   public CouponEntity findByCouponCode(String couponCode);
    
 }

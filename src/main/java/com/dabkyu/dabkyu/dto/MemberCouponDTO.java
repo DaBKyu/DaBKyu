@@ -18,16 +18,19 @@ import lombok.Setter;
 public class MemberCouponDTO {
     private MemberEntity email;
 	private CouponEntity couponSeqno;
+    private String isExpire;
 
     public MemberCouponDTO(MemberCouponEntity entity) {
         this.email = entity.getEmail();
         this.couponSeqno = entity.getCouponSeqno();
+        this.isExpire = entity.getIsExpire();
     }
 
     public MemberCouponEntity dtoToEntity(MemberCouponDTO dto) {
         MemberCouponEntity entity = MemberCouponEntity.builder()
                                                       .email(dto.getEmail())
                                                       .couponSeqno(dto.getCouponSeqno())
+                                                      .isExpire(dto.getIsExpire())
                                                       .build();
         return entity;
     }

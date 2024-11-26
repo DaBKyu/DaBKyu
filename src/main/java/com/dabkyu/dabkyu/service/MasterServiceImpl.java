@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -160,8 +161,9 @@ public class MasterServiceImpl implements MasterService {
     public Page<ProductEntity> productList(Long category1Seqno, Long category2Seqno, Long category3Seqno, String productName, PageRequest pageRequest) {
         if (category1Seqno == null && category2Seqno == null && category3Seqno == null && productName == null) {
             return productRepository.findAll(pageRequest); 
+        }else{ //검색 (카테고리 OR 상품명)
+            return  productRepository.findByAllCategories(category1Seqno, category2Seqno, category3Seqno, productName, pageRequest);
         }
-        return  productRepository.findByAllCategories(category1Seqno, category2Seqno, category3Seqno, productName, pageRequest);
     }
     
 
@@ -196,11 +198,13 @@ public class MasterServiceImpl implements MasterService {
         ProductEntity productEntity = productRepository.findById(productSeqno).get();
         return productEntity.getCategory3Seqno();
     }
+
     @Override
     public Category2Entity getCategory2ByProduct(Long productSeqno) throws Exception {
         ProductEntity productEntity = productRepository.findById(productSeqno).get();
         return productEntity.getCategory3Seqno().getCategory2Seqno();
     }
+
     @Override
     public Category1Entity getCategory1ByProduct(Long productSeqno) throws Exception {
         ProductEntity productEntity = productRepository.findById(productSeqno).get();
@@ -324,14 +328,9 @@ public class MasterServiceImpl implements MasterService {
         Page<OrderDetailEntity> orderDetailPage;
 
         //검색기능 
-        if (category != null && productname != null) {
+        if (category != null || productname != null) { //카테고리 OR 상품명으로 검색
             orderDetailPage = orderDetailRepository.findByCategoryAndProductNameContaining(category, productname, pageRequest);
-        } else if(category == null && productname != null){
-            //orderDetailPage = orderDetailRepository.findByProductNameContaining(productname, pageRequest);
-            orderDetailPage = orderDetailRepository.findByOrderProductSeqno_ProductSeqno_ProductNameContaining(productname, pageRequest);
-        } else if(category != null && productname == null){
-            orderDetailPage = orderDetailRepository.findByCategory(category, pageRequest);
-        } else{
+        } else{ //전체 불러오기
             orderDetailPage = orderDetailRepository.findAll(pageRequest);
         }
          
@@ -617,7 +616,7 @@ public class MasterServiceImpl implements MasterService {
     public void deleteCategory3(Long category3Seqno) throws Exception {
         Category3Entity category3Entity = category3Repository.findById(category3Seqno).get();
 
-        Category3Entity temporaryCategory = category3Repository.findByIsTemporaryTrue(); //
+        Category3Entity temporaryCategory = category3Repository.findByIsTemporary("Y"); 
 
         if (temporaryCategory == null) { //임시 카테고리 없다면 생성. 
             temporaryCategory = new Category3Entity();
@@ -639,7 +638,7 @@ public class MasterServiceImpl implements MasterService {
 
     //쿠폰 리스트 
     @Override
-    public Page<Map<String,Object>> couponList(int pageNum, int postNum, String keyword) throws Exception{
+    public Page<Map<String,Object>> couponList(int pageNum, int postNum) throws Exception{
         
         PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"couponStartDate"));
 
@@ -690,6 +689,8 @@ public class MasterServiceImpl implements MasterService {
     //쿠폰 등록 (쿠폰 seqno가져오기)
     @Override
     public Long writeCoupon(CouponDTO couponDTO) throws Exception{
+        String couponCode = generateCouponCode(); //쿠폰 코드 난수로 생성
+        couponDTO.setCouponCode(couponCode); //쿠폰 코드 설정
         CouponEntity couponEntity = couponDTO.dtoToEntity(couponDTO);
         couponRepository.save(couponEntity);
         return couponEntity.getCouponSeqno();
@@ -752,7 +753,7 @@ public class MasterServiceImpl implements MasterService {
         couponTargetRepository.deleteByCouponSeqnoAndProductSeqno(couponSeqno, productSeqno);
     }
 
-    //쿠폰 배포
+    //쿠폰 배포 (자동)
     @Override
     public void couponToUser(Long couponSeqno, boolean isAllMembers, String memberGrade, boolean isBirthday, boolean isNewMember) throws Exception{
         CouponEntity couponEntity = couponRepository.findById(couponSeqno).get();
@@ -783,44 +784,64 @@ public class MasterServiceImpl implements MasterService {
                 MemberCouponEntity memberCouponEntity = MemberCouponEntity.builder()
                                                                         .email(member)
                                                                         .couponSeqno(couponEntity)
+                                                                        .isExpire("N")
                                                                         .build();
                 memberCouponRepository.save(memberCouponEntity);
             }
         }  
     }
 
+    //쿠폰 배포 (수동) - 다운로드
+    @Override
+    public void downloadCoupon(Long couponSeqno, String email) throws Exception{
+        CouponEntity couponEntity = couponRepository.findById(couponSeqno).get();
+        MemberEntity memberEntity = memberRepository.findById(email).get();
+
+        MemberCouponEntity existingCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqnoAndEmail_Email(couponSeqno, email);
+        
+        if(existingCoupon == null){//existingCoupon != null -> 이미 있는 쿠폰
+            MemberCouponEntity memberCouponEntity = MemberCouponEntity.builder()
+                                                              .email(memberEntity)
+                                                              .couponSeqno(couponEntity)
+                                                              .isExpire("N")
+                                                              .build();
+            memberCouponRepository.save(memberCouponEntity);
+        }
+    }
+
+    //쿠폰 배포 (수동) - 코드 등록
+    @Override
+    public void getCouponCode(String couponCode, String email) throws Exception{
+        CouponEntity couponEntity = couponRepository.findByCouponCode(couponCode);
+        MemberEntity memberEntity = memberRepository.findById(email).get();
+
+        MemberCouponEntity existingCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqnoAndEmail_Email(couponEntity.getCouponSeqno(), email);
+        
+        if(existingCoupon == null){//existingCoupon != null -> 이미 있는 쿠폰
+            MemberCouponEntity memberCouponEntity = MemberCouponEntity.builder()
+                                                                  .email(memberEntity)
+                                                                  .couponSeqno(couponEntity)
+                                                                  .isExpire("N") 
+                                                                  .build();
+            memberCouponRepository.save(memberCouponEntity);
+        }
+    }
+
     //생일 회원
-    private boolean isBirthdayMember(MemberEntity member) {
+    private boolean isBirthdayMember(MemberEntity member){
         LocalDateTime today = LocalDateTime.now();
         return today.getMonth() == member.getBirthDate().getMonth() && today.getDayOfMonth() == member.getBirthDate().getDayOfMonth();
     }
     
-    //신규 회원을 
-    private boolean isNewMember(MemberEntity member) {
+    //신규 회원
+    private boolean isNewMember(MemberEntity member){
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         return member.getRegdate().isAfter(oneMonthAgo); 
     }
 
-
-    //쿠폰 삭제 
-    @Override
-    public void deleteCoupon(Long couponSeqno, String email) throws Exception{
-        CouponEntity couponEntity = couponRepository.findById(couponSeqno).get();
-      
-        //사용기한이 만료되었을 경우
-        LocalDateTime now = LocalDateTime.now();
-        if(couponEntity.getCouponEndDate().isBefore(now)){
-            couponEntity.setIsExpire("Y");
-        }
-
-        //사용조건(등급)이 맞지 않았을 경우
-        MemberEntity memberEntity = memberRepository.findById(email).get();
-        String userRole = memberEntity.getRole();
-        if(!userRole.equals(couponEntity.getCouponRole())){
-            couponEntity.setIsExpire("Y");
-        }
-
-        couponRepository.save(couponEntity);
+    //쿠폰 코드 랜덤 생성
+    private String generateCouponCode() {
+        return UUID.randomUUID().toString().substring(0, 15);
     }
 
     //리뷰 리스트 
@@ -1006,9 +1027,9 @@ public class MasterServiceImpl implements MasterService {
         // 쿠폰 복원 처리 (만료처리된 쿠폰 복원)
         if (couponSeqno != null) {
             //쿠폰 상태 업데이트 (사용 가능 상태로 변경)
-            //MemberCouponEntity memberCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqno(couponSeqno);
-            CouponEntity coupon = couponRepository.findById(couponSeqno).get();
-            coupon.setIsExpire("N");
+            MemberCouponEntity memberCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqno(couponSeqno);
+            //CouponEntity coupon = couponRepository.findById(couponSeqno).get();
+            memberCoupon.setIsExpire("N");
         }
 
         memberRepository.save(member);  
@@ -1032,6 +1053,7 @@ public class MasterServiceImpl implements MasterService {
 
     }
 
+    /* 
     //관리자가 쿠폰종료일이 지난 쿠폰들 isExpired를 "Y"로 업데이트 
     @Override
     public void setExpiredCouponsToExpired(LocalDateTime referenceDate) {
@@ -1050,7 +1072,7 @@ public class MasterServiceImpl implements MasterService {
     
         // 만료된 쿠폰 정보 저장
         couponRepository.saveAll(coupons);
-    }
+    } */
 
 }
 

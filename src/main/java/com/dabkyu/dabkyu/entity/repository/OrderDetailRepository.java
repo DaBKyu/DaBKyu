@@ -21,6 +21,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, 
     //public Page<OrderDetailEntity> findAll(PageRequest pageRequest);
 
     //주문리스트 카테고리3으로 카테고리+상품명 조회
+    /* 
     @Query("SELECT od FROM orderDetail od " +
             "JOIN od.orderProductSeqno op " +
             "JOIN op.productSeqno p " +
@@ -30,7 +31,6 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, 
     public Page<OrderDetailEntity> findByCategoryAndProductNameContaining(@Param("category") Long category, 
                                                                @Param("productName") String productName, Pageable pageable);
     
-    // 수정 필요
     //주문리스트 카테고리3으로 카테고리 조회
     @Query("SELECT od FROM orderDetail od " +
             "JOIN od.orderProductSeqno op " +
@@ -38,6 +38,17 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, 
             "JOIN p.category3Seqno c3 " +
             "WHERE c3.category3Seqno = :category3Seqno")
     public Page<OrderDetailEntity> findByCategory(@Param("category") Long category, Pageable pageable);
+    */
+
+    //주문리스트 카테고리3으로 카테고리 OR 상품명 조회
+    @Query("SELECT od FROM orderDetail od " +
+            "JOIN od.orderProductSeqno op " +
+            "JOIN op.productSeqno p " +
+            "JOIN p.category3Seqno c3 " +
+            "WHERE (:category3Seqno IS NULL OR c3.category3Seqno = :category3Seqno) " +
+            "AND (:productName = '' OR p.productName LIKE %:productName%)")
+    public Page<OrderDetailEntity> findByCategoryAndProductNameContaining(@Param("category") Long category, 
+                                                               @Param("productName") String productName, Pageable pageable);
 
     //주문리스트 상품명으로 조회
     //public Page<OrderDetailEntity> findByProductNameContaining(String productname, Pageable pageable);

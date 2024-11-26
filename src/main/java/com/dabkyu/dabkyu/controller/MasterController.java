@@ -3,27 +3,21 @@ package com.dabkyu.dabkyu.controller;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.Locale.Category;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -32,9 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.dabkyu.dabkyu.dto.Category1DTO;
 import com.dabkyu.dabkyu.dto.Category2DTO;
 import com.dabkyu.dabkyu.dto.Category3DTO;
-import com.dabkyu.dabkyu.dto.CouponCategoryDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
-import com.dabkyu.dabkyu.dto.CouponTargetDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
@@ -42,16 +34,10 @@ import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
 import com.dabkyu.dabkyu.dto.QuestionCommentDTO;
-import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
-import com.dabkyu.dabkyu.dto.ReviewDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
-import com.dabkyu.dabkyu.entity.Category1Entity;
-import com.dabkyu.dabkyu.entity.Category2Entity;
-import com.dabkyu.dabkyu.entity.Category3Entity;
-import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
@@ -60,21 +46,11 @@ import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReportEntity;
-import com.dabkyu.dabkyu.entity.ReviewEntity;
-import com.dabkyu.dabkyu.entity.repository.Category1Repository;
-import com.dabkyu.dabkyu.entity.repository.Category2Repository;
-import com.dabkyu.dabkyu.entity.repository.Category3Repository;
-import com.dabkyu.dabkyu.entity.repository.CouponRepository;
-import com.dabkyu.dabkyu.entity.repository.MemberRepository;
-import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
-import com.dabkyu.dabkyu.entity.repository.ProductRepository;
 import com.dabkyu.dabkyu.service.MasterService;
-import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.util.PageUtil;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -184,10 +160,8 @@ public class MasterController{
         model.addAttribute("category2Seqno", category2Seqno);
         model.addAttribute("category3Seqno", category3Seqno);
         model.addAttribute("thumbnailFiles", thumbnailFiles);
-		    model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,productName));
+		model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,productName));
     }
-    
-
 
     //상품 상세보기 
     @GetMapping("/master/getProductDetail/{productSeqno}")
@@ -218,7 +192,10 @@ public class MasterController{
                 throws Exception{
                 
         ProductEntity productEntity = masterService.getProductBySeqno(productSeqno); 
-        String isTemporaryCategory = productEntity.getCategory3Seqno().getIsTemporary();
+        String isTemporaryCategory = productEntity.getCategory3Seqno().getIsTemporary(); // "Y","N" 값으로 임시 카테고리 여부 확인
+        if(isTemporaryCategory == null){
+            isTemporaryCategory = "N";
+        }
         model.addAttribute("productview", productEntity); // 상품 정보           
         model.addAttribute("productfileview", masterService.getProductFiles(productSeqno)); //상품 파일 정보 
         model.addAttribute("productinfofileview", masterService.getProductInfoFiles(productSeqno)); //상품설명 이미지 파일 정보
@@ -230,6 +207,7 @@ public class MasterController{
         model.addAttribute("allcategory1", masterService.getAllCategories1()); //모든 카테고리 정보
         model.addAttribute("allcategory2", masterService.getAllCategories2());
         model.addAttribute("allcategory3", masterService.getAllCategories3());
+
         model.addAttribute("needsModification", isTemporaryCategory); //임시 카테고리 //[수정] 알림을 위한
     }
 
@@ -430,12 +408,11 @@ public class MasterController{
     }
 
     //주문내역 리스트
-     
     @GetMapping("/master/order")
     public void getOrderList(Model model, 
                             @RequestParam("page") int pageNum, 
                             @RequestParam(name="productname",defaultValue="",required=false) String productname,
-                            @RequestParam(name="category",defaultValue="",required=false) Long category) 
+                            @RequestParam(name="category",required=false) Long category) 
                             throws Exception{
         int postNum = 10; 
         int pageListCount = 10;                         
@@ -694,7 +671,7 @@ public class MasterController{
     //리뷰 리스트 화면 
     @GetMapping("/master/reviewList")
     public void getReviewList(Model model, @RequestParam("page") int pageNum, 
-                @RequestParam(name="category",defaultValue="",required=false) Long category) 
+                @RequestParam(name="category", required=false) Long category) 
                 throws Exception{
         int postNum = 15;
         int pageListCount = 10;
@@ -723,7 +700,7 @@ public class MasterController{
     @GetMapping("/master/reviewReport")
     public void getReviewReportList(Model model, 
                 @RequestParam("page") int pageNum,
-                @RequestParam("reportTitle") String reportTitle)
+                @RequestParam("reportTitle") String reportTitle) //title로 검색
                 throws Exception{
         int postNum = 10;
         int pageListCount = 10;
@@ -767,14 +744,13 @@ public class MasterController{
     //쿠폰 리스트보기 
     @GetMapping("/master/couponList")
     public void getCouponList(Model model,
-                @RequestParam("page") int pageNum,
-                @RequestParam(name="keyword",defaultValue="",required=false) String keyword) 
+                @RequestParam("page") int pageNum) 
                 throws Exception {
         int postNum = 15; 
         int pageListCount = 10; 
         
         PageUtil page = new PageUtil();
-        Page<Map<String, Object>> couponPage = masterService.couponList(pageNum, postNum, keyword);
+        Page<Map<String, Object>> couponPage = masterService.couponList(pageNum, postNum);
         int totalCount = (int) couponPage.getTotalElements();
 
         model.addAttribute("couponPage", couponPage);
@@ -782,8 +758,7 @@ public class MasterController{
         model.addAttribute("totalElement", totalCount);
         model.addAttribute("postNum", postNum);
         model.addAttribute("page", pageNum);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("pageList", page.getPageCoupon(pageNum, postNum, pageListCount, totalCount, keyword));
+        model.addAttribute("pageList", page.getPageCoupon(pageNum, postNum, pageListCount, totalCount));
     }
 
     //쿠폰 등록 화면보기
@@ -818,7 +793,7 @@ public class MasterController{
         Long couponSeqno = 0L;
        
         if(kind.equals("I")){
-
+            
             couponSeqno = masterService.writeCoupon(couponDTO);
 
         }else if(kind.equals("U")){
@@ -856,9 +831,8 @@ public class MasterController{
         return "{\"message\":\"good\"}"; 
     }
 
-
-    //쿠폰-사용자 배포
-    @PostMapping()
+    //쿠폰-사용자 배포 (자동)
+    @PostMapping("/master/distributionCoupon")
     public void clientCoupon(@RequestParam("couponSeqno") Long couponSeqno,
                 @RequestParam(name = "isAllMembers", required = false) boolean isAllMembers,
                 @RequestParam(name = "memberGrade", required = false) String memberGrade,
@@ -867,20 +841,25 @@ public class MasterController{
                 throws Exception{
         //자동: 특정 회원 지정 발행, 웅영자 지정 대상 자동 발행(신규회원, 첫주문 완료 회원, 생일인 회원) ///구매한지 1년 후 쿠폰 발급??              
         masterService.couponToUser(couponSeqno, isAllMembers, memberGrade, isBirthday, isNewMember); 
-        //수동: 고객 다운로드, 운영자의 쿠폰코드 생성
-        
-    }
-    
-    //쿠폰 삭제(사용불가)
-    @Transactional
-    @GetMapping("/master/deleteCoupon")
-    public void getDeleteCoupon(@RequestParam("couponSeqno") Long couponSeqno,
-                                @RequestParam("email") String email) throws Exception{
-
-        masterService.deleteCoupon(couponSeqno, email);
     }
 
-     // 결제 취소 및 환불 신청 내역 보기
+    //쿠폰 다운로드 
+    @PostMapping("/master/downloadCoupon")
+    public void clientDownloadCoupon(@RequestParam("couponSeqno") Long couponSeqno, 
+                @RequestParam("email") String email) 
+                throws Exception{
+        masterService.downloadCoupon(couponSeqno, email);
+    }
+
+    //쿠폰 코드 발급
+    @PostMapping("/master/codeCoupon")
+    public void clientCodeCoupon(@RequestParam("couponCode") String couponCode,
+                @RequestParam("email") String email) 
+                throws Exception{
+        masterService.getCouponCode(couponCode, email);
+    }
+
+    // 결제 취소 및 환불 신청 내역 보기
     @GetMapping("/master/paymentCancelAndRefund")
     public List<OrderDetailEntity> getCancelAndRefund() {
     
@@ -927,6 +906,7 @@ public class MasterController{
         return "{\"message\":\"good\"}";
     }
 
+    /* 
     //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
     @PostMapping("/master/ExpiredUpdate")
     public String updateExpiredCoupons() {
@@ -935,7 +915,7 @@ public class MasterController{
         masterService.setExpiredCouponsToExpired(referenceDate);
 
         return "{\"message\":\"good\"}";
-    }
+    }*/
 
 }
 
