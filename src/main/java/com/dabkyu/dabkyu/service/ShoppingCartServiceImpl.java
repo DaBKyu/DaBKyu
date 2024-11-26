@@ -20,6 +20,7 @@ import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductOptionEntity;
 import com.dabkyu.dabkyu.entity.RelatedProductEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
+import com.dabkyu.dabkyu.entity.ShoppingCartEntityID;
 import com.dabkyu.dabkyu.entity.repository.AddedRelatedProductRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
@@ -33,9 +34,11 @@ import com.dabkyu.dabkyu.entity.repository.ShoppingCartRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Service 
 @AllArgsConstructor
+@Log4j2
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     private final OrderProductRepository orderProductRepository;
@@ -48,7 +51,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final MemberRepository memberRepository;
     private final RelatedProductRepository relatedProductRepository;
     private final ProductRepository productRepository;
-    
+
     // 장바구니 보기
     @Override
     public List<ShoppingCartEntity> getCartItems(String email) {
@@ -64,42 +67,50 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         Map<Long, Integer> relatedProducts,
         List<Long> productOptions
     ) {
+        log.info("addToCart 서비스 호출");
         // OrderProductEntity 생성 및 저장
-        orderProductRepository.save(orderProduct.dtoToEntity(orderProduct));
+        log.info("productSeqno: ({})", orderProduct.getProductSeqno());
+        OrderProductEntity orderProductEntity = orderProduct.dtoToEntity(orderProduct, productRepository.findById(orderProduct.getProductSeqno()).get());
+        orderProductRepository.save(orderProductEntity);
+        log.info("orderProduct 저장");
 
         // 주문 추가 상품과 주문 추가 옵션이 있는지 확인후 저장
-        if(!relatedProducts.isEmpty()){
-            for (Map.Entry<Long,Integer> entry : relatedProducts.entrySet()) {
-                RelatedProductEntity relatedProductEntity = relatedProductRepository.findById(entry.getKey()).get();
-                OrderProductEntity orderProductEntity = orderProductRepository.findById(orderProduct.getOrderProductSeqno()).get();
-                AddedRelatedProductEntity addedRelatedProductEntity = AddedRelatedProductEntity.builder()
-                                                                                               .orderProductSeqno(orderProductEntity)
-                                                                                               .relatedProductSeqno(relatedProductEntity)
-                                                                                               .amount(entry.getValue())
-                                                                                               .build();
-            addedRelatedProductRepository.save(addedRelatedProductEntity);                                                                              
+        if (relatedProducts != null) {   
+            if(!relatedProducts.isEmpty()){
+                log.info("추가상품 추가 시작");
+                for (Map.Entry<Long,Integer> entry : relatedProducts.entrySet()) {
+                    RelatedProductEntity relatedProductEntity = relatedProductRepository.findById(entry.getKey()).get();
+                    // OrderProductEntity orderProductEntity = orderProductRepository.findById(orderProduct.getOrderProductSeqno()).get();
+                    AddedRelatedProductEntity addedRelatedProductEntity = AddedRelatedProductEntity.builder()
+                    .orderProductSeqno(orderProductEntity)
+                    .relatedProductSeqno(relatedProductEntity)
+                    .amount(entry.getValue())
+                    .build();
+                    addedRelatedProductRepository.save(addedRelatedProductEntity);                                                                              
+                }
             }
-       
         }
 
-        if(!productOptions.isEmpty()){
-            for (Long seqno:productOptions) {
-                ProductOptionEntity productOptionEntity = productOptionRepository.findById(seqno).get();
-                OrderProductEntity orderProductEntity = orderProductRepository.findById(orderProduct.getOrderProductSeqno()).get();
-                OrderProductOptionEntity orderProductOptionEntity = OrderProductOptionEntity.builder()
-                                                                                               .orderProductSeqno(orderProductEntity)
-                                                                                               .optionSeqno(productOptionEntity)
-                                                                                               .build();
-            orderProductOptionRepository.save(orderProductOptionEntity);                                                                              
+        if (productOptions != null) {
+            if(!productOptions.isEmpty()){
+                log.info("옵션 추가 시작");
+                for (Long seqno:productOptions) {
+                    ProductOptionEntity productOptionEntity = productOptionRepository.findById(seqno).get();
+                    // OrderProductEntity orderProductEntity = orderProductRepository.findById(orderProduct.getOrderProductSeqno()).get();
+                    OrderProductOptionEntity orderProductOptionEntity = OrderProductOptionEntity.builder()
+                    .orderProductSeqno(orderProductEntity)
+                    .optionSeqno(productOptionEntity)
+                    .build();
+                    orderProductOptionRepository.save(orderProductOptionEntity);                                                                              
+                }
             }
-       
         }
 
-
+        log.info("추가상품, 옵션 추가 완료");
         MemberEntity memberEntity = memberRepository.findById(memberDTO.getEmail()).get();
         ShoppingCartEntity shoppingCartEntity = ShoppingCartEntity.builder()
                                                                   .email(memberEntity)
-                                                                  .orderProductSeqno(orderProduct.dtoToEntity(orderProduct))
+                                                                  .orderProductSeqno(orderProductEntity)
                                                                   .build();
         shoppingCartRepository.save(shoppingCartEntity);
     }
@@ -109,7 +120,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public void updateCartItemQuantity(String email, Long orderProductSeqno, int newQuantity) {
         // 장바구니 항목 가져오기
-        ShoppingCartEntity cartItem = shoppingCartRepository.findByEmail_EmailAndOrderProductSeqno_OrderProductSeqno(email, orderProductSeqno);
+        ShoppingCartEntityID shoppingCartEntityID = new ShoppingCartEntityID(email, orderProductSeqno);
+        ShoppingCartEntity cartItem = shoppingCartRepository.findById(shoppingCartEntityID).get();
         
         // 장바구니에 해당 상품이 존재하는지 확인
         if (cartItem == null) {

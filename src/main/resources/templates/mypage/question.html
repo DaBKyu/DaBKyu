@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>문의 페이지</title>
-<link rel="stylesheet" type="text/css" href="/src/main/resources/static/css/shopHeader.css">
+<link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
 <style>
 .container {
   width: 1000px;
@@ -158,6 +158,18 @@
   margin: 100px auto;
   align-items: center; /* 세로 중앙 정렬 */
   text-align: center; /* 텍스트 중앙 정렬 */
+}
+.content {
+  width: 87%;
+  height: 350px;
+  overflow: auto;
+  margin: 22px auto auto 50px;
+  padding: 10px;
+  box-sizing: border-box;
+  border: solid #adadad;
+  text-align: left;
+  font-size: 16px;
+  resize: both;
 }
 </style>
 </head>
@@ -352,9 +364,7 @@ const fileDelete = (fileNum) => {
                 style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;"
                 placeholder="" onkeydown="press()">
        </div>
-       <input type="text" name="keyword" id="keyword" 
-         			style="width:870px;height: 500px;font-size: 16px; margin-left:50px; margin-top: 10px; border: 1px solid #e3e3e3;"
-         			placeholder="내용을 입력해주세요." onkeydown="press()">
+       <textarea id="content" cols="100" rows="500" class="content" name="content" placeholder="내용을 입력하세요"></textarea>
 
       <div class="fileuploadForm">
             		<input type="file" id="inputFile" name="uploadFile" style="display:none" multiple>

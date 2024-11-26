@@ -8,12 +8,23 @@
 <link rel="stylesheet" type="text/css" href="/css/board.css">
 <link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
 <style>
-
+aside {
+width: 200px;
+margin-top: 64px;
+position: absolute;
+top: 0;
+bottom: 0;
+background: rgb(255, 255, 255);
+transform: translateX(0); /* 메뉴를 처음에는 왼쪽으로 숨김 */
+transition: transform 0.3s ease; /* 슬라이딩 애니메이션 */
+z-index: 9999;
+border: solid 1px #e3e3e3;
+}
 .slider-container {
     position: relative;
     width: 100%;
     max-width: 930px;
-    height: 36vh;
+    height: 50vh;
     margin: auto; /* 좌우 자동 여백 */
     overflow: hidden;
     padding: 5px 0; /* 상하 여백 추가 */
@@ -37,35 +48,36 @@
     gap: 20px; /* 카드 간격 */
     width: 100%; /* 슬라이더 전체 너비 */
     transition: transform 0.5s ease-in-out;
+    height: 450px;
 }
 
 /* 각 카드 스타일 */
 .movie-card {
     width: 200px;
-    height: 150px;
+    height: 200px;
     text-align: center;
-    background-color: #333;
-    color: white;
+    background-color: white;
+    color: rgb(0, 0, 0);
     border-radius: 10px;
     overflow: hidden;
+    font-size: 12px;
 }
 
 /* 좌우 버튼 스타일 */
 button {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    background:#5a5252;
     color: white;
     border: none;
-    padding: 15px;
     font-size: 24px;
+    color: white;
+    background:#5a5252;
+    border: none;
     cursor: pointer;
     border-radius: 50%;
-    transition: background-color 0.3s;
     display: block; /* 기본적으로 보이도록 설정 */
-    opacity: 1; /* 버튼의 기본 투명도 */
-    transition: opacity 0.3s ease-in-out; /* 부드러운 전환을 위해 opacity 사용 */
     
 }
 
@@ -75,31 +87,34 @@ button:hover {
 
 .prev-btn {
     left: 400px;
-    top: 365px;
+    top: 380px;
     z-index: 1;
 }
 
 .next-btn {
     right: 400px;
-    top: 365px;
+    top: 380px;
     z-index: 1;
 }
+
 </style>
 </head>
 <body>
     <th:block th:replace="~{layout/shopHeader::header}"></th:block>
-    <h2 style="text-align: center; margin-top: 100px; margin-left: -20px;">카테고리</h2>
-    <button class="prev-btn" id="prevButton">◁</button>
+    <h2 style="text-align: center; margin-top: 100px; margin-left:-820px;">Product</h2>
+    <button class="prev-btn" id="prevButton">&#60;</button>
     <div class="slider-container">
         <div class="movie-slider">
-            <div th:each="item : ${list}" class="movie-card">  
-                <a th:href="@{'/shop/list?page=' + ${item.category1Seqno}}" style="text-decoration: none; color: inherit;">
-                <span th:text="${item.category1Name}"></span>
-                </a>        
+            <div th:each="item : ${product}" class="movie-card">
+                <a th:href="@{'/shop/view?productSeqno=' + ${item.productSeqno}} + '&page=1'" style="text-decoration: none; text-decoration: none; color: inherit;">
+                <img th:if="${item.infoStoredImage != null && item.infoStoredImage != ''}" th:src="@{/shop/product/{imageName}(imageName=${item.infoStoredImage})}" style="width: 200px; height:150px; border-radius: 10px;">
+                제품명 : <span th:text="${item.productName}"></span><br>
+                제품 가격 : <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')+'원'}" style="line-height: 3;"></span>
+                </a>
             </div>
         </div>    
     </div>
-    <button class="next-btn" id="nextButton">▷</button>
+    <button class="next-btn" id="nextButton">&#62;</button>
 <script>
 const nextButton = document.getElementById('nextButton');
 const prevButton = document.getElementById('prevButton');
@@ -151,8 +166,30 @@ prevButton.addEventListener('click', () => {
 
 // 페이지 로딩 시 첫 번째 화면에서 이전 버튼 숨기기
 updateSliderPosition();
+// 알림 버튼 및 모달 요소 가져오기
+const notificationBtn = document.getElementById('notificationBtn');
+const notificationModal = document.getElementById('notificationModal');
 
+// 알림 버튼 클릭 시 모달 열기/닫기
+notificationBtn.addEventListener('click', () => {
+    if (notificationModal.style.display === 'block') {
+        // 모달이 이미 열려 있으면 닫기
+        notificationModal.style.display = 'none';
+    } else {
+        // 모달이 닫혀 있으면 열기
+        notificationModal.style.display = 'block';
+    }
+});
+
+// 모달 외부 클릭 시 모달 숨기기
+window.addEventListener('click', (event) => {
+    if (notificationModal.style.display === 'block' && 
+        event.target !== notificationModal && 
+        event.target !== notificationBtn && 
+        !notificationModal.contains(event.target)) {
+            notificationModal.style.display = 'none';
+    }
+});
 </script>
-<script src="../js/menuToggle_ShopHeader.js"></script>
 </body>
 </html>

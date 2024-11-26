@@ -49,6 +49,7 @@ public class MemberController {
     @GetMapping("/member/login")
     public void getLogin() {}
 
+    
 
     // 로그인(Spring Security)
     @PostMapping("/member/login")
@@ -60,7 +61,7 @@ public class MemberController {
     @PostMapping("/member/loginCheck")
     public String postLoginCheck(MemberDTO member) throws Exception {
         
-        // 아이디 체크
+        // 아이디 체크  
         if (service.idCheck(member.getEmail()) == 0) {
             return "{\"message\":\"ID_NOT_FOUND\"}";
         }
@@ -126,7 +127,7 @@ public class MemberController {
 
 
     // 마이페이지
-    @GetMapping("/mypage")
+    @GetMapping("/mypage/order")
     public void getMypage(
         Model model,
         HttpSession session,
@@ -237,7 +238,7 @@ public class MemberController {
 
 
     // 관심 카테고리 화면
-    @GetMapping("/mypayge/myCategories")
+    @GetMapping("/mypage/myCategories")
     public void getMyCategories(Model model, HttpSession session) {
         String email = (String) session.getAttribute("email");
         model.addAttribute("myCategoryList", service.myCategoryList(email));
@@ -270,6 +271,7 @@ public class MemberController {
         model.addAttribute("productNum", productNum);
         model.addAttribute("pageList", pageUtil.getPageListNoKeyword(page, productNum, pagelistNum, totalCount));
     }
+    
     
 
     // 내 리뷰 리스트 화면
@@ -324,6 +326,10 @@ public class MemberController {
         model.addAttribute("questionNum", questionNum);
         model.addAttribute("pageList", pageUtil.getPageListNoKeyword(page, questionNum, pagelistNum, totalCount));
 
+    }
+    // 문의 페이지
+    @GetMapping("/mypage/question")
+    public void getQuestion(Model model) {
     }
     
 
@@ -479,7 +485,7 @@ public class MemberController {
 
     // 회원 탈퇴
     @Transactional
-    @GetMapping("/member/deleteID")
+    @GetMapping("/mypage/deleteID")
     public String getDeleteID(HttpSession session) throws Exception {
         
         String email = (String) session.getAttribute("email");

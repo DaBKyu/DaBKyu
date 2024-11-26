@@ -1,191 +1,182 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+				xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>장바구니 페이지</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+<meta charset="UTF-8">
+<title>장바구니</title>
+<link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
+<style>
 
-        .cart-container {
-            width: 80%;
-            margin: 20px auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+.tableDiv {
+text-align: center;
+}
 
-        .cart-header {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
+.InfoTable {
+	border-collapse: collapse;
+	border-top: 3px solid #168;
+	width: 85%;  
+	margin-left: auto; margin-right: auto;
+}  
+.InfoTable th {
+	color: #168;
+	background: #f0f6f9;
+	text-align: center;
+}
+.InfoTable th, .InfoTable td {
+	padding: 10px;
+	border: 1px solid #ddd;
+}
+.InfoTable th:first-child, .InfoTable td:first-child {
+	border-left: 0;
+}
+.InfoTable th:last-child, .InfoTable td:last-child {
+	border-right: 0;
+}
+.InfoTable tr td:first-child{
+	text-align: center;
+}
+.InfoTable caption{caption-side: top; }
 
-        .cart-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #ddd;
-            padding: 15px 0;
-        }
+.p_image {
+	max-width: 30%;
+	height: auto;
+	margin: auto;
+}
 
-        .cart-item img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-        }
+.btn_cart  {
+width:150px;
+height:40px;
+background: #168;
+color:white;
+font-weight: bold;
+border:none;
+cursor:pointer;
 
-        .item-details {
-            flex: 1;
-            padding-left: 10px;
-        }
+}
 
-        .item-price {
-            font-size: 18px;
-            color: #333;
-        }
+</style>
+<script>
+	//전역변수 초기화
+	var email = '[[${session.email}]]';
+	var totalItemAmount = 0;
 
-        .quantity-input {
-            width: 40px;
-            padding: 5px;
-            margin-left: 10px;
-            text-align: center;
-        }
 
-        .total-section {
-            text-align: left; /* 총 금액을 왼쪽으로 정렬 */
-            font-size: 20px;
-            margin-top: 20px;
-        }
+	//상품별 상품 가격 계산
+	const count = (type,priceId,quantityId,amountId,orderProductSeqno) =>  {
+		console.log('priceId:', priceId); // 확인용 로그
+		console.log('quantityId:', quantityId); // 확인용 로그
+		console.log('amountId:', amountId); // 확인용 로그
+		console.log('orderProductSeqno:', orderProductSeqno); // 확인용 로그
 
-        .action-buttons {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
+		let amount = parseInt(document.getElementById(amountId).innerHTML.replace(/,/g, ""));
+		let price = parseInt(document.getElementById(priceId).innerHTML.replace(/,/g, ""));
+		let quantity = parseInt(document.getElementById(quantityId).innerHTML);
 
-        .checkout-btn,
-        .cancel-btn {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
+		if(type === 'plus') {
+			quantity += 1;
+			amount += price;
+			quantityUpdate(orderProductSeqno,quantity);  
+		} else if(type === 'minus' && quantity !==1)  {
+			quantity -= 1;
+			amount -= price;
+			quantityUpdate(orderProductSeqno,quantity);
+		}
+		document.getElementById(quantityId).innerHTML = quantity.toLocaleString('ko-KR');
+		document.getElementById(amountId).innerHTML = amount.toLocaleString('ko-KR');
+		//document.getElementById('selectedAmount').innerHTML = totalItemAmount.toLocaleString('ko-KR');
+		//cal_totalAmount();
 
-        .checkout-btn:hover,
-        .cancel-btn:hover {
-            background-color: #0056b3;
-        }
+	}
 
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            margin-left: 10px;
-        }
+	//상품 갯수 변경 업데이트
+	const quantityUpdate = async (orderProductSeqno,quantity) => {
+		console.log("갯수 수정 시작");
 
-        .checkbox-container input {
-            margin-right: 5px;
-        }
-    </style>
+		await fetch('/mypage/shoppingCart?kind=U',{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				email : email,
+				orderProductSeqno : orderProductSeqno,
+				amount : quantity
+			}),
+		}).then((response) => response.text())
+		.then((data) => {
+			if(data == null || data == '')
+				alert("시스템 장애로 상품 수량변경이 실패했습니다.");
+		}).catch((error) => console.log("error = " + error));
+
+	}
+	
+	
+</script>
+
+<!--<script src="/js/logout.js"></script>-->
+
 </head>
+<!--<body onload = "cal_totalAmount()">-->
 <body>
+<!-- 로그인 여부 확인 -->
+<script>
+	//let email = '[[${session.email}]]';
+	if(email == '' || email == null || email == undefined)
+		document.location.href = '/member/login';
+</script>
+<th:block th:replace="~{layout/shopHeader::header}"></th:block>
+<div class="mall">
+	<div class="main_shop">
+		<div class="tableDiv">
+			<h1>[[${session.username}]]님의 장바구니</h1>
+			<br><br>
+			<table class="InfoTable">
+				<thead>
+					<tr>
+						<th>제품이미지</th>
+						<th>제품명</th>
+						<th>제품단가</th>
+						<th>제품갯수</th>
+						<th>제품가격</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="orderProduct : ${list}">
+						<td><img th:src="@{/shop/product/{imageName}(imageName=${orderProduct.orderProductSeqno.productSeqno.infoStoredImage})}"
+								 style="width: 100px; height: 70px;">
+						</td>
+						<td><a th:href="@{'/shop/view?productSeqno=' + ${orderProduct.orderProductSeqno.productSeqno.productSeqno}} + '&page=1'">
+							<span th:text="${orderProduct.orderProductSeqno.productSeqno.productName}"></span>
+							</a>
+						</td>
 
-    <div class="cart-container">
-        <div class="cart-header">
-            <h2>장바구니</h2>
-        </div>
+						<th:block th:if="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1">
+			  				<td><span th:id="${'p' + orderProduct.orderProductSeqno}">0</span>원</td>
+			  			</th:block>
 
-        <!-- 첫 번째 제품 -->
-        <div class="cart-item">
-            <img src="product1.jpg" alt="상품 이미지">
-            <div class="item-details">
-                <div><strong>상품명 1</strong></div>
-                <div class="item-price">
-                    <span>가격: ₩15,000</span>
-                </div>
-            </div>
-            <div class="item-quantity">
-                <label for="quantity1">수량:</label>
-                <input type="number" id="quantity1" class="quantity-input" value="1" min="1">
-            </div>
-            <div class="checkbox-container">
-                <input type="checkbox" id="product1-checkbox" checked>
-                <label for="product1-checkbox">선택</label>
-            </div>
-        </div>
-
-        <!-- 두 번째 제품 -->
-        <div class="cart-item">
-            <img src="product2.jpg" alt="상품 이미지">
-            <div class="item-details">
-                <div><strong>상품명 2</strong></div>
-                <div class="item-price">
-                    <span>가격: ₩20,000</span>
-                </div>
-            </div>
-            <div class="item-quantity">
-                <label for="quantity2">수량:</label>
-                <input type="number" id="quantity2" class="quantity-input" value="1" min="1">
-            </div>
-            <div class="checkbox-container">
-                <input type="checkbox" id="product2-checkbox" checked>
-                <label for="product2-checkbox">선택</label>
-            </div>
-        </div>
-
-        <!-- 총 결제 금액 -->
-        <div class="total-section">
-            <div><strong>총 결제 금액: ₩35,000</strong></div>
-        </div>
-
-        <!-- 결제 및 취소 버튼 -->
-        <div class="action-buttons">
-            <button class="checkout-btn" onclick="alert('구매가 완료되었습니다.')">구매하기</button>
-            <button class="cancel-btn" onclick="alert('취소되었습니다.')">취소</button>
-        </div>
-    </div>
-
-    <script>
-        // 총 금액 계산
-        function calculateTotal() {
-            const prices = [15000, 20000]; // 각 상품의 가격
-            const quantities = document.querySelectorAll('.quantity-input');
-            const checkboxes = document.querySelectorAll('.checkbox-container input');
-            let total = 0;
-
-            quantities.forEach((input, index) => {
-                // 체크박스가 선택된 제품만 총 결제 금액에 포함
-                if (checkboxes[index].checked) {
-                    total += prices[index] * input.value;
-                }
-            });
-
-            document.querySelector('.total-section strong').textContent = '총 결제 금액: ₩' + total;
-        }
-
-        // 수량 변경 시 총 금액 재계산
-        const quantityInputs = document.querySelectorAll('.quantity-input');
-        quantityInputs.forEach(input => {
-            input.addEventListener('input', calculateTotal);
-        });
-
-        // 체크박스 상태 변경 시 총 금액 재계산
-        const checkboxes = document.querySelectorAll('.checkbox-container input');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', calculateTotal);
-        });
-
-        // 페이지 로드 시 총 금액 계산
-        window.onload = calculateTotal;
-    </script>
+						<th:block th:if="${orderProduct.orderProductSeqno.productSeqno.stockAmount} gt 0">
+							<td><span th:id="${'p' + orderProduct.orderProductSeqno}">[[${#numbers.formatInteger(orderProduct.orderProductSeqno.productSeqno.price,3,'COMMA')}]]</span>원</td>
+						</th:block>
+						
+						<td><input type='button' th:onclick='count("plus",[[${"p" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"q"+ orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"a" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${orderProduct.orderProductSeqno.orderProductSeqno}]])' value='+' th:disabled="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1">
+							<span th:id="${'q' + orderProduct.orderProductSeqno}">[[${orderProduct.orderProductSeqno.amount}]]</span>
+							<input type='button' th:onclick='count("minus",[[${"p" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"q"+ orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"a" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${orderProduct.orderProductSeqno.orderProductSeqno}]])' value='-' th:disabled="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1">
+						</td>
+						<th:block th:if="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1">
+							<td><span class="cartAmount" th:id="${'a' + orderProduct.orderProductSeqno.orderProductSeqno}">0</span>원</td>
+						</th:block>
+						<th:block th:if="${orderProduct.orderProductSeqno.productSeqno.stockAmount} gt 0">
+							<td><span class="cartAmount" 
+								th:id="${'a' + orderProduct.orderProductSeqno.orderProductSeqno}" 
+								th:text="${#numbers.formatInteger(orderProduct.orderProductSeqno.amount * orderProduct.orderProductSeqno.productSeqno.price, 3, 'COMMA')}">
+					  		</span>원</td>
+						</th:block>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
 </body>
 </html>
+

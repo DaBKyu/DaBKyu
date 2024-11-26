@@ -53,10 +53,12 @@ public class AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String reDate = lastpwDate.plusDays(30).toString();
         String today = LocalDateTime.now().toString();
 
-        String url = "/shop/list?page=1";
+        String url = "/shop/main";
 
         if (reDate.compareTo(today) < 0) {
             url = "/member/checkPasswordNotice";
+        } else if (member.getRole().equals("MASTER")) {
+            url = "/master/main";
         }
 
         setDefaultTargetUrl(url);
