@@ -27,8 +27,6 @@ import lombok.Setter;
 @Table(name="likelist")
 @IdClass(LikeListEntityID.class)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class LikeListEntity {
 
     @Id

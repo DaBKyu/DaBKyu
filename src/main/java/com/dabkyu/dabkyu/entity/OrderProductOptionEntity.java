@@ -24,8 +24,6 @@ import lombok.Setter;
 @Table(name="order_product_option")
 @IdClass(OrderProductOptionEntityID.class)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class OrderProductOptionEntity {
 
     @Id

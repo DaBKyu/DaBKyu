@@ -26,8 +26,6 @@ import lombok.Setter;
 @Entity(name="reviewFile")
 @Table(name="review_file")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ReviewFileEntity {
 
     @Id
