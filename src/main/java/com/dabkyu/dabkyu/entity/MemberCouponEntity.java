@@ -2,6 +2,8 @@ package com.dabkyu.dabkyu.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -36,5 +38,8 @@ public class MemberCouponEntity {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name="coupon_seqno", nullable = false)
 	private CouponEntity couponSeqno;
+
+	@Column(name="isExpire", length=2, nullable = false)
+    private String isExpire;
 	
 }

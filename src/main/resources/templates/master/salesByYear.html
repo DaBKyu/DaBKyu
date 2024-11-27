@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>연도별 월별 매출액 통계</title>
+    <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+    <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css">
+</head>
+<body>
+    <h1>연도별 월별 매출액 통계</h1>
+    
+    <!-- 연도 입력 필드 추가 -->
+    <div>
+        <label for="year">연도: </label>
+        <input type="number" id="year" value="2024" min="2000" max="2100">
+        <button onclick="updateChart()">조회</button>
+    </div>
+    
+    <div id="chart"></div>
+
+    <script>
+        // 월별 매출 데이터를 가져오는 함수
+        async function fetchMonthlySales(year) {
+            const response = await fetch(`/master/salesByYearData?year=${year}`);
+            
+            // 응답이 JSON인지 확인
+            const textResponse = await response.text();  // 응답을 텍스트로 읽기
+            console.log('서버 응답:', textResponse);  // 응답 내용 확인
+            
+            try {
+                const data = JSON.parse(textResponse);  // 텍스트를 JSON으로 변환
+                return data;
+            } catch (error) {
+                console.error('JSON 파싱 실패:', error);
+                return [];
+            }
+        }
+
+        // 연도에 해당하는 모든 월을 생성하는 함수
+        function getAllMonthsInYear(year) {
+            const months = [];
+            for (let month = 1; month <= 12; month++) {
+                months.push(`${year}-${month < 10 ? '0' + month : month}`);
+            }
+            return months;
+        }
+
+        // 차트 업데이트 함수
+        async function updateChart() {
+            const year = document.getElementById('year').value;
+
+            // 연도가 비어있는지 체크
+            if (!year) {
+                alert('연도를 입력해주세요.');
+                return;
+            }
+
+            // API 호출
+            const data = await fetchMonthlySales(year);
+            if (!data || data.length === 0) {
+                console.error('데이터가 비어 있습니다.');
+            }
+
+            // 연도에 해당하는 모든 월 리스트 생성
+            const allMonths = getAllMonthsInYear(year);
+
+            // 서버에서 반환된 데이터 형식에 맞춰 처리
+            const categories = allMonths; // 모든 월을 카테고리로 설정
+            const seriesData = allMonths.map(month => {
+                // 반환된 데이터에서 해당 월의 매출을 찾고, 없으면 0으로 처리
+                const entry = data.find(d => d.month.startsWith(month));  // 월별 데이터를 정확히 매핑
+                // 매출이 없으면 0으로 처리
+                return entry ? entry.totalSales || 0 : 0;
+            });
+
+            // 차트 데이터 정의
+            const chartData = {
+                categories: categories,
+                series: [
+                    {
+                        name: 'Total Sales',
+                        data: seriesData
+                    }
+                ]
+            };
+
+            // 차트 옵션 정의
+            const options = {
+                chart: { width: 900, height: 400, title: 'Monthly Sales' },
+                xAxis: { title: 'Month', label: { interval: 1 } },
+                yAxis: { title: 'Sales (₩)' },
+                series: { showDot: true, lineWidth: 2 }
+            };
+
+            // 차트를 그릴 DOM 요소 선택
+            const chartContainer = document.getElementById('chart');
+
+            // 기존 차트 삭제
+            chartContainer.innerHTML = '';
+
+            // 라인 차트 생성
+            toastui.Chart.lineChart({ el: chartContainer, data: chartData, options: options });
+        }
+
+        // 페이지 로드시 기본 데이터 표시
+        updateChart();
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 누적 구매 금액 통계</title>
+    <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
+    <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+</head>
+<body>
+    <h1>회원별 누적 구매 금액 통계</h1>
+    <div id="chart" style="width: 1000px; height: 500px; margin: 0 auto;"></div>
+
+    <script>
+        // 데이터 가져오기
+        fetch('/master/salesByMemberData')
+            .then(response => {
+                if (!response.ok) throw new Error("Failed to fetch data");
+                return response.json();
+            })
+            .then(data => {
+                console.log(data); // 데이터를 콘솔에 출력하여 확인
+
+                // 데이터를 배열로 확인하고 비어있는지 체크
+                if (!Array.isArray(data) || data.length === 0) {
+                    console.error("No data available");
+                    document.getElementById('chart').innerText = "No data available.";
+                    return; // 데이터가 비어 있거나 배열이 아니면 종료
+                }
+
+                // 회원 이름 및 누적 구매 금액 데이터 추출
+                const categories = data.map(item => item.username);
+                const totalPvalues = data.map(item => item.totalPvalue);
+
+                // 차트 데이터 구성
+                const container = document.getElementById('chart');
+                const dataForChart = {
+                    categories: categories,
+                    series: [
+                        {
+                            name: '누적 구매 금액',
+                            data: totalPvalues,
+                        },
+                    ],
+                };
+
+                // 차트 옵션 구성
+                const options = {
+                    chart: {
+                        title: '회원별 누적 구매 금액',
+                        width: 1000,
+                        height: 500,
+                    },
+                    xAxis: {
+                        title: '회원 이름',
+                    },
+                    yAxis: {
+                        title: '누적 구매 금액',
+                        min: 0,
+                    },
+                    series: {
+                        showLabel: true, // 데이터 라벨 표시
+                    },
+                };
+
+                // 차트 렌더링
+                toastui.Chart.columnChart({ el: container, data: dataForChart, options: options });
+            })
+            .catch(error => {
+                console.error('Error fetching sales data:', error);
+                document.getElementById('chart').innerText = "Failed to load sales data.";
+            });
+    </script>
+</body>
+</html>

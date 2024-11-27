@@ -13,7 +13,7 @@ import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 
 public interface OrderInfoRepository extends JpaRepository<OrderInfoEntity, Long> {
-    
+
     public List<OrderInfoEntity> findByEmail_Email(String email);
 
     public OrderInfoEntity findByEmail_EmailAndOrderSeqno(String email, Long orderSeqno);
@@ -44,5 +44,32 @@ public interface OrderInfoRepository extends JpaRepository<OrderInfoEntity, Long
        "    AND o.orderDate >= :oneYearAgo" + // 최근 1년 이내의 주문 제외
        ")")
     public List<MemberEntity> findMembersWithNoOrderInLastYear(@Param("oneYearAgo") LocalDateTime oneYearAgo);
+
+    //일별 매출
+    @Query(value = "SELECT TRUNC(o.order_date) AS ORDER_DATE_STR, SUM(o.total_price) AS TOTAL_SALES " +
+                "FROM order_info o " +
+                "JOIN order_detail od ON o.order_seqno = od.order_seqno " +
+                "WHERE o.order_date BETWEEN :startDate AND :endDate " +
+                "AND od.refund_yn = 'N' " +
+                "AND od.cancel_yn = 'N' " +
+                "GROUP BY TRUNC(o.order_date) " +
+                "ORDER BY TRUNC(o.order_date) ASC", 
+          nativeQuery = true)
+    public List<Object[]> findDailySalesWithinDateRange(
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
+    );
+
+    //월별 매출
+    @Query(value = "SELECT TRUNC(o.order_date, 'MM') AS month, SUM(o.total_price) " +
+                    "FROM order_info o " + 
+                    "JOIN order_detail od ON o.order_seqno = od.order_seqno " +
+                    "WHERE EXTRACT(YEAR FROM o.order_date) = :year " +
+                    "AND od.refund_yn = 'N' " +
+                    "AND od.cancel_yn = 'N' " +
+                    "GROUP BY TRUNC(o.order_date, 'MM') " +
+                    "ORDER BY TRUNC(o.order_date, 'MM')",
+           nativeQuery = true)
+    public List<Object[]> findMonthlySalesByYear(@Param("year") int year);
 
 }

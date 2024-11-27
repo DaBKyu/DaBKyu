@@ -1,6 +1,7 @@
 package com.dabkyu.dabkyu.controller;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,25 +28,37 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.dabkyu.dabkyu.dto.Category1DTO;
 import com.dabkyu.dabkyu.dto.Category2DTO;
 import com.dabkyu.dabkyu.dto.Category3DTO;
+import com.dabkyu.dabkyu.dto.CategorySalesDTO;
 import com.dabkyu.dabkyu.dto.CouponCategoryDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.CouponTargetDTO;
+import com.dabkyu.dabkyu.dto.DailySalesDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.MemberSalesDTO;
+import com.dabkyu.dabkyu.dto.MonthlySalesDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
+import com.dabkyu.dabkyu.dto.ProductSalesDTO;
 import com.dabkyu.dabkyu.dto.QuestionCommentDTO;
 import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.dto.ReviewDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
+import com.dabkyu.dabkyu.dto.SalesByAgeGroupDTO;
+import com.dabkyu.dabkyu.dto.SalesByMemberGradeDTO;
+import com.dabkyu.dabkyu.dto.SignupAgeStatDTO;
+import com.dabkyu.dabkyu.dto.SignupDateStatDTO;
+import com.dabkyu.dabkyu.dto.SignupGenderStatDTO;
+import com.dabkyu.dabkyu.dto.VisitorCountDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
@@ -58,7 +72,6 @@ import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReportEntity;
-import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.repository.Category1Repository;
 import com.dabkyu.dabkyu.entity.repository.Category2Repository;
 import com.dabkyu.dabkyu.entity.repository.Category3Repository;
@@ -67,16 +80,14 @@ import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductRepository;
 import com.dabkyu.dabkyu.service.MasterService;
-import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
+import com.dabkyu.dabkyu.service.VisitorService;
 import com.dabkyu.dabkyu.util.PageUtil;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import oracle.jdbc.proxy.annotation.Post;
 
 @Controller
 @Log4j2
@@ -93,6 +104,7 @@ public class MasterController{
     private final Category1Repository category1Repository;
     private final Category2Repository category2Repository;
     private final Category3Repository category3Repository;
+    private final VisitorService visitorService;
     
     //메인페이지
     @GetMapping("/master") 
@@ -818,7 +830,6 @@ public class MasterController{
 
     }
       
-
     //전체 회원의 누적구매금액을 조회 후 등급 업데이트
     @PostMapping("/master/gradeUpdate")
     public String updateCustomerGrade() {
@@ -838,6 +849,190 @@ public class MasterController{
 
         return "{\"message\":\"good\"}";
     }
+
+    /* 매출통계
+    -카테고리별 
+    -일별 
+    -월별 
+    -연령대별 
+    -회원별 
+    -등급별 
+    -상품별 
+    */
+    //-카테고리별 매출 통계
+    @GetMapping("/master/salesByCategory")
+    public String getSalesByCategoryPage() {
+        return "master/salesByCategory"; // Thymeleaf 템플릿 이름
+    }
+
+    @GetMapping("/master/salesByCategoryData")
+    @ResponseBody
+    public List<CategorySalesDTO> getCategorySalesData() {
+        return masterService.getCategorySales(); // JSON 데이터를 반환
+    }
+
+    //일별 매출 통계
+    @GetMapping("/master/salesByDaily")
+    public String getSalesByDailyPage() {
+        return "master/salesByDaily"; // Thymeleaf 템플릿 이름
+    }
+
+    @GetMapping("/master/salesByDailyData")
+    @ResponseBody
+    public List<DailySalesDTO> getDailySales(
+        @RequestParam("startDateTime")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+        @RequestParam("endDateTime")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
+        return masterService.getDailySales(startDateTime, endDateTime);
+    }
+
+    //월별 매출 통계
+    @GetMapping("/master/salesByYear")
+    public String getSalesByYearPage() {
+        return "master/salesByYear";
+    }
+    
+    @GetMapping("/master/salesByYearData")
+    @ResponseBody
+    public List<MonthlySalesDTO> getYearlySales(
+        @RequestParam("year") int year) {
+        return masterService.getYearlySales(year);
+    }
+
+    //회원별 매출 통계
+    @GetMapping("/master/salesByMember")
+    public String getSalesByMemberPage() {
+        return "master/salesByMember";
+    }
+    
+    @GetMapping("/master/salesByMemberData")
+    @ResponseBody
+    public List<MemberSalesDTO> getMemberSales() {
+        return masterService.getMemberSales();
+    }
+
+    //연령대별 매출 통계
+    @GetMapping("/master/salesByAge")
+    public String getSalesByAgePage() {
+        return "master/salesByAge";
+    }
+    
+    @GetMapping("/master/salesByAgeData")
+    @ResponseBody
+    public List<SalesByAgeGroupDTO> getSalesByAge() {
+        return masterService.getSalesByAge();
+    }
+
+    //등급별 매출 통계
+    @GetMapping("/master/salesByGrade")
+    public String getSalesByGradePage() {
+        return "master/salesByGrade";
+    }
+    
+    @GetMapping("/master/salesByGradeData")
+    @ResponseBody
+    public List<SalesByMemberGradeDTO> getSalesByGrade() {
+        return masterService.getSalesByGrade();
+    }
+    
+    //상품별 매출 통계
+    @GetMapping("/master/salesByProduct")
+    public String getSalesByProductPage() {
+        return "master/salesByProduct";
+    }
+    
+    @GetMapping("/master/salesByProductData")
+    @ResponseBody
+    public List<ProductSalesDTO> getProductSales() {
+        return masterService.getSalesByProduct();
+    }
+    
+    /* 
+    //가입통계
+    -가입일 기준
+    -성별
+    -연령
+    */
+
+    //가입일 기준 가입 통계
+    @GetMapping("/master/signupDateStat")
+    public String getSignupDateStatPage() {
+        return "master/signupDateStat";
+    }
+    
+    @GetMapping("/master/signupDateStatData")
+    @ResponseBody
+    public List<SignupDateStatDTO> getSignupDateStat(
+        @RequestParam("startDateTime") 
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+        @RequestParam("endDateTime") 
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
+
+        try {
+            // Service를 호출하여 통계 데이터를 가져옵니다.
+            return masterService.getSignupDateStat(startDateTime, endDateTime);
+        } catch (Exception e) {
+            // 예외 발생 시 JSON 형식으로 오류 메시지 반환
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.", e);
+        }
+    }
+
+    //성별 기준 가입 통계
+    @GetMapping("/master/signupGenderStat")
+    public String getSignupGenderStatPage() {
+        return "master/signupGenderStat";
+    }
+    
+    @GetMapping("/master/signupGenderStatData")
+    @ResponseBody
+    public List<SignupGenderStatDTO> getSignupGenderStat() {
+        return masterService.getSignupGenderStat();
+    }
+
+
+    //연령대 기준 가입 통계
+    @GetMapping("/master/signupAgeStat")
+    public String getSignupAgeStatPage() {
+        return "master/signupAgeStat";
+    }
+    
+    @GetMapping("/master/signupAgeStatData")
+    @ResponseBody
+    public List<SignupAgeStatDTO> getSignupAgeStat() {
+        return masterService.getSignupAgeStat();
+    }
+
+    /*
+    //방문통계
+    -방문자수 
+    */
+
+    /* 
+    //고유 방문자 기록
+    @PostMapping("/logVisitor")
+    public String logVisitor(@RequestParam("ipAddress") String ipAddress) {
+            visitorService.logVisitor(ipAddress);  // 방문 기록 저장
+            //return "Visitor log for IP " + ipAddress + " has been recorded successfully.";
+            return "{\"message\":\"good\"}";
+    }
+
+    //오늘의 고유 방문자 수 조회
+    @GetMapping("/visitorCount")
+    public Long getTodayVisitorCount() {
+        return visitorService.getTodayVisitorCount(); 
+    }
+
+    // 날짜별 방문자 수 조회 (차트용)
+    @GetMapping("/visitorCountByDate")
+    public List<VisitorCountDTO> getVisitorCountByDate() {
+        LocalDateTime startOfMonth = LocalDate.now().atStartOfDay(); // 이번 달 1일 00:00:00
+        LocalDateTime endOfMonth = LocalDate.now().atTime(23, 59, 59); // 이번 달 31일 23:59:59
+        
+        // 날짜별 방문자 수
+        return visitorService.getVisitorCountByDate(startOfMonth, endOfMonth);
+    }
+    */
 
 }
 

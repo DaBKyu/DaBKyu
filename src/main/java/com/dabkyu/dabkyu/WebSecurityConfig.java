@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.dabkyu.dabkyu.service.UserDetailsServiceImpl;
 
@@ -24,6 +25,7 @@ public class WebSecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final VisitorLogFilter visitorLogFilter;
 
     //스프링 시큐리티의 암호화 객체를 빈에 등록
     @Bean
@@ -40,6 +42,9 @@ public class WebSecurityConfig {
     //스프링 시큐리티 필터 빈에 등록
     @Bean
     public SecurityFilterChain filter(HttpSecurity http) throws Exception {
+
+         // VisitorLogFilter를 UsernamePasswordAuthenticationFilter 전에 등록
+        //http.addFilterBefore(visitorLogFilter, UsernamePasswordAuthenticationFilter.class);
 
         //formLogin 설정
         http.formLogin(
@@ -76,7 +81,8 @@ public class WebSecurityConfig {
             .requestMatchers("/mypage/**").hasAnyAuthority("USER", "MASTER")
             .requestMatchers("/shop/**").permitAll()
             .requestMatchers("/purchase/**").hasAnyAuthority("USER", "MASTER")
-            .requestMatchers("/master/**").hasAnyAuthority("MASTER")
+            //.requestMatchers("/master/**").hasAnyAuthority("MASTER")
+            .requestMatchers("/master/**").permitAll()
             .anyRequest().authenticated()
         );
 

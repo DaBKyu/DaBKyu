@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Chart</title>
+    <script type="text/javascript" src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+</head>
+<body>
+
+    <h1>Visitor Count Chart</h1>
+    <div id="chart" style="width: 800px; height: 400px;"></div>
+
+    <script>
+        // 방문자 수 데이터를 서버에서 가져오는 함수
+        fetch('/master/visitorCountByDate')
+            .then(response => response.json())
+            .then(data => {
+                const chartData = {
+                    categories: data.map(item => item.date),
+                    series: [{
+                        name: 'Visitor Count',
+                        data: data.map(item => item.count)
+                    }]
+                };
+
+                // 차트 생성
+                const chart = new toastui.Chart({
+                    el: document.getElementById('chart'),
+                    width: 800,
+                    height: 400,
+                    chart: {
+                        title: 'Visitor Count by Date',
+                        format: 'line'
+                    },
+                    yAxis: {
+                        title: 'Visitor Count'
+                    },
+                    xAxis: {
+                        title: 'Date'
+                    },
+                    series: chartData.series,
+                    categories: chartData.categories
+                });
+            })
+            .catch(error => console.error('Error fetching visitor data:', error));
+    </script>
+
+</body>
+</html>

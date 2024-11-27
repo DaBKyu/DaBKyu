@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>연령대별 가입 통계</title>
+    <!-- Toast UI Chart 스타일 -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css">
+    <!-- Toast UI Chart 라이브러리 -->
+    <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+</head>
+<body>
+    <h1>연령대별 가입 통계</h1>
+    <div id="chart" style="width: 700px; height: 400px;"></div>
+
+    <script>
+        // API로부터 데이터를 가져오는 함수
+        async function fetchAgeStatData() {
+            try {
+                const response = await fetch('/master/signupAgeStatData');
+                if (!response.ok) {
+                    throw new Error('데이터를 가져오는데 실패했습니다.');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error(error);
+                alert('데이터를 가져오는 중 오류가 발생했습니다.');
+                return [];
+            }
+        }
+
+        // 차트를 렌더링하는 함수
+        async function updateChart() {
+            const data = await fetchAgeStatData();
+
+            if (data.length === 0) {
+                document.getElementById('chart').innerText = '표시할 데이터가 없습니다.';
+                return;
+            }
+
+            // Toast UI Chart용 데이터 형식으로 변환
+            const categories = data.map(item => item.ageGroup); // 연령대
+            const series = [
+                {
+                    name: '가입 수',
+                    data: data.map(item => item.ageGroupCount) // 가입 수
+                }
+            ];
+
+            // 차트 생성
+            toastui.Chart.columnChart({
+                el: document.getElementById('chart'),
+                data: { categories, series },
+                options: {
+                    chart: { title: '연령대별 가입 통계', width: 700, height: 400 },
+                    xAxis: { title: '연령대' },
+                    yAxis: { title: '가입 수', min: 0 },
+                    series: { showLabel: true }
+                }
+            });
+        }
+
+        // 페이지 로드 시 차트 렌더링
+        updateChart();
+    </script>
+</body>
+</html>

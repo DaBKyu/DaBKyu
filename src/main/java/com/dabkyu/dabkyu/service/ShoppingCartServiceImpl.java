@@ -191,8 +191,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             MemberCouponEntity memberCoupon = memberCouponRepository.findById(new MemberCouponEntityID(email, couponSeqno))
                     .orElseThrow(() -> new RuntimeException("유효한 쿠폰이 아닙니다."));
             // 쿠폰 만료처리
-            CouponEntity coupon = couponRepository.findById(couponSeqno).get();
-            coupon.setIsExpire("Y");
+            //CouponEntity coupon = couponRepository.findById(couponSeqno).get();
+            //coupon.setIsExpire("Y");
+            memberCoupon.setIsExpire("Y");
         }
 
         // 포인트 적립 금액 계산

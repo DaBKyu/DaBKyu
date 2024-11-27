@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -26,6 +28,7 @@ import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.ReviewDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
+import com.dabkyu.dabkyu.dto.TopSellingProductDTO;
 import com.dabkyu.dabkyu.entity.MemberReviewLikeEntity;
 import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.ProductEntity;
@@ -34,6 +37,7 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
 import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.service.ProductService;
+import com.dabkyu.dabkyu.service.ProductServiceImpl.TopProduct;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.service.ShoppingCartService;
@@ -104,6 +108,48 @@ public class ShopController {
 		
 		return "shop/list"; 
 	}
+
+	//가장 많이 팔린 상품 10개 조회
+	@ResponseBody
+	@GetMapping("/shop/topSelling")
+	public List<TopSellingProductDTO> getTopSellingProducts() throws Exception {
+		return productService.getTop10BestSellingProducts();
+	}
+
+	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회 테스트
+	@ResponseBody
+	@GetMapping("/shop/topProductsByAgeForLoggedUser")
+	public Map<String, List<TopProduct>> getTopProductsForLoggedUser() throws Exception {
+		// 하드코딩된 테스트용 이메일
+		String email = "1234@example.com";  // 로그인된 사용자가 아닌 테스트용으로 하드코딩된 이메일을 사용
+	
+		// 서비스 메서드 호출
+		return productService.getTopProductsByAgeForUser(email);
+	}
+	
+	/*//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
+	@ResponseBody
+	@GetMapping("/shop/topProductsByAgeForLoggedUser")
+    public Map<String, List<TopProduct>> getTopProductsForLoggedUser() throws Exception {
+        // 로그인된 사용자 정보에서 이메일을 가져옴
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String email = authentication.getName();  // 로그인한 사용자의 이메일
+            return productService.getTopProductsByAgeForUser(email);
+        }
+        throw new IllegalStateException("사용자가 로그인되지 않았습니다.");
+    }
+		*/
+
+	/* 
+	// 연령대별 가장 많이 팔린 상품 10개 조회
+	@ResponseBody
+	@GetMapping("/shop/topProductsByAge")
+	public Map<String, List<TopProduct>> getTopProductsByAgeGroup() throws Exception{
+		System.out.println("getTopProductsByAgeGroup 호출됨");  // 메서드 호출 확인용 로그
+		return productService.getTop10ProductsByAgeGroup();
+	}
+	*/
     
     //상품 상세 보기
 	@GetMapping("/shop/view")
@@ -507,6 +553,7 @@ public class ShopController {
 		return "{\"message\":\"good\"}";
 	}
 	
+   
 }
     
 

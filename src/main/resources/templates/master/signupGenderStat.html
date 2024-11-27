@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성별기준 가입통계</title>
+    <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+    <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css">
+    <style>
+     
+    </style>
+</head>
+<body>
+    <h2>성별기준 가입통계</h2>
+    <div id="chart"></div>
+
+    <script>
+        // 서버에서 데이터 가져오기
+        fetch('/master/signupGenderStatData')
+            .then(response => response.json())
+            .then(data => {
+                // 파이 차트를 위한 데이터 변환
+                const chartData = {
+                    categories: ['Gender'],
+                    series: data.map(item => ({
+                        name: item.gender,
+                        data: item.genderCount
+                    }))
+                };
+
+                // Toast UI Chart 파이 차트 생성
+                const chart = toastui.Chart.pieChart({
+                    el: document.getElementById('chart'),
+                    data: chartData,
+                    options: {
+                        chart: {
+                            width: 600,
+                            height: 400,
+                            title: '성별 기준 가입 통계'
+                        },
+                        series: {
+                            radiusRange: ['40%', '100%'], // 차트 크기 조정
+                            showLegend: true,
+                            label: {
+                                normal: {
+                                    show: true,
+                                    formatter: '{name}: {value} ({percentage}%)'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
