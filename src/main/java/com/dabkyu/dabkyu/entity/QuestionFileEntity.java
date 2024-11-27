@@ -26,8 +26,6 @@ import lombok.Setter;
 @Entity(name="questionFile")
 @Table(name="question_file")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class QuestionFileEntity {
 
     @Id

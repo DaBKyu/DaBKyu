@@ -22,8 +22,6 @@ import lombok.Setter;
 @Entity(name="notification")
 @Table(name="notification")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class NotificationEntity {
 
     @Id

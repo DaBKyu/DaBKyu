@@ -28,8 +28,6 @@ import lombok.Setter;
 @Entity(name="orderInfo")
 @Table(name="order_info")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class OrderInfoEntity {
 
     @Id

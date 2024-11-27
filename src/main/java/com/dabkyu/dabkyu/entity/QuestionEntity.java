@@ -28,8 +28,6 @@ import lombok.Setter;
 @Entity(name="question")
 @Table(name="question")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class QuestionEntity {
 
     @Id

@@ -22,8 +22,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity(name="coupon")
 @Table(name="coupon")
-@AllArgsConstructor
-@NoArgsConstructor  
 public class CouponEntity {
 
     @Id

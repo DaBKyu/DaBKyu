@@ -26,8 +26,6 @@ import lombok.Setter;
 @Entity(name="orderDetail")
 @Table(name="order_detail")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class OrderDetailEntity {
 
     @Id
