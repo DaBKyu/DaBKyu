@@ -13,6 +13,7 @@ import com.dabkyu.dabkyu.dto.CouponCategoryDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.CouponTargetDTO;
 import com.dabkyu.dabkyu.dto.DailySalesDTO;
+import com.dabkyu.dabkyu.dto.DailyVisitorDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.MemberSalesDTO;
 import com.dabkyu.dabkyu.dto.MonthlySalesDTO;
@@ -245,5 +246,7 @@ public interface MasterService {
 
     //연령대 기준 가입 통계
     public List<SignupAgeStatDTO> getSignupAgeStat();
+
+    public List<DailyVisitorDTO> getDailyVisitors(LocalDateTime startDate, LocalDateTime endDate);
 
 }

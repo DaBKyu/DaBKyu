@@ -25,7 +25,6 @@ public class WebSecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
-    private final VisitorLogFilter visitorLogFilter;
 
     //스프링 시큐리티의 암호화 객체를 빈에 등록
     @Bean
@@ -81,8 +80,7 @@ public class WebSecurityConfig {
             .requestMatchers("/mypage/**").hasAnyAuthority("USER", "MASTER")
             .requestMatchers("/shop/**").permitAll()
             .requestMatchers("/purchase/**").hasAnyAuthority("USER", "MASTER")
-            //.requestMatchers("/master/**").hasAnyAuthority("MASTER")
-            .requestMatchers("/master/**").permitAll()
+            .requestMatchers("/master/**").hasAnyAuthority("MASTER")
             .anyRequest().authenticated()
         );
 

@@ -1,10 +1,8 @@
 package com.dabkyu.dabkyu.service;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +24,7 @@ import com.dabkyu.dabkyu.dto.CouponCategoryDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.CouponTargetDTO;
 import com.dabkyu.dabkyu.dto.DailySalesDTO;
+import com.dabkyu.dabkyu.dto.DailyVisitorDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.MemberSalesDTO;
 import com.dabkyu.dabkyu.dto.MonthlySalesDTO;
@@ -69,7 +68,6 @@ import com.dabkyu.dabkyu.entity.QuestionFileEntity;
 import com.dabkyu.dabkyu.entity.ReportEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
-import com.dabkyu.dabkyu.entity.VisitorLogEntity;
 import com.dabkyu.dabkyu.entity.repository.AddedRelatedProductRepository;
 import com.dabkyu.dabkyu.entity.repository.Category1Repository;
 import com.dabkyu.dabkyu.entity.repository.Category2Repository;
@@ -79,13 +77,13 @@ import com.dabkyu.dabkyu.entity.repository.CouponRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponTargetRepository;
 import com.dabkyu.dabkyu.entity.repository.MasterRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberLogRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberNotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.NotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderInfoRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductOptionRepository;
-import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductInfoFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductOptionRepository;
@@ -133,6 +131,7 @@ public class MasterServiceImpl implements MasterService {
     private final Category2Repository category2Repository;
     private final Category3Repository category3Repository;
     private final MemberCouponRepository memberCouponRepository;
+    private final MemberLogRepository memberLogRepository;
 
     //맴버 리스트 보기
     @Override
@@ -926,22 +925,24 @@ public class MasterServiceImpl implements MasterService {
     //관리자가 쿠폰종료일이 지난 쿠폰들 isExpired를 "Y"로 업데이트-> memberCoupon으로 바꾸기
     @Override
     public void setExpiredCouponsToExpired(LocalDateTime referenceDate) {
-
         // 만료된 쿠폰만 조회
-        List<CouponEntity> coupons = couponRepository.findByCouponEndDateBefore(referenceDate);
-
-        // 만료된 쿠폰을 업데이트
-        for (CouponEntity coupon : coupons) {
-            // 쿠폰 종료일이 현재 날짜보다 이전이고, 아직 만료되지 않은 쿠폰인 경우
-            if ("N".equals(coupon.getIsExpire())) {
-                // 만료된 쿠폰의 isExpired를 "Y"로 설정
-                coupon.setIsExpire("Y");
-            }
-        }
+        List<CouponEntity> expiredCoupons = couponRepository.findExpiredCoupons(referenceDate);
     
-        // 만료된 쿠폰 정보 저장
-        couponRepository.saveAll(coupons);
+        // 만료된 쿠폰을 업데이트
+        for (CouponEntity expiredCoupon : expiredCoupons) {
+            // CouponEntity에서 couponSeqno 값을 추출하여 MemberCoupon 조회
+            List<MemberCouponEntity> memberCoupons = memberCouponRepository.findAllByCouponSeqno_CouponSeqno(expiredCoupon.getCouponSeqno());
+            
+            // 여러 개의 MemberCouponEntity가 반환되므로, 리스트 순회하며 'isExpire'를 업데이트
+            for (MemberCouponEntity memberCoupon : memberCoupons) {
+                memberCoupon.setIsExpire("Y");
+            }
+    
+            // 업데이트 결과를 데이터베이스에 반영
+            memberCouponRepository.saveAll(memberCoupons);
+        }
     }
+    
 
     //카테고리별 매출 통계
     @Override
@@ -1066,10 +1067,20 @@ public List<SalesByAgeGroupDTO> getSalesByAge() {
         
         return signupAgeStatDTOs;
     }
-
-
+    
+    @Override
+    public List<DailyVisitorDTO> getDailyVisitors(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Object[]> results = memberLogRepository.findDailyVisitorsWithinDateRange(startDate, endDate);
+        return results.stream()
+                .map(row -> new DailyVisitorDTO(
+                    ((java.sql.Timestamp) row[0]).toLocalDateTime().toLocalDate(), // Timestamp를 LocalDate로 변환
+                    ((Number) row[1]).intValue()                                  // 방문자 수
+                ))
+                .collect(Collectors.toList());
+    }
     
     
+
 
 
 }

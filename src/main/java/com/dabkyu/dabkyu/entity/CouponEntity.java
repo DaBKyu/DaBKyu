@@ -61,7 +61,7 @@ public class CouponEntity {
     @Column(name="isDupl", length=2, nullable = false)
     private String isDupl;
 
-    @Column(name="isExpire", length=2, nullable = false)
-    private String isExpire;
+    //@Column(name="isExpire", length=2, nullable = false)
+    //private String isExpire;
 
 }

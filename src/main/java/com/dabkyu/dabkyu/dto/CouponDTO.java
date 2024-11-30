@@ -41,7 +41,7 @@ public class CouponDTO {
         this.minOrder= entity.getMinOrder();
         this.couponRole= entity.getCouponRole();
         this.isDupl = entity.getIsDupl();
-        this.isExpire = entity.getIsExpire();
+        //this.isExpire = entity.getIsExpire();
     }
 
     public CouponEntity dtoToEntity(CouponDTO dto) {
@@ -57,7 +57,7 @@ public class CouponDTO {
                                           .minOrder(dto.getMinOrder())
                                           .couponRole(dto.getCouponRole())
                                           .isDupl(dto.getIsDupl())
-                                          .isExpire(dto.getIsExpire())
+                                          //.isExpire(dto.getIsExpire())
                                           .build();
         return entity;
     }

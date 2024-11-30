@@ -3,6 +3,7 @@ package com.dabkyu.dabkyu.controller;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import com.dabkyu.dabkyu.dto.CouponCategoryDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.CouponTargetDTO;
 import com.dabkyu.dabkyu.dto.DailySalesDTO;
+import com.dabkyu.dabkyu.dto.DailyVisitorDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.MemberSalesDTO;
 import com.dabkyu.dabkyu.dto.MonthlySalesDTO;
@@ -76,6 +78,7 @@ import com.dabkyu.dabkyu.entity.repository.Category1Repository;
 import com.dabkyu.dabkyu.entity.repository.Category2Repository;
 import com.dabkyu.dabkyu.entity.repository.Category3Repository;
 import com.dabkyu.dabkyu.entity.repository.CouponRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberLogRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductRepository;
@@ -840,15 +843,17 @@ public class MasterController{
         return "{\"message\":\"good\"}";
     }
 
-    //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
-    @PostMapping("/master/ExpiredUpdate")
-    public String updateExpiredCoupons() {
-        LocalDateTime referenceDate = LocalDateTime.now();
-        
-        masterService.setExpiredCouponsToExpired(referenceDate);
+    // 관리자가 쿠폰 종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
+@PostMapping("/master/expiredUpdate")
+public void updateExpiredCoupons() {
+    LocalDateTime referenceDate = LocalDateTime.now();
+    
+    // 만료된 쿠폰을 처리하는 서비스 메서드 호출
+    masterService.setExpiredCouponsToExpired(referenceDate);
+    
+    // 성공적인 처리 후 아무 것도 반환하지 않음 (HTTP 상태 200)
+}
 
-        return "{\"message\":\"good\"}";
-    }
 
     /* 매출통계
     -카테고리별 
@@ -1002,6 +1007,26 @@ public class MasterController{
     public List<SignupAgeStatDTO> getSignupAgeStat() {
         return masterService.getSignupAgeStat();
     }
+
+    // 일별 방문자 통계 페이지
+    @GetMapping("/master/visitorsByDaily")
+    public String getVisitorsByDailyPage() {
+        return "master/visitorsByDaily"; // Thymeleaf 템플릿 이름
+    }
+
+    @GetMapping("/master/visitorsByDailyData")
+    @ResponseBody
+    public List<DailyVisitorDTO> getDailyVisitors(
+        @RequestParam("startDateTime")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+        @RequestParam("endDateTime") 
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
+        
+        return masterService.getDailyVisitors(startDateTime, endDateTime);
+    }
+    
+    
+
 
     /*
     //방문통계
