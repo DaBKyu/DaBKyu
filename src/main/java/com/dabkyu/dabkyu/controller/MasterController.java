@@ -3,6 +3,7 @@ package com.dabkyu.dabkyu.controller;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -716,10 +717,13 @@ public class MasterController{
     } 
 
     //리뷰 상세보기
-    @GetMapping("/master/review/{reviewSeqno}")
-    public void getReviewView(@PathVariable Long reviewSeqno, Model model) throws Exception{
-        model.addAttribute("review", reviewService.view(reviewSeqno));
-        model.addAttribute("reviewFiles", reviewService.fileListView(reviewSeqno));
+    @GetMapping("/master/reviewList/{reviewSeqno}")
+    @ResponseBody
+    public Map<String, Object> getReviewView(@PathVariable Long reviewSeqno) throws Exception {
+        Map<String, Object> response = new HashMap<>();
+        response.put("review", reviewService.view(reviewSeqno));
+        response.put("reviewFiles", reviewService.fileListView(reviewSeqno));
+        return response;
     }
 
     //리뷰 신고 리스트
@@ -764,7 +768,7 @@ public class MasterController{
         }
         masterService.deleteReview(reviewSeqno); //리뷰삭제
 
-        return "redirect:/master/reviewList";  
+        return "redirect:/master/reviewList?page=1";  
     }
 
     //쿠폰 리스트보기 
