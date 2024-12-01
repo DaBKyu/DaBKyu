@@ -43,4 +43,7 @@ public interface EmailService {
     //첨부파일 목록 보기
 	public List<EmailFileDTO> fileListView(Long emailSeqno) throws Exception;
 
+    //회원가입 인증코드 메일 발송
+    public void sendAuthCode(String email, String authCode) throws Exception;
+
 }

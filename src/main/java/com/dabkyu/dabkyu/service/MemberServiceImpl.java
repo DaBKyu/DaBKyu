@@ -1,6 +1,5 @@
 package com.dabkyu.dabkyu.service;
 
-import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,7 +30,6 @@ import com.dabkyu.dabkyu.entity.repository.MemberAddressRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberLogRepository;
-//import com.dabkyu.dabkyu.entity.repository.AddressRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionFileRepository;
@@ -46,7 +44,6 @@ import lombok.AllArgsConstructor;
 public class MemberServiceImpl implements MemberService {
     
     private final MemberRepository memberRepository;
-	//private final AddressRepository addressRepository;
     private final OrderProductRepository orderProductRepository;
     private final MemberAddressRepository memberAddressRepository;
 	private final QuestionFileRepository questionFileRepository;
