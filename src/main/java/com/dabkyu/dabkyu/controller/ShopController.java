@@ -115,7 +115,8 @@ public class ShopController {
 	public List<TopSellingProductDTO> getTopSellingProducts() throws Exception {
 		return productService.getTop10BestSellingProducts();
 	}
-
+	
+	/* 
 	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회 테스트
 	@ResponseBody
 	@GetMapping("/shop/topProductsByAgeForLoggedUser")
@@ -126,8 +127,9 @@ public class ShopController {
 		// 서비스 메서드 호출
 		return productService.getTopProductsByAgeForUser(email);
 	}
+	*/
 	
-	/*//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
+	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
 	@ResponseBody
 	@GetMapping("/shop/topProductsByAgeForLoggedUser")
     public Map<String, List<TopProduct>> getTopProductsForLoggedUser() throws Exception {
@@ -139,7 +141,6 @@ public class ShopController {
         }
         throw new IllegalStateException("사용자가 로그인되지 않았습니다.");
     }
-		*/
 
 	/* 
 	// 연령대별 가장 많이 팔린 상품 10개 조회
