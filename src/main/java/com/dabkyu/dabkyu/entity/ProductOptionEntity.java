@@ -26,8 +26,6 @@ import lombok.Setter;
 @Entity(name="productOption")
 @Table(name="product_option")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ProductOptionEntity {
 
     @Id

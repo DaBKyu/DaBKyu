@@ -25,8 +25,6 @@ import lombok.Setter;
 @Table(name="member_coupon")
 @IdClass(MemberCouponEntityID.class)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class MemberCouponEntity {
 
     @Id

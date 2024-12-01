@@ -21,6 +21,7 @@ import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.repository.Category1Repository;
 import com.dabkyu.dabkyu.entity.repository.Category2Repository;
 import com.dabkyu.dabkyu.entity.repository.Category3Repository;
@@ -54,6 +55,12 @@ public class ProductServiceImpl implements ProductService{
 	@Override
 	public List<ProductEntity> productAllList(String keyword) throws Exception{
 		return productRepository.findByProductNameContaining(keyword);
+	}
+
+	//상품 이미지 보기////
+	public List<ProductFileEntity> productFileList() throws Exception{
+		return productFileRepository.findAll();
+	 
 	}
 	/////////////////////////////////
 	/// 
@@ -163,4 +170,6 @@ public class ProductServiceImpl implements ProductService{
 		report.setReportDate(LocalDateTime.now());
 		reportRepository.save(report.dtoToEntity(report));
 	}
+
+	
 }

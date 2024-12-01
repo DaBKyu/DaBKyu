@@ -24,8 +24,6 @@ import lombok.Setter;
 @Table(name="member_notification")
 @IdClass(MemberNotificationEntityID.class)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class MemberNotificationEntity {
 
     @Id

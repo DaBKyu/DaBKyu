@@ -37,6 +37,7 @@ import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.MemberReviewLikeEntity;
 import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
@@ -60,6 +61,7 @@ public class ShopController {
 	private final MemberService memberService;
 	private final QuestionService questionService;
 	private final ReviewService reviewService;
+
 
 	// 내 알림 화면
     @GetMapping("/shop/notice")
@@ -105,6 +107,8 @@ public class ShopController {
 		List<Category2Entity> list2 = productService.category2List();
 		List<Category3Entity> list3 = productService.category3List();
 		List<ProductEntity> product = productService.productList();
+		List<ProductFileEntity> productFile = productService.productFileList();
+
 		// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
     	list2 = list2.stream()
 					.sorted(Comparator.comparingLong(Category2Entity::getCategory2Seqno)) // category2Seqno 기준 오름차순 정렬
@@ -114,6 +118,7 @@ public class ShopController {
 		model.addAttribute("list2", list2);
 		model.addAttribute("list3", list3);
 		model.addAttribute("product", product);
+		model.addAttribute("productFile", productFile);
 	}	
 
 
@@ -214,11 +219,11 @@ public class ShopController {
 	}
 	
     
-    //상품 상세 보기
+    //상품 상세 보기 ( + 리뷰 보기 추가(미완) )
 	@GetMapping("/shop/view")
 	public void getView(
 		Model model,
-		@RequestParam(name="productSeqno") Long productSeqno, 
+		@RequestParam(name="productSeqno") Long productSeqno,
 		@RequestParam(name="page") int pageNum,
 		@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
 		HttpSession session) throws Exception {
@@ -226,6 +231,9 @@ public class ShopController {
 		List<Category1Entity> mist = productService.category1List();
 		List<Category2Entity> list2 = productService.category2List();
 		List<Category3Entity> list3 = productService.category3List();
+		List<ProductFileEntity> productFile = productService.productFileList();
+		//리뷰내용 가져오기 시도 
+		ReviewDTO review = reviewService.view(productSeqno);
 
 		//String sessionEmail = (String)session.getAttribute("email");
         model.addAttribute("view", productService.view(productSeqno));
@@ -233,7 +241,8 @@ public class ShopController {
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("pre_seqno", productService.pre_seqno(productSeqno,keyword));		
 		model.addAttribute("next_seqno", productService.next_seqno(productSeqno,keyword));
-		// model.addAttribute("fileListView", productService.fileListView(productSeqno));	
+		// model.addAttribute("fileListView", productService.fileListView(productSeqno));
+	
 
 		// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
     	list2 = list2.stream()
@@ -243,6 +252,9 @@ public class ShopController {
 		model.addAttribute("mist", mist);
 		model.addAttribute("list2", list2);
 		model.addAttribute("list3", list3);
+		model.addAttribute("productFile", productFile);
+		//리뷰내용 가져오기 시도 
+		model.addAttribute("review", review);
     }
 
 	// 장바구니 보기

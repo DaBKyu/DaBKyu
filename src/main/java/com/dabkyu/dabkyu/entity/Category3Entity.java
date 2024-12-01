@@ -26,8 +26,6 @@ import lombok.Setter;
 @Entity(name="category3")
 @Table(name="category3")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Category3Entity {
 
     @Id

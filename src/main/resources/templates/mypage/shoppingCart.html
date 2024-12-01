@@ -13,13 +13,13 @@ text-align: center;
 
 .InfoTable {
 	border-collapse: collapse;
-	border-top: 3px solid #168;
+	border-top: 3px solid #e3e3e3;
 	width: 85%;  
 	margin-left: auto; margin-right: auto;
 }  
 .InfoTable th {
-	color: #168;
-	background: #f0f6f9;
+	color: black;
+	background: #e3e3e3;
 	text-align: center;
 }
 .InfoTable th, .InfoTable td {
@@ -46,8 +46,8 @@ text-align: center;
 .btn_cart  {
 width:150px;
 height:40px;
-background: #168;
-color:white;
+background: #e3e3e3;
+color:black;
 font-weight: bold;
 border:none;
 cursor:pointer;
@@ -62,30 +62,73 @@ cursor:pointer;
 
 
 	//상품별 상품 가격 계산
-	const count = (type,priceId,quantityId,amountId,orderProductSeqno) =>  {
+	const count = (type,priceId,quantityId,amountId,orderProductSeqno,checkId) =>  {
 		console.log('priceId:', priceId); // 확인용 로그
 		console.log('quantityId:', quantityId); // 확인용 로그
 		console.log('amountId:', amountId); // 확인용 로그
 		console.log('orderProductSeqno:', orderProductSeqno); // 확인용 로그
+		console.log('checkId:', checkId); // 확인용 로그
 
 		let amount = parseInt(document.getElementById(amountId).innerHTML.replace(/,/g, ""));
 		let price = parseInt(document.getElementById(priceId).innerHTML.replace(/,/g, ""));
 		let quantity = parseInt(document.getElementById(quantityId).innerHTML);
 
+		let checkBox = document.getElementById(checkId).checked;
+
+
 		if(type === 'plus') {
 			quantity += 1;
 			amount += price;
+			if(checkBox) totalItemAmount += price;
 			quantityUpdate(orderProductSeqno,quantity);  
 		} else if(type === 'minus' && quantity !==1)  {
 			quantity -= 1;
 			amount -= price;
+			if(checkBox) totalItemAmount -= price;
 			quantityUpdate(orderProductSeqno,quantity);
 		}
 		document.getElementById(quantityId).innerHTML = quantity.toLocaleString('ko-KR');
 		document.getElementById(amountId).innerHTML = amount.toLocaleString('ko-KR');
-		//document.getElementById('selectedAmount').innerHTML = totalItemAmount.toLocaleString('ko-KR');
-		//cal_totalAmount();
+		if(checkBox)
+			  
+		document.getElementById('selectedAmount').innerHTML = totalItemAmount.toLocaleString('ko-KR');
+		cal_totalAmount();
+	}
 
+	//장바구니 내 전체 상품 가격 계산
+	const cal_totalAmount = () => {
+		
+		let tCart = 0;
+		let totalCartAmount = document.querySelectorAll('.cartAmount');
+		for(let amount of totalCartAmount){
+			
+			tCart += parseInt(amount.innerHTML.replace(/,/g, ""));
+		}
+
+		document.querySelector('#totalAmount').innerHTML = tCart.toLocaleString('ko-KR');
+		return tCart;
+	}
+	
+	//항목별 체크박스 클릭/언클릭 시(onchange) 장바구니 내 선택 상품 가격 계산
+	const cal_selectedAmount = (itemAmountId) => {
+		
+		let amount = parseInt(document.getElementById(itemAmountId).innerHTML.replace(/,/g, ""));
+		
+		if(event.target.checked) totalItemAmount += amount; //체크했으면 totalItemAmount에 amount를 더한다
+			else { //언체크 하면 ...
+				document.getElementById('allCheck').checked = false; //1. 전체 선택 해제
+				totalItemAmount -= amount; //2. totalItemAmount에서 amount를 뺀다.
+			}
+		document.getElementById('selectedAmount').innerHTML = totalItemAmount.toLocaleString('ko-KR');
+		
+	}
+	//전체 체크 박스 선택/취소 시 상품 가격 계산
+	const cal_allSelectedAmount = () => {
+		
+		if(event.target.checked) totalItemAmount = cal_totalAmount();
+			else totalItemAmount = 0;
+		document.getElementById('selectedAmount').innerHTML = totalItemAmount.toLocaleString('ko-KR');
+		
 	}
 
 	//상품 갯수 변경 업데이트
@@ -109,7 +152,72 @@ cursor:pointer;
 		}).catch((error) => console.log("error = " + error));
 
 	}
+
+
+	//상품 전체 선택/해제
+	const selectAll = (selectAll) => {
+		const checkboxes = document.getElementsByName('cartItems');
+	  	checkboxes.forEach( (checkbox) => 
+		  	{ 
+		  		if(checkbox.disabled != true)
+		  			checkbox.checked = selectAll.checked; 
+		});
+	}
 	
+	//상품 삭제
+	const cartManage = async (type) => {
+		
+	const checkboxArray = document.querySelectorAll(".cartItems:checked");
+
+	let message = '';
+
+	const orderProductList = [];
+
+	if(type === 'delete') message = '삭제';
+		else if(type === 'deleteAll') message = '장바구니 비우기';
+
+		if(type !== 'deleteAll'){
+
+			//체크한 항목이 없을 경우 알림창 열기 
+			if(checkboxArray.length == 0) {
+				alert(`${message}할 항목을 선택하세요.`);
+				return; //함수 실행을 종료
+			}
+			
+			//선택 항목 실행 여부 확인
+			if(!confirm(`선택한 항목을 ${message} 하시겠습니까?`)) return;	      
+			
+			//orderProductList 체크된 cart_id 값 넣기
+			for (let i = 0; i < checkboxArray.length; i++) {
+				orderProductList.push(checkboxArray[i].value)
+			}	
+			
+		} 
+		console.log("orderProductList",orderProductList);
+		if(type === 'deleteAll'){	    	  
+			if(!confirm(`${message}를 실행 하시겠습니까?`)) return false;	    	  
+		}
+				
+		//체크한 항목에 대해 삭제 또는 등록 실행
+		await fetch('/mypage/shoppingCart',{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+				body: JSON.stringify({
+					orderProductList: orderProductList,
+					type: type
+			}),				
+		}).then((response)=> response.text())
+		.then((data) => {
+			if(data == 'good'){
+				if(type === 'delete' || type === 'deleteAll') window.location.reload();        	
+			} else alert(`시스템 장애로 ${message} 하기가 실패했습니다.`); 	
+		}).catch((error)=> { 
+			console.log("error = " + error);	       		
+		});
+	}
+
 	
 </script>
 
@@ -117,7 +225,7 @@ cursor:pointer;
 
 </head>
 <!--<body onload = "cal_totalAmount()">-->
-<body>
+<body onload = "cal_totalAmount()">
 <!-- 로그인 여부 확인 -->
 <script>
 	//let email = '[[${session.email}]]';
@@ -133,6 +241,7 @@ cursor:pointer;
 			<table class="InfoTable">
 				<thead>
 					<tr>
+						<th><input type="checkbox" id="allCheck" onclick="selectAll(this)" onchange="cal_allSelectedAmount()"></th>
 						<th>제품이미지</th>
 						<th>제품명</th>
 						<th>제품단가</th>
@@ -142,8 +251,11 @@ cursor:pointer;
 				</thead>
 				<tbody>
 					<tr th:each="orderProduct : ${list}">
-						<td><img th:src="@{/shop/product/{imageName}(imageName=${orderProduct.orderProductSeqno.productSeqno.infoStoredImage})}"
-								 style="width: 100px; height: 70px;">
+						<td><input type="checkbox" th:id="${'c' + orderProduct.orderProductSeqno}" class="cartItems" name="cartItems" th:value="${orderProduct.orderProductSeqno.orderProductSeqno}" 
+							th:onchange='cal_selectedAmount([[${"a" + orderProduct.orderProductSeqno}]])' th:disabled="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1"></td>
+						<td>
+							<!-- <img th:src="@{/shop/product/{imageName}(imageName=${orderProduct.orderProductSeqno.productSeqno.infoStoredImage})}"
+								 style="width: 100px; height: 70px;"> -->
 						</td>
 						<td><a th:href="@{'/shop/view?productSeqno=' + ${orderProduct.orderProductSeqno.productSeqno.productSeqno}} + '&page=1'">
 							<span th:text="${orderProduct.orderProductSeqno.productSeqno.productName}"></span>
@@ -158,9 +270,9 @@ cursor:pointer;
 							<td><span th:id="${'p' + orderProduct.orderProductSeqno}">[[${#numbers.formatInteger(orderProduct.orderProductSeqno.productSeqno.price,3,'COMMA')}]]</span>원</td>
 						</th:block>
 						
-						<td><input type='button' th:onclick='count("plus",[[${"p" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"q"+ orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"a" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${orderProduct.orderProductSeqno.orderProductSeqno}]])' value='+' th:disabled="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1">
+						<td><input type='button' th:onclick='count("plus",[[${"p" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"q"+ orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"a" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"c" + orderProduct.orderProductSeqno.orderProductSeqno}]])' value='+' th:disabled="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1">
 							<span th:id="${'q' + orderProduct.orderProductSeqno}">[[${orderProduct.orderProductSeqno.amount}]]</span>
-							<input type='button' th:onclick='count("minus",[[${"p" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"q"+ orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"a" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${orderProduct.orderProductSeqno.orderProductSeqno}]])' value='-' th:disabled="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1">
+							<input type='button' th:onclick='count("minus",[[${"p" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"q"+ orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"a" + orderProduct.orderProductSeqno.orderProductSeqno}]],[[${orderProduct.orderProductSeqno.orderProductSeqno}]],[[${"c" + orderProduct.orderProductSeqno.orderProductSeqno}]])' value='-' th:disabled="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1">
 						</td>
 						<th:block th:if="${orderProduct.orderProductSeqno.productSeqno.stockAmount} lt 1">
 							<td><span class="cartAmount" th:id="${'a' + orderProduct.orderProductSeqno.orderProductSeqno}">0</span>원</td>
@@ -173,6 +285,21 @@ cursor:pointer;
 						</th:block>
 					</tr>
 				</tbody>
+			<tr>
+				<td colspan="3"><br>
+					<div class="deleteItems" style="text-align:left">
+						<input type="button" class="btn_cart" value="장바구니 비우기" onclick="cartManage('deleteAll')">	
+						<input type="button" class="btn_cart" value="선택삭제" onclick="cartManage('delete')">
+						<input type="button" class="btn_cart" value="주문서 작성하기" onclick="cartManage('register')">
+					</div>
+				</td>
+				<td colspan="5"><br>
+					<div class="registerItems" style="text-align: right">
+						<h2>선택 상품 가격 : <span id="selectedAmount"></span>원</h2>
+						<h2>전체 상품 가격 : <span id="totalAmount"></span>원</h2>						
+					</div>
+				</td>
+			</tr>
 			</table>
 		</div>
 	</div>

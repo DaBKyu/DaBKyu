@@ -27,8 +27,6 @@ import lombok.Setter;
 @Table(name="member_log")
 @Builder
 @IdClass(MemberLogEntityID.class)
-@NoArgsConstructor
-@AllArgsConstructor
 public class MemberLogEntity {
     
 	@Id

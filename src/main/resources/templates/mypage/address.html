@@ -87,16 +87,6 @@
     margin-right: 5px;
 }
 </style>
-<script>
-const search = () => {
-    const keyword = document.querySelector('#keyword');
-    document.location.href='/board/list?page=1&keyword=' + keyword.value;
-}
-
-const press = () => {
-    if(event.keyCode == 13) search();
-}
-</script>
 </head>
 <body>
     <nav>

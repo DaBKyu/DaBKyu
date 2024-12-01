@@ -210,7 +210,7 @@ select {
     <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
      <div class="flex-container" style="align-items: center;">
         <div class="rectangle2" style="width: 500px; height: 300px; margin-top: -60px; border: none;">
-            <img th:src="@{/shop/product/{imageName}(imageName=${view.infoStoredImage})}" style="width: 500px; height: 300px;">
+            <!-- <img th:src="@{/shop/product/{imageName}(imageName=${productFile.isThumb})}" style="width: 500px; height: 300px;"> -->
         </div>
         <div style="margin-left: 20px;">
             <div style="font-size: 20px; border: 1px solid #e3e3e3; border-top: none; border-left: none; border-right: none; padding: 5px 0; width: 600px; margin-top: 40px; font-size: 24pxZ;">[[${view.productName}]]</div>
@@ -260,7 +260,7 @@ select {
             <span style="margin-left: 350px; font-size: 20px;">총 금액 : </span>&nbsp;
 					<span id="total_price" style="font-size: 20px;">[[${#numbers.formatInteger(view.price,3,'COMMA')}]]</span><span style="font-size: 20px;">원</span>
                     <br><br>
-            <input type="button" id="btn_save" value="구매하기" onclick="window.location.href='/shop/pay?'+'toPayOrderProductList'" style="margin-left:350px;">
+            <input type="button" id="btn_save" value="구매하기" onclick="window.location.href='/shop/pay'" style="margin-left:350px;">
             <input type="button" id="btn_cancel" value="장바구니 담기" th:onclick="cart([[${session.email}]],[[${view.productSeqno}]],[[${amount}]])" style="margin-left:20px;">
             <input type="button" id="btn_cancel" value="관심상품" onclick="" style="margin-left:20px;">
         </div>   
@@ -278,6 +278,14 @@ select {
                                              margin-top: 10px; margin-bottom: 100px; border-bottom: 1px solid #e3e3e3; background-color: transparent;
                                               border-top: none; border-left: none; border-right: none;"></div>
                     </div>
+                    <table class="InfoTable" style="margin-top: -100px;">
+                        <tr>
+                            <th>작성자</th>
+                            <th>내용</th>
+                        </tr>
+                            <td>[[${review.email.email}]]</td>
+                            <td>[[${review.revContent}]]</td>
+                        </table>
                     <div class="flex-container">          
                         <div class="rectangle2" style="width: 100px;">Q&A</div>
                         <div class="field_view" style="width:1020px;height:40px;font-size: 16px;

@@ -89,8 +89,8 @@ aside {
                 <p>제품 가격: <span th:text="${item.price}"></span>원</p>
             </div>
             
-            <img th:if="${item.infoStoredImage != null && item.infoStoredImage != ''}" th:src="@{/shop/product/{imageName}(imageName=${item.infoStoredImage})}" style="width: 200px; height:150px; border-radius: 10px;">
-            <img th:unless="${item.infoStoredImage == null || item.infoStoredImage == ''}" src="">
+            <!-- <img th:if="${item.infoStoredImage != null && item.infoStoredImage != ''}" th:src="@{/shop/product/{imageName}(imageName=${item.infoStoredImage})}" style="width: 200px; height:150px; border-radius: 10px;">
+            <img th:unless="${item.infoStoredImage == null || item.infoStoredImage == ''}" src=""> -->
             </a>
         </div>
     </div>
