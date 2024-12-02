@@ -2,6 +2,8 @@ package com.dabkyu.dabkyu.controller;
 
 import java.io.File;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -113,6 +115,9 @@ public class MemberController {
 
         // 회원가입
         if (kind.equals("I")) {
+            String birthDate = member.getBirth();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+            member.setBirthDate(LocalDate.parse(birthDate, formatter));
             member.setPassword(pwdEncoder.encode(member.getPassword()));
             memberService.signup(member);
             log.info("회원등록: {\"username\":" + member.getUsername() + "\", \"status\":\"good\"}");

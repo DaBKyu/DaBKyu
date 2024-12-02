@@ -29,9 +29,9 @@ body {
 </style>
 </head>
 <body>
-    <div class="RegisterForm" align="center">
+    <div class="RegistryForm" align="center">
         <h1>회원가입</h1>
-        <form id="RegisteryForm" name="RegisteryForm" method="POST" style="margin-top: 40px;">
+        <form id="RegistryForm" name="RegistryForm" method="POST" style="margin-top: 40px;">
             <div class="form_list">
                 <div class="input-group has-validation" id="divEmail">
                     <div class="form-floating">
@@ -80,7 +80,7 @@ body {
                 </div>
 
                 <div class="form-floating" id="divBirthDate">
-                    <input type="text" class="form-control input_field" id="birthDate" name="birthDate" placeholder="생년월일 8자리" onblur="checkBirth()">
+                    <input type="text" class="form-control input_field" id="birthDate" name="birth" placeholder="생년월일 8자리" onblur="checkBirth()">
                     <label for="floatingInput">생년월일 8자리</label>
                 </div>
                 <div class="mb-3">
@@ -88,9 +88,9 @@ body {
                 </div>
                 <div class="mb-3">
                     <div class="row" style="width: 100%">
-                        <input type="radio" class="btn-check" name="identityGender" id="identityGender1" value="M" autocomplete="off">
+                        <input type="radio" class="btn-check" name="gender" id="identityGender1" value="M" autocomplete="off">
                         <label class="btn btn-outline-dark col" for="identityGender1">남자</label>
-                        <input type="radio" class="btn-check" name="identityGender" id="identityGender2" value="F" autocomplete="off">
+                        <input type="radio" class="btn-check" name="gender" id="identityGender2" value="F" autocomplete="off">
                         <label class="btn btn-outline-dark col" for="identityGender2">여자</label>
                     </div>
                 </div>
@@ -99,7 +99,11 @@ body {
                     <label for="floatingInput">휴대전화번호</label>
                 </div>
             </div>
-            
+            <label for="emailRecept">이메일 수신 동의</label>
+            <input type="checkbox" id="emailRecept" name="emailRecept" value="Y">
+            <br>
+            <label for="notificationYn">알림 수신 동의</label>
+            <input type="checkbox" id="notificationYn" name="notificationYn" value="Y">
             <br>
             <input type="button" id="btn_register" class="btn_register" value="회원가입" onclick="" style="width: 300px; height: 40px; margin-top: 20px; background-color: black; color: white; border-radius: 5px; border: 1px solid black;">
         </form>
@@ -137,14 +141,22 @@ window.onload = () => {
 			password1.focus();
 			return false;
 		}
-        if(telno.value == '') {
-			alert("전화번호를 입력하세요");
-			telno.focus();
-			return false;
-		}
+        const birth = document.querySelector("#birthDate");
+
+        if(birth.value =="") {
+            alert("생년월일을 입력하세요");
+            birth.focus();
+            return false;
+        }
+        
         const gender = document.querySelectorAll('input[name=gender]:checked');
         if(gender.lenth == 0) {
 			alert("성별을 선택하세요");
+			return false;
+		}
+        if(telno.value == '') {
+			alert("전화번호를 입력하세요");
+			telno.focus();
 			return false;
 		}
 
@@ -169,20 +181,31 @@ window.onload = () => {
 		telno.value = afterTelno;
 
         const formData = new FormData(RegistryForm);
+        formData.append("kind", "I");
+
+        const emailReceptCheckbox = document.getElementById('emailRecept');
+        const notificationCheckbox = document.getElementById('notificationYn');
+        // 체크박스가 선택되지 않으면 "N" 값을 추가
+        if (!emailReceptCheckbox.checked) {
+            formData.set('emailRecept', 'N'); // "N" 값 설정
+        }
+        if (!notificationCheckbox.checked) {
+            formData.set('notificationYn', 'N');
+        }
 		
 		await fetch('/member/signup', {
 			method: 'POST',
 			body: formData
 		}).then((response)=> response.json())
 			.then((data)=> {
-				if(data.message === 'good'){
+				if(data.status === 'good'){
 					alert(decodeURIComponent(data.username) + '님, 회원 가입을 축하 드립니다.');
-					document.location.href='/board/list?page=1';
+					document.location.href='/shop/main';
 				} else {
 					alert("서버 장애로 회원 가입에 실패했습니다.");
 				}
 		}).catch((error)=> {
-			console.lor("error = " + error);
+			console.log("error = " + error);
 		});
     });
 };

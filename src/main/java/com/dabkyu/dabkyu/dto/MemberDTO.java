@@ -1,6 +1,10 @@
 package com.dabkyu.dabkyu.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +24,7 @@ public class MemberDTO {
     private String telno;
     private String username;
     private String gender;
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
     private String memberGrade;
     private String pay;
     private LocalDateTime regdate;
@@ -30,13 +34,13 @@ public class MemberDTO {
     private String fromSocial;
     private int pwcheck;
     private int point;
-    // private String myCategories;
     private String role;
     private String notificationYn;
     private String emailRecept;
     private LocalDateTime emailReceptDate;
     private String authkey;
     private int totalPvalue;
+    private String birth;
     
     public MemberDTO(MemberEntity memberEntity) {
         this.email = memberEntity.getEmail();
@@ -54,7 +58,6 @@ public class MemberDTO {
         this.fromSocial = memberEntity.getFromSocial();
         this.pwcheck = memberEntity.getPwcheck();
         this.point = memberEntity.getPoint();
-        // this.myCategories = memberEntity.getMyCategories();
         this.role = memberEntity.getRole();
         this.notificationYn = memberEntity.getNotificationYn();
         this.emailRecept = memberEntity.getEmailRecept();
@@ -81,7 +84,6 @@ public class MemberDTO {
                                                 .fromSocial(dto.getFromSocial())
                                                 .pwcheck(dto.getPwcheck())
                                                 .point(dto.getPoint())
-                                                // .myCategories(dto.getMyCategories())
                                                 .role(dto.getRole())
                                                 .notificationYn(dto.getNotificationYn())
                                                 .emailRecept(dto.getEmailRecept())
