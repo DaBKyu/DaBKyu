@@ -1,10 +1,18 @@
 package com.dabkyu.dabkyu.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +25,10 @@ import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.dto.ReportDTO;
+import com.dabkyu.dabkyu.dto.TopSellingProductDTO;
+import com.dabkyu.dabkyu.entity.MemberEntity;
+import com.dabkyu.dabkyu.entity.OrderDetailEntity;
+import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
@@ -26,6 +38,9 @@ import com.dabkyu.dabkyu.entity.repository.Category2Repository;
 import com.dabkyu.dabkyu.entity.repository.Category3Repository;
 import com.dabkyu.dabkyu.entity.ProductOptionEntity;
 import com.dabkyu.dabkyu.entity.RelatedProductEntity;
+import com.dabkyu.dabkyu.entity.repository.MemberRepository;
+import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
+import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductOptionRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductRepository;
@@ -48,6 +63,9 @@ public class ProductServiceImpl implements ProductService{
 	private final ProductFileRepository productFileRepository;
 	private final ProductOptionRepository productOptionRepository;
 	private final RelatedProductRepository relatedProductRepository;
+	private final MemberRepository memberRepository;
+	private final OrderDetailRepository orderDetailRepository;
+    private final OrderProductRepository orderProductRepository;
 
 	////////////내가만든거/////////////
 	// seachAll에서 사용할 전체 상품 보기
@@ -101,7 +119,133 @@ public class ProductServiceImpl implements ProductService{
             // 카테고리가 선택되지 않은 경우 전체 상품 목록 조회
             return productRepository.findByProductNameContaining(keyword, pageRequest);
    		}		
-}
+	}
+
+
+  //가장 많이 팔린 상품 10개 조회
+  @Override
+  public List<TopSellingProductDTO> getTop10BestSellingProducts() throws Exception {
+      return orderProductRepository.findTop10SellingProducts();
+  }
+
+  //로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
+  @Override
+  public Map<String, List<TopProduct>> getTopProductsByAgeForUser(String email) throws Exception {
+    List<MemberEntity> members = memberRepository.findAll();
+    List<OrderDetailEntity> orderDetails = orderDetailRepository.findAll();
+
+    Map<String, List<TopProduct>> result = new HashMap<>();
+
+    // 특정 이메일을 가진 회원만 처리
+    Optional<MemberEntity> orderMemberEntityOptional = members.stream()
+            .filter(member -> member.getEmail().equals(email))
+            .findFirst();
+
+    if (orderMemberEntityOptional.isPresent()) {
+        MemberEntity orderMember = orderMemberEntityOptional.get();
+
+        // 나이 계산
+        LocalDate orderBirthDate = orderMember.getBirthDate().toLocalDate();
+        int orderAge = Period.between(orderBirthDate, LocalDate.now()).getYears();
+        System.out.println("회원 연령: " + orderAge); // 나이 확인 로그
+
+        // 연령대 계산
+        String orderAgeGroup = getAgeGroup(orderAge);
+        System.out.println("회원 연령대: " + orderAgeGroup); // 연령대 확인 로그
+
+        // 해당 연령대의 모든 회원 주문 내역에서 상품 처리
+        List<TopProduct> topProducts = new ArrayList<>();
+
+        for (OrderDetailEntity orderDetail : orderDetails) {
+            MemberEntity orderDetailMember = orderDetail.getOrderSeqno().getEmail();
+
+            // 주문 회원의 연령대 확인
+            LocalDate birthDate = orderDetailMember.getBirthDate().toLocalDate();
+            int memberAge = Period.between(birthDate, LocalDate.now()).getYears();
+            String memberAgeGroup = getAgeGroup(memberAge);
+            //System.out.println("주문 회원 생년월일: " + orderDetailMember.getBirthDate());
+            //System.out.println("주문 회원 나이: " + memberAge);
+            //System.out.println("주문 회원 연령대: " + memberAgeGroup); // 각 주문 회원의 나이 및 연령대 출력
+
+            // 로그인된 회원의 연령대와 동일한 연령대의 주문만 처리
+            if (memberAgeGroup.equals(orderAgeGroup)) {  // 로그인한 회원의 연령대와 일치하는 주문만 처리
+                // 연령대가 일치하고, 취소나 환불되지 않은 상품만 처리
+                if (!"Y".equals(orderDetail.getCancelYn()) && !"Y".equals(orderDetail.getRefundYn())) {
+                    OrderProductEntity orderProduct = orderDetail.getOrderProductSeqno();
+
+                    // 상품 정보가 null인 경우 처리
+                    if (orderProduct != null) {
+                        String productName = orderProduct.getProductSeqno().getProductName();
+                        int amount = orderProduct.getAmount();
+                        System.out.println("상품명: " + productName + ", 수량: " + amount); // 상품명과 수량 확인 로그
+                        addProductToTopList(topProducts, productName, amount);
+                    } else {
+                        System.out.println("상품 정보가 없습니다. 주문 세부 정보: " + orderDetail); // 상품 정보가 없을 경우 로그
+                    }
+                }
+            }
+        }
+
+        // 연령대별로 구매 횟수 기준 상위 10개 상품 추출
+        topProducts.sort((p1, p2) -> Integer.compare(p2.getPurchaseCount(), p1.getPurchaseCount()));
+        result.put(orderAgeGroup, topProducts.size() > 10 ? topProducts.subList(0, 10) : topProducts);
+    } else {
+        System.out.println("회원이 존재하지 않습니다."); // 회원이 없는 경우 로그
+    }
+
+    return result;
+  }
+
+  // 나이를 기준으로 연령대 구하는 메서드
+  private String getAgeGroup(int age) {
+    if (age >= 20 && age < 30) {
+        return "20대";
+    } else if (age >= 30 && age < 40) {
+        return "30대";
+    } else if (age >= 40 && age < 50) {
+        return "40대";
+    } else if (age >= 50) {
+        return "50대 이상";
+    } else {
+        return "미성년자";  // 20세 미만은 제외하거나 다른 그룹으로 처리 가능
+    }
+  }
+
+  // 상품을 구매 횟수 리스트에 추가하는 메서드
+  private void addProductToTopList(List<TopProduct> topProducts, String productName, int amount) {
+    Optional<TopProduct> existingProduct = topProducts.stream()
+        .filter(product -> product.getProductName().equals(productName))
+        .findFirst();
+
+    if (existingProduct.isPresent()) {
+        existingProduct.get().addPurchaseCount(amount);
+    } else {
+        topProducts.add(new TopProduct(productName, amount));
+    }
+  }
+
+  // 상품의 이름과 구매 횟수를 나타내는 클래스
+  public static class TopProduct {
+    private String productName;
+    private int purchaseCount;
+
+    public TopProduct(String productName, int purchaseCount) {
+        this.productName = productName;
+        this.purchaseCount = purchaseCount;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public int getPurchaseCount() {
+        return purchaseCount;
+    }
+
+    public void addPurchaseCount(int amount) {
+        this.purchaseCount += amount;
+    }
+  }
 
 	// //카테고리별 상품 목록 보기
 	// @Override

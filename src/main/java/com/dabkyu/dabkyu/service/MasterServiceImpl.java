@@ -1,6 +1,9 @@
 package com.dabkyu.dabkyu.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,21 +20,32 @@ import org.springframework.stereotype.Service;
 import com.dabkyu.dabkyu.dto.Category1DTO;
 import com.dabkyu.dabkyu.dto.Category2DTO;
 import com.dabkyu.dabkyu.dto.Category3DTO;
+import com.dabkyu.dabkyu.dto.CategorySalesDTO;
 import com.dabkyu.dabkyu.dto.CouponCategoryDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.CouponTargetDTO;
+import com.dabkyu.dabkyu.dto.DailySalesDTO;
+import com.dabkyu.dabkyu.dto.DailyVisitorDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.MemberSalesDTO;
+import com.dabkyu.dabkyu.dto.MonthlySalesDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
+import com.dabkyu.dabkyu.dto.ProductSalesDTO;
 import com.dabkyu.dabkyu.dto.QuestionCommentDTO;
 import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.dto.ReviewDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
+import com.dabkyu.dabkyu.dto.SalesByAgeGroupDTO;
+import com.dabkyu.dabkyu.dto.SalesByMemberGradeDTO;
+import com.dabkyu.dabkyu.dto.SignupAgeStatDTO;
+import com.dabkyu.dabkyu.dto.SignupDateStatDTO;
+import com.dabkyu.dabkyu.dto.SignupGenderStatDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
@@ -61,7 +75,9 @@ import com.dabkyu.dabkyu.entity.repository.Category2Repository;
 import com.dabkyu.dabkyu.entity.repository.Category3Repository;
 import com.dabkyu.dabkyu.entity.repository.CouponCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponRepository;
-import com.dabkyu.dabkyu.entity.repository.CouponTargetRepository;
+import com.dabkyu.dabkyu.entity.repository.MasterRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberLogRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberNotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
@@ -115,6 +131,8 @@ public class MasterServiceImpl implements MasterService {
     private final Category1Repository category1Repository;
     private final Category2Repository category2Repository;
     private final Category3Repository category3Repository;
+    private final MemberCouponRepository memberCouponRepository;
+    private final MemberLogRepository memberLogRepository;
 
     //맴버 리스트 보기
     @Override
@@ -1027,11 +1045,13 @@ public class MasterServiceImpl implements MasterService {
         // 쿠폰 복원 처리 (만료처리된 쿠폰 복원)
         if (couponSeqno != null) {
             //쿠폰 상태 업데이트 (사용 가능 상태로 변경)
-            MemberCouponEntity memberCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqno(couponSeqno);
             //CouponEntity coupon = couponRepository.findById(couponSeqno).get();
+            //coupon.setIsExpire("N");
+
+            //membercoupon으로 변경
+            MemberCouponEntity memberCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqno(couponSeqno);
             memberCoupon.setIsExpire("N");
         }
-
         memberRepository.save(member);  
 
         //회원 알림 설정
@@ -1053,6 +1073,7 @@ public class MasterServiceImpl implements MasterService {
 
     }
 
+
     @Override
     public MemberEntity getMemberEmail(String email) {
 
@@ -1063,23 +1084,158 @@ public class MasterServiceImpl implements MasterService {
     //관리자가 쿠폰종료일이 지난 쿠폰들 isExpired를 "Y"로 업데이트 
     @Override
     public void setExpiredCouponsToExpired(LocalDateTime referenceDate) {
-
         // 만료된 쿠폰만 조회
-        List<CouponEntity> coupons = couponRepository.findByCouponEndDateBefore(referenceDate);
-
+        List<CouponEntity> expiredCoupons = couponRepository.findExpiredCoupons(referenceDate);
+    
         // 만료된 쿠폰을 업데이트
-        for (CouponEntity coupon : coupons) {
-            // 쿠폰 종료일이 현재 날짜보다 이전이고, 아직 만료되지 않은 쿠폰인 경우
-            if ("N".equals(coupon.getIsExpire())) {
-                // 만료된 쿠폰의 isExpired를 "Y"로 설정
-                coupon.setIsExpire("Y");
+        for (CouponEntity expiredCoupon : expiredCoupons) {
+            // CouponEntity에서 couponSeqno 값을 추출하여 MemberCoupon 조회
+            List<MemberCouponEntity> memberCoupons = memberCouponRepository.findAllByCouponSeqno_CouponSeqno(expiredCoupon.getCouponSeqno());
+            
+            // 여러 개의 MemberCouponEntity가 반환되므로, 리스트 순회하며 'isExpire'를 업데이트
+            for (MemberCouponEntity memberCoupon : memberCoupons) {
+                memberCoupon.setIsExpire("Y");
             }
+    
+            // 업데이트 결과를 데이터베이스에 반영
+            memberCouponRepository.saveAll(memberCoupons);
+        }
+    }
+    
+    //카테고리별 매출 통계
+    @Override
+    public List<CategorySalesDTO> getCategorySales() {
+        return orderDetailRepository.getCategorySales();
+    }
+
+    //일별 매출 통계
+    @Override
+    public List<DailySalesDTO> getDailySales(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Object[]> results = orderInfoRepository.findDailySalesWithinDateRange(startDate, endDate);
+        return results.stream()
+                .map(row -> new DailySalesDTO(
+                    ((java.sql.Timestamp) row[0]).toLocalDateTime().toLocalDate(), // Timestamp를 LocalDate로 변환
+                    ((Number) row[1]).intValue()                                  // 합계 매출액
+                ))
+                .collect(Collectors.toList());
+    }
+
+    //월별 매출 통계
+    @Override
+    public List<MonthlySalesDTO> getYearlySales(int year) {
+        List<Object[]> results = orderInfoRepository.findMonthlySalesByYear(year);
+        return results.stream()
+                .map(row -> new MonthlySalesDTO(
+                    ((java.sql.Timestamp) row[0]).toLocalDateTime().toLocalDate().withDayOfMonth(1), // 월별로 첫날을 사용
+                    ((Number) row[1]).intValue()                                                   // 합계 매출액
+                ))
+                .collect(Collectors.toList());
+    }
+
+    //회원별 매출 통계
+    @Override
+    public List<MemberSalesDTO> getMemberSales() {
+        return memberRepository.findAllMemberSales();
+    }
+
+    //연령별 매출 통계
+    @Override
+    public List<SalesByAgeGroupDTO> getSalesByAge() {
+        // findSalesByAgeGroup() 메소드가 Object[] 리스트를 반환하므로 이를 SalesByAgeGroupDTO로 변환
+        List<Object[]> results = memberRepository.findSalesByAgeGroup();
+        List<SalesByAgeGroupDTO> salesByAgeGroupDTOs = new ArrayList<>();
+        
+        // Object[]에서 값을 추출하여 SalesByAgeGroupDTO로 변환
+        for (Object[] result : results) {
+            String ageGroup = (String) result[0]; // 나이대
+            BigDecimal totalSales = (BigDecimal) result[1]; // 판매 총액
+            salesByAgeGroupDTOs.add(new SalesByAgeGroupDTO(ageGroup, totalSales));
+        }
+        
+        return salesByAgeGroupDTOs;
+    }
+    
+    //등급별 매출 통계
+    @Override
+    public List<SalesByMemberGradeDTO> getSalesByGrade() {
+        return memberRepository.findSalesByGrade();
+    }
+    
+    //상품별 매출 통계
+    @Override
+      public List<ProductSalesDTO> getSalesByProduct() {
+        // Repository에서 데이터를 가져오고 DTO로 매핑
+        return orderDetailRepository.findProductSales()
+            .stream()
+            .map(row -> new ProductSalesDTO((String) row[0], (BigDecimal) row[1]))
+            .toList();
+    }
+    
+    //가입일 기준 가입 통계
+    @Override
+    public List<SignupDateStatDTO> getSignupDateStat(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        // DateTimeFormatter를 사용하여 LocalDateTime을 문자열로 변환
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String startDate = startDateTime.format(formatter); // LocalDateTime을 String으로 변환
+        String endDate = endDateTime.format(formatter);     // LocalDateTime을 String으로 변환
+    
+        // 수정된 쿼리 호출
+        List<Object[]> results = memberRepository.findSignupDateStat(startDate, endDate);
+        List<SignupDateStatDTO> dtoList = new ArrayList<>();
+    
+        // 쿼리 결과를 DTO로 변환
+        for (Object[] result : results) {
+            // java.sql.Timestamp를 LocalDate로 변환
+            LocalDate date = ((java.sql.Timestamp) result[0]).toLocalDateTime().toLocalDate(); // 날짜만 추출
+    
+            Long signupCount = ((Number) result[1]).longValue(); // `COUNT(m)` 결과를 Long으로 변환
+    
+            // DTO 객체 생성
+            SignupDateStatDTO dto = new SignupDateStatDTO(date, signupCount);
+            dtoList.add(dto);
         }
     
-        // 만료된 쿠폰 정보 저장
-        couponRepository.saveAll(coupons);
-    } */
+        // 최종 결과 반환
+        return dtoList;
+    }
 
+    //성별 기준 가입 통계
+    @Override
+    public List<SignupGenderStatDTO> getSignupGenderStat(){
+        return memberRepository.findSignupGenderStat();
+    }
+
+    //연령대 기준 가입 통계
+    @Override
+    public List<SignupAgeStatDTO> getSignupAgeStat() {
+        // native query 결과를 가져옵니다.
+        List<Object[]> results = memberRepository.findSignupAgeStat();
+        
+        // 결과를 SignupAgeStatDTO로 변환
+        List<SignupAgeStatDTO> signupAgeStatDTOs = new ArrayList<>();
+        
+        // Object[]에서 값을 추출하여 SignupAgeStatDTO로 변환
+        for (Object[] result : results) {
+            String ageGroup = (String) result[0]; // 나이대
+            BigDecimal ageGroupCount = (BigDecimal) result[1]; // 가입자 수
+            signupAgeStatDTOs.add(new SignupAgeStatDTO(ageGroup, ageGroupCount));
+        }
+        
+        return signupAgeStatDTOs;
+    }
+
+    //일별 방문자 통계
+    @Override
+    public List<DailyVisitorDTO> getDailyVisitors(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Object[]> results = memberLogRepository.findDailyVisitorsWithinDateRange(startDate, endDate);
+        return results.stream()
+                .map(row -> new DailyVisitorDTO(
+                    ((java.sql.Timestamp) row[0]).toLocalDateTime().toLocalDate(), // Timestamp를 LocalDate로 변환
+                    ((Number) row[1]).intValue()                                  // 방문자 수
+                ))
+                .collect(Collectors.toList());
+    }
+    
 }
 
     

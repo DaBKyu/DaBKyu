@@ -11,6 +11,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -31,6 +33,7 @@ import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.ReviewDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
+import com.dabkyu.dabkyu.dto.TopSellingProductDTO;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
@@ -42,6 +45,7 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
 import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.service.ProductService;
+import com.dabkyu.dabkyu.service.ProductServiceImpl.TopProduct;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.service.ShoppingCartService;
@@ -212,9 +216,26 @@ public class ShopController {
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword,CateSeqno));
 	}
+
+	//가장 많이 팔린 상품 10개 조회
+	@ResponseBody
+	@GetMapping("/shop/topSelling")
+	public List<TopSellingProductDTO> getTopSellingProducts() throws Exception {
+		return productService.getTop10BestSellingProducts();
+	}
 	
-    
-    //상품 상세 보기
+	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
+	@ResponseBody
+	@GetMapping("/shop/topProductsByAgeForLoggedUser")
+    public Map<String, List<TopProduct>> getTopProductsForLoggedUser(HttpSession session) throws Exception {
+		String email = (String) session.getAttribute("email"); 
+		if (email != null) {
+			return productService.getTopProductsByAgeForUser(email); 
+		}
+		throw new IllegalStateException("사용자가 로그인되지 않았습니다.");
+    }
+
+  //상품 상세 보기
 	@GetMapping("/shop/view")
 	public void getView(
 		Model model,
@@ -661,6 +682,7 @@ public class ShopController {
 		return "{\"message\":\"good\"}";
 	}
 	
+   
 }
     
 

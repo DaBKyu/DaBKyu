@@ -8,17 +8,28 @@ import org.springframework.data.domain.PageRequest;
 import com.dabkyu.dabkyu.dto.Category1DTO;
 import com.dabkyu.dabkyu.dto.Category2DTO;
 import com.dabkyu.dabkyu.dto.Category3DTO;
+import com.dabkyu.dabkyu.dto.CategorySalesDTO;
 import com.dabkyu.dabkyu.dto.CouponCategoryDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.CouponTargetDTO;
+import com.dabkyu.dabkyu.dto.DailySalesDTO;
+import com.dabkyu.dabkyu.dto.DailyVisitorDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.MemberSalesDTO;
+import com.dabkyu.dabkyu.dto.MonthlySalesDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
+import com.dabkyu.dabkyu.dto.ProductSalesDTO;
 import com.dabkyu.dabkyu.dto.QuestionCommentDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
+import com.dabkyu.dabkyu.dto.SalesByAgeGroupDTO;
+import com.dabkyu.dabkyu.dto.SalesByMemberGradeDTO;
+import com.dabkyu.dabkyu.dto.SignupAgeStatDTO;
+import com.dabkyu.dabkyu.dto.SignupDateStatDTO;
+import com.dabkyu.dabkyu.dto.SignupGenderStatDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
@@ -237,5 +248,38 @@ public interface MasterService {
     public MemberEntity getMemberEmail(String email);
     //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
     //public void setExpiredCouponsToExpired(LocalDateTime referenceDate);
+
+    //카테고리별 매출 통계
+    public List<CategorySalesDTO> getCategorySales();
+
+    //일별 매출 통계
+    public List<DailySalesDTO> getDailySales(LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+    //월별 매출 통계
+    public List<MonthlySalesDTO> getYearlySales(int year);
+
+    //회원별 매출 통계
+    public List<MemberSalesDTO> getMemberSales();
+
+    //연령대별 매출 통계
+    public List<SalesByAgeGroupDTO> getSalesByAge();
+
+    //등급별 매출 통계
+    public List<SalesByMemberGradeDTO> getSalesByGrade();
+
+    //상품별 매출 통계
+    public List<ProductSalesDTO> getSalesByProduct();
+
+    //가입일 기준 가입 통계
+    public List<SignupDateStatDTO> getSignupDateStat(LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+    //성별 기준 가입 통계
+    public List<SignupGenderStatDTO> getSignupGenderStat();
+
+    //연령대 기준 가입 통계
+    public List<SignupAgeStatDTO> getSignupAgeStat();
+
+    //일별 방문자 통계 
+    public List<DailyVisitorDTO> getDailyVisitors(LocalDateTime startDate, LocalDateTime endDate);
 
 }

@@ -1,10 +1,15 @@
 package com.dabkyu.dabkyu.entity.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.dabkyu.dabkyu.dto.ProductSalesDTO;
+import com.dabkyu.dabkyu.dto.TopSellingProductDTO;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 
 public interface OrderProductRepository extends JpaRepository<OrderProductEntity, Long> {
@@ -28,6 +33,14 @@ public interface OrderProductRepository extends JpaRepository<OrderProductEntity
         Pageable pageable
     );
 
-    public OrderProductEntity findByOrderProductSeqno(Long orderProductSeqno);
-
+    //public OrderProductEntity findByOrderProductSeqno(Long orderProductSeqno);
+    
+    //각 상품 총 판매량 구하기
+    @Query("SELECT new com.dabkyu.dabkyu.dto.TopSellingProductDTO(p.productName, SUM(op.amount)) " +
+       "FROM orderProduct op " +
+       "JOIN op.productSeqno p " +
+       "GROUP BY p.productSeqno, p.productName " +
+       "ORDER BY SUM(op.amount) DESC " +
+       "FETCH FIRST 10 ROWS ONLY")
+    public List<TopSellingProductDTO> findTop10SellingProducts();
 }

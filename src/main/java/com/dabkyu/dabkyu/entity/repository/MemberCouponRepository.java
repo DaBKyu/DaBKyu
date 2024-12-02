@@ -26,7 +26,12 @@ public interface MemberCouponRepository extends JpaRepository<MemberCouponEntity
         Pageable pageable
         );
 
+        
+    // 하나의 MemberCouponEntity를 반환
     public MemberCouponEntity findByCouponSeqno_CouponSeqno(Long couponSeqno);
+
+    // 여러 개의 MemberCouponEntity를 반환
+    public List<MemberCouponEntity> findAllByCouponSeqno_CouponSeqno(Long couponSeqno);
 
     public MemberCouponEntity findByCouponSeqno_CouponSeqnoAndEmail_Email(Long couponSeqno, String email);
 
