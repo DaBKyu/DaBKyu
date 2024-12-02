@@ -49,10 +49,12 @@ import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReportEntity;
 import com.dabkyu.dabkyu.service.MasterService;
+import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.util.PageUtil;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -63,6 +65,7 @@ import lombok.extern.log4j.Log4j2;
 public class MasterController{
 
     private final MasterService masterService;
+    private final MemberService memberService;
     private final QuestionService questionService;
     private final ReviewService reviewService;
     
@@ -643,19 +646,26 @@ public class MasterController{
     //문의 답변 등록 및 수정
     @ResponseBody
     @PostMapping("/master/question/reply")
-    public void postReply(@RequestParam(value = "queSeqno", required = false) Long queSeqno,
-                @RequestParam("option") String option, 
-                @RequestBody QuestionCommentDTO commentDTO)
-                throws Exception{
-        
-            QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
-            commentDTO.setQueSeqno(questionEntity);
-    
-            if ("I".equals(option)) {
-                masterService.replyQuestion(commentDTO, questionEntity);
-            } else if("U".equals(option)) {
-                masterService.replyQuestionModify(commentDTO);
-            }
+    public String postReply(
+            @RequestParam("option") String option, 
+            @RequestBody QuestionCommentDTO commentDTO, HttpSession session
+            ) throws Exception {
+        log.info("답변 등록 시작");
+        log.info(option);
+        String email = (String) session.getAttribute("email");
+        Long queSeqno = commentDTO.getQuestionSeqno();
+        QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
+        commentDTO.setQueSeqno(questionEntity);
+        commentDTO.setEmail(masterService.getMemberEmail(email));
+
+        if ("I".equals(option)) {
+            log.info("답변 등록 서비스 호출");
+            masterService.replyQuestion(commentDTO, questionEntity);
+        } else if("U".equals(option)) {
+            masterService.replyQuestionModify(commentDTO);
+        }
+        return "{\"message\":\"good\"}";
+
 	}
 
     //문의 삭제 

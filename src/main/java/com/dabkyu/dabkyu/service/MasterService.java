@@ -233,7 +233,8 @@ public interface MasterService {
 
     //결제 취소 및 환불 처리
     public void cancelOrRefundOrder(Long orderDetailSeqno, Long couponSeqno, int point, boolean isRefund);
-
+    
+    public MemberEntity getMemberEmail(String email);
     //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
     //public void setExpiredCouponsToExpired(LocalDateTime referenceDate);
 
