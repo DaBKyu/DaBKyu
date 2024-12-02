@@ -8,16 +8,15 @@
     <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
 </head>
 <body>
-    <h1>가입일 통계</h1>
-    <div>
+    <h1 style="text-align: center;">가입일 기준 가입 통계</h1>
+    <div style="text-align: center;">
         <label for="startDateTime">시작 날짜:</label>
         <input type="date" id="startDateTime" name="startDateTime" value="2024-11-01">
         <label for="endDateTime">종료 날짜:</label>
         <input type="date" id="endDateTime" name="endDateTime" value="2024-11-30">
         <button onclick="updateChart()">조회</button>
     </div>
-    <div id="chart" style="width: 100%; height: 400px;"></div>
-
+    <div id="chart" style="width: 1000px; height: 500px; margin: 0 auto;"></div>
     <script>
         // 날짜 범위 사이의 모든 날짜를 가져오는 함수
         function getAllDatesInRange(startDate, endDate) {

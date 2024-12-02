@@ -8,7 +8,7 @@
     <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
 </head>
 <body>
-    <h1>회원별 누적 구매 금액 통계</h1>
+    <h1 style="text-align: center;">회원별 누적 구매 금액 통계</h1>
     <div id="chart" style="width: 1000px; height: 500px; margin: 0 auto;"></div>
 
     <script>
@@ -21,16 +21,19 @@
             .then(data => {
                 console.log(data); // 데이터를 콘솔에 출력하여 확인
 
-                // 데이터를 배열로 확인하고 비어있는지 체크
+                // 데이터가 배열이고 비어있지 않은지 확인
                 if (!Array.isArray(data) || data.length === 0) {
                     console.error("No data available");
                     document.getElementById('chart').innerText = "No data available.";
-                    return; // 데이터가 비어 있거나 배열이 아니면 종료
+                    return; // 데이터가 비어있거나 배열이 아니면 종료
                 }
 
                 // 회원 이름 및 누적 구매 금액 데이터 추출
                 const categories = data.map(item => item.username);
                 const totalPvalues = data.map(item => item.totalPvalue);
+
+                console.log('Categories:', categories); // categories 확인
+                console.log('TotalPvalues:', totalPvalues); // totalPvalues 확인
 
                 // 차트 데이터 구성
                 const container = document.getElementById('chart');
@@ -48,11 +51,15 @@
                 const options = {
                     chart: {
                         title: '회원별 누적 구매 금액',
-                        width: 1000,
+                        width: 1500,
                         height: 500,
                     },
                     xAxis: {
                         title: '회원 이름',
+                        // 레이블의 회전 설정
+                        label: {
+                            rotation: -45, // xAxis 레이블 회전 각도 설정
+                        },
                     },
                     yAxis: {
                         title: '누적 구매 금액',
@@ -60,6 +67,9 @@
                     },
                     series: {
                         showLabel: true, // 데이터 라벨 표시
+                    },
+                    tooltip: {
+                        suffix: '원', // 툴팁에 원 단위 추가
                     },
                 };
 

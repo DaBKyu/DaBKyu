@@ -98,8 +98,7 @@ public class ProductServiceImpl implements ProductService{
         return orderProductRepository.findTop10SellingProducts();
     }
     
-
-    //로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회 테스트
+    //로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
 	@Override
     public Map<String, List<TopProduct>> getTopProductsByAgeForUser(String email) throws Exception {
     List<MemberEntity> members = memberRepository.findAll();
@@ -217,113 +216,6 @@ public class ProductServiceImpl implements ProductService{
         this.purchaseCount += amount;
     }
     }
-
-/*
-	@Override
-public Map<String, List<TopProduct>> getTop10ProductsByAgeGroup() throws Exception {
-    List<MemberEntity> members = memberRepository.findAll();
-    List<OrderDetailEntity> orderDetails = orderDetailRepository.findAll();
-
-    System.out.println("회원 수: " + members.size());
-    System.out.println("주문 상세 내역 수: " + orderDetails.size());
-
-    Map<String, List<TopProduct>> result = new HashMap<>();
-
-    // 연령대별 상품 구매 횟수 카운트
-    for (MemberEntity member : members) {
-        // 나이 계산
-        LocalDate birthDate = member.getBirthDate().toLocalDate();
-        int age = Period.between(birthDate, LocalDate.now()).getYears();
-
-        // 연령대 계산
-        String ageGroup = getAgeGroup(age);
-
-        // 연령대별 상품 구매 횟수 초기화
-        List<TopProduct> topProducts = result.getOrDefault(ageGroup, new ArrayList<>());
-
-        // 해당 회원의 주문 내역에서 cancelYn, refundYn이 'Y'가 아닌 상품 처리
-        for (OrderDetailEntity orderDetail : orderDetails) {
-            // 주문 상세 내역과 회원 이메일 일치 여부 확인
-            if (orderDetail.getOrderSeqno().getEmail().equals(member.getEmail()) &&
-                !"Y".equals(orderDetail.getCancelYn()) || 
-                !"Y".equals(orderDetail.getRefundYn())) {
-
-                OrderProductEntity orderProduct = orderDetail.getOrderProductSeqno();
-
-                // orderProduct가 null인지 확인하는 로그 추가
-                if (orderProduct != null) {
-                    String productName = orderProduct.getProductSeqno().getProductName();
-                    int amount = orderProduct.getAmount();
-                    System.out.println("회원: " + member.getEmail() + " 상품명: " + productName + ", 수량: " + amount);  // 확인용 로그
-                    addProductToTopList(topProducts, productName, amount);
-                } else {
-                    System.out.println("OrderProductEntity가 null입니다.");  // orderProduct가 null인 경우
-                }
-            } else {
-                // 조건 불일치 로그 추가 (취소 또는 환불된 주문 제외)
-                System.out.println("조건 불일치 - cancelYn: " + orderDetail.getCancelYn() + ", refundYn: " + orderDetail.getRefundYn());
-            }
-        }
-
-        // 연령대별로 구매 횟수 기준 상위 10개 상품 추출
-        topProducts.sort((p1, p2) -> Integer.compare(p2.getPurchaseCount(), p1.getPurchaseCount()));
-        result.put(ageGroup, topProducts.size() > 10 ? topProducts.subList(0, 10) : topProducts);
-    }
-
-    return result;
-}
-
-// 나이를 기준으로 연령대 구하는 메서드
-private String getAgeGroup(int age) {
-    if (age >= 20 && age < 30) {
-        return "20대";
-    } else if (age >= 30 && age < 40) {
-        return "30대";
-    } else if (age >= 40 && age < 50) {
-        return "40대";
-    } else if (age >= 50) {
-        return "50대 이상";
-    } else {
-        return "미성년자";  // 20세 미만은 제외하거나 다른 그룹으로 처리 가능
-    }
-}
-
-// 상품을 구매 횟수 리스트에 추가하는 메서드
-private void addProductToTopList(List<TopProduct> topProducts, String productName, int amount) {
-    Optional<TopProduct> existingProduct = topProducts.stream()
-        .filter(product -> product.getProductName().equals(productName))
-        .findFirst();
-
-    if (existingProduct.isPresent()) {
-        existingProduct.get().addPurchaseCount(amount);
-    } else {
-        topProducts.add(new TopProduct(productName, amount));
-    }
-}
-
-// 상품의 이름과 구매 횟수를 나타내는 클래스
-public static class TopProduct {
-    private String productName;
-    private int purchaseCount;
-
-    public TopProduct(String productName, int purchaseCount) {
-        this.productName = productName;
-        this.purchaseCount = purchaseCount;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public int getPurchaseCount() {
-        return purchaseCount;
-    }
-
-    public void addPurchaseCount(int amount) {
-        this.purchaseCount += amount;
-    }
-}
- */
 
     // 상품 상세 보기
 	@Override

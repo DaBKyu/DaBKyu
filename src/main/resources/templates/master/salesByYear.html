@@ -8,16 +8,16 @@
     <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css">
 </head>
 <body>
-    <h1>연도별 월별 매출액 통계</h1>
+    <h1 style="text-align: center;">연도별 월별 매출액 통계</h1>
     
     <!-- 연도 입력 필드 추가 -->
-    <div>
+    <div style="text-align: center;">
         <label for="year">연도: </label>
         <input type="number" id="year" value="2024" min="2000" max="2100">
         <button onclick="updateChart()">조회</button>
     </div>
     
-    <div id="chart"></div>
+    <div id="chart" style="width: 1000px; height: 500px; margin: 0 auto;"></div>
 
     <script>
         // 월별 매출 데이터를 가져오는 함수
@@ -79,7 +79,7 @@
                 categories: categories,
                 series: [
                     {
-                        name: 'Total Sales',
+                        name: '월별 매출액',
                         data: seriesData
                     }
                 ]
@@ -87,9 +87,9 @@
 
             // 차트 옵션 정의
             const options = {
-                chart: { width: 900, height: 400, title: 'Monthly Sales' },
-                xAxis: { title: 'Month', label: { interval: 1 } },
-                yAxis: { title: 'Sales (₩)' },
+                chart: { width: 900, height: 400, title: '월별 매출액' },
+                xAxis: { title: '월', label: { interval: 1 } },
+                yAxis: { title: '매출 (₩)' },
                 series: { showDot: true, lineWidth: 2 }
             };
 

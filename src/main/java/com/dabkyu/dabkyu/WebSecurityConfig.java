@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.dabkyu.dabkyu.service.UserDetailsServiceImpl;
 
@@ -42,8 +41,11 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filter(HttpSecurity http) throws Exception {
 
-         // VisitorLogFilter를 UsernamePasswordAuthenticationFilter 전에 등록
-        //http.addFilterBefore(visitorLogFilter, UsernamePasswordAuthenticationFilter.class);
+        //X-Frame-Options 허용
+        http
+        .headers(headers -> headers
+            .frameOptions(frame -> frame.sameOrigin()) // iframe을 같은 출처에서 허용
+        ); 
 
         //formLogin 설정
         http.formLogin(

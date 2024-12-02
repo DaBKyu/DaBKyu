@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css">
 </head>
 <body>
-    <h1>일별 방문자 통계</h1>
+    <h1 style="text-align: center;">일별 방문자 통계</h1>
     
     <!-- 날짜 입력 필드 -->
-    <div>
+    <div style="text-align: center;">
         <label for="startDate">시작 날짜: </label>
         <input type="date" id="startDate" value="2024-11-01">
         <label for="endDate">끝 날짜: </label>
@@ -19,7 +19,7 @@
         <button onclick="updateChart()">조회</button>
     </div>
     
-    <div id="chart"></div>
+    <div id="chart" style="width: 1000px; height: 00px; margin: 0 auto;"></div>
 
     <script>
         // 날짜 범위 사이의 모든 날짜를 가져오는 함수
@@ -88,7 +88,7 @@
                 categories: categories,
                 series: [
                     {
-                        name: 'Visitors',
+                        name: '방문자수',
                         data: seriesData
                     }
                 ]
@@ -96,9 +96,9 @@
 
             // 차트 옵션 정의
             const options = {
-                chart: { width: 900, height: 400, title: 'Daily Visitors' },
-                xAxis: { title: 'Date', label: { interval: 1 } },
-                yAxis: { title: 'Visitor Count' },
+                chart: { width: 900, height: 400, title: '일별 방문자수' },
+                xAxis: { title: '일', label: { interval: 1 } },
+                yAxis: { title: '방문자 수' },
                 series: { showDot: true, lineWidth: 2 }
             };
 

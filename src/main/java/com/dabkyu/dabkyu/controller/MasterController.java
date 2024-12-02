@@ -85,7 +85,6 @@ import com.dabkyu.dabkyu.entity.repository.ProductRepository;
 import com.dabkyu.dabkyu.service.MasterService;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
-import com.dabkyu.dabkyu.service.VisitorService;
 import com.dabkyu.dabkyu.util.PageUtil;
 
 import jakarta.transaction.Transactional;
@@ -107,7 +106,6 @@ public class MasterController{
     private final Category1Repository category1Repository;
     private final Category2Repository category2Repository;
     private final Category3Repository category3Repository;
-    private final VisitorService visitorService;
     
     //메인페이지
     @GetMapping("/master") 
@@ -844,16 +842,21 @@ public class MasterController{
     }
 
     // 관리자가 쿠폰 종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
-@PostMapping("/master/expiredUpdate")
-public void updateExpiredCoupons() {
-    LocalDateTime referenceDate = LocalDateTime.now();
-    
-    // 만료된 쿠폰을 처리하는 서비스 메서드 호출
-    masterService.setExpiredCouponsToExpired(referenceDate);
-    
-    // 성공적인 처리 후 아무 것도 반환하지 않음 (HTTP 상태 200)
-}
+    @PostMapping("/master/expiredUpdate")
+    public void updateExpiredCoupons() {
+        LocalDateTime referenceDate = LocalDateTime.now();
+        
+        // 만료된 쿠폰을 처리하는 서비스 메서드 호출
+        masterService.setExpiredCouponsToExpired(referenceDate);
+        
+        // 성공적인 처리 후 아무 것도 반환하지 않음 (HTTP 상태 200)
+    }
 
+    //통계 페이지(매출통계,가입통계,방문통계)
+    @GetMapping("/master/statisticsPage")
+    public String getStatisticsPage() {
+        return "master/statisticsPage";
+    }
 
     /* 매출통계
     -카테고리별 
@@ -995,7 +998,6 @@ public void updateExpiredCoupons() {
         return masterService.getSignupGenderStat();
     }
 
-
     //연령대 기준 가입 통계
     @GetMapping("/master/signupAgeStat")
     public String getSignupAgeStatPage() {
@@ -1007,6 +1009,11 @@ public void updateExpiredCoupons() {
     public List<SignupAgeStatDTO> getSignupAgeStat() {
         return masterService.getSignupAgeStat();
     }
+
+     /*
+    //방문통계
+    -방문자수 
+    */
 
     // 일별 방문자 통계 페이지
     @GetMapping("/master/visitorsByDaily")
@@ -1024,41 +1031,6 @@ public void updateExpiredCoupons() {
         
         return masterService.getDailyVisitors(startDateTime, endDateTime);
     }
-    
-    
-
-
-    /*
-    //방문통계
-    -방문자수 
-    */
-
-    /* 
-    //고유 방문자 기록
-    @PostMapping("/logVisitor")
-    public String logVisitor(@RequestParam("ipAddress") String ipAddress) {
-            visitorService.logVisitor(ipAddress);  // 방문 기록 저장
-            //return "Visitor log for IP " + ipAddress + " has been recorded successfully.";
-            return "{\"message\":\"good\"}";
-    }
-
-    //오늘의 고유 방문자 수 조회
-    @GetMapping("/visitorCount")
-    public Long getTodayVisitorCount() {
-        return visitorService.getTodayVisitorCount(); 
-    }
-
-    // 날짜별 방문자 수 조회 (차트용)
-    @GetMapping("/visitorCountByDate")
-    public List<VisitorCountDTO> getVisitorCountByDate() {
-        LocalDateTime startOfMonth = LocalDate.now().atStartOfDay(); // 이번 달 1일 00:00:00
-        LocalDateTime endOfMonth = LocalDate.now().atTime(23, 59, 59); // 이번 달 31일 23:59:59
-        
-        // 날짜별 방문자 수
-        return visitorService.getVisitorCountByDate(startOfMonth, endOfMonth);
-    }
-    */
-
 }
 
 

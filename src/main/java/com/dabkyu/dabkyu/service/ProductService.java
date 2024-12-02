@@ -25,11 +25,8 @@ public interface ProductService {
 	//가장 많이 팔린 상품 10개 조회
 	public List<TopSellingProductDTO> getTop10BestSellingProducts() throws Exception;
 
-	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회 테스트
+	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
 	public Map<String, List<TopProduct>> getTopProductsByAgeForUser(String email) throws Exception;
-
-	//연령대별 상위 10개 상품 조회
-	//public Map<String, List<TopProduct>> getTop10ProductsByAgeGroup() throws Exception;
 
     //상품 상세 보기
 	public ProductDTO view(Long productSeqno) throws Exception;

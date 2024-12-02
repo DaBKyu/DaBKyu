@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css">
 </head>
 <body>
-    <h1>일별 매출액 통계</h1>
-    
+    <h1 style="text-align: center;">일별 매출액 통계</h1>
+
     <!-- 날짜 입력 필드 추가 -->
-    <div>
+    <div style="text-align:center;">
         <label for="startDate">시작 날짜: </label>
         <input type="date" id="startDate" value="2024-11-01">
         <label for="endDate">끝 날짜: </label>
@@ -19,7 +19,7 @@
         <button onclick="updateChart()">조회</button>
     </div>
     
-    <div id="chart"></div>
+    <div id="chart" style="width: 1000px; height: 500px; margin: 0 auto;"></div>
 
     <script>
         // 날짜 범위 사이의 모든 날짜를 가져오는 함수
@@ -88,7 +88,7 @@
                 categories: categories,
                 series: [
                     {
-                        name: 'Total Sales',
+                        name: '매출액',
                         data: seriesData
                     }
                 ]
@@ -96,9 +96,9 @@
 
             // 차트 옵션 정의
             const options = {
-                chart: { width: 900, height: 400, title: 'Daily Sales' },
-                xAxis: { title: 'Date', label: { interval: 1 } },
-                yAxis: { title: 'Sales (₩)' },
+                chart: { width: 900, height: 400, title: '일별 매출액' },
+                xAxis: { title: '일', label: { interval: 1 } },
+                yAxis: { title: '매출 (₩)' },
                 series: { showDot: true, lineWidth: 2 }
             };
 

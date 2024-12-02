@@ -943,7 +943,6 @@ public class MasterServiceImpl implements MasterService {
         }
     }
     
-
     //카테고리별 매출 통계
     @Override
     public List<CategorySalesDTO> getCategorySales() {
@@ -982,22 +981,21 @@ public class MasterServiceImpl implements MasterService {
 
     //연령별 매출 통계
     @Override
-public List<SalesByAgeGroupDTO> getSalesByAge() {
-    // findSalesByAgeGroup() 메소드가 Object[] 리스트를 반환하므로 이를 SalesByAgeGroupDTO로 변환
-    List<Object[]> results = memberRepository.findSalesByAgeGroup();
-    List<SalesByAgeGroupDTO> salesByAgeGroupDTOs = new ArrayList<>();
-    
-    // Object[]에서 값을 추출하여 SalesByAgeGroupDTO로 변환
-    for (Object[] result : results) {
-        String ageGroup = (String) result[0]; // 나이대
-        BigDecimal totalSales = (BigDecimal) result[1]; // 판매 총액
-        salesByAgeGroupDTOs.add(new SalesByAgeGroupDTO(ageGroup, totalSales));
+    public List<SalesByAgeGroupDTO> getSalesByAge() {
+        // findSalesByAgeGroup() 메소드가 Object[] 리스트를 반환하므로 이를 SalesByAgeGroupDTO로 변환
+        List<Object[]> results = memberRepository.findSalesByAgeGroup();
+        List<SalesByAgeGroupDTO> salesByAgeGroupDTOs = new ArrayList<>();
+        
+        // Object[]에서 값을 추출하여 SalesByAgeGroupDTO로 변환
+        for (Object[] result : results) {
+            String ageGroup = (String) result[0]; // 나이대
+            BigDecimal totalSales = (BigDecimal) result[1]; // 판매 총액
+            salesByAgeGroupDTOs.add(new SalesByAgeGroupDTO(ageGroup, totalSales));
+        }
+        
+        return salesByAgeGroupDTOs;
     }
     
-    return salesByAgeGroupDTOs;
-}
-
-
     //등급별 매출 통계
     @Override
     public List<SalesByMemberGradeDTO> getSalesByGrade() {
@@ -1050,7 +1048,6 @@ public List<SalesByAgeGroupDTO> getSalesByAge() {
 
     //연령대 기준 가입 통계
     @Override
-
     public List<SignupAgeStatDTO> getSignupAgeStat() {
         // native query 결과를 가져옵니다.
         List<Object[]> results = memberRepository.findSignupAgeStat();
@@ -1067,7 +1064,8 @@ public List<SalesByAgeGroupDTO> getSalesByAge() {
         
         return signupAgeStatDTOs;
     }
-    
+
+    //일별 방문자 통계
     @Override
     public List<DailyVisitorDTO> getDailyVisitors(LocalDateTime startDate, LocalDateTime endDate) {
         List<Object[]> results = memberLogRepository.findDailyVisitorsWithinDateRange(startDate, endDate);
@@ -1079,10 +1077,6 @@ public List<SalesByAgeGroupDTO> getSalesByAge() {
                 .collect(Collectors.toList());
     }
     
-    
-
-
-
 }
 
     

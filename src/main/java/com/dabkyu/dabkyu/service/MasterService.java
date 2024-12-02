@@ -247,6 +247,7 @@ public interface MasterService {
     //연령대 기준 가입 통계
     public List<SignupAgeStatDTO> getSignupAgeStat();
 
+    //일별 방문자 통계 
     public List<DailyVisitorDTO> getDailyVisitors(LocalDateTime startDate, LocalDateTime endDate);
 
 }
