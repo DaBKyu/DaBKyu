@@ -18,12 +18,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="recentView")
 @Table(name="recent_view")
 @IdClass(RecentViewEntityID.class)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class RecentViewEntity {
 
     @Id

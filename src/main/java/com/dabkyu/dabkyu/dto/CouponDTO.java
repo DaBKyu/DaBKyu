@@ -3,6 +3,7 @@ package com.dabkyu.dabkyu.dto;
 import java.time.LocalDateTime;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,8 +27,7 @@ public class CouponDTO {
     private int minOrder;
     private String couponRole;
     private String isDupl;
-    private String isExpire;
-
+    private String couponCode;
 
     public CouponDTO(CouponEntity entity) {
         this.couponSeqno = entity.getCouponSeqno();
@@ -41,7 +41,8 @@ public class CouponDTO {
         this.minOrder= entity.getMinOrder();
         this.couponRole= entity.getCouponRole();
         this.isDupl = entity.getIsDupl();
-        //this.isExpire = entity.getIsExpire();
+        this.couponCode = entity.getCouponCode();
+
     }
 
     public CouponEntity dtoToEntity(CouponDTO dto) {
@@ -57,7 +58,7 @@ public class CouponDTO {
                                           .minOrder(dto.getMinOrder())
                                           .couponRole(dto.getCouponRole())
                                           .isDupl(dto.getIsDupl())
-                                          //.isExpire(dto.getIsExpire())
+                                          .couponCode(dto.getCouponCode())
                                           .build();
         return entity;
     }

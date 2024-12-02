@@ -50,3 +50,53 @@ const track = document.querySelector('.carousel-track');
         }
         moveToSlide(currentSlideIndex);
     });
+   function loadContent(page) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", page, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            document.getElementById("content").innerHTML = xhr.responseText;
+
+            // HTML이 로드된 후 요소를 다시 찾고 이벤트 리스너를 추가합니다.
+            const track = document.querySelector('.carousel-track');
+            const slides = Array.from(track.children);
+            const nextButton = document.querySelector('.next');
+            const prevButton = document.querySelector('.prev');
+            let currentSlideIndex = 0;
+
+            if (track && slides.length > 0) {
+                const slideWidth = slides[0].getBoundingClientRect().width;
+
+                const moveToSlide = (index) => {
+                    track.style.transform = `translateX(-${index * slideWidth}px)`;
+                    nextButton.style.display = (index === slides.length - 1) ? 'none' : 'block';
+                    prevButton.style.display = (index === 0) ? 'none' : 'block';
+                };
+
+                nextButton.addEventListener('click', () => {
+                    if (currentSlideIndex < slides.length - 1) {
+                        currentSlideIndex++;
+                    } else {
+                        currentSlideIndex = 0;
+                    }
+                    moveToSlide(currentSlideIndex);
+                });
+
+                prevButton.addEventListener('click', () => {
+                    if (currentSlideIndex > 0) {
+                        currentSlideIndex--;
+                    } else {
+                        currentSlideIndex = slides.length - 1;
+                    }
+                    moveToSlide(currentSlideIndex);
+                });
+
+                // 첫 슬라이드 상태 초기화
+                prevButton.style.display = 'none';
+            } else {
+                console.error("Carousel elements not found.");
+            }
+        }
+    };
+    xhr.send();
+};

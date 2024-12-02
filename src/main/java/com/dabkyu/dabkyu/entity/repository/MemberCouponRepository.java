@@ -33,6 +33,10 @@ public interface MemberCouponRepository extends JpaRepository<MemberCouponEntity
     // 여러 개의 MemberCouponEntity를 반환
     public List<MemberCouponEntity> findAllByCouponSeqno_CouponSeqno(Long couponSeqno);
 
+    public MemberCouponEntity findByCouponSeqno_CouponSeqnoAndEmail_Email(Long couponSeqno, String email);
+
+    //public MemberCouponEntity findByCouponCodeAndEmail_Email(String couponCode, String email);
+
     //특정 이메일과 쿠폰 번호 목록으로 해당 회원의 쿠폰 리스트를 조회
     @Query("SELECT mc FROM memberCoupon mc " +
                    "WHERE mc.couponSeqno.couponSeqno IN :couponSeqnoList " +
@@ -41,5 +45,6 @@ public interface MemberCouponRepository extends JpaRepository<MemberCouponEntity
         @Param("couponSeqnoList") List<Long> couponSeqnoList, 
         @Param("email") String email);
 
+    public List<MemberCouponEntity> findByEmail_Email(String email);
 
 }

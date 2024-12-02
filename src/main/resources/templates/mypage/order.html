@@ -6,15 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내 웹 주문 페이지</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
     <!-- Font Awesome CSS 추가 -->
     <style>
         body {
-            display: flex;
+
             font-family: Arial, sans-serif;
         }
 
-        #myMenu {
+        .myMenu {
             width: 250px;
             /* 메뉴 너비 조정 */
             padding: 20px;
@@ -391,26 +391,11 @@
 </head>
 
 <body>
-
-    <body>
-        <div id="myMenu">
-            <h2>mypage</h2>
-            <div class="user-icon">
-                <i class="fas fa-user-circle"></i> <!-- 사용자 아이콘 -->
-            </div>
-            <nav>
-                <div>
-                    <div>나의 쇼핑</div>
-                    <ul>
-                        <li><a href="order.html" title="주문목록/배송현황">주문/배송현황</a></li>
-                        <li><a href="cancelRefundChange.html" title="취소/환불/교환">취소/환불/교환</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <div>나의 정보</div>
-                    <ul>
-                        <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li>
-                        <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
+    <th:block th:replace="~{layout/MyPageHeader::header}"></th:block>
+    <div class="" style="display: flex; width: 1400px;">
+    <th:block th:replace="~{layout/SideMenu::SideMenu}"></th:block>
+    <div class="order-list" style="margin-left: 200px;">
+        <span class="order-list-title">주문목록</span>
 
                     </ul>
                 </div>
@@ -484,17 +469,50 @@
                                         </div>
                                     </div>
                                 </div>
-                            </td>
-                            <td class="order-actions">
-                                <!-- 배송 상태가 "배송전"일 경우 취소 버튼 추가 -->
-                                <button class="cancel-order" id="cancelOrderBtn" style="display: none;">주문
-                                    취소</button><br><br>
-                                <button class="exchange-return" id="exchangeReturnBtn">교환, 반품 신청</button> <br>
-                                <button class="write-review" id="writeReviewBtn">리뷰 작성하기</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </div>
+                        </td>
+                        <td class="order-actions">
+                            <button class="exchange-return" id="exchangeReturnBtn">교환, 반품 신청</button>  <br>
+                            <button class="write-review" id="writeReviewBtn">리뷰 작성하기</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+<!-- 리뷰 작성 모달 -->
+<div id="reviewModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h1>리뷰 작성</h1>
+        <!-- action 속성에 리뷰 모음 페이지 URL 입력 -->
+        <form class="review-form" action="reviews" method="get">
+            <!-- 작성자 이름 입력 필드 추가 -->
+            <label for="authorName">작성자 이름:</label>
+            <input type="text" id="authorName" name="authorName" placeholder="작성자 이름을 입력하세요" required>
+
+            <label for="reviewText">리뷰를 작성해 주세요:</label>
+            <textarea id="reviewText" name="review" rows="4" required></textarea>
+
+            <!-- 날짜 선택 -->
+            <label for="reviewDate">리뷰 작성 날짜:</label>
+            <input type="date" id="reviewDate" name="reviewDate" required>
+            
+            <!-- 별점 선택 -->
+            <div class="star-rating">
+                <input type="radio" id="star1" name="rating" value="1" hidden>
+                <label for="star1" class="star">&#9733;</label>
+
+                <input type="radio" id="star2" name="rating" value="2" hidden>
+                <label for="star2" class="star">&#9733;</label>
+
+                <input type="radio" id="star3" name="rating" value="3" hidden>
+                <label for="star3" class="star">&#9733;</label>
+
+                <input type="radio" id="star4" name="rating" value="4" hidden>
+                <label for="star4" class="star">&#9733;</label>
+
+                <input type="radio" id="star5" name="rating" value="5" hidden>
+                <label for="star5" class="star">&#9733;</label>
             </div>
 
             <!-- 리뷰 작성 모달 -->
@@ -828,310 +846,9 @@
                     const modal = document.getElementById(modalId);
                     modal.style.display = 'block';
                 }
-            
-                // 모달 닫기 함수
-                function closeModal(modalId) {
-                    const modal = document.getElementById(modalId);
-                    modal.style.display = 'none';
-                }
-            
-                // 모든 모달 닫기
-                function closeAllModals() {
-                    const modals = document.querySelectorAll('.modal');
-                    modals.forEach(modal => {
-                        modal.style.display = 'none';
-                    });
-            
-                    // 모달 닫을 때 라디오 버튼 초기화
-                    document.getElementById('exchangeRadio').checked = false;
-                    document.getElementById('refundRadio').checked = false;
-                    selectedReason = '';  // 환불 사유 초기화
-                    selectedExchangeReason = '';  // 교환 사유 초기화
-                    document.getElementById('selectedReasonDisplay').textContent = ''; // 선택된 사유 표시 초기화
-                }
-            
-                // 사유선택 값 저장 (환불/교환 사유 선택)
-                document.querySelectorAll('input[name="refundReason"]').forEach(checkbox => {
-                    checkbox.addEventListener('change', function () {
-                        const label = document.querySelector(`label[for="${this.id}"]`);
-                        if (label) {
-                            selectedReason = label.textContent;
-                        }
-                    });
-                });
-            
-                document.querySelectorAll('input[name="exchangeReason"]').forEach(checkbox => {
-                    checkbox.addEventListener('change', function () {
-                        const label = document.querySelector(`label[for="${this.id}"]`);
-                        if (label) {
-                            selectedExchangeReason = label.textContent;
-                        }
-                    });
-                });
-            
-                // 교환 사유 선택 시
-                document.querySelectorAll('input[name="reason"]').forEach(radio => {
-                    radio.addEventListener('change', function () {
-                        const label = document.querySelector(`label[for="${this.id}"]`);
-                        if (label) {
-                            selectedExchangeReason = label.textContent;
-                            const reasonDisplayElement = document.getElementById('selectedReasonDisplay');
-                            if (reasonDisplayElement) {
-                                reasonDisplayElement.textContent = `선택된 사유: ${selectedExchangeReason}`;
-                            }
-                        }
-                    });
-                });
-            
-                // "다음 단계" 버튼 클릭 시 교환/환불 사유 선택 여부 확인
-                document.getElementById('nextStepFromExchangeReturnBtn').addEventListener('click', function () {
-                    const isExchange = document.getElementById('exchangeRadio').checked;
-                    const isRefund = document.getElementById('refundRadio').checked;
-            
-                    // 경고 메시지 제거하고, 사유가 선택되지 않으면 해당 사유 선택 모달을 열기
-                    if (isExchange && !selectedExchangeReason) {
-                        openModal('reasonSelectionModal');  // 교환 사유 모달 열기
-                        return;
-                    } else if (isRefund && !selectedReason) {
-                        openModal('refundReasonSelectionModal');  // 환불 사유 모달 열기
-                        return;
-                    }
-            
-                    // 선택된 사유가 있으면 해당 사유를 표시하고 해결 방법 모달 열기
-                    document.getElementById('selectedReasonText').textContent = selectedReason || selectedExchangeReason;
-            
-                    if (isExchange) {
-                        openModal('newSolutionSelectionModal');
-                        closeModal('exchangeReturnModal');
-                    } else if (isRefund) {
-                        openModal('solutionSelectionModal');
-                        closeModal('exchangeReturnModal');
-                    }
-                });
-            
-                // 교환 사유 목록에서 '다음 단계' 버튼 클릭 시
-                document.getElementById('nextStepFromReasonBtn').addEventListener('click', function () {
-                    if (!selectedExchangeReason) {
-                        openModal('reasonSelectionModal');
-                        return;
-                    }
-            
-                    openModal('newSolutionSelectionModal');
-                    closeModal('reasonSelectionModal');
-                    document.getElementById('selectedReasonText').textContent = selectedExchangeReason;
-                });
-            
-                // 환불 신청 라디오 버튼 클릭 시 환불 사유 선택 모달 열기
-                document.getElementById('refundRadio').addEventListener('change', function () {
-                    // 환불 신청 시 사유 선택 화면을 미리 열지 않음
-                    document.getElementById('refundGuide').style.display = 'block';
-                    document.getElementById('estimatedRefundAmount').style.display = 'block';
-                });
-            
-                // 환불 사유 목록에서 '다음 단계' 버튼 클릭 시
-                document.getElementById('nextStepFromRefundBtn').addEventListener('click', function () {
-                    if (!selectedReason) {
-                        openModal('refundReasonSelectionModal');
-                        return;
-                    }
-            
-                    openModal('solutionSelectionModal');
-                    closeModal('refundReasonSelectionModal');
-                    document.getElementById('selectedReasonText').textContent = selectedReason;
-                });
-            
-                // "이전 단계" 버튼 클릭 이벤트 처리 (교환/환불 사유 선택 화면으로 돌아가기)
-                document.getElementById('prevStepFromReasonBtn').addEventListener('click', function () {
-                    // 교환/환불 신청 화면으로 돌아갈 때 값 초기화
-                    document.getElementById('exchangeRadio').checked = false;
-                    document.getElementById('refundRadio').checked = false;
-                    selectedReason = '';  // 환불 사유 초기화
-                    selectedExchangeReason = '';  // 교환 사유 초기화
-                    document.getElementById('selectedReasonDisplay').textContent = ''; // 선택된 사유 표시 초기화
-            
-                    openModal('exchangeReturnModal');  // 교환/환불 신청 화면 열기
-                    closeModal('reasonSelectionModal');  // 교환 사유 선택 모달 닫기
-                });
-            
-                document.getElementById('prevStepFromRefundBtn').addEventListener('click', function () {
-                    // 교환/환불 신청 화면으로 돌아갈 때 값 초기화
-                    document.getElementById('exchangeRadio').checked = false;
-                    document.getElementById('refundRadio').checked = false;
-                    selectedReason = '';  // 환불 사유 초기화
-                    selectedExchangeReason = '';  // 교환 사유 초기화
-                    document.getElementById('selectedReasonDisplay').textContent = ''; // 선택된 사유 표시 초기화
-            
-                    openModal('exchangeReturnModal');  // 교환/환불 신청 화면 열기
-                    closeModal('refundReasonSelectionModal');  // 환불 사유 선택 모달 닫기
-                });
-            
-                // 교환 해결방안 모달에서 '이전 단계' 버튼 클릭 시
-                document.getElementById('prevStepFromNewSolutionBtn').addEventListener('click', function () {
-                    // 교환 사유 초기화
-                    selectedExchangeReason = ''; // 교환 사유 초기화
-                    document.getElementById('selectedReasonDisplay').textContent = ''; // 선택된 사유 표시 초기화
-            
-                    openModal('reasonSelectionModal');  // 교환 사유 선택 화면 열기
-                    closeModal('newSolutionSelectionModal');  // 교환 해결방안 모달 닫기
-                });
-            
-                // 환불 해결방안 모달에서 '이전 단계' 버튼 클릭 시
-                document.getElementById('prevStepFromSolutionBtn').addEventListener('click', function () {
-                    const isExchange = document.getElementById('exchangeRadio').checked;
-            
-                    // 교환/환불 신청 화면으로 돌아가기 전에 값 초기화
-                    document.getElementById('exchangeRadio').checked = false;
-                    document.getElementById('refundRadio').checked = false;
-                    selectedReason = '';  // 환불 사유 초기화
-                    selectedExchangeReason = '';  // 교환 사유 초기화
-                    document.getElementById('selectedReasonDisplay').textContent = ''; // 선택된 사유 표시 초기화
-            
-                    if (isExchange) {
-                        openModal('reasonSelectionModal');  // 교환 사유 선택 화면 열기
-                        closeModal('newSolutionSelectionModal');  // 교환 해결방안 모달 닫기
-                    } else {
-                        openModal('refundReasonSelectionModal');  // 환불 사유 선택 화면 열기
-                        closeModal('solutionSelectionModal');  // 환불 해결방안 모달 닫기
-                    }
-                });
-            
-            
-
-                // 기타 사유 텍스트 입력 칸 보이기/숨기기
-                document.querySelectorAll('input[name="refundReason"]').forEach(function (radioButton) {
-                    radioButton.addEventListener('change', function () {
-                        var otherReasonContainer = document.getElementById('otherReasonContainer');
-                        if (document.getElementById('reasonRefund4').checked) {
-                            otherReasonContainer.style.display = 'block';  // 기타 사유 입력칸 보이기
-                        } else {
-                            otherReasonContainer.style.display = 'none';  // 기타 사유 입력칸 숨기기
-                        }
-                    });
-                });
-
-                // "기타" 체크박스가 선택될 때 입력 필드 보이기/숨기기
-                document.getElementById('other').addEventListener('change', function () {
-                    var otherInputContainer = document.getElementById('otherInputContainer');
-                    if (this.checked) {
-                        otherInputContainer.style.display = 'block'; // 텍스트 입력 필드 보이기
-                    } else {
-                        otherInputContainer.style.display = 'none';  // 텍스트 입력 필드 숨기기
-                    }
-                });
-
-                // 회수 요청사항의 기타 사항 입력 칸 보이기/숨기기
-                document.querySelectorAll('input[name="pickupLocation"]').forEach(function (radioButton) {
-                    radioButton.addEventListener('change', function () {
-                        var otherInputContainer = document.getElementById('otherInputContainer');
-                        if (document.getElementById('other').checked) {
-                            otherInputContainer.style.display = 'block';  // 기타 사항 입력칸 보이기
-                        } else {
-                            otherInputContainer.style.display = 'none';  // 기타 사항 입력칸 숨기기
-                        }
-                    });
-                });
-
-                // 새로운 해결 방법에서 기타 사항 입력 칸 보이기/숨기기
-                document.querySelectorAll('input[name="pickupLocation"]').forEach(function (checkbox) {
-                    checkbox.addEventListener('change', function () {
-                        var newOtherInputContainer = document.getElementById('newOtherInputContainer');
-                        if (document.getElementById('newOther').checked) {
-                            newOtherInputContainer.style.display = 'block';  // 기타 사항 입력칸 보이기
-                        } else {
-                            newOtherInputContainer.style.display = 'none';  // 기타 사항 입력칸 숨기기
-                        }
-                    });
-                });
-                // "신청하기" 버튼 클릭 이벤트 처리
-                document.getElementById('submitRequestBtn').addEventListener('click', function () {
-                    alert('신청이 완료되었습니다.');
-                    window.location.href = 'order.html'; // 'order.html'로 이동
-                });
-
-                // "교환신청하기" 버튼 클릭 이벤트 처리
-                document.getElementById('submitNewRequestBtn').addEventListener('click', function () {
-                    alert('교환신청이 완료되었습니다.');
-                    window.location.href = 'order.html'; // 교환신청 완료 후 'order.html'로 이동
-                });
-
-
-                // 현재 날짜를 'yyyy-mm-dd' 형식으로 가져와서 입력 필드에 자동으로 설정
-                window.onload = function () {
-                    var today = new Date();
-                    var yyyy = today.getFullYear();
-                    var mm = today.getMonth() + 1; // 월은 0부터 시작하므로 1을 더해줌
-                    var dd = today.getDate();
-
-                    // 월과 일이 두 자리가 되도록 0을 채워줌
-                    if (mm < 10) mm = '0' + mm;
-                    if (dd < 10) dd = '0' + dd;
-
-                    var currentDate = yyyy + '-' + mm + '-' + dd;
-
-                    // 현재 날짜를 input 필드에 설정
-                    document.getElementById("reviewDate").value = currentDate;
-                };
-
-                // 리뷰 작성하기 버튼 클릭 시 모달 열기
-                const writeReviewBtn = document.getElementById("writeReviewBtn");
-                const reviewModal = document.getElementById("reviewModal");
-                const closeButton = document.querySelector(".close-button");
-
-                // 리뷰 작성 팝업 열기
-                writeReviewBtn.addEventListener("click", function () {
-                    reviewModal.style.display = "block";
-                });
-
-                // 모달 닫기
-                closeButton.addEventListener("click", function () {
-                    reviewModal.style.display = "none";
-                });
-
-                // 모달 외부 클릭 시 닫기
-                window.addEventListener("click", function (event) {
-                    if (event.target === reviewModal) {
-                        reviewModal.style.display = "none";
-                    }
-                });
-
-                // 리뷰 제출 폼 처리 (실제 서버로 제출하는 로직은 추가해야 합니다)
-                document.querySelector(".review-form").addEventListener("submit", function (event) {
-                    event.preventDefault(); // 페이지 리로딩 방지
-                    const reviewText = document.getElementById("reviewText").value;
-                    alert("리뷰가 제출되었습니다: " + reviewText);
-                    reviewModal.style.display = "none"; // 제출 후 모달 닫기
-                });
-
-
-                // 요소들이 존재하는지 확인합니다.
-                const orderStatusElement = document.getElementById("orderStatus");
-                const cancelOrderBtn = document.getElementById("cancelOrderBtn");
-
-                // 주문 상태에 따라 "주문 취소" 버튼을 표시하거나 숨깁니다.
-                if (orderStatusElement && cancelOrderBtn) {
-                    const orderStatus = orderStatusElement.textContent.trim(); // 텍스트를 가져옵니다.
-
-                    // 주문 상태가 "배송전"이면 취소 버튼을 표시
-                    if (orderStatus === "배송전") {
-                        cancelOrderBtn.style.display = "inline-block";
-                    } else {
-                        cancelOrderBtn.style.display = "none";
-                    }
-                }
-
-                // 주문 취소 버튼 클릭 이벤트 추가
-                if (cancelOrderBtn) {
-                    cancelOrderBtn.addEventListener("click", function () {
-                        // 팝업 창을 띄웁니다.
-                        alert("주문이 취소되었습니다.");
-                        // 취소 후 버튼을 숨기거나 다른 동작을 추가할 수 있습니다.
-                        cancelOrderBtn.style.display = "none"; // 버튼 숨기기 (선택사항)
-                    });
-                }
-
-            </script>
-
-
-    </body>
+            ;
+        </script>
+        </div>
+</body>
 
 </html>

@@ -21,12 +21,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="likeList")
 @Table(name="likelist")
 @IdClass(LikeListEntityID.class)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class LikeListEntity {
 
     @Id

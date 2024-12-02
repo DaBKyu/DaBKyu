@@ -21,11 +21,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="category2")
 @Table(name="category2")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Category2Entity {
 
     @Id

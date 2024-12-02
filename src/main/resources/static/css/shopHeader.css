@@ -30,13 +30,11 @@ border: solid 1px #e3e3e3;
 
 /* 메뉴 아이콘 스타일 */
 #menu-toggle {
-position: fixed;
 top: 18px;
 left: 20px; /* 아이콘의 위치를 왼쪽 상단으로 조정 */
 font-size: 20px;
 color: #333;
-cursor: pointer;
-z-index: 100; /* 메뉴보다 앞에 위치 */
+cursor: pointer; /* 메뉴보다 앞에 위치 */
 }
 
 #menu-toggle:hover {
@@ -106,6 +104,7 @@ display: initial;
 aside.open {
 transform: translateX(0); /* 왼쪽에서 오른쪽으로 슬라이드 */
 }
+
 nav {
 width: 100%;
 height: 64px;
@@ -116,6 +115,7 @@ align-items: center;
 padding: 0 10px;
 border: 1px solid #e3e3e3;
 }
+
 /* 알림 모달 스타일 */
 .notification-modal {
     display: none; /* 기본 숨김 */

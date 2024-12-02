@@ -18,12 +18,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="shoppingCart")
 @Table(name="shopping_cart")
 @IdClass(ShoppingCartEntityID.class)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ShoppingCartEntity {
 
     @Id

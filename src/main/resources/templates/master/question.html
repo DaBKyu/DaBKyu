@@ -37,19 +37,20 @@
             <th scope="col">내용</th>
             <th scope="col">작성자</th>
             <th scope="col">작성일</th>
-            <th>답변버튼</th>
+            <th>버튼</th>
             </tr>
         </thead>
         <tbody class="table-group-divider">
             <th:block  th:if="${#strings.equals(listIsEmpty,'N')}">
-                <tr th:each="entry : ${list}">
+                <tr th:each="entry : ${questionList}">
                     <td><input class="form-check-input question-checkbox" type="checkbox" value=""></td>
                     <td th:text="${entry['question'].queType}">답변전</td>
                     <td th:text="${entry['question'].queTitle}">문의제목입니다</td>
                     <td><span th:text="${entry['question'].queContent}">문의 내용 입니다.</span></td>
                     <td th:text="${entry['question'].email.email}">qscd123&nbsp;</td>
                     <td th:text="${#temporals.format(entry['question'].queDate, 'yyyy-MM-dd')}">2024.10.29</td>
-                    <td><a class="btn btn-outline-primary" th:href="@{/master/question/{queSeqno}(queSeqno=${entry['question'].queSeqno})}">답변</a></td>
+                    <td><a class="btn btn-outline-primary" th:href="@{'/master/questionDetail?queSeqno=' + ${entry['question'].queSeqno} + '&page=' + 
+                        ${page} + '&queType=' + ${queType}}">답변</a></td>
                 </tr>
             </th:block>
             <!-- 목록이 비어 있을 경우 -->
@@ -98,10 +99,10 @@
         });
 
         deleteButton.addEventListener('click', function() {
-            var selectedReviews = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
-            if (selectedReviews.length > 0) {
+            var selectedQuestions = Array.from(document.querySelectorAll('.question-checkbox:checked')).map(cb => cb.value);
+            if (selectedQuestions.length > 0) {
                 if (confirm('선택한 문의를 삭제하시겠습니까?')) {
-                    deleteReviews(selectedReviews);
+                    deleteQuestions(selectedQuestions);
                 }
             } else {
                 alert('삭제할 문의를 선택해주세요.');
@@ -111,13 +112,13 @@
 
     });
 
-    function deleteReviews(questionIds) {
-        fetch('/master/questions/delete', {
+    function deleteQuestions(queSeqno) {
+        fetch('/master/question/delete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ ids: questionIds })
+            body: JSON.stringify({ ids: queSeqno })
         })
         .then(response => {
             if (!response.ok) {
@@ -131,7 +132,7 @@
             window.location.reload();
         })
         .catch((error) => {
-            console.error('리뷰 삭제 실패:', error);
+            console.error('문의 삭제 실패:', error);
             alert('문의 삭제에 실패했습니다. 다시 시도해 주세요.');
         });
     }

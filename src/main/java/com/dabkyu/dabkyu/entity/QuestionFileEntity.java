@@ -21,11 +21,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="questionFile")
 @Table(name="question_file")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class QuestionFileEntity {
 
     @Id

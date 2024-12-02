@@ -24,5 +24,9 @@ public interface CouponRepository extends JpaRepository<CouponEntity, Long> {
    @Query("SELECT c FROM coupon c WHERE c.couponEndDate < :referenceDate")
    public List<CouponEntity> findExpiredCoupons(@Param("referenceDate") LocalDateTime referenceDate);
 
+   public List<CouponEntity> findByCouponEndDateBefore(LocalDateTime referenceDate);
+
+   public CouponEntity findByCouponCode(String couponCode);
+
    
 }

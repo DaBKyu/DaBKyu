@@ -5,14 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>아이디 찾기 페이지</title>
 <style>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 화면 높이만큼 설정하여 수직 중앙 정렬 */
+    margin: 0;
+}
 .ModifyForm {
-    width:500px;
-    height:500px;
     margin: auto;
-    padding: 20px, 20px;
-    text-align: left;
-    background-color:#FFFFFF;
-    text-align: center;
+    padding: 20px;
     border:2px solid #adabab;
     border-radius: 10px;
     margin-top: 40px;
@@ -28,6 +30,7 @@
 </head>
 <body>
     <div class="ModifyForm" align="center" >
+        <h1>아이디 찾기</h1>
         <div class="InputForm" style="margin-top: 40px;"></div>
         <a style="margin-left: -280px; font-size:12px;">이름</a><br>
         <input type="text" class="input_field" id="email" name="email" placeholder=""><br>

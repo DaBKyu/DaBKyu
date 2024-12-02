@@ -19,11 +19,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="couponTarget")
 @Table(name="coupon_target")
 @IdClass(CouponTargetEntityID.class)
-@NoArgsConstructor
-@AllArgsConstructor
 public class CouponTargetEntity {
 
     @Id

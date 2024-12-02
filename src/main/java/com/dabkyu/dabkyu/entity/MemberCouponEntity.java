@@ -19,12 +19,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="memberCoupon")
 @Table(name="member_coupon")
 @IdClass(MemberCouponEntityID.class)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class MemberCouponEntity {
 
     @Id
@@ -39,7 +39,7 @@ public class MemberCouponEntity {
 	@JoinColumn(name="coupon_seqno", nullable = false)
 	private CouponEntity couponSeqno;
 
-	@Column(name="isExpire", length=2, nullable = false)
-    private String isExpire;
+	@Column(name = "is_expire", length = 2, nullable = true)
+  private String isExpire;
 	
 }

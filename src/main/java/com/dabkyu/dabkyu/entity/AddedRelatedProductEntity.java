@@ -20,11 +20,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="addedRelatedProduct")
 @Table(name="added_related_product")
 @IdClass(AddedRelatedProductEntityID.class)
-@NoArgsConstructor
-@AllArgsConstructor
 public class AddedRelatedProductEntity {
 
     @Id

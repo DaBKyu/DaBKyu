@@ -18,10 +18,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="coupon")
 @Table(name="coupon")
-@AllArgsConstructor
-@NoArgsConstructor  
 public class CouponEntity {
 
     @Id
@@ -61,7 +61,7 @@ public class CouponEntity {
     @Column(name="isDupl", length=2, nullable = false)
     private String isDupl;
 
-    //@Column(name="isExpire", length=2, nullable = false)
-    //private String isExpire;
+    @Column(name="coupon_code", length=20, nullable = false)
+    private String couponCode;
 
 }

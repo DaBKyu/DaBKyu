@@ -18,12 +18,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="memberCategory")
 @Table(name="member_category")
 @IdClass(MemberCategoryEntityID.class)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class MemberCategoryEntity {
 
     @Id

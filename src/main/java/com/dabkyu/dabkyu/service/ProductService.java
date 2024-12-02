@@ -11,16 +11,34 @@ import com.dabkyu.dabkyu.dto.ProductOptionDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.dto.TopSellingProductDTO;
+import com.dabkyu.dabkyu.entity.Category1Entity;
+import com.dabkyu.dabkyu.entity.Category2Entity;
+import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.service.ProductServiceImpl.TopProduct;
 
 public interface ProductService {
+	////////////내가만든거/////////////
+	// seachAll에서 사용할 전체 상품 보기
+	public List<ProductEntity> productAllList(String keyword) throws Exception;
+	/////////////////////////////////
+	//전체 카테고리1 목록 보기
+	public List<Category1Entity> category1List() throws Exception;
 
-	//상품 목록 보기(메인페이지)
-	public Page<ProductEntity> findProductList(int pageNum, int postNum, String keyword) throws Exception;
+	//전체 카테고리2 목록 보기
+	public List<Category2Entity> category2List() throws Exception;
 
-    //상품 목록 보기(카테고리 조회)
-	public Page<ProductEntity> list(int pageNum, int postNum, String keyword, Long category1Seqno, Long category2Seqno, Long category3Seqno) throws Exception;
+	//전체 카테고리3 목록 보기
+	public List<Category3Entity> category3List() throws Exception;
+
+	// 전체 상품 보기
+	public List<ProductEntity> productList() throws Exception;
+
+    //상품 목록 보기
+	public Page<ProductEntity> list(int pageNum, int postNum, String keyword, Long cateSeqno) throws Exception;
+
+	// //카테고리별 상품 목록 보기
+	// public Page<ProductEntity> categoryProduct(int pageNum, int postNum, Long cateSeqno, String keyword) throws Exception;
 
 	//가장 많이 팔린 상품 10개 조회
 	public List<TopSellingProductDTO> getTop10BestSellingProducts() throws Exception;
@@ -48,4 +66,5 @@ public interface ProductService {
 
 	// 리뷰 신고
 	public void report(ReportDTO report) throws Exception;
+
 }

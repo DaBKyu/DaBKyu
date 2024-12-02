@@ -23,11 +23,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="question")
 @Table(name="question")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class QuestionEntity {
 
     @Id
