@@ -16,6 +16,66 @@
         const press = () => {
             if(event.keyCode == 13) search();
         }
+
+        const deleteUsers = async (emails) => {
+            try {
+                for (const email of emails) {
+                    const response = await fetch(`/master/deleteClient?email=${email}`, { method: 'GET' });
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            alert(`이메일 ${emails}를 찾을 수 없습니다.`);
+                        } else if (response.status === 500) {
+                            alert(`이메일 ${emails} 삭제 중 오류가 발생했습니다.`);
+                        }
+                    }
+                }
+                alert("선택한 회원이 성공적으로 삭제되었습니다.");
+                window.location.href = '/master/client?page=1';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('시스템 장애로 인해 일부 회원 삭제가 실패했습니다.');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkAll = document.getElementById('checkAll');
+            var deleteButton = document.getElementById('deleteButton');
+            var selectgrade = document.getElementById('memberGrade');
+
+            selectgrade.addEventListener('change', function() {
+                var selectedGrade = this.value;
+                var rows = document.querySelectorAll('table tbody tr');
+                
+                rows.forEach(row => {
+                var grade = row.querySelector('td:nth-child(6)').textContent.trim(); // 6번째 열이 회원등급
+                if (selectedGrade === "" || grade === selectedGrade) {
+                    row.style.display = ''; // 등급이 일치하면 보이기
+                } else {
+                    row.style.display = 'none'; // 등급이 일치하지 않으면 숨기기
+                }
+                });
+            });
+    
+            checkAll.addEventListener('change', function() {
+                var checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = checkAll.checked;
+                });
+            });
+    
+            deleteButton.addEventListener('click', function() {
+                var selectedClients = Array.from(document.querySelectorAll('tbody input[type="checkbox"]:checked'))
+                                           .map(cb => cb.value);
+                if (selectedClients.length > 0) {
+                    if (confirm('선택한 회원을 삭제하시겠습니까?')) {
+                        deleteUsers(selectedClients);
+                    }
+                } else {
+                    alert('삭제할 회원을 선택해주세요.');
+                }
+            });
+        });
     </script>
 </head>
 
@@ -23,7 +83,7 @@
     <!-- 네비게이션 바 -->
     <div th:insert="~{layout/masterNav :: master-nav}"></div>
         
-    <div class="container mt-5">     
+    <div class="container mt-5 mb-5">     
         <h2 class="mt-4">회원관리</h2>
 
         <!-- 검색 바 -->
@@ -59,6 +119,7 @@
                         <th scope="col">회원등급</th>
                         <th scope="col">수신동의</th>
                         <th scope="col">가입일</th>
+                        <th scope="col">버튼</th>
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
@@ -72,6 +133,7 @@
                             <td th:text="${member.memberGrade}">GOLD</td>
                             <td th:text="${member.notificationYn == 'Y' ? 'Y' : 'N'}">N</td>
                             <td th:text="${#temporals.format(member.regdate, 'yyyy-MM-dd')}">2024.10.29</td>
+                            <td><a class="btn btn-outline-primary" th:href="@{'/master/modifyClient?email=' + ${member.email}}">수정</a></td>
                         </tr>
                     </th:block>
                     <!-- 목록이 비어 있을 경우 -->
@@ -84,103 +146,14 @@
 
         <!-- 버튼 그룹 -->
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button type="button" class="btn btn-primary" id="sendMailButton">메일 보내기</button>
             <button type="button" class="btn btn-danger" id="deleteButton">삭제</button>
         </div>
 
 
         <!-- 페이지네이션 -->
-        <div>[(${pageList})]</div>
+        <div style="text-align: center; margin-bottom: 4px;">[(${pageList})]</div>
 
     </div>
     
-<script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        var selectgrade = document.getElementById('memberGrade');
-        var checkAll = document.getElementById('checkAll');
-        var deleteButton = document.getElementById('deleteButton');
-        var sendMailButton = document.getElementById('sendMailButton');
-
-        selectgrade.addEventListener('change', function() {
-            const selectedGrade = this.value;
-            const rows = document.querySelectorAll('table tbody tr');
-            
-            rows.forEach(row => {
-            const grade = row.querySelector('td:nth-child(6)').textContent.trim(); // 6번째 열이 회원등급
-            if (selectedGrade === "" || grade === selectedGrade) {
-                row.style.display = ''; // 등급이 일치하면 보이기
-            } else {
-                row.style.display = 'none'; // 등급이 일치하지 않으면 숨기기
-            }
-            });
-        });
-
-        checkAll.addEventListener('change', function() {
-            var checkboxes = document.querySelectorAll('.user-checkbox');
-            checkboxes.forEach(function(checkbox) {
-                checkbox.checked = checkAll.checked;
-            });
-        });
-
-        deleteButton.addEventListener('click', function() {
-            var selectedUsers = getSelectedUsers();
-            if (selectedUsers.length > 0) {
-                if (confirm('선택한 회원을 삭제하시겠습니까?')) {
-                    deleteUsers(selectedUsers);
-                }
-            } else {
-                alert('삭제할 회원을 선택해주세요.');
-            }
-        });
-
-        sendMailButton.addEventListener('click', function() {
-            var selectedUsers = getSelectedUsers();
-            if (selectedUsers.length > 0) {
-                var consentUsers = selectedUsers.filter(function(userId) {
-                    var row = document.querySelector(`tr[data-user-id="${userId}"]`);
-                    return row.querySelector('.receive-consent').textContent === 'Y';
-                });
-                if (consentUsers.length > 0) {
-                    window.location.href = '/mailSend?users=' + consentUsers.join(',');
-                } else {
-                    alert('선택된 회원 중 수신 동의한 회원이 없습니다.');
-                }
-            } else {
-                alert('메일을 보낼 회원을 선택해주세요.');
-            }
-        });
-    });
-
-    function getSelectedUsers() {
-        return Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
-    }
-
-    function deleteUsers(email) {
-
-        fetch('/master/deleteClient', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                [header]: token
-            },
-            body: JSON.stringify({ ids: email })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('회원 삭제 성공:', data);
-            alert('회원 삭제에 성공했습니다.');
-            window.location.reload();
-        })
-        .catch((error) => {
-            console.error('회원 삭제 실패:', error);
-            alert('회원 삭제에 실패했습니다. 다시 시도해 주세요.');
-        });
-    }
-</script>
 </body>
 </html>

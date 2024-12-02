@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -78,10 +79,12 @@ import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductRepository;
 
 import com.dabkyu.dabkyu.service.MasterService;
+import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.util.PageUtil;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -92,6 +95,7 @@ import lombok.extern.log4j.Log4j2;
 public class MasterController{
 
     private final MasterService masterService;
+    private final MemberService memberService;
     private final QuestionService questionService;
     private final ReviewService reviewService;
     
@@ -135,19 +139,20 @@ public class MasterController{
     }
 
     //고객정보 수정 화면보기
-    @GetMapping("/master/modifyClient/{email}")
-    public void getModifyClient(@PathVariable String email, Model model) throws Exception{
+    @GetMapping("/master/modifyClient")
+    public void getModifyClient(@RequestParam("email") String email, Model model) throws Exception{
 
         model.addAttribute("member", masterService.getMemberByEmail(email));
     }
 
     //고객정보 수정 
-    @PostMapping("/master/modifyViewClient/{email}")
+    @ResponseBody
+    @PostMapping("/master/modifyViewClient")
     public String postModifyClient(@ModelAttribute MemberDTO memberDTO) throws Exception {
 
         masterService.memberModify(memberDTO);
 
-        return "redirect:/master/client"; 
+        return "{\"message\":\"good\"}";
     }
 
     //상품 리스트 화면보기 
@@ -671,19 +676,26 @@ public class MasterController{
     //문의 답변 등록 및 수정
     @ResponseBody
     @PostMapping("/master/question/reply")
-    public void postReply(@RequestParam(value = "queSeqno", required = false) Long queSeqno,
-                @RequestParam("option") String option, 
-                @RequestBody QuestionCommentDTO commentDTO)
-                throws Exception{
-        
-            QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
-            commentDTO.setQueSeqno(questionEntity);
-    
-            if ("I".equals(option)) {
-                masterService.replyQuestion(commentDTO, questionEntity);
-            } else if("U".equals(option)) {
-                masterService.replyQuestionModify(commentDTO);
-            }
+    public String postReply(
+            @RequestParam("option") String option, 
+            @RequestBody QuestionCommentDTO commentDTO, HttpSession session
+            ) throws Exception {
+        log.info("답변 등록 시작");
+        log.info(option);
+        String email = (String) session.getAttribute("email");
+        Long queSeqno = commentDTO.getQuestionSeqno();
+        QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
+        commentDTO.setQueSeqno(questionEntity);
+        commentDTO.setEmail(masterService.getMemberEmail(email));
+
+        if ("I".equals(option)) {
+            log.info("답변 등록 서비스 호출");
+            masterService.replyQuestion(commentDTO, questionEntity);
+        } else if("U".equals(option)) {
+            masterService.replyQuestionModify(commentDTO);
+        }
+        return "{\"message\":\"good\"}";
+
 	}
 
     //문의 삭제 
@@ -746,10 +758,13 @@ public class MasterController{
     } 
 
     //리뷰 상세보기
-    @GetMapping("/master/review/{reviewSeqno}")
-    public void getReviewView(@PathVariable Long reviewSeqno, Model model) throws Exception{
-        model.addAttribute("review", reviewService.view(reviewSeqno));
-        model.addAttribute("reviewFiles", reviewService.fileListView(reviewSeqno));
+    @GetMapping("/master/reviewList/{reviewSeqno}")
+    @ResponseBody
+    public Map<String, Object> getReviewView(@PathVariable Long reviewSeqno) throws Exception {
+        Map<String, Object> response = new HashMap<>();
+        response.put("review", reviewService.view(reviewSeqno));
+        response.put("reviewFiles", reviewService.fileListView(reviewSeqno));
+        return response;
     }
 
     //리뷰 신고 리스트
@@ -794,7 +809,7 @@ public class MasterController{
         }
         masterService.deleteReview(reviewSeqno); //리뷰삭제
 
-        return "redirect:/master/reviewList";  
+        return "redirect:/master/reviewList?page=1";  
     }
 
     //쿠폰 리스트보기 

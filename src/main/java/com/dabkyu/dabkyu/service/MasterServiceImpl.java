@@ -1073,7 +1073,15 @@ public class MasterServiceImpl implements MasterService {
 
     }
 
-    //관리자가 쿠폰종료일이 지난 쿠폰들 isExpired를 "Y"로 업데이트(memberCoupon으로 변경)
+
+    @Override
+    public MemberEntity getMemberEmail(String email) {
+
+        return memberRepository.findById(email).get();
+    }
+
+    /* 
+    //관리자가 쿠폰종료일이 지난 쿠폰들 isExpired를 "Y"로 업데이트 
     @Override
     public void setExpiredCouponsToExpired(LocalDateTime referenceDate) {
         // 만료된 쿠폰만 조회

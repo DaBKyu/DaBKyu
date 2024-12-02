@@ -62,8 +62,12 @@ public class EmailController {
         }
         
         //파일 저장
-        if(mailFileList != null) {
-           emailService.saveEmailFile(maxSeqno, mailFileList);
+        if (mailFileList != null && mailFileList.length > 0) {
+            for (MultipartFile file : mailFileList) {
+                if (!file.isEmpty()) {
+                    emailService.saveEmailFile(maxSeqno, new MultipartFile[]{file});
+                }
+            }
         }
         
         return "{\"message\":\"good\"}";
