@@ -145,7 +145,7 @@ public class ProductServiceImpl implements ProductService{
         MemberEntity orderMember = orderMemberEntityOptional.get();
 
         // 나이 계산
-        LocalDate orderBirthDate = orderMember.getBirthDate().toLocalDate();
+        LocalDate orderBirthDate = orderMember.getBirthDate();
         int orderAge = Period.between(orderBirthDate, LocalDate.now()).getYears();
         System.out.println("회원 연령: " + orderAge); // 나이 확인 로그
 
@@ -160,7 +160,7 @@ public class ProductServiceImpl implements ProductService{
             MemberEntity orderDetailMember = orderDetail.getOrderSeqno().getEmail();
 
             // 주문 회원의 연령대 확인
-            LocalDate birthDate = orderDetailMember.getBirthDate().toLocalDate();
+            LocalDate birthDate = orderDetailMember.getBirthDate();
             int memberAge = Period.between(birthDate, LocalDate.now()).getYears();
             String memberAgeGroup = getAgeGroup(memberAge);
             //System.out.println("주문 회원 생년월일: " + orderDetailMember.getBirthDate());

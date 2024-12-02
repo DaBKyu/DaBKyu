@@ -75,10 +75,9 @@ import com.dabkyu.dabkyu.entity.repository.Category2Repository;
 import com.dabkyu.dabkyu.entity.repository.Category3Repository;
 import com.dabkyu.dabkyu.entity.repository.CouponCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.CouponRepository;
-import com.dabkyu.dabkyu.entity.repository.MasterRepository;
+import com.dabkyu.dabkyu.entity.repository.CouponTargetRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberLogRepository;
-import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberNotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.NotificationRepository;
@@ -131,7 +130,6 @@ public class MasterServiceImpl implements MasterService {
     private final Category1Repository category1Repository;
     private final Category2Repository category2Repository;
     private final Category3Repository category3Repository;
-    private final MemberCouponRepository memberCouponRepository;
     private final MemberLogRepository memberLogRepository;
 
     //맴버 리스트 보기
@@ -1080,7 +1078,7 @@ public class MasterServiceImpl implements MasterService {
         return memberRepository.findById(email).get();
     }
 
-    /* 
+    /*
     //관리자가 쿠폰종료일이 지난 쿠폰들 isExpired를 "Y"로 업데이트 
     @Override
     public void setExpiredCouponsToExpired(LocalDateTime referenceDate) {
@@ -1101,6 +1099,7 @@ public class MasterServiceImpl implements MasterService {
             memberCouponRepository.saveAll(memberCoupons);
         }
     }
+    */
     
     //카테고리별 매출 통계
     @Override

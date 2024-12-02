@@ -976,6 +976,7 @@ public class MasterController{
         return "{\"message\":\"good\"}";
     }
 
+    /*
     // 관리자가 쿠폰 종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
     @PostMapping("/master/expiredUpdate")
     public void updateExpiredCoupons() {
@@ -986,6 +987,7 @@ public class MasterController{
 
         // 성공적인 처리 후 아무 것도 반환하지 않음 (HTTP 상태 200)
     }
+    */
 
     //통계 페이지(매출통계,가입통계,방문통계)
     @GetMapping("/master/statisticsPage")
