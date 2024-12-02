@@ -27,9 +27,6 @@ import lombok.Setter;
 public class MemberEntity {
 
     @Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MEMBER_SEQ")	
-	@SequenceGenerator(name="MEMBER_SEQ", sequenceName = "member_seq", 
-		initialValue = 1, allocationSize = 1)
 	@Column(name="email",length=50,nullable=false)
 	private String email;
 

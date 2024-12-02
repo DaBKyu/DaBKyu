@@ -106,19 +106,20 @@ public class MasterController{
     }
 
     //고객정보 수정 화면보기
-    @GetMapping("/master/modifyClient/{email}")
-    public void getModifyClient(@PathVariable String email, Model model) throws Exception{
+    @GetMapping("/master/modifyClient")
+    public void getModifyClient(@RequestParam("email") String email, Model model) throws Exception{
 
         model.addAttribute("member", masterService.getMemberByEmail(email));
     }
 
     //고객정보 수정 
-    @PostMapping("/master/modifyViewClient/{email}")
+    @ResponseBody
+    @PostMapping("/master/modifyViewClient")
     public String postModifyClient(@ModelAttribute MemberDTO memberDTO) throws Exception {
 
         masterService.memberModify(memberDTO);
 
-        return "redirect:/master/client"; 
+        return "{\"message\":\"good\"}";
     }
 
     //상품 리스트 화면보기 
