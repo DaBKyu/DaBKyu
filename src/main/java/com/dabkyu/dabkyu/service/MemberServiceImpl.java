@@ -2,10 +2,13 @@ package com.dabkyu.dabkyu.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -19,6 +22,8 @@ import com.dabkyu.dabkyu.entity.MemberAddressEntity;
 import com.dabkyu.dabkyu.entity.MemberCategoryEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.MemberLogEntity;
+import com.dabkyu.dabkyu.entity.OrderDetailEntity;
+import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
@@ -31,6 +36,8 @@ import com.dabkyu.dabkyu.entity.repository.MemberCategoryRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberCouponRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberLogRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
+import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
+import com.dabkyu.dabkyu.entity.repository.OrderInfoRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionFileRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionRepository;
@@ -54,6 +61,8 @@ public class MemberServiceImpl implements MemberService {
     private final QuestionRepository questionRepository;
     private final MemberCouponRepository memberCouponRepository;
     private final MemberLogRepository memberLogRepository;
+    private final OrderInfoRepository orderInfoRepository;
+    private final OrderDetailRepository orderDetailRepository;
     
     // 회원가입
     @Override
@@ -89,9 +98,33 @@ public class MemberServiceImpl implements MemberService {
 
     // 회원 주문제품 내역
     @Override
-	public Page<OrderProductEntity> orderProductList(String email, int page, int orderNum, String keyword) {
+	public Page<OrderDetailEntity> orderDetailList(String email, int page, int orderNum, String keyword) {
         PageRequest pageRequest = PageRequest.of(page -1, orderNum, Sort.by(Direction.DESC, "orderProductSeqno"));
-        return orderProductRepository.findOrderProductsByEmailAndProductNameContaining(email, keyword, pageRequest);
+        List<OrderDetailEntity> orderDetailEntities = new ArrayList<>();
+
+        List<OrderInfoEntity> orderInfoEntities = orderInfoRepository.findByEmail_Email(email);
+        for (OrderInfoEntity orderInfoEntity : orderInfoEntities) {
+            List<OrderDetailEntity> details = orderDetailRepository.findByOrderSeqno(orderInfoEntity);
+            orderDetailEntities.addAll(details);
+        }
+
+        // 키워드 필터링 (Optional)
+        if (keyword != null && !keyword.isEmpty()) {
+            orderDetailEntities = orderDetailEntities.stream()
+                                                                                    .filter(orderDetail  -> orderDetail .getOrderProductSeqno().getProductSeqno().getProductName().contains(keyword))
+                                                                                    .toList();
+        }
+
+    int start = (int) pageRequest.getOffset();
+    int end = Math.min((start + pageRequest.getPageSize()), orderDetailEntities.size());
+
+    if (start > end) {
+        return new PageImpl<>(Collections.emptyList(), pageRequest, orderDetailEntities.size());
+    }
+
+    List<OrderDetailEntity> pagedOrderDetails  = orderDetailEntities.subList(start, end);
+
+    return new PageImpl<>(pagedOrderDetails , pageRequest, orderDetailEntities.size());
     }
 
     // 배송지 목록 조회

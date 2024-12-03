@@ -106,8 +106,13 @@ public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService {
                                           .username(provider.toUpperCase() + "회원")
                                           .password(pwdEncoder.encode("12345"))
                                           .role("USER")
+                                          .memberGrade("BRONZE")
+                                          .pwcheck(0)
                                           .regdate(LocalDateTime.now())
                                           .fromSocial("Y")
+                                          .notificationYn("Y")
+                                          .emailRecept("Y")
+                                          .totalPvalue(0)
                                           .build();
         memberRepository.save(member);
         return member;

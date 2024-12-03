@@ -420,14 +420,14 @@ public class MasterServiceImpl implements MasterService {
     @Override
     public List<OrderDetailEntity> getOrderDetails(Long orderSeqno) throws Exception{
         OrderInfoEntity orderInfoEntity = orderInfoRepository.findById(orderSeqno).get();
-        return orderDetailRepository.findByOrderSeqno_OrderSeqno(orderInfoEntity);
+        return orderDetailRepository.findByOrderSeqno(orderInfoEntity);
     }
 
     //OrderProduct찾기
     @Override
     public List<OrderProductEntity> getOrderProducts(Long orderSeqno) throws Exception{
         OrderInfoEntity orderInfoEntity = orderInfoRepository.findById(orderSeqno).get();
-        return orderDetailRepository.findByOrderSeqno_OrderSeqno(orderInfoEntity).stream()
+        return orderDetailRepository.findByOrderSeqno(orderInfoEntity).stream()
             .map(OrderDetailEntity::getOrderProductSeqno) 
             .collect(Collectors.toList());
     }
@@ -997,7 +997,7 @@ public class MasterServiceImpl implements MasterService {
         // 각 주문에 대해 orderDetail 리스트 반환
         List<OrderDetailEntity> orderDetails = new ArrayList<>();
         for (OrderInfoEntity order : orders) {
-            orderDetails.addAll(orderDetailRepository.findByOrderSeqno_OrderSeqno(order));
+            orderDetails.addAll(orderDetailRepository.findByOrderSeqno(order));
         }
 
         return orderDetails;
@@ -1021,7 +1021,7 @@ public class MasterServiceImpl implements MasterService {
         orderInfoRepository.save(orderInfo);
 
         // 주문 상품 목록 조회
-        List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno_OrderSeqno(orderInfo);
+        List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno(orderInfo);
 
         // 주문 상세 정보 처리 
         for (OrderDetailEntity orderDetailEntity : orderDetails) {

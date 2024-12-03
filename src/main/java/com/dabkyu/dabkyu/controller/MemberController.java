@@ -26,6 +26,7 @@ import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
+import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
@@ -198,17 +199,23 @@ public class MemberController {
         int page
     ) throws Exception {
 
+        log.info("-----------------------주문 상세 리스트 조회------------------------");
         String email = (String) session.getAttribute("email");
 
         int orderNum = 10;   // 한 번에 보여줄 주문 갯수
         int pagelistNum = 10;   // 페이지 리스트 갯수
 
         PageUtil pageUtil = new PageUtil();
-        Page<OrderProductEntity> orderProductList = memberService.orderProductList(email, page, orderNum, keyword);
-        int totalCount = (int) orderProductList.getTotalElements();
+        Page<OrderDetailEntity> orderDetailList = memberService.orderDetailList(email, page, orderNum, keyword);
+        log.info("--------------------주문제품 갯수: {}-----------------------", orderDetailList.getSize());
+        for (OrderDetailEntity orderDetailEntity : orderDetailList) {
+            log.info("---------------------주문제품: {}-------------------------", orderDetailEntity.getOrderProductSeqno().getProductSeqno().getProductName());
+            log.info("---------------------주문제품: {}-------------------------", orderDetailEntity.getOrderProductSeqno().getProductSeqno().getPrice());
+        }
+        int totalCount = (int) orderDetailList.getTotalElements();
 
-        model.addAttribute("orderProductList", orderProductList);
-        model.addAttribute("listIsEmpty", orderProductList.hasContent()?"N":"Y");
+        model.addAttribute("orderDetailList", orderDetailList);
+        model.addAttribute("listIsEmpty", orderDetailList.hasContent()?"N":"Y");
         model.addAttribute("totalCount", totalCount);
         model.addAttribute("page", page);
         model.addAttribute("orderNum", orderNum);
@@ -399,10 +406,6 @@ public class MemberController {
         model.addAttribute("pageList", pageUtil.getPageListNoKeyword(page, questionNum, pagelistNum, totalCount));
 
     }
-    // 문의 페이지
-    @GetMapping("/mypage/question")
-    public void getQuestion(Model model) {
-    }
     
 
     // 내 쿠폰 리스트 화면
@@ -447,6 +450,7 @@ public class MemberController {
     
 
     // 아이디 찾기
+    @ResponseBody
     @PostMapping("/member/searchID")
     public String postSearchID(
         @RequestParam("username") String username,
@@ -471,16 +475,11 @@ public class MemberController {
     @ResponseBody
     @PostMapping("/member/searchPassword")
     public String postSearchPassword(
-        @RequestParam("email") String email,
-        @RequestParam("telno") String telno
+        @RequestParam("email") String email
     ) throws Exception {
         
         if (memberService.idCheck(email) == 0) {
             return "{\"message\":\"ID_NOT_FOUND\"}";
-        }
-
-        if (!memberService.memberInfo(email).getTelno().equals(telno)) {
-            return "{\"message\":\"TELNO_NOT_FOUND\"}";
         }
 
         PasswordMaker pwmaker = new PasswordMaker();
@@ -491,8 +490,11 @@ public class MemberController {
         member.setPassword(pwdEncoder.encode(tempPW));
         memberService.modifyMemberPassword(member);
         memberService.lastdateUpdate(email, "password");
+
+        //이메일 발송
+        emailService.sendTempPw(email, tempPW);
         
-        return "{\"message\":\"good\", \"tempPW\":\"" + tempPW + "\"}";
+        return "{\"message\":\"good\"}";
     }
     
 

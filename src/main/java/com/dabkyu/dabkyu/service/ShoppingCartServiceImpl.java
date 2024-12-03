@@ -362,7 +362,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         if ("결제 완료".equals(orderInfo.getOrderStatus())) {
             
             // 해당 주문에 포함된 상품들을 찾기
-            List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno_OrderSeqno(orderInfo);
+            List<OrderDetailEntity> orderDetails = orderDetailRepository.findByOrderSeqno(orderInfo);
             
             for (OrderDetailEntity orderDetail : orderDetails) {
                 //OrderProductEntity orderProduct = orderDetail.getOrderProductSeqno();
