@@ -1,5 +1,7 @@
 package com.dabkyu.dabkyu.entity;
 
+import java.util.List;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -11,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -66,4 +69,11 @@ public class ProductEntity {
 
 	@Column(name="secret_yn",length = 2,nullable=false)
 	private String secretYn;
+
+	@OneToMany(mappedBy = "productSeqno", fetch = FetchType.LAZY)
+	private List<ProductFileEntity> productFiles;
+
+	public List<ProductFileEntity> getProductFiles() {
+		return productFiles;
+	}
 }

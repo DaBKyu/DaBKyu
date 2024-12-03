@@ -138,15 +138,15 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 
-  //가장 많이 팔린 상품 10개 조회
-  @Override
-  public List<TopSellingProductDTO> getTop10BestSellingProducts() throws Exception {
-      return orderProductRepository.findTop10SellingProducts();
-  }
-
-  //로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
-  @Override
-  public Map<String, List<TopProduct>> getTopProductsByAgeForUser(String email) throws Exception {
+   //가장 많이 팔린 상품 10개 조회
+    @Override
+    public List<TopSellingProductDTO> getTop10BestSellingProducts() throws Exception {
+        return orderProductRepository.findTop10SellingProducts();
+    }
+    
+ // 로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회 
+@Override
+public Map<String, List<TopProduct>> getTopProductsByAgeForUser(String email) throws Exception {
     List<MemberEntity> members = memberRepository.findAll();
     List<OrderDetailEntity> orderDetails = orderDetailRepository.findAll();
 
@@ -179,9 +179,6 @@ public class ProductServiceImpl implements ProductService{
             LocalDate birthDate = orderDetailMember.getBirthDate();
             int memberAge = Period.between(birthDate, LocalDate.now()).getYears();
             String memberAgeGroup = getAgeGroup(memberAge);
-            //System.out.println("주문 회원 생년월일: " + orderDetailMember.getBirthDate());
-            //System.out.println("주문 회원 나이: " + memberAge);
-            //System.out.println("주문 회원 연령대: " + memberAgeGroup); // 각 주문 회원의 나이 및 연령대 출력
 
             // 로그인된 회원의 연령대와 동일한 연령대의 주문만 처리
             if (memberAgeGroup.equals(orderAgeGroup)) {  // 로그인한 회원의 연령대와 일치하는 주문만 처리
@@ -192,9 +189,10 @@ public class ProductServiceImpl implements ProductService{
                     // 상품 정보가 null인 경우 처리
                     if (orderProduct != null) {
                         String productName = orderProduct.getProductSeqno().getProductName();
+                        String storedFilename = getStoredFilename(orderProduct.getProductSeqno()); // 수정된 부분
                         int amount = orderProduct.getAmount();
-                        System.out.println("상품명: " + productName + ", 수량: " + amount); // 상품명과 수량 확인 로그
-                        addProductToTopList(topProducts, productName, amount);
+                        Long productSeqno = orderProduct.getProductSeqno().getProductSeqno(); // 추가된 부분
+                        addProductToTopList(topProducts, productName, storedFilename, amount, productSeqno); // productSeqno 추가
                     } else {
                         System.out.println("상품 정보가 없습니다. 주문 세부 정보: " + orderDetail); // 상품 정보가 없을 경우 로그
                     }
@@ -210,10 +208,24 @@ public class ProductServiceImpl implements ProductService{
     }
 
     return result;
-  }
+}
 
-  // 나이를 기준으로 연령대 구하는 메서드
-  private String getAgeGroup(int age) {
+// 상품에 해당하는 썸네일 파일명과 productSeqno 가져오기
+private String getStoredFilename(ProductEntity product) {
+    // 상품이 null이 아니고, 관련된 파일들이 있을 경우
+    if (product != null && product.getProductFiles() != null) {
+        // 썸네일(is_thumb == "Y")인 파일을 찾아서 해당 파일의 storedFilename을 반환
+        return product.getProductFiles().stream()
+                .filter(productFile -> "Y".equals(productFile.getIsThumb())) // 썸네일만 선택
+                .map(ProductFileEntity::getStoredFilename) // stored_filename을 가져옴
+                .findFirst() // 첫 번째 썸네일만 반환
+                .orElse(null); // 썸네일이 없으면 null 반환
+    }
+    return null; // 상품이나 파일이 없으면 null 반환
+}
+
+// 나이를 기준으로 연령대 구하는 메서드
+private String getAgeGroup(int age) {
     if (age >= 20 && age < 30) {
         return "20대";
     } else if (age >= 30 && age < 40) {
@@ -225,10 +237,10 @@ public class ProductServiceImpl implements ProductService{
     } else {
         return "미성년자";  // 20세 미만은 제외하거나 다른 그룹으로 처리 가능
     }
-  }
+}
 
-  // 상품을 구매 횟수 리스트에 추가하는 메서드
-  private void addProductToTopList(List<TopProduct> topProducts, String productName, int amount) {
+// 상품을 구매 횟수 리스트에 추가하는 메서드
+private void addProductToTopList(List<TopProduct> topProducts, String productName, String storedFilename, int amount, Long productSeqno) {
     Optional<TopProduct> existingProduct = topProducts.stream()
         .filter(product -> product.getProductName().equals(productName))
         .findFirst();
@@ -236,18 +248,22 @@ public class ProductServiceImpl implements ProductService{
     if (existingProduct.isPresent()) {
         existingProduct.get().addPurchaseCount(amount);
     } else {
-        topProducts.add(new TopProduct(productName, amount));
+        topProducts.add(new TopProduct(productName, amount, storedFilename, productSeqno)); // productSeqno 추가
     }
-  }
+}
 
-  // 상품의 이름과 구매 횟수를 나타내는 클래스
-  public static class TopProduct {
+// 상품의 이름과 구매 횟수를 나타내는 클래스
+public static class TopProduct {
     private String productName;
     private int purchaseCount;
+    private String storedFilename;  // 추가된 필드
+    private Long productSeqno;    // 추가된 필드
 
-    public TopProduct(String productName, int purchaseCount) {
+    public TopProduct(String productName, int purchaseCount, String storedFilename, Long productSeqno) {
         this.productName = productName;
         this.purchaseCount = purchaseCount;
+        this.storedFilename = storedFilename;
+        this.productSeqno = productSeqno; // 추가된 필드
     }
 
     public String getProductName() {
@@ -258,10 +274,19 @@ public class ProductServiceImpl implements ProductService{
         return purchaseCount;
     }
 
+    public String getStoredFilename() {
+        return storedFilename;  // 추가된 getter
+    }
+
+    public Long getProductSeqno() {
+        return productSeqno; // 추가된 getter
+    }
+
     public void addPurchaseCount(int amount) {
         this.purchaseCount += amount;
     }
-  }
+}
+
 
 	// //카테고리별 상품 목록 보기
 	// @Override
