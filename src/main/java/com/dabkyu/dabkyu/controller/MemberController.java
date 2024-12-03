@@ -241,7 +241,7 @@ public class MemberController {
     public void getAddress(Model model,
         @RequestParam(name="memberAddressSeqno") Long memberAddressSeqno) throws Exception {
         
-        MemberAddressDTO viewAddr = service.viewAddr(memberAddressSeqno);
+        MemberAddressDTO viewAddr = memberService.viewAddr(memberAddressSeqno);
         model.addAttribute("viewAddr", viewAddr);
     }
 
@@ -252,8 +252,8 @@ public class MemberController {
 
         String email = (String) session.getAttribute("email");
 
-        List<MemberAddressEntity> addressList = service.addressList(email);
-        MemberAddressDTO viewBasicAddr = service.viewBasicAddr(email);
+        List<MemberAddressEntity> addressList = memberService.addressList(email);
+        MemberAddressDTO viewBasicAddr = memberService.viewBasicAddr(email);
 
         Collections.sort(addressList, Comparator.comparing(MemberAddressEntity::getMemberAddressSeqno).reversed());
 
@@ -267,7 +267,7 @@ public class MemberController {
     @GetMapping("/mypage/addAddr")
     public void getAddAdress(Model model, HttpSession session) throws Exception {
         String email = (String) session.getAttribute("email");
-        model.addAttribute("member", service.memberInfo(email));
+        model.addAttribute("member", memberService.memberInfo(email));
     }
     
     
@@ -301,9 +301,9 @@ public class MemberController {
     @GetMapping("/mypage/memberInfo")
     public void getMemberInfo(Model model, HttpSession session) {
         String email = (String) session.getAttribute("email");
-        MemberAddressDTO viewBasicAddr = service.viewBasicAddr(email);
+        MemberAddressDTO viewBasicAddr = memberService.viewBasicAddr(email);
 
-        model.addAttribute("member", service.memberInfo(email));
+        model.addAttribute("member", memberService.memberInfo(email));
         model.addAttribute("viewBasicAddr", viewBasicAddr);
     }
 
