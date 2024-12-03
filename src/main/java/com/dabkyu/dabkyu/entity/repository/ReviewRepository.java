@@ -1,7 +1,6 @@
 package com.dabkyu.dabkyu.entity.repository;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,16 +8,15 @@ import org.springframework.data.repository.query.Param;
 
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
+import java.util.List;
+
 
 public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
   
-  public Page<ReviewEntity> findByReviewSeqnoOrProductSeqno_ProductSeqno
-            (Long keyword1,Long keyword2,Pageable pageable);
+  // 해당 제품에 대한 리뷰 보기
+  public Page<ReviewEntity> findByProductSeqno_ProductSeqno(Long productSeqno, Pageable pageable);
 
-  // 전체 리뷰 목록 보기
-  public Page<ReviewEntity> findByEmail_EmailContainingOrRevContentContaining(String keyword1, String keyword2, PageRequest pageRequest);
-
-  // 상품 이전 보기
+  // 리뷰 이전 보기
 	@Query("select max(r.reviewSeqno) from review r " 
     + "where r.reviewSeqno < :reviewSeqno and "
     + "(r.email.email like %:keyword1% or r.revContent like %:keyword2%)")
@@ -26,7 +24,7 @@ public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
         @Param("keyword1") String keyword1,
         @Param("keyword2") String keyword2);
 
-  // 상품 다음 보기
+  // 리뷰 다음 보기
   @Query("select min(r.reviewSeqno) from review r "
       + "where r.reviewSeqno < :reviewSeqno and "
       + "(r.email.email like %:keyword1% or r.revContent like %:keyword2%)")

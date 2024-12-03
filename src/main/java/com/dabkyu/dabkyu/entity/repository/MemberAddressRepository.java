@@ -9,4 +9,8 @@ import java.util.List;
 
 public interface MemberAddressRepository extends JpaRepository<MemberAddressEntity, Long> {
     public List<MemberAddressEntity> findByEmail_Email(String email);
+
+    public MemberAddressEntity findByEmail_EmailAndIsBasic(String email, String isBasic);
+
+    public List<MemberAddressEntity> findByMemberAddressSeqno(Long memberAddressSeqno);
 }

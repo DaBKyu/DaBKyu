@@ -14,7 +14,5 @@ public interface ProductFileRepository extends JpaRepository<ProductFileEntity, 
     public ProductFileEntity findTopByProductSeqnoOrderByProductFileSeqnoAsc(ProductEntity product);
 
     // 특정 상품에 대한 모든 이미지 파일을 가져오는 메서드
-    public List<ProductFileEntity> findByProductSeqno_ProductSeqno(ProductEntity product);
-    
     public List<ProductFileEntity> findByProductSeqno_ProductSeqno(Long productSeqno);
 }

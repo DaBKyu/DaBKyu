@@ -257,11 +257,12 @@
         </div>
         <div class="profile-info">
             <label for="address">기본 배송지:</label>
-            <p id="address"></p>
+            <p id="address">[[${viewBasicAddr.address}]],[[${viewBasicAddr.detailAddr}]]</p>
         </div>
 
         <!-- 수정 버튼 -->
         <a href="modifyMemberInfo" class="edit-button">회원정보 수정</a>
+        <a href="/mypage/addrList" class="edit-button">배송지 리스트</a>
     </div>
     </div>
 </body>

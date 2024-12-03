@@ -33,13 +33,11 @@ public class ReviewServiceImpl implements ReviewService {
 	private final MemberRepository memberRepository;
 	private final MemberReviewLikeRepository memberReviewLikeRepository;
 
-    //상품 리뷰 보기
+	// 해당 제품에 대한 리뷰 목록 보기
 	@Override
-	public Page<ReviewEntity> list(int pageNum, int postNum, String keyword) throws Exception {
-		//페이징 기준을 설정 --> 시작점, 증가분, 정렬 방식
-		// (시작페이지 --> 0부터 시작, 한 화면에 보이는 행의 수, 정렬기준(Sort.by)
+	public Page<ReviewEntity> productReviewList(int pageNum, int postNum, Long productSeqno) throws Exception {
 		PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"reviewSeqno"));
-		return reviewRepository.findByEmail_EmailContainingOrRevContentContaining(keyword, keyword, pageRequest);
+		return reviewRepository.findByProductSeqno_ProductSeqno(productSeqno, pageRequest);
 	}
 
 	//리뷰 내용 보기

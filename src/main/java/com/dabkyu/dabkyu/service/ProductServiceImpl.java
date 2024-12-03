@@ -22,12 +22,14 @@ import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
+import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
 import com.dabkyu.dabkyu.entity.repository.Category1Repository;
 import com.dabkyu.dabkyu.entity.repository.Category2Repository;
 import com.dabkyu.dabkyu.entity.repository.Category3Repository;
 import com.dabkyu.dabkyu.entity.ProductOptionEntity;
 import com.dabkyu.dabkyu.entity.RelatedProductEntity;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
+import com.dabkyu.dabkyu.entity.repository.ProductInfoFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductOptionRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductRepository;
 import com.dabkyu.dabkyu.entity.repository.RelatedProductRepository;
@@ -47,23 +49,30 @@ public class ProductServiceImpl implements ProductService{
 	private final Category2Repository category2Repository;
 	private final Category3Repository category3Repository;
 	private final ProductFileRepository productFileRepository;
+	private final ProductInfoFileRepository productInfoFileRepository;
 	private final ProductOptionRepository productOptionRepository;
 	private final RelatedProductRepository relatedProductRepository;
 
 	////////////내가만든거/////////////
 	// seachAll에서 사용할 전체 상품 보기
 	@Override
-	public List<ProductEntity> productAllList(String keyword) throws Exception{
-		return productRepository.findByProductNameContaining(keyword);
+	public Page<ProductEntity> productAllList(int pageNum, int postNum, String keyword) throws Exception{
+		PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC,"productSeqno"));
+		return productRepository.findByProductNameContaining(keyword, pageRequest);
 	}
 
 	//상품 이미지 보기////
-	public List<ProductFileEntity> productFileList() throws Exception{
-		return productFileRepository.findAll();
+	public List<ProductFileEntity> productFileList(Long productSeqno) throws Exception{
+		return productFileRepository.findByProductSeqno_ProductSeqno(productSeqno);
 	 
 	}
 	/////////////////////////////////
-	/// 
+	
+	//제품 설명 첨부 파일 보기
+	public List<ProductInfoFileEntity> productInfoFileList(Long productSeqno) throws Exception{
+		return productInfoFileRepository.findByProductSeqno_ProductSeqno(productSeqno);
+	}
+
 	//전체 카테고리1 목록 보기
 	@Override
 	public List<Category1Entity> category1List() throws Exception {
