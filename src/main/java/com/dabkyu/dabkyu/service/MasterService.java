@@ -246,8 +246,9 @@ public interface MasterService {
     public void cancelOrRefundOrder(Long orderDetailSeqno, Long couponSeqno, int point, boolean isRefund);
     
     public MemberEntity getMemberEmail(String email);
+
     //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
-    //public void setExpiredCouponsToExpired(LocalDateTime referenceDate);
+    public void setExpiredCouponsToExpired(LocalDateTime referenceDate);
 
     //카테고리별 매출 통계
     public List<CategorySalesDTO> getCategorySales();
@@ -281,5 +282,12 @@ public interface MasterService {
 
     //일별 방문자 통계 
     public List<DailyVisitorDTO> getDailyVisitors(LocalDateTime startDate, LocalDateTime endDate);
+
+    public List<Category2Entity> getCategories2ByCategory1(Long category1Seqno);
+
+    public List<Category3Entity> getCategories3ByCategory2(Long category2Seqno);
+
+    //카테고리3 찾기
+    public Category3Entity findCategoryBySeqno(Long category3Seqno);
 
 }

@@ -217,6 +217,12 @@ public class ShopController {
 		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword,CateSeqno));
 	}
 
+	//상품 조회 테스트
+	@GetMapping("/shop/shopmainTest")
+	public String shopMain() {
+		return "shop/shopmainTest"; // 템플릿 파일의 경로가 맞는지 확인
+	}
+
 	//가장 많이 팔린 상품 10개 조회
 	@ResponseBody
 	@GetMapping("/shop/topSelling")
@@ -227,13 +233,13 @@ public class ShopController {
 	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
 	@ResponseBody
 	@GetMapping("/shop/topProductsByAgeForLoggedUser")
-    public Map<String, List<TopProduct>> getTopProductsForLoggedUser(HttpSession session) throws Exception {
+	public Map<String, List<TopProduct>> getTopProductsForLoggedUser(HttpSession session) throws Exception {
 		String email = (String) session.getAttribute("email"); 
 		if (email != null) {
 			return productService.getTopProductsByAgeForUser(email); 
 		}
 		throw new IllegalStateException("사용자가 로그인되지 않았습니다.");
-    }
+	}
 
   //상품 상세 보기
 	@GetMapping("/shop/view")

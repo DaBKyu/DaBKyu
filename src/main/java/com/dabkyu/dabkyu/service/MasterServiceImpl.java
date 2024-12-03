@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -96,6 +97,7 @@ import com.dabkyu.dabkyu.entity.repository.ReportRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -250,6 +252,17 @@ public class MasterServiceImpl implements MasterService {
     public List<ProductEntity> getAllProducts() throws Exception{
         return productRepository.findAll(); 
     }
+
+    @Override
+    public List<Category2Entity> getCategories2ByCategory1(Long category1Seqno) {
+        return category2Repository.findByCategory1Seqno(category1Repository.findById(category1Seqno).get());
+    }
+    
+    @Override
+    public List<Category3Entity> getCategories3ByCategory2(Long category2Seqno) {
+        return category3Repository.findByCategory2Seqno(category2Repository.findById(category2Seqno).get());
+    }
+    
 
     //상품등록
     @Override
@@ -1078,7 +1091,7 @@ public class MasterServiceImpl implements MasterService {
         return memberRepository.findById(email).get();
     }
 
-    /*
+
     //관리자가 쿠폰종료일이 지난 쿠폰들 isExpired를 "Y"로 업데이트 
     @Override
     public void setExpiredCouponsToExpired(LocalDateTime referenceDate) {
@@ -1099,7 +1112,7 @@ public class MasterServiceImpl implements MasterService {
             memberCouponRepository.saveAll(memberCoupons);
         }
     }
-    */
+    
     
     //카테고리별 매출 통계
     @Override
@@ -1233,6 +1246,11 @@ public class MasterServiceImpl implements MasterService {
                     ((Number) row[1]).intValue()                                  // 방문자 수
                 ))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Category3Entity findCategoryBySeqno(Long category3Seqno) {
+        return category3Repository.findByCategory3Seqno(category3Seqno);
     }
     
 }

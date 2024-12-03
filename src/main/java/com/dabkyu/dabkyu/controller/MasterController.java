@@ -1,6 +1,7 @@
 package com.dabkyu.dabkyu.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,6 +63,9 @@ import com.dabkyu.dabkyu.dto.SignupDateStatDTO;
 import com.dabkyu.dabkyu.dto.SignupGenderStatDTO;
 import com.dabkyu.dabkyu.dto.VisitorCountDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
+import com.dabkyu.dabkyu.entity.Category1Entity;
+import com.dabkyu.dabkyu.entity.Category2Entity;
+import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
@@ -217,10 +222,53 @@ public class MasterController{
     }
 
     //상품 등록 화면보기 
-    @GetMapping("/master/postProduct") 
-    public void getPostProduct() {}
+    @GetMapping("/master/postProduct")
+    public void getPostProduct(Model model) {
+        List<Category1Entity> allCategory1 = masterService.getAllCategories1();
+        List<Category2Entity> allCategory2 = masterService.getAllCategories2();
+        List<Category3Entity> allCategory3 = masterService.getAllCategories3();
+        
+        model.addAttribute("allcategory1", allCategory1);
+        model.addAttribute("allcategory2", allCategory2);
+        model.addAttribute("allcategory3", allCategory3);
 
+    }
+    
+    @GetMapping("/master/getMiddleCategories")
+    @ResponseBody
+    public List<Category2DTO> getMiddleCategories(@RequestParam("category1Seqno") Long category1Seqno) {
+        // Category2Entity 목록을 가져옴
+        List<Category2Entity> category2List = masterService.getCategories2ByCategory1(category1Seqno);
+        
+        // Category2DTO 목록으로 변환
+        List<Category2DTO> category2DTOList = category2List.stream()
+                .map(category -> new Category2DTO(
+                        category.getCategory2Seqno(), 
+                        category.getCategory1Seqno().getCategory1Seqno(),
+                        category.getCategory2Name()))
+                .collect(Collectors.toList());
+        
+        return category2DTOList;
+    }
+    
 
+    @GetMapping("/master/getSubCategories")
+    @ResponseBody
+    public List<Category3DTO> getSubCategories(@RequestParam("category2Seqno") Long category2Seqno) {
+        // Category3Entity 목록을 가져옴
+        List<Category3Entity> category3List = masterService.getCategories3ByCategory2(category2Seqno);
+        
+        // Category3DTO 목록으로 변환
+        List<Category3DTO> category3DTOList = category3List.stream()
+                .map(category -> new Category3DTO(
+                        category.getCategory3Seqno(),
+                        category.getCategory2Seqno().getCategory2Seqno(), 
+                        category.getCategory3Name()))
+                .collect(Collectors.toList());
+        
+        return category3DTOList;
+    }
+    
     //상품 수정 화면보기 >> 수정 눌렀을 때 
     @GetMapping("/master/modifyProduct")
     public void getmMdifyProduct(@RequestParam("productSeqno") Long productSeqno,
@@ -250,14 +298,12 @@ public class MasterController{
     //상품 등록 및 수정  
     @ResponseBody
     @PostMapping("/master/postProduct")
-    public String postProduct(ProductDTO productDTO, 
+    public String postProduct(ProductDTO productDTO, Model model,
+                @RequestParam(name="subCategory", required =false) Long subCategory,
                 @RequestParam(name="productImage",required=false) List<MultipartFile> productImages,
                 @RequestParam(name="detailImage", required=false) List<MultipartFile> detailImages,
                 @RequestParam(name="deleteProductImages", required=false) Long[] deleteProductImages,
                 @RequestParam(name="deleteDetailProductImage",required=false) Long[] deleteDetailProductImages,
-                @RequestParam(name="category1Seqno") Long category1Seqno,
-                @RequestParam(name="category2Seqno") Long category2Seqno,
-                @RequestParam(name="category3Seqno") Long category3Seqno,
                 @RequestParam(name="optionMap", required=false) Map<String, String> optionMap,          
                 @RequestParam(name="relatedProductMap", required=false) Map<String, String> relatedProductMap,
                 @RequestParam(name="deleteOptionMap", required=false) Map<String, String> deleteOptionMap,
@@ -281,22 +327,22 @@ public class MasterController{
         File pdetailImg = new File(productDetailImgPath);
         if(!pImg.exists()) pImg.mkdir();
         if(!pdetailImg.exists()) pdetailImg.mkdir();
-        
-        ProductEntity productEntity = productDTO.dtoToEntity(productDTO);
 
         Long seqno = 0L;
 
         //상품 정보
         if(productDTO.getProductSeqno() == null){
+            productDTO.setLikecnt(0);
+            log.info("-------------카테고리3Seqno: {} ----------------", subCategory);
+            Category3Entity category3 = masterService.findCategoryBySeqno(subCategory);
+            log.info("-------------카테고리3: {} ----------------", category3.getCategory3Name());
+            productDTO.setCategory3Seqno(category3);
             seqno = masterService.productPost(productDTO);
             productDTO.setProductSeqno(seqno);
         }else{ //상품 수정하기
             masterService.productModify(productDTO);
         }
-
-        //카테고리
-        masterService.setProductCategory(category3Seqno, productDTO);
-
+        ProductEntity productEntity = masterService.getProductBySeqno(seqno);
         //옵션 추가 및 수정
         List<ProductOptionDTO> productOptionDTOList = new ArrayList<>();
         if(optionMap != null){ 
@@ -350,7 +396,7 @@ public class MasterController{
                 e.printStackTrace();
             }
         });
-
+        
         //상품이미지파일 //productfile
         if(productImages != null){
             boolean firstImage = true;
@@ -403,7 +449,7 @@ public class MasterController{
                 }
             }
         }
-
+        
         //옵션 삭제
         if(deleteOptionMap != null){
             for(Map.Entry<String,String> entry : deleteOptionMap.entrySet()){
@@ -435,6 +481,8 @@ public class MasterController{
 
         return "{\"message\":\"good\"}"; 
     }
+
+    
 
     //상품 삭제 (활성 비활성) 
     @ResponseBody
@@ -976,7 +1024,7 @@ public class MasterController{
         return "{\"message\":\"good\"}";
     }
 
-    /*
+    
     // 관리자가 쿠폰 종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
     @PostMapping("/master/expiredUpdate")
     public void updateExpiredCoupons() {
@@ -987,7 +1035,7 @@ public class MasterController{
 
         // 성공적인 처리 후 아무 것도 반환하지 않음 (HTTP 상태 200)
     }
-    */
+    
 
     //통계 페이지(매출통계,가입통계,방문통계)
     @GetMapping("/master/statisticsPage")
