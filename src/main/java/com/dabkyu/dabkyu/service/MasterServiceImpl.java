@@ -322,14 +322,14 @@ public class MasterServiceImpl implements MasterService {
     
     //주문 리스트
     @Override
-    public Page<Map<String, Object>> orderList(int pageNum, int postNum, String productname, Long category3Seqno) throws Exception{
+    public Page<Map<String, Object>> orderList(int pageNum, int postNum, String productname, Long category) throws Exception{
         
         PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC, "orderSeqno"));
         Page<OrderDetailEntity> orderDetailPage;
 
         //검색기능 
-        if (category3Seqno != null || productname != null) { //카테고리 OR 상품명으로 검색
-            orderDetailPage = orderDetailRepository.findByCategory3SeqnoAndProductNameContaining(category3Seqno, productname, pageRequest);
+        if (category != null || productname != null) { //카테고리 OR 상품명으로 검색
+            orderDetailPage = orderDetailRepository.findByCategoryAndProductNameContaining(category, productname, pageRequest);
         } else{ //전체 불러오기
             orderDetailPage = orderDetailRepository.findAll(pageRequest);
         }
@@ -349,8 +349,8 @@ public class MasterServiceImpl implements MasterService {
         result.put("productPrice", productEntity.getPrice());
 
         // 카테고리 정보 
-        Category3Entity category3Entity = productEntity.getCategory3Seqno();
-        result.put("category", category3Entity.getCategory3Name());
+        String category3Name = orderProductEntity.getProductSeqno().getCategory3Seqno().getCategory3Name();
+        result.put("category3Name", category3Name);
 
         // 취소 여부, 환불 여부
         result.put("cancelYn", orderDetail.getCancelYn());

@@ -47,7 +47,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, 
             "JOIN p.category3Seqno c3 " +
             "WHERE (:category3Seqno IS NULL OR c3.category3Seqno = :category3Seqno) " +
             "AND (:productName = '' OR p.productName LIKE %:productName%)")
-    public Page<OrderDetailEntity> findByCategory3SeqnoAndProductNameContaining(@Param("category3Seqno") Long category3Seqno, 
+    public Page<OrderDetailEntity> findByCategoryAndProductNameContaining(@Param("category") Long category, 
                                                                @Param("productName") String productName, Pageable pageable);
 
     //주문리스트 상품명으로 조회

@@ -416,13 +416,13 @@ public class MasterController{
     public void getOrderList(Model model, 
                             @RequestParam(name="page", defaultValue="1") int pageNum, 
                             @RequestParam(name="productname",defaultValue="",required=false) String productname,
-                            @RequestParam(name="category3Seqno",required=false) Long category3Seqno) 
+                            @RequestParam(name="category",required=false) Long category)
                             throws Exception{
         int postNum = 10; 
         int pageListCount = 10;                         
         
         PageUtil page = new PageUtil();
-        Page<Map<String, Object>> orderList = masterService.orderList(pageNum, postNum, productname, category3Seqno);                        
+        Page<Map<String, Object>> orderList = masterService.orderList(pageNum, postNum, productname, category);                        
         int totalCount = (int) orderList.getTotalElements(); 
         
         model.addAttribute("orderList", orderList);
@@ -431,8 +431,8 @@ public class MasterController{
         model.addAttribute("postNum", postNum);
         model.addAttribute("page", pageNum);
         model.addAttribute("productname", productname);
-        model.addAttribute("category3Seqno", category3Seqno);
-        model.addAttribute("pageList", page.getPageOrder(pageNum, postNum, pageListCount,totalCount,productname,category3Seqno));
+        model.addAttribute("category", category);
+        model.addAttribute("pageList", page.getPageOrder(pageNum, postNum, pageListCount,totalCount,productname,category));
     }
         
 
