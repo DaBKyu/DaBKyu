@@ -32,8 +32,11 @@ public interface MemberService {
 	// 배송지 목록 조회
 	public List<MemberAddressEntity> addressList(String email);
 
-	// 배송지 상세 조회
-	public MemberAddressDTO viewAddress(Long memberAddressSeqno);
+	/// 특정 배송지 조회
+	public MemberAddressDTO viewAddr(Long memberAddressSeqno);
+	
+	// 기본배송지 조회
+	public MemberAddressDTO viewBasicAddr(String email);
 
 	// 배송지 등록
 	public void addAddress(MemberAddressDTO address);

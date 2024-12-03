@@ -15,13 +15,23 @@ import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.ProductFileEntity;
+import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
 import com.dabkyu.dabkyu.service.ProductServiceImpl.TopProduct;
 
 public interface ProductService {
 	////////////내가만든거/////////////
 	// seachAll에서 사용할 전체 상품 보기
-	public List<ProductEntity> productAllList(String keyword) throws Exception;
+	public Page<ProductEntity> productAllList(int pageNum, int postNum, String keyword) throws Exception;
+
+	//상품 이미지 보기////
+	public List<ProductFileEntity> productFileList(Long productSeqno) throws Exception;
+	
 	/////////////////////////////////
+	
+	//제품 설명 첨부 파일 보기
+	public List<ProductInfoFileEntity> productInfoFileList(Long productSeqno) throws Exception;
+
 	//전체 카테고리1 목록 보기
 	public List<Category1Entity> category1List() throws Exception;
 

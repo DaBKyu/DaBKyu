@@ -103,8 +103,8 @@
             <div class="product-price">
                 <p>제품 가격: <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')+'원'}"></span></p>
             </div>
-            <img th:if="${item.infoStoredImage != null && item.infoStoredImage != ''}" th:src="@{/shop/product/{imageName}(imageName=${item.infoStoredImage})}" style="width: 200px; height:150px; border-radius: 10px;">
-            <img th:unless="${item.infoStoredImage == null || item.infoStoredImage == ''}" src="">
+            <!-- <img th:if="${item.infoStoredImage != null && item.infoStoredImage != ''}" th:src="@{/shop/product/{imageName}(imageName=${item.infoStoredImage})}" style="width: 200px; height:150px; border-radius: 10px;">
+            <img th:unless="${item.infoStoredImage == null || item.infoStoredImage == ''}" src=""> -->
             </a>
         </div>
     </div>

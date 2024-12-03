@@ -99,11 +99,21 @@ public class MemberServiceImpl implements MemberService {
 	public List<MemberAddressEntity> addressList(String email) {
         return memberAddressRepository.findByEmail_Email(email);
     }
-
-	// 배송지 상세 조회
+    
+	/// 특정 배송지 조회
     @Override
-	public MemberAddressDTO viewAddress(Long memberAddressSeqno) {
-        return memberAddressRepository.findById(memberAddressSeqno).map(addr -> new MemberAddressDTO(addr)).get();
+	public MemberAddressDTO viewAddr(Long memberAddressSeqno) {
+        MemberAddressEntity memberAddr = memberAddressRepository.findById(memberAddressSeqno).get();
+        return new MemberAddressDTO(memberAddr);
+    }
+
+	// 기본배송지 조회
+    @Override
+	public MemberAddressDTO viewBasicAddr(String email) {
+        // return memberAddressRepository.findByEmail_EmailandIsBasic(email, 'Y').map(addr -> new MemberAddressDTO(addr));
+        String isBasic = "Y";
+        MemberAddressEntity memberBasicAddr = memberAddressRepository.findByEmail_EmailAndIsBasic(email, isBasic);
+        return new MemberAddressDTO(memberBasicAddr);
     }
 
 	// 배송지 등록
@@ -121,7 +131,9 @@ public class MemberServiceImpl implements MemberService {
         memberAddressEntity.setZipcode(address.getZipcode());
         memberAddressEntity.setDetailAddr(address.getDetailAddr());
         memberAddressEntity.setRequest(address.getRequest());
-        memberAddressEntity.setIsBasic(address.getIsBasic());
+        memberAddressEntity.setReceiverName(address.getReceiverName());
+        memberAddressEntity.setReceiverTelno(address.getReceiverTelno());
+        // memberAddressEntity.setIsBasic(address.getIsBasic());
         memberAddressRepository.save(memberAddressEntity);
     }
 

@@ -23,7 +23,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
 
     Page<MemberEntity> findByMemberGrade(String memberGrade, Pageable pageable); // 회원등급으로 검색
 
-    
+
     // 패스워드 변경 30일 이후로 연기
     @Transactional
     @Modifying
