@@ -7,8 +7,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale.Category;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,6 +63,7 @@ import com.dabkyu.dabkyu.dto.SignupDateStatDTO;
 import com.dabkyu.dabkyu.dto.SignupGenderStatDTO;
 import com.dabkyu.dabkyu.dto.VisitorCountDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
+import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
@@ -83,6 +86,7 @@ import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.util.PageUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
@@ -446,9 +450,9 @@ public class MasterController{
     //주문내역 리스트
     @GetMapping("/master/order")
     public void getOrderList(Model model, 
-                            @RequestParam("page") int pageNum, 
+                            @RequestParam(name="page", defaultValue="1") int pageNum, 
                             @RequestParam(name="productname",defaultValue="",required=false) String productname,
-                            @RequestParam(name="category",required=false) Long category) 
+                            @RequestParam(name="category",required=false) Long category)
                             throws Exception{
         int postNum = 10; 
         int pageListCount = 10;                         
@@ -499,36 +503,39 @@ public class MasterController{
     }
 
     //카테고리 리스트 화면보기
-    @GetMapping("/master/categoryList")
-    public void getCategoryList(Model model) {
-        model.addAttribute("categories1", masterService.getAllCategories1());
-        model.addAttribute("categories2", masterService.getAllCategories2());
-        model.addAttribute("categories3", masterService.getAllCategories3());
+    @GetMapping("/master/manageCategory")
+    public void getManageCategory(Model model) {
+
+        // 엔티티를 DTO로 변환하여 전달
+        List<Category1DTO> category1DTOs = masterService.getAllCategories1().stream()
+            .map(entity -> new Category1DTO(entity.getCategory1Seqno(), entity.getCategory1Name()))
+            .collect(Collectors.toList());
+
+        List<Category2DTO> category2DTOs = masterService.getAllCategories2().stream()
+            .map(entity -> new Category2DTO(entity.getCategory2Seqno(), entity.getCategory1Seqno().getCategory1Seqno(), entity.getCategory2Name()))
+            .collect(Collectors.toList());
+
+        List<Category3DTO> category3DTOs = masterService.getAllCategories3().stream()
+            .map(entity -> new Category3DTO(entity.getCategory3Seqno(), entity.getCategory2Seqno().getCategory2Seqno(), entity.getCategory3Name()))
+            .collect(Collectors.toList());
+            
+        model.addAttribute("categories1", category1DTOs);
+        model.addAttribute("categories2", category2DTOs);
+        model.addAttribute("categories3", category3DTOs);
     }
 
-    //카테고리 추가 화면보기
-    @GetMapping("/master/createCategory")
-    public void getCreateCategory() {}
-
-    //카테고리 수정 화면보기 
-    @GetMapping("/master/modifyCategory")
-    public void getModifyCategory(Model model) {
-        model.addAttribute("categories1", masterService.getAllCategories1());
-        model.addAttribute("categories2", masterService.getAllCategories2());
-        model.addAttribute("categories3", masterService.getAllCategories3());
-    }
-
+    
     //카테고리 추가 및 수정 및 삭제 
     @Transactional
     @ResponseBody
-    @PostMapping("/master/createCategory")
-    public ResponseEntity<String> manageCategory(
+    @PostMapping("/master/manageCategory")
+    public ResponseEntity<String> postManageCategory(
                         @RequestParam(name="category1") Map<String, String> category1Map,
                         @RequestParam(name="category2") Map<String, String> category2Map,
                         @RequestParam(name="category3") Map<String, String> category3Map,
-                        @RequestParam(name="deleteCategory1") Map<String, String> deleteCategory1Map,
-                        @RequestParam(name="deleteCategory2") Map<String, String> deleteCategory2Map,
-                        @RequestParam(name="deleteCategory3") Map<String, String> deleteCategory3Map) 
+                        @RequestParam(name="deleteCategory1",required=false) Map<String, String> deleteCategory1Map,
+                        @RequestParam(name="deleteCategory2",required=false) Map<String, String> deleteCategory2Map,
+                        @RequestParam(name="deleteCategory3",required=false) Map<String, String> deleteCategory3Map) 
                         throws Exception{  
                                             
         try{
@@ -620,6 +627,8 @@ public class MasterController{
             return ResponseEntity.status(500).body("Error saving categories: " + e.getMessage());
         }
     } 
+        
+
 
     //문의 리스트 
     @GetMapping("/master/question")

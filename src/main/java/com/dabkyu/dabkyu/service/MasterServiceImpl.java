@@ -340,7 +340,7 @@ public class MasterServiceImpl implements MasterService {
     @Override
     public Page<Map<String, Object>> orderList(int pageNum, int postNum, String productname, Long category) throws Exception{
         
-        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC, "orderDate"));
+        PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC, "orderSeqno"));
         Page<OrderDetailEntity> orderDetailPage;
 
         //검색기능 
@@ -546,10 +546,12 @@ public class MasterServiceImpl implements MasterService {
     public List<Category1Entity> getAllCategories1() {
         return category1Repository.findAll();
     }
+
     @Override
     public List<Category2Entity> getAllCategories2() {
         return category2Repository.findAll();
     }
+
     @Override
     public List<Category3Entity> getAllCategories3() {
         return category3Repository.findAll();
