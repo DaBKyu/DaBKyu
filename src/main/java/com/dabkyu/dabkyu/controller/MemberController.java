@@ -4,12 +4,23 @@ import java.io.File;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
@@ -21,6 +32,7 @@ import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
+import com.dabkyu.dabkyu.service.EmailService;
 import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.util.PageUtil;
 import com.dabkyu.dabkyu.util.PasswordMaker;
@@ -29,11 +41,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -43,14 +50,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Log4j2
 public class MemberController {
     
-    private final MemberService service;
+    private final MemberService memberService;
+    private final EmailService emailService;
     private final BCryptPasswordEncoder pwdEncoder;
+
+    private final RedisTemplate<String, String> redisTemplate;
     
 
     // 로그인 화면
     @GetMapping("/member/login")
     public void getLogin() {}
-
     
 
     // 로그인(Spring Security)
@@ -64,12 +73,12 @@ public class MemberController {
     public String postLoginCheck(MemberDTO member) throws Exception {
         
         // 아이디 체크  
-        if (service.idCheck(member.getEmail()) == 0) {
+        if (memberService.idCheck(member.getEmail()) == 0) {
             return "{\"message\":\"ID_NOT_FOUND\"}";
         }
 
         // 비밀번호 체크
-        if (!pwdEncoder.matches(member.getPassword(), service.memberInfo(member.getEmail()).getPassword().toString())) {
+        if (!pwdEncoder.matches(member.getPassword(), memberService.memberInfo(member.getEmail()).getPassword().toString())) {
             return "{\"message\":\"PASSWORD_NOT_FOUND\"}";
         }
 
@@ -82,7 +91,7 @@ public class MemberController {
     public String getBeforeLogout(HttpSession session) throws Exception {
         
         String email = (String) session.getAttribute("email");
-        service.lastdateUpdate(email, "logout");
+        memberService.lastdateUpdate(email, "logout");
         session.invalidate();
         return "redirect:/member/logout";
     }
@@ -108,18 +117,68 @@ public class MemberController {
 
         // 회원가입
         if (kind.equals("I")) {
+            String birthDate = member.getBirth();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+            member.setBirthDate(LocalDate.parse(birthDate, formatter));
             member.setPassword(pwdEncoder.encode(member.getPassword()));
-            service.signup(member);
+            memberService.signup(member);
             log.info("회원등록: {\"username\":" + member.getUsername() + "\", \"status\":\"good\"}");
         }
 
         // 회원정보 수정
         if (kind.equals("U")) {
-            service.modifyMemberInfo(member);
+            memberService.modifyMemberInfo(member);
             log.info("회원정보수정: {\"username\":" + member.getUsername() + "\", \"status\":\"good\"}");
         }
 
         return "{\"username\":" + URLEncoder.encode(member.getUsername(), "UTF-8") + "\", \"status\":\"good\"}";
+    }
+
+
+    // 이메일 인증번호 발송
+    @ResponseBody
+    @PostMapping("/member/sendEmail")
+    public String postSendEmail(@RequestBody Map<String, String> request) throws Exception {
+        
+        String email = request.get("email");
+        
+        // 이메일 중복 체크
+        if (memberService.idCheck(email) == 1) {
+            return "{\"status\": 1}"; // 0: 성공, 1: 이미 존재하는 이메일, 2: 서버 오류
+        }
+
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder authCodeBuilder = new StringBuilder();
+        Random random = new Random();
+
+        for (int i = 0; i < 6; i++) {
+            int index = random.nextInt(chars.length());
+            authCodeBuilder.append(chars.charAt(index));
+        }
+
+        String authCode = authCodeBuilder.toString();
+        redisTemplate.opsForValue().set(email, authCode, 5, TimeUnit.MINUTES); // Redis에 저장, 5분 동안 유효
+
+        emailService.sendAuthCode(email, authCode); // 이메일 발송
+
+        return "{\"status\": 0}"; // 0: 성공, 1: 이미 존재하는 이메일, 2: 서버 오류
+    }
+
+
+    // 이메일 인증번호 확인
+    @ResponseBody
+    @PostMapping("/member/checkAuth")
+    public String postCheckAuth(@RequestBody Map<String, String> request) throws Exception {
+        
+        String email = request.get("email");
+        String authNum = request.get("authNum");
+
+        String authCode = redisTemplate.opsForValue().get(email);
+        if (!authCode.equals(authNum)) {
+            return "{\"status\": 1}"; // 0: 성공, 1: 일치하지 않음, 2: 서버 오류
+        }
+
+        return "{\"status\": 0}"; // 0: 성공, 1: 일치하지 않음, 2: 서버 오류
     }
     
 
@@ -145,7 +204,7 @@ public class MemberController {
         int pagelistNum = 10;   // 페이지 리스트 갯수
 
         PageUtil pageUtil = new PageUtil();
-        Page<OrderProductEntity> orderProductList = service.orderProductList(email, page, orderNum, keyword);
+        Page<OrderProductEntity> orderProductList = memberService.orderProductList(email, page, orderNum, keyword);
         int totalCount = (int) orderProductList.getTotalElements();
 
         model.addAttribute("orderProductList", orderProductList);
@@ -185,6 +244,7 @@ public class MemberController {
     public void getAddrList(Model model, HttpSession session) throws Exception {
 
         String email = (String) session.getAttribute("email");
+
         List<MemberAddressEntity> addressList = service.addressList(email);
         MemberAddressDTO viewBasicAddr = service.viewBasicAddr(email);
 
@@ -195,17 +255,6 @@ public class MemberController {
         model.addAttribute("viewBasicAddr", viewBasicAddr);
     }
     
-
-    // 배송지 수정 화면
-    @GetMapping("/mypage/modifyAddress")
-    public void getModifyAddress(
-        Model model,
-        @RequestParam("memberAddressSeqno")
-        Long seqno
-    ) throws Exception {
-        
-        // model.addAttribute("viewAddress", service.viewAddress(seqno));
-    }
     
     // 배송지 추가 화면
     @GetMapping("/mypage/addAddr")
@@ -219,7 +268,7 @@ public class MemberController {
     @ResponseBody
     @PostMapping("/mypage/addAddress")
     public String postAddAddress(MemberAddressDTO address) throws Exception {
-        service.addAddress(address);
+        memberService.addAddress(address);
         return "{\"message\":\"good\"}";
     }
     
@@ -228,7 +277,7 @@ public class MemberController {
     @ResponseBody
     @PostMapping("/mypage/modifyAddress")
     public String postModifyAddress(MemberAddressDTO address) throws Exception {
-        service.modifyAddress(address);
+        memberService.modifyAddress(address);
         return "{\"message\":\"good\"}";
     }
     
@@ -236,7 +285,7 @@ public class MemberController {
     // 배송지 삭제
     @GetMapping("/mypage/deleteAddress")
     public String getDeleteAddress(@RequestParam("seqno") Long seqno) throws Exception {
-        service.deleteAddress(seqno);
+        memberService.deleteAddress(seqno);
         return "redirect:/mypage/address";
     }
     
@@ -256,7 +305,7 @@ public class MemberController {
     @GetMapping("/mypage/modifyMemberInfo")
     public void getModifyMemberInfo(Model model, HttpSession session) {
         String email = (String) session.getAttribute("email");
-        model.addAttribute("member", service.memberInfo(email));
+        model.addAttribute("member", memberService.memberInfo(email));
     }
 
 
@@ -264,8 +313,8 @@ public class MemberController {
     @GetMapping("/mypage/myCategories")
     public void getMyCategories(Model model, HttpSession session) {
         String email = (String) session.getAttribute("email");
-        model.addAttribute("myCategoryList", service.myCategoryList(email));
-        model.addAttribute("isEmpty", service.myCategoryList(email).isEmpty()?"Y":"N");
+        model.addAttribute("myCategoryList", memberService.myCategoryList(email));
+        model.addAttribute("isEmpty", memberService.myCategoryList(email).isEmpty()?"Y":"N");
     }
     
 
@@ -284,7 +333,7 @@ public class MemberController {
         int pagelistNum = 10;   // 페이지 리스트 갯수
 
         PageUtil pageUtil = new PageUtil();
-        Page<ProductEntity> myLikeList = service.myLikeList(email, page, productNum);
+        Page<ProductEntity> myLikeList = memberService.myLikeList(email, page, productNum);
         int totalCount = (int) myLikeList.getTotalElements();
 
         model.addAttribute("myLikeList", myLikeList);
@@ -312,7 +361,7 @@ public class MemberController {
         int pagelistNum = 10;   // 페이지 리스트 갯수
 
         PageUtil pageUtil = new PageUtil();
-        Page<ReviewEntity> myReviewList = service.myReviewList(email, page, reviewNum);
+        Page<ReviewEntity> myReviewList = memberService.myReviewList(email, page, reviewNum);
         int totalCount = (int) myReviewList.getTotalElements();
 
         model.addAttribute("myReviewList", myReviewList);
@@ -339,7 +388,7 @@ public class MemberController {
         int pagelistNum = 10;   // 페이지 리스트 갯수
 
         PageUtil pageUtil = new PageUtil();
-        Page<QuestionEntity> myQuestionList = service.myQuestionList(email, page, questionNum);
+        Page<QuestionEntity> myQuestionList = memberService.myQuestionList(email, page, questionNum);
         int totalCount = (int) myQuestionList.getTotalElements();
 
         model.addAttribute("myQuestionList", myQuestionList);
@@ -371,7 +420,7 @@ public class MemberController {
         int pagelistNum = 10;   // 페이지 리스트 갯수
 
         PageUtil pageUtil = new PageUtil();
-        Page<CouponEntity> myCouponList = service.myCouponList(email, page, couponNum);
+        Page<CouponEntity> myCouponList = memberService.myCouponList(email, page, couponNum);
         int totalCount = (int) myCouponList.getTotalElements();
 
         model.addAttribute("myCouponList", myCouponList);
@@ -388,7 +437,7 @@ public class MemberController {
     @GetMapping("/mypage/myGrade")
     public void getMyGrade(Model model, HttpSession session) {
         String email = (String) session.getAttribute("email");
-        model.addAttribute("member", service.memberInfo(email));
+        model.addAttribute("member", memberService.memberInfo(email));
     }
     
 
@@ -407,7 +456,7 @@ public class MemberController {
         MemberDTO member = new MemberDTO();
         member.setUsername(username);
         member.setTelno(telno);
-        String email = service.searchID(member) == null? "ID_NOT_FOUND":service.searchID(member);
+        String email = memberService.searchID(member) == null? "ID_NOT_FOUND":memberService.searchID(member);
 
         return "{\"message\":\"" + email + "\"}";
     }
@@ -426,11 +475,11 @@ public class MemberController {
         @RequestParam("telno") String telno
     ) throws Exception {
         
-        if (service.idCheck(email) == 0) {
+        if (memberService.idCheck(email) == 0) {
             return "{\"message\":\"ID_NOT_FOUND\"}";
         }
 
-        if (!service.memberInfo(email).getTelno().equals(telno)) {
+        if (!memberService.memberInfo(email).getTelno().equals(telno)) {
             return "{\"message\":\"TELNO_NOT_FOUND\"}";
         }
 
@@ -440,8 +489,8 @@ public class MemberController {
         MemberDTO member = new MemberDTO();
         member.setEmail(email);
         member.setPassword(pwdEncoder.encode(tempPW));
-        service.modifyMemberPassword(member);
-        service.lastdateUpdate(email, "password");
+        memberService.modifyMemberPassword(member);
+        memberService.lastdateUpdate(email, "password");
         
         return "{\"message\":\"good\", \"tempPW\":\"" + tempPW + "\"}";
     }
@@ -462,15 +511,15 @@ public class MemberController {
         
         String email = (String) session.getAttribute("email");
 
-        if (!pwdEncoder.matches(old_password, service.memberInfo(email).getPassword())) {
+        if (!pwdEncoder.matches(old_password, memberService.memberInfo(email).getPassword())) {
             return "{\"message\":\"PASSWORD_NOT_FOUND\"}";
         }
 
         MemberDTO member = new MemberDTO();
         member.setEmail(email);
         member.setPassword(pwdEncoder.encode(new_password));
-        service.modifyMemberPassword(member);
-        service.lastdateUpdate(email, "password");
+        memberService.modifyMemberPassword(member);
+        memberService.lastdateUpdate(email, "password");
         return "{\"message\":\"good\"}";
     }
     
@@ -483,7 +532,7 @@ public class MemberController {
     ) throws Exception {
         
         String email = (String) session.getAttribute("email");
-        MemberDTO member = service.memberInfo(email);
+        MemberDTO member = memberService.memberInfo(email);
         int addedDate = 30 * (member.getPwcheck() + 1);
         model.addAttribute("addedDate", addedDate);
     }
@@ -493,7 +542,7 @@ public class MemberController {
     @GetMapping("/mypage/modifyPasswordAfter30")
     public String getModifyPasswordAfter30(HttpSession session) throws Exception {
         String email = (String) session.getAttribute("email");
-        service.modifyPasswordAfter30(email);
+        memberService.modifyPasswordAfter30(email);
         return "redirect:/shop/list?page=1";
     }
     
@@ -502,7 +551,7 @@ public class MemberController {
     @ResponseBody
     @PostMapping("/member/idCheck")
     public int postIdcheck(@RequestBody String email) throws Exception {
-        return service.idCheck(email);
+        return memberService.idCheck(email);
     }
     
 
@@ -533,7 +582,7 @@ public class MemberController {
         // 운영체제에 따른 이미지 디렉토리 설정 종료
 
         // 회원이 첨부한 문의 파일 삭제
-        List<QuestionFileEntity> questionStoredFilenameList = service.getStoredQuestionFilenameList(email);
+        List<QuestionFileEntity> questionStoredFilenameList = memberService.getStoredQuestionFilenameList(email);
         File questFilename;
         for (QuestionFileEntity questionFileEntity : questionStoredFilenameList) {
             questFilename = new File(questionFilePath + questionFileEntity.getStoredFilename());
@@ -541,7 +590,7 @@ public class MemberController {
         }
 
         // 회원이 첨부한 리뷰 파일 삭제
-        List<ReviewFileEntity> reviewStoredFilenameList = service.getStoredReviewFilenameList(email);
+        List<ReviewFileEntity> reviewStoredFilenameList = memberService.getStoredReviewFilenameList(email);
         File reviewFilename;
         for (ReviewFileEntity reviewFileEntity : reviewStoredFilenameList) {
             reviewFilename = new File(reviewFilePath + reviewFileEntity.getStoredFilename());
@@ -549,7 +598,7 @@ public class MemberController {
         }
 
         // 회원 정보 삭제
-        service.deleteID(email);
+        memberService.deleteID(email);
 
         // 세션 삭제
         session.invalidate();

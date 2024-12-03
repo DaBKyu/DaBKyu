@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -286,10 +287,28 @@ public class EmailServiceImpl implements EmailService {
 
     //첨부파일 목록 보기
     @Override
-    public List<EmailFileDTO> fileListView(Long emailSeqno) throws Exception{
+    public List<EmailFileDTO> fileListView(Long emailSeqno) throws Exception {
         List<EmailFileDTO> fileDTOs = new ArrayList<>();
 
         emailFileRepository.findByEmailSeqno(emailRepository.findById(emailSeqno).get()).stream().forEach(list-> fileDTOs.add(new EmailFileDTO(list)));
         return fileDTOs;
+    }
+
+    //회원가입 인증코드 메일 발송
+    @Override
+    public void sendAuthCode(String email, String authCode) throws Exception {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("[다비켜] 이메일 인증번호 발송");
+        message.setText("안녕하세요.\n\n인증번호는 다음과 같습니다:\n\n" 
+                        + authCode + "\n\n감사합니다.");
+
+        // 이메일 발송
+        try {
+            emailSender.send(message);
+            log.info("인증번호 전송 성공: " + email);
+        } catch (Exception e) {
+            log.info("인증번호 전송 실패: " + e.getMessage());
+        }
     }
 }

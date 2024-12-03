@@ -204,7 +204,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             // 쿠폰 만료처리
             //CouponEntity coupon = couponRepository.findById(couponSeqno).get();
             //coupon.setIsExpire("Y");
-
             memberCoupon.setIsExpire("Y");
         }
 

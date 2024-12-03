@@ -40,6 +40,6 @@ public class MemberCouponEntity {
 	private CouponEntity couponSeqno;
 
 	@Column(name = "is_expire", length = 2, nullable = true)
-    private String isExpire;
+  private String isExpire;
 	
 }

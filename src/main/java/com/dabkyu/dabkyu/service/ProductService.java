@@ -1,6 +1,7 @@
 package com.dabkyu.dabkyu.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 
@@ -9,12 +10,14 @@ import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.dto.ReportDTO;
+import com.dabkyu.dabkyu.dto.TopSellingProductDTO;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
+import com.dabkyu.dabkyu.service.ProductServiceImpl.TopProduct;
 
 public interface ProductService {
 	////////////내가만든거/////////////
@@ -46,6 +49,12 @@ public interface ProductService {
 
 	// //카테고리별 상품 목록 보기
 	// public Page<ProductEntity> categoryProduct(int pageNum, int postNum, Long cateSeqno, String keyword) throws Exception;
+
+	//가장 많이 팔린 상품 10개 조회
+	public List<TopSellingProductDTO> getTop10BestSellingProducts() throws Exception;
+
+	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
+	public Map<String, List<TopProduct>> getTopProductsByAgeForUser(String email) throws Exception;
 
     //상품 상세 보기
 	public ProductDTO view(Long productSeqno) throws Exception;

@@ -45,6 +45,12 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filter(HttpSecurity http) throws Exception {
 
+        //X-Frame-Options 허용
+        http
+        .headers(headers -> headers
+            .frameOptions(frame -> frame.sameOrigin()) // iframe을 같은 출처에서 허용
+        ); 
+
         //formLogin 설정
         http.formLogin(
             (login) -> login

@@ -23,6 +23,7 @@ public class QuestionCommentDTO {
 	private String comWriter;
 	private String comContent;
 	private LocalDateTime comDate;
+    private Long questionSeqno;
 
     public QuestionCommentDTO(QuestionCommentEntity entity) {
         this.questionCommentSeqno = entity.getQuestionCommentSeqno();

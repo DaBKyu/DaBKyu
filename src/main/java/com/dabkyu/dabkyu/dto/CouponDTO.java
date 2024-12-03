@@ -42,6 +42,7 @@ public class CouponDTO {
         this.couponRole= entity.getCouponRole();
         this.isDupl = entity.getIsDupl();
         this.couponCode = entity.getCouponCode();
+
     }
 
     public CouponEntity dtoToEntity(CouponDTO dto) {

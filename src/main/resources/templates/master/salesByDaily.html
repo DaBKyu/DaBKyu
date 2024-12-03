@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일별 매출액 통계</title>
+    <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+    <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css">
+</head>
+<body>
+    <h1 style="text-align: center;">일별 매출액 통계</h1>
+
+    <!-- 날짜 입력 필드 추가 -->
+    <div style="text-align:center;">
+        <label for="startDate">시작 날짜: </label>
+        <input type="date" id="startDate" value="2024-11-01">
+        <label for="endDate">끝 날짜: </label>
+        <input type="date" id="endDate" value="2024-11-30">
+        <button onclick="updateChart()">조회</button>
+    </div>
+    
+    <div id="chart" style="width: 1000px; height: 500px; margin: 0 auto;"></div>
+
+    <script>
+        // 날짜 범위 사이의 모든 날짜를 가져오는 함수
+        function getAllDatesInRange(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const dates = [];
+            
+            while (start <= end) {
+                const dateStr = start.toISOString().split('T')[0];  // "YYYY-MM-DD" 형식
+                dates.push(dateStr);
+                start.setDate(start.getDate() + 1); // 하루씩 증가
+            }
+            
+            return dates;
+        }
+
+        // API로부터 일별 매출 데이터를 가져오는 함수
+        async function fetchDailySales(startDateTime, endDateTime) {
+            const response = await fetch(`/master/salesByDailyData?startDateTime=${startDateTime}&endDateTime=${endDateTime}`);
+            if (!response.ok) {
+                console.error('API 호출 실패:', response.status);
+                return [];
+            }
+
+            // 서버에서 반환된 데이터 확인
+            const data = await response.json();
+            console.log('서버 응답 데이터:', data);
+            return data;
+        }
+
+        // 차트 업데이트 함수
+        async function updateChart() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            // 날짜가 비어있는지 체크
+            if (!startDate || !endDate) {
+                alert('시작 날짜와 끝 날짜를 입력해주세요.');
+                return;
+            }
+
+            // LocalDate -> LocalDateTime 형식으로 변환 (시간을 00:00:00으로 설정)
+            const startDateTimeFormatted = startDate + "T00:00:00";
+            const endDateTimeFormatted = endDate + "T23:59:59";
+
+            // API 호출
+            const data = await fetchDailySales(startDateTimeFormatted, endDateTimeFormatted);
+            if (!data || data.length === 0) {
+                console.error('데이터가 비어 있습니다.');
+            }
+
+            // 날짜 범위 내의 모든 날짜 리스트 생성
+            const allDates = getAllDatesInRange(startDate, endDate);
+
+            // 서버에서 반환된 데이터 형식에 맞춰 처리
+            const categories = allDates; // 모든 날짜가 포함된 리스트
+            const seriesData = allDates.map(date => {
+                // 반환된 데이터에서 해당 날짜의 매출을 찾고, 없으면 0으로 처리
+                const entry = data.find(d => d.date === date);
+                return entry ? entry.totalSales || 0 : 0;
+            });
+
+            // 차트 데이터 정의
+            const chartData = {
+                categories: categories,
+                series: [
+                    {
+                        name: '매출액',
+                        data: seriesData
+                    }
+                ]
+            };
+
+            // 차트 옵션 정의
+            const options = {
+                chart: { width: 900, height: 400, title: '일별 매출액' },
+                xAxis: { title: '일', label: { interval: 1 } },
+                yAxis: { title: '매출 (₩)' },
+                series: { showDot: true, lineWidth: 2 }
+            };
+
+            // 차트를 그릴 DOM 요소 선택
+            const chartContainer = document.getElementById('chart');
+
+            // 기존 차트 삭제
+            chartContainer.innerHTML = '';
+
+            // 라인 차트 생성
+            toastui.Chart.lineChart({ el: chartContainer, data: chartData, options: options });
+        }
+
+        // 페이지 로드시 기본 데이터 표시
+        updateChart();
+    </script>
+</body>
+</html>

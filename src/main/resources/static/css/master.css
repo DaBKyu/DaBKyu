@@ -1,17 +1,6 @@
 a{text-decoration: none; color: #000000;}
-
 .headtext{font-size: 24px; font-weight:bold; font-family: "Noto Sans KR", sans-serif;}
-.dropend:hover>.dropdown-menu {
-    display: block;
-    margin-left: .1em;
-}
-@media screen and (min-width:769px) {
-        .dropend:hover>.dropdown-menu {
-            position: absolute;
-            top: 0;
-            left: 100%;
-        }
-}
+.pagent{text-align: center; margin-bottom: 4px;}
 ol, ul{padding: 0;}
 li{
     list-style: none;
@@ -60,4 +49,48 @@ th {
     background: rgba(255, 255, 255, 0.7);
     border: none;
     cursor: pointer;
+}
+
+
+
+
+
+
+button {
+    display: inline-block; /* 버튼을 항상 보이도록 설정 */
+    visibility: visible;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #f0f0f0;
+}
+
+/* 수정 버튼 스타일 */
+button.edit-button {
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+/* 삭제 버튼 스타일 */
+button.delete-button {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+/* 버튼 클릭시 색상 변경 */
+button.edit-button:hover {
+    background-color: #0056b3;
+}
+
+button.delete-button:hover {
+    background-color: #c82333;
 }

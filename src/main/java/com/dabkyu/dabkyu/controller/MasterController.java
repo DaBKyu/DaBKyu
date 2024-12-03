@@ -1,16 +1,24 @@
 package com.dabkyu.dabkyu.controller;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale.Category;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,23 +30,40 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.dabkyu.dabkyu.dto.Category1DTO;
 import com.dabkyu.dabkyu.dto.Category2DTO;
 import com.dabkyu.dabkyu.dto.Category3DTO;
+import com.dabkyu.dabkyu.dto.CategorySalesDTO;
+import com.dabkyu.dabkyu.dto.CouponCategoryDTO;
+import com.dabkyu.dabkyu.dto.CouponDTO;
+import com.dabkyu.dabkyu.dto.CouponTargetDTO;
+import com.dabkyu.dabkyu.dto.DailySalesDTO;
+import com.dabkyu.dabkyu.dto.DailyVisitorDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.MemberSalesDTO;
+import com.dabkyu.dabkyu.dto.MonthlySalesDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
+import com.dabkyu.dabkyu.dto.ProductSalesDTO;
 import com.dabkyu.dabkyu.dto.QuestionCommentDTO;
 import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.dto.ReviewFileDTO;
+import com.dabkyu.dabkyu.dto.SalesByAgeGroupDTO;
+import com.dabkyu.dabkyu.dto.SalesByMemberGradeDTO;
+import com.dabkyu.dabkyu.dto.SignupAgeStatDTO;
+import com.dabkyu.dabkyu.dto.SignupDateStatDTO;
+import com.dabkyu.dabkyu.dto.SignupGenderStatDTO;
+import com.dabkyu.dabkyu.dto.VisitorCountDTO;
 import com.dabkyu.dabkyu.entity.AddedRelatedProductEntity;
+import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
@@ -47,11 +72,23 @@ import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReportEntity;
+import com.dabkyu.dabkyu.entity.repository.Category1Repository;
+import com.dabkyu.dabkyu.entity.repository.Category2Repository;
+import com.dabkyu.dabkyu.entity.repository.Category3Repository;
+import com.dabkyu.dabkyu.entity.repository.CouponRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberLogRepository;
+import com.dabkyu.dabkyu.entity.repository.MemberRepository;
+import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
+import com.dabkyu.dabkyu.entity.repository.ProductRepository;
+
 import com.dabkyu.dabkyu.service.MasterService;
+import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.util.PageUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -62,6 +99,7 @@ import lombok.extern.log4j.Log4j2;
 public class MasterController{
 
     private final MasterService masterService;
+    private final MemberService memberService;
     private final QuestionService questionService;
     private final ReviewService reviewService;
     
@@ -105,19 +143,20 @@ public class MasterController{
     }
 
     //고객정보 수정 화면보기
-    @GetMapping("/master/modifyClient/{email}")
-    public void getModifyClient(@PathVariable String email, Model model) throws Exception{
+    @GetMapping("/master/modifyClient")
+    public void getModifyClient(@RequestParam("email") String email, Model model) throws Exception{
 
         model.addAttribute("member", masterService.getMemberByEmail(email));
     }
 
     //고객정보 수정 
-    @PostMapping("/master/modifyViewClient/{email}")
+    @ResponseBody
+    @PostMapping("/master/modifyViewClient")
     public String postModifyClient(@ModelAttribute MemberDTO memberDTO) throws Exception {
 
         masterService.memberModify(memberDTO);
 
-        return "redirect:/master/client"; 
+        return "{\"message\":\"good\"}";
     }
 
     //상품 리스트 화면보기 
@@ -411,9 +450,9 @@ public class MasterController{
     //주문내역 리스트
     @GetMapping("/master/order")
     public void getOrderList(Model model, 
-                            @RequestParam("page") int pageNum, 
+                            @RequestParam(name="page", defaultValue="1") int pageNum, 
                             @RequestParam(name="productname",defaultValue="",required=false) String productname,
-                            @RequestParam(name="category",required=false) Long category) 
+                            @RequestParam(name="category",required=false) Long category)
                             throws Exception{
         int postNum = 10; 
         int pageListCount = 10;                         
@@ -464,36 +503,39 @@ public class MasterController{
     }
 
     //카테고리 리스트 화면보기
-    @GetMapping("/master/categoryList")
-    public void getCategoryList(Model model) {
-        model.addAttribute("categories1", masterService.getAllCategories1());
-        model.addAttribute("categories2", masterService.getAllCategories2());
-        model.addAttribute("categories3", masterService.getAllCategories3());
+    @GetMapping("/master/manageCategory")
+    public void getManageCategory(Model model) {
+
+        // 엔티티를 DTO로 변환하여 전달
+        List<Category1DTO> category1DTOs = masterService.getAllCategories1().stream()
+            .map(entity -> new Category1DTO(entity.getCategory1Seqno(), entity.getCategory1Name()))
+            .collect(Collectors.toList());
+
+        List<Category2DTO> category2DTOs = masterService.getAllCategories2().stream()
+            .map(entity -> new Category2DTO(entity.getCategory2Seqno(), entity.getCategory1Seqno().getCategory1Seqno(), entity.getCategory2Name()))
+            .collect(Collectors.toList());
+
+        List<Category3DTO> category3DTOs = masterService.getAllCategories3().stream()
+            .map(entity -> new Category3DTO(entity.getCategory3Seqno(), entity.getCategory2Seqno().getCategory2Seqno(), entity.getCategory3Name()))
+            .collect(Collectors.toList());
+            
+        model.addAttribute("categories1", category1DTOs);
+        model.addAttribute("categories2", category2DTOs);
+        model.addAttribute("categories3", category3DTOs);
     }
 
-    //카테고리 추가 화면보기
-    @GetMapping("/master/createCategory")
-    public void getCreateCategory() {}
-
-    //카테고리 수정 화면보기 
-    @GetMapping("/master/modifyCategory")
-    public void getModifyCategory(Model model) {
-        model.addAttribute("categories1", masterService.getAllCategories1());
-        model.addAttribute("categories2", masterService.getAllCategories2());
-        model.addAttribute("categories3", masterService.getAllCategories3());
-    }
-
+    
     //카테고리 추가 및 수정 및 삭제 
     @Transactional
     @ResponseBody
-    @PostMapping("/master/createCategory")
-    public ResponseEntity<String> manageCategory(
+    @PostMapping("/master/manageCategory")
+    public ResponseEntity<String> postManageCategory(
                         @RequestParam(name="category1") Map<String, String> category1Map,
                         @RequestParam(name="category2") Map<String, String> category2Map,
                         @RequestParam(name="category3") Map<String, String> category3Map,
-                        @RequestParam(name="deleteCategory1") Map<String, String> deleteCategory1Map,
-                        @RequestParam(name="deleteCategory2") Map<String, String> deleteCategory2Map,
-                        @RequestParam(name="deleteCategory3") Map<String, String> deleteCategory3Map) 
+                        @RequestParam(name="deleteCategory1",required=false) Map<String, String> deleteCategory1Map,
+                        @RequestParam(name="deleteCategory2",required=false) Map<String, String> deleteCategory2Map,
+                        @RequestParam(name="deleteCategory3",required=false) Map<String, String> deleteCategory3Map) 
                         throws Exception{  
                                             
         try{
@@ -585,6 +627,8 @@ public class MasterController{
             return ResponseEntity.status(500).body("Error saving categories: " + e.getMessage());
         }
     } 
+        
+
 
     //문의 리스트 
     @GetMapping("/master/question")
@@ -641,19 +685,26 @@ public class MasterController{
     //문의 답변 등록 및 수정
     @ResponseBody
     @PostMapping("/master/question/reply")
-    public void postReply(@RequestParam(value = "queSeqno", required = false) Long queSeqno,
-                @RequestParam("option") String option, 
-                @RequestBody QuestionCommentDTO commentDTO)
-                throws Exception{
-        
-            QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
-            commentDTO.setQueSeqno(questionEntity);
-    
-            if ("I".equals(option)) {
-                masterService.replyQuestion(commentDTO, questionEntity);
-            } else if("U".equals(option)) {
-                masterService.replyQuestionModify(commentDTO);
-            }
+    public String postReply(
+            @RequestParam("option") String option, 
+            @RequestBody QuestionCommentDTO commentDTO, HttpSession session
+            ) throws Exception {
+        log.info("답변 등록 시작");
+        log.info(option);
+        String email = (String) session.getAttribute("email");
+        Long queSeqno = commentDTO.getQuestionSeqno();
+        QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
+        commentDTO.setQueSeqno(questionEntity);
+        commentDTO.setEmail(masterService.getMemberEmail(email));
+
+        if ("I".equals(option)) {
+            log.info("답변 등록 서비스 호출");
+            masterService.replyQuestion(commentDTO, questionEntity);
+        } else if("U".equals(option)) {
+            masterService.replyQuestionModify(commentDTO);
+        }
+        return "{\"message\":\"good\"}";
+
 	}
 
     //문의 삭제 
@@ -716,10 +767,13 @@ public class MasterController{
     } 
 
     //리뷰 상세보기
-    @GetMapping("/master/review/{reviewSeqno}")
-    public void getReviewView(@PathVariable Long reviewSeqno, Model model) throws Exception{
-        model.addAttribute("review", reviewService.view(reviewSeqno));
-        model.addAttribute("reviewFiles", reviewService.fileListView(reviewSeqno));
+    @GetMapping("/master/reviewList/{reviewSeqno}")
+    @ResponseBody
+    public Map<String, Object> getReviewView(@PathVariable Long reviewSeqno) throws Exception {
+        Map<String, Object> response = new HashMap<>();
+        response.put("review", reviewService.view(reviewSeqno));
+        response.put("reviewFiles", reviewService.fileListView(reviewSeqno));
+        return response;
     }
 
     //리뷰 신고 리스트
@@ -764,7 +818,7 @@ public class MasterController{
         }
         masterService.deleteReview(reviewSeqno); //리뷰삭제
 
-        return "redirect:/master/reviewList";  
+        return "redirect:/master/reviewList?page=1";  
     }
 
     //쿠폰 리스트보기 
@@ -919,7 +973,6 @@ public class MasterController{
     //매출, //통계 (관심카테고리, 찜목록, 구매) 
     @GetMapping("/master/Status")
     public void getStatus() {
-
     }   
 
     //전체 회원의 누적구매금액을 조회 후 등급 업데이트
@@ -932,17 +985,198 @@ public class MasterController{
         return "{\"message\":\"good\"}";
     }
 
-    /* 
-    //관리자가 쿠폰종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
-    @PostMapping("/master/ExpiredUpdate")
-    public String updateExpiredCoupons() {
+    /*
+    // 관리자가 쿠폰 종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
+    @PostMapping("/master/expiredUpdate")
+    public void updateExpiredCoupons() {
         LocalDateTime referenceDate = LocalDateTime.now();
-        
+
+        // 만료된 쿠폰을 처리하는 서비스 메서드 호출
         masterService.setExpiredCouponsToExpired(referenceDate);
 
-        return "{\"message\":\"good\"}";
-    }*/
+        // 성공적인 처리 후 아무 것도 반환하지 않음 (HTTP 상태 200)
+    }
+    */
 
+    //통계 페이지(매출통계,가입통계,방문통계)
+    @GetMapping("/master/statisticsPage")
+    public String getStatisticsPage() {
+        return "master/statisticsPage";
+    }
+
+    /* 매출통계
+    -카테고리별 
+    -일별 
+    -월별 
+    -연령대별 
+    -회원별 
+    -등급별 
+    -상품별 
+    */
+    //-카테고리별 매출 통계
+    @GetMapping("/master/salesByCategory")
+    public String getSalesByCategoryPage() {
+        return "master/salesByCategory"; // Thymeleaf 템플릿 이름
+    }
+
+    @GetMapping("/master/salesByCategoryData")
+    @ResponseBody
+    public List<CategorySalesDTO> getCategorySalesData() {
+        return masterService.getCategorySales(); // JSON 데이터를 반환
+    }
+
+    //일별 매출 통계
+    @GetMapping("/master/salesByDaily")
+    public String getSalesByDailyPage() {
+        return "master/salesByDaily"; // Thymeleaf 템플릿 이름
+    }
+
+    @GetMapping("/master/salesByDailyData")
+    @ResponseBody
+    public List<DailySalesDTO> getDailySales(
+        @RequestParam("startDateTime")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+        @RequestParam("endDateTime")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
+        return masterService.getDailySales(startDateTime, endDateTime);
+    }
+
+    //월별 매출 통계
+    @GetMapping("/master/salesByYear")
+    public String getSalesByYearPage() {
+        return "master/salesByYear";
+    }
+    
+    @GetMapping("/master/salesByYearData")
+    @ResponseBody
+    public List<MonthlySalesDTO> getYearlySales(
+        @RequestParam("year") int year) {
+        return masterService.getYearlySales(year);
+    }
+
+    //회원별 매출 통계
+    @GetMapping("/master/salesByMember")
+    public String getSalesByMemberPage() {
+        return "master/salesByMember";
+    }
+    
+    @GetMapping("/master/salesByMemberData")
+    @ResponseBody
+    public List<MemberSalesDTO> getMemberSales() {
+        return masterService.getMemberSales();
+    }
+
+    //연령대별 매출 통계
+    @GetMapping("/master/salesByAge")
+    public String getSalesByAgePage() {
+        return "master/salesByAge";
+    }
+    
+    @GetMapping("/master/salesByAgeData")
+    @ResponseBody
+    public List<SalesByAgeGroupDTO> getSalesByAge() {
+        return masterService.getSalesByAge();
+    }
+
+    //등급별 매출 통계
+    @GetMapping("/master/salesByGrade")
+    public String getSalesByGradePage() {
+        return "master/salesByGrade";
+    }
+    
+    @GetMapping("/master/salesByGradeData")
+    @ResponseBody
+    public List<SalesByMemberGradeDTO> getSalesByGrade() {
+        return masterService.getSalesByGrade();
+    }
+    
+    //상품별 매출 통계
+    @GetMapping("/master/salesByProduct")
+    public String getSalesByProductPage() {
+        return "master/salesByProduct";
+    }
+    
+    @GetMapping("/master/salesByProductData")
+    @ResponseBody
+    public List<ProductSalesDTO> getProductSales() {
+        return masterService.getSalesByProduct();
+    }
+    
+    /* 
+    //가입통계
+    -가입일 기준
+    -성별
+    -연령
+    */
+
+    //가입일 기준 가입 통계
+    @GetMapping("/master/signupDateStat")
+    public String getSignupDateStatPage() {
+        return "master/signupDateStat";
+    }
+    
+    @GetMapping("/master/signupDateStatData")
+    @ResponseBody
+    public List<SignupDateStatDTO> getSignupDateStat(
+        @RequestParam("startDateTime") 
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+        @RequestParam("endDateTime") 
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
+
+        try {
+            // Service를 호출하여 통계 데이터를 가져옵니다.
+            return masterService.getSignupDateStat(startDateTime, endDateTime);
+        } catch (Exception e) {
+            // 예외 발생 시 JSON 형식으로 오류 메시지 반환
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.", e);
+        }
+    }
+
+    //성별 기준 가입 통계
+    @GetMapping("/master/signupGenderStat")
+    public String getSignupGenderStatPage() {
+        return "master/signupGenderStat";
+    }
+    
+    @GetMapping("/master/signupGenderStatData")
+    @ResponseBody
+    public List<SignupGenderStatDTO> getSignupGenderStat() {
+        return masterService.getSignupGenderStat();
+    }
+
+    //연령대 기준 가입 통계
+    @GetMapping("/master/signupAgeStat")
+    public String getSignupAgeStatPage() {
+        return "master/signupAgeStat";
+    }
+    
+    @GetMapping("/master/signupAgeStatData")
+    @ResponseBody
+    public List<SignupAgeStatDTO> getSignupAgeStat() {
+        return masterService.getSignupAgeStat();
+    }
+
+     /*
+    //방문통계
+    -방문자수 
+    */
+
+    // 일별 방문자 통계 페이지
+    @GetMapping("/master/visitorsByDaily")
+    public String getVisitorsByDailyPage() {
+        return "master/visitorsByDaily"; // Thymeleaf 템플릿 이름
+    }
+
+    @GetMapping("/master/visitorsByDailyData")
+    @ResponseBody
+    public List<DailyVisitorDTO> getDailyVisitors(
+        @RequestParam("startDateTime")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+        @RequestParam("endDateTime") 
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
+        
+        return masterService.getDailyVisitors(startDateTime, endDateTime);
+    }
 }
 
 

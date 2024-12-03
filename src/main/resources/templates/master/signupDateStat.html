@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가입일 통계</title>
+    <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
+    <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+</head>
+<body>
+    <h1 style="text-align: center;">가입일 기준 가입 통계</h1>
+    <div style="text-align: center;">
+        <label for="startDateTime">시작 날짜:</label>
+        <input type="date" id="startDateTime" name="startDateTime" value="2024-11-01">
+        <label for="endDateTime">종료 날짜:</label>
+        <input type="date" id="endDateTime" name="endDateTime" value="2024-11-30">
+        <button onclick="updateChart()">조회</button>
+    </div>
+    <div id="chart" style="width: 1000px; height: 500px; margin: 0 auto;"></div>
+    <script>
+        // 날짜 범위 사이의 모든 날짜를 가져오는 함수
+        function getAllDatesInRange(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const dates = [];
+
+            while (start <= end) {
+                const dateStr = start.toISOString().split('T')[0]; // "YYYY-MM-DD" 형식
+                dates.push(dateStr);
+                start.setDate(start.getDate() + 1); // 하루씩 증가
+            }
+
+            return dates;
+        }
+
+        // 차트 업데이트 함수
+        async function updateChart() {
+            const startDate = document.getElementById('startDateTime').value;
+            const endDate = document.getElementById('endDateTime').value;
+            //const year = document.getElementById('year').value;
+
+            if (!startDate || !endDate) {
+                alert('시작 날짜와 종료 날짜를 입력해주세요.');
+                return;
+            }
+
+            const startDateTime = startDate + "T00:00:00";
+            const endDateTime = endDate + "T23:59:59";
+
+            try {
+                // 서버 API 호출
+                const response = await fetch(`/master/signupDateStatData?startDateTime=${startDateTime}&endDateTime=${endDateTime}`);
+                if (!response.ok) {
+                    throw new Error('통계 데이터를 가져오는 데 실패했습니다.');
+                }
+
+                const data = await response.json();
+                console.log('API 응답 데이터:', data);
+
+                // 날짜 범위 내의 모든 날짜 생성
+                const allDates = getAllDatesInRange(startDate, endDate);
+
+                // 모든 날짜를 기준으로 데이터 매핑
+                const categories = allDates;
+                const seriesData = allDates.map(date => {
+                    const entry = data.find(d => d.regDate === date);
+                    return entry ? entry.signupCount || 0 : 0;
+                });
+
+                // 차트 데이터 정의
+                const chartData = {
+                    categories: categories,
+                    series: [
+                        {
+                            name: '가입 수',
+                            data: seriesData,
+                        },
+                    ],
+                };
+
+                // 차트 옵션 정의
+                const options = {
+                    chart: {
+                        title: '가입일 기준 가입 통계',
+                        width: 900,
+                        height: 400,
+                    },
+                    xAxis: {
+                        title: '가입일',
+                        label: { interval: 1 },
+                    },
+                    yAxis: {
+                        title: '가입 수',
+                    },
+                    series: {
+                        showLabel: true,
+                    },
+                };
+
+                // 기존 차트 삭제 후 다시 그리기
+                const el = document.getElementById('chart');
+                el.innerHTML = '';
+                toastui.Chart.lineChart({ el, data: chartData, options });
+            } catch (error) {
+                console.error('차트를 업데이트하는 동안 오류 발생:', error);
+                alert('데이터를 가져오는 데 실패했습니다.');
+            }
+        }
+
+        // 페이지 로드 시 기본 차트 렌더링
+        updateChart();
+    </script>
+</body>
+</html>
