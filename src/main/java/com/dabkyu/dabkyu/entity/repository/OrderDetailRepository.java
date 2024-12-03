@@ -15,7 +15,7 @@ import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, Long> {
     // 특정 주문에 해당하는 모든 주문 상세 정보 조회
-    public List<OrderDetailEntity> findByOrderSeqno_OrderSeqno(OrderInfoEntity orderSeqno);
+    public List<OrderDetailEntity> findByOrderSeqno(OrderInfoEntity orderSeqno);
 
     // 특정 주문 상품에 해당하는 주문 상세 정보 조회
     public OrderDetailEntity findByOrderSeqno_OrderSeqno(Long orderSeqno);

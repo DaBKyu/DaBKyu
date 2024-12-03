@@ -311,4 +311,24 @@ public class EmailServiceImpl implements EmailService {
             log.info("인증번호 전송 실패: " + e.getMessage());
         }
     }
+
+    //임시 비밀번호 메일 발송
+    @Override
+    public void sendTempPw(String email, String tempPW) throws Exception {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("[다비켜] 임시 비밀번호 발송");
+        message.setText("안녕하세요.\n\n 임시 비밀번호는 다음과 같습니다:\n\n" 
+        + tempPW + "\n\n감사합니다.");
+
+        // 이메일 발송
+        try {
+            emailSender.send(message);
+            log.info("인증번호 전송 성공: " + email);
+        } catch (Exception e) {
+            log.info("인증번호 전송 실패: " + e.getMessage());
+        }
+
+    }
+
 }

@@ -9,6 +9,7 @@ import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
+import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
@@ -25,7 +26,7 @@ public interface MemberService {
 	public void modifyMemberInfo(MemberDTO member);
 
 	// 회원 주문제품 내역
-	public Page<OrderProductEntity> orderProductList(String email, int page, int orderNum, String keyword);
+	public Page<OrderDetailEntity> orderDetailList(String email, int page, int orderNum, String keyword);
 
 	// 취소, 환불, 교환 내역 조회
 

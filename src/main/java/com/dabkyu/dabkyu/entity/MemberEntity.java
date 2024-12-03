@@ -37,10 +37,10 @@ public class MemberEntity {
 	@Column(name="username",length=20,nullable=false)
 	private String username;
 
-	@Column(name="gender",length=10,nullable=false)
+	@Column(name="gender",length=10,nullable=true)
 	private String gender;
 
-	@Column(name="birth_date",nullable=false)
+	@Column(name="birth_date",nullable=true)
 	private LocalDate birthDate;
 	
 	@Column(name="member_grade",length=20,nullable=false)

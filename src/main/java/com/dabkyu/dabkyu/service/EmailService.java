@@ -46,4 +46,7 @@ public interface EmailService {
     //회원가입 인증코드 메일 발송
     public void sendAuthCode(String email, String authCode) throws Exception;
 
+    //임시 비밀번호 메일 발송
+    public void sendTempPw(String email, String tempPW) throws Exception;
+
 }
