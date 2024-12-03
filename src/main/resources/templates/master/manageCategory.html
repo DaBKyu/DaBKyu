@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상품관리페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" >
+    <link rel="stylesheet" href="../../static/css/master.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
+</head>
+
+<body>
+  
+    <!-- 네비게이션 바 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+          <a class="navbar-brand" href="#">Admin</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item dropdown"><a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown" aria-expanded="false">상품관리</a>
+                      <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="../master/productManage.html">상품관리</a></li>
+                          <li><a class="dropdown-item" href="../master/categoryManage.html">카테고리 관리</a></li>
+                          <li><a class="dropdown-item" href="../master/productUpload.html">상품 등록</a></li>
+                        </ul>
+                  </li>
+                  <li class="nav-item"><a class="nav-link" href="../master/userManage.html">회원관리</a></li>
+                  <li class="nav-item"><a class="nav-link" href="../master/deliveryManage.html">배송관리</a></li>
+                  <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">문의/리뷰목록</a>
+                      <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="../master/qnaList.html">문의 목록</a></li>
+                          <li><a class="dropdown-item" href="../master/reviewList.html">리뷰 목록</a></li>
+                        </ul>
+                  </li>
+                  <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
+                      <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="../master/mailList.html">메일 발송 목록</a></li>
+                          <li><a class="dropdown-item" href="../master/mailSend.html">메일 발송</a></li>
+                        </ul>
+                  </li>
+                  <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">쿠폰</a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="../master/couponMake.html">쿠폰 생성</a></li>
+                      <li><a class="dropdown-item" href="../master/couponList.html">생성된 쿠폰 리스트</a></li>
+                    </ul>
+                  </li>
+              </ul>
+              <span class="navbar-text">Admin01</span>
+          </div>
+      </div>
+    </nav>
+        
+    <!-- 카테고리 관리 -->
+    <div class="container mt-3">     
+      <h3 class="mt-3">카테고리 관리</h3>
+      <hr>
+
+      <!-- 카테고리 목록을 1차, 2차, 3차로 나누어 출력 -->
+      <div class="row mt-4">
+          <!-- 1차 카테고리 -->
+          <div class="col-md-4">
+              <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item active" aria-current="page">선택</li>
+                  </ol>
+              </nav>
+              <!-- 1차 카테고리 리스트 -->
+              <ul class="list-group" id="category1-list">
+                  <!-- Thymeleaf 반복문으로 1차 카테고리 출력 -->
+                  <li th:each="category : ${categories1}" 
+                      th:text="${category.category1Name}" 
+                      th:data-id="${category.category1Seqno}" 
+                      th:onclick="|selectCategory1(${category.category1Seqno})|"     
+                      class="list-group-item">카테고리 이름
+                          <!-- 수정 버튼 -->
+                          <button class="btn btn-sm btn-outline-primary" 
+                                  onclick="editCategory(event, 1)">수정</button>
+                          <!-- 삭제 버튼 -->
+                          <button class="btn btn-sm btn-outline-danger" 
+                                  onclick="deleteCategory(event, 1)">삭제</button>
+                  </li>
+              </ul>
+
+              <!-- 1차 카테고리 추가 폼 -->
+              <div class="input-group mt-2">
+                  <input type="text" id="mainCategory" class="form-control" placeholder="카테고리명을 입력하세요." aria-label="">
+                  <button th:onclick="'addCategory(1)'" class="btn btn-outline-secondary">추가</button>
+              </div>
+          </div>
+
+          <!-- 2차 카테고리 (선택된 1차 카테고리에 대한 하위 카테고리) -->
+          <div class="col-md-4">
+              <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                      <li th:if="${category.category1Seqno == selectedCategory1Seqno}" 
+                          th:each="category : ${categories1}" 
+                          th:text="${category.category1Name}" 
+                          class="breadcrumb-item"></li>
+                      <li class="breadcrumb-item active" 
+                          aria-current="page">선택</li>
+                  </ol>
+              </nav>
+
+              <!-- 2차 카테고리 리스트 -->
+              <ul class="list-group" id="category2-list">
+                  <!-- 선택된 1차 카테고리에 대한 하위 카테고리를 출력 -->
+                   <li th:each="subcategory : ${categories2}"
+                      th:if="${subcategory.category1Seqno == selectedCategory1Seqno}" 
+                      th:text="${subcategory.category2Name}" 
+                      th:data-id="${subcategory.category2Seqno}"
+                      th:onclick="|selectCategory2(${subcategory.category2Seqno})|"
+                      class="list-group-item">소 카테고리 이름
+                          <button class="btn btn-sm btn-outline-primary" th:onclick="'editCategory(' + ${subcategory.category2Seqno} + ', \'' + ${subcategory.category2Name} + '\')'">수정</button>
+                          <button class="btn btn-sm btn-outline-danger" th:onclick="'deleteCategory(' + ${subcategory.category2Seqno} + ')'">삭제</button>
+                  </li> 
+              </ul>
+
+              <!-- 2차 카테고리 추가 폼 -->
+              <div class="input-group mt-2">
+                  <input type="text" id="midCategory" class="form-control" placeholder="카테고리명을 입력하세요." aria-label="">
+                  <button th:onclick="'addCategory(2)'" class="btn btn-outline-secondary">추가</button>
+              </div>  
+          </div>
+
+          <!-- 3차 카테고리 (선택된 2차 카테고리에 대한 하위 카테고리) -->
+          <div class="col-md-4">
+               <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                      <li th:each="category : ${categories1}"
+                          th:if="${category.category1Seqno == selectedCategory1Seqno}"
+                          th:text="${category.category1Name}" 
+                          class="breadcrumb-item"></li>
+                      <li th:each="subcategory : ${categories2}"
+                          th:if="${subcategory.category1Seqno == selectedCategory1Seqno && subcategory.category2Seqno == selectedCategory2Seqno}"
+                          th:text="${subcategory.category2Name}" 
+                          class="breadcrumb-item"></li>
+                      <li class= "breadcrumb-item active" aria-current= "page">선택</li> 
+                  </ol> 
+              </nav> 
+
+              <!-- 3차 카테고리 리스트 -->
+              <ul class= "list-group" id="category3-list"> 
+                  <!-- 선택된 2차 카테고리에 대한 하위 카테고리를 출력 --> 
+                   <li th:each= "subSubcategory : ${categories3}" 
+                      th:if="${subSubcategory.category2Seqno == selectedCategory2Seqno}" 
+                      th:text= "${subSubcategory.category3Name}" 
+                      th:data-id= "${subSubcategory.category3Seqno}"
+                      class= "list-group-item"> 상세 카테고리 이름
+                          <button class="btn btn-sm btn-outline-primary" th:onclick="'editCategory(' + ${subSubcategory.category3Seqno} + ', \'' + ${subSubcategory.category3Name} + '\')'">수정</button>
+                          <button class="btn btn-sm btn-outline-danger" th:onclick="'deleteCategory(' + ${subSubcategory.category3Seqno} + ')'">삭제</button>
+                  </li> 
+              </ul> 
+
+              <!-- 3차 카테고리 추가 폼 --> 
+              <div class= "input-group mt-2"> 
+                  <input type= "text" id= "detailCategory" placeholder= "카테고리명을 입력하세요." aria-label="" class= "form-control"/> 
+                  <button th:onclick="'addCategory(3)'" type= "button" id= "button-addon2" class= "btn btn-outline-secondary">추가</button> 
+              </div>  
+          </div>  
+      </div>  
+  </div> 
+
+<script th:inline="javascript">
+    const category1List = [[${categories1}]];
+    const category2List = [[${categories2}]];
+    const category3List = [[${categories3}]];
+
+    const category1Map = new Map();  
+    const category2Map = new Map();  
+    const category3Map = new Map(); 
+    const deleteCategory1Map = new Map();
+    const deleteCategory2Map = new Map();
+    const deleteCategory3Map = new Map();
+    let tempSeqno = -1;
+    let selectedCategory1Seqno = null;
+    let selectedCategory2Seqno = null;
+
+    // category1 데이터 처리
+    category1List.forEach(category1 => {
+        category1Map.set(category1.category1Seqno, category1.category1Name);
+    });
+    // category2 데이터 처리
+    category2List.forEach(category2 => {
+        category2Map.set(category2.category2Seqno + "," + category2.category1Seqno, category2.category2Name);
+    });
+    // category3 데이터 처리
+    category3List.forEach(category3 => {
+        category3Map.set(category3.category3Seqno + "," + category3.category2Seqno, category3.category3Name);
+    });
+
+    console.log("Category 1 Map:", category1Map);
+    console.log("Category 2 Map:", category2Map);
+    console.log("Category 3 Map:", category3Map);
+
+    //카테고리 1 필터링
+    function selectCategory1(category1Seqno) {
+        selectedCategory1Seqno = category1Seqno;
+        updateCategory2List();
+        updateCategory3List();
+        console.log(selectedCategory1Seqno,category1Seqno);
+    }
+
+    //카테고리 2 필터링
+    function selectCategory2(category2Seqno) {
+        selectedCategory2Seqno = category2Seqno;
+        updateCategory3List();
+    }
+
+    //2차 카테고리 목록 업데이트
+    function updateCategory2List() {
+        const category2ListElement = document.getElementById('category2-list');
+        category2ListElement.innerHTML = ''; // 기존 항목 초기화
+
+        category2List.forEach(category2 => {
+            if (category2.category1Seqno === selectedCategory1Seqno) {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item');
+                listItem.textContent = category2.category2Name;
+                listItem.setAttribute('data-id', category2.category2Seqno);
+                listItem.setAttribute('data-parent-id', category2.category1Seqno);
+                listItem.onclick = () => selectCategory2(category2.category2Seqno);
+                category2ListElement.appendChild(listItem);
+            }
+        });
+    }
+
+    //3차 카테고리 목록 업데이트
+    function updateCategory3List() {
+        const category3ListElement = document.getElementById('category3-list');
+        category3ListElement.innerHTML = ''; // 기존 항목 초기화
+
+        category3List.forEach(category3 => {
+            if (category3.category2Seqno === selectedCategory2Seqno) {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item');
+                listItem.textContent = category3.category3Name;
+                listItem.setAttribute('data-id', category3.category3Seqno);
+                listItem.setAttribute('data-parent-id', category3.category2Seqno);
+                category3ListElement.appendChild(listItem);
+            }
+        });
+    }
+
+    //카테고리 추가
+    function addCategory(level) {
+        let categoryName;
+        let categoryId;
+
+        if (level === 1) {
+            categoryName = document.getElementById("mainCategory").value;
+        } else if (level === 2) {
+            categoryName = document.getElementById("midCategory").value;
+        } else if (level === 3) {
+            categoryName = document.getElementById("detailCategory").value;
+        }
+
+        if (!categoryName || categoryName.trim() === "") {
+        alert("카테고리 이름을 입력해주세요.");
+        return;
+        }
+
+       
+    }
+    // 카테고리 데이터를 서버로 보내는 함수
+    function sendCategoryData() {
+    
+    }
+  
+   // 카테고리 수정 함수
+   function editCategory(categoryId, currentName) {
+       const newName = prompt("새로운 카테고리 이름을 입력하세요:", currentName);
+  
+       if (!newName || newName.trim() === "" || newName === currentName) {
+           alert("변경된 이름이 없습니다.");
+           return;
+       }
+
+       const categoryData = {
+         category1: level === 1 ? { [categoryId]: newName } : {},
+         category2: level === 2 ? { [`${categoryId},1`]: newName } : {},
+         category3: level === 3 ? { [`${categoryId},2`]: newName } : {}
+       };
+  
+       fetch('/master/manageCategory', {
+           method: 'POST',
+           headers: {
+               'Content-Type': 'application/json',
+           },
+           body: JSON.stringify({ id: categoryId, name: newName })
+       }).then(response => response.json())
+         .then(data => {
+             if (data.success) {
+                 window.location.reload();
+             } else {
+                 alert('카테고리 수정에 실패했습니다.');
+             }
+       });
+   }
+    
+   // 카테고리 삭제 함수
+   function deleteCategory(categoryId) {
+       if (confirm("정말로 이 카테고리를 삭제하시겠습니까?")) {
+           fetch(`/categories/delete/${categoryId}`, {
+               method: 'DELETE',  // DELETE 메서드 사용
+               headers: { 'Content-Type': 'application/json' }
+           }).then(response => response.json())
+             .then(data => {
+                 if (data.success) {
+                     window.location.reload();
+                 } else {
+                     alert('카테고리 삭제에 실패했습니다.');
+                 }
+             })
+             .catch(error => {
+                 console.error('Error:', error);
+                 alert('서버와의 통신 중 오류가 발생했습니다.');
+             });
+       }
+   }
+       
+  </script>
+</body>
+</html>

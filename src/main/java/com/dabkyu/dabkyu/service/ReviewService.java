@@ -12,17 +12,17 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 
 public interface ReviewService {
 
-    // 상품 리뷰 보기
-	public Page<ReviewEntity> list(int pageNum, int postNum, String keyword) throws Exception;
+	// 해당 제품에 대한 리뷰 목록 보기
+	public Page<ReviewEntity> productReviewList(int pageNum, int postNum, Long productSeqno) throws Exception;
 
 	//게시물 상세 내용 보기
 	public ReviewDTO view(Long reviewSeqno) throws Exception;
 	
 	//게시물 내용 이전 보기
-	public Long pre_seqno(Long reviewSeqno,String keyword) throws Exception;
+	public Long pre_seqno(Long reviewSeqno, String keyword) throws Exception;
 	
 	//게시물 내용 다음 보기
-	public Long next_seqno(Long reviewSeqno,String keyword) throws Exception;
+	public Long next_seqno(Long reviewSeqno, String keyword) throws Exception;
 
     // 상품 리뷰 등록 하기
 	public void write(ReviewDTO review) throws Exception;

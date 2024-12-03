@@ -2,6 +2,8 @@ package com.dabkyu.dabkyu.controller;
 
 import java.io.File;
 import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.Comparator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -227,36 +229,43 @@ public class MemberController {
     }
     
 
-    // 배송지 조회
-    @GetMapping("/mypage/address")
-    public void getAddress(Model model, HttpSession session) throws Exception {
+    // 배송지 리스트에서 배송지 수정 화면
+    @GetMapping("/mypage/modifyMemberAddress")
+    public void getAddress(Model model,
+        @RequestParam(name="memberAddressSeqno") Long memberAddressSeqno) throws Exception {
         
-        String email = (String) session.getAttribute("email");
-        List<MemberAddressEntity> addressList = memberService.addressList(email);
-
-        model.addAttribute("listIsEmpty", addressList.isEmpty()?"Y":"N");
-        model.addAttribute("addressList", addressList);
+        MemberAddressDTO viewAddr = service.viewAddr(memberAddressSeqno);
+        model.addAttribute("viewAddr", viewAddr);
     }
 
 
-    // 배송지 추가 화면
-    @GetMapping("/mypage/addAddress")
-    public void gerAddAddress() {}
-    
+    // 배송지 리스트 화면
+    @GetMapping("/mypage/addrList")
+    public void getAddrList(Model model, HttpSession session) throws Exception {
 
-    // 배송지 수정 화면
-    @GetMapping("/mypage/modifyAddress")
-    public void getModifyAddress(
-        Model model,
-        @RequestParam("memberAddressSeqno")
-        Long seqno
-    ) throws Exception {
-        
-        model.addAttribute("viewAddress", memberService.viewAddress(seqno));
+        String email = (String) session.getAttribute("email");
+
+        List<MemberAddressEntity> addressList = service.addressList(email);
+        MemberAddressDTO viewBasicAddr = service.viewBasicAddr(email);
+
+        Collections.sort(addressList, Comparator.comparing(MemberAddressEntity::getMemberAddressSeqno).reversed());
+
+        model.addAttribute("listIsEmpty", addressList.isEmpty()?"Y":"N");
+        model.addAttribute("addressList", addressList);
+        model.addAttribute("viewBasicAddr", viewBasicAddr);
+    }
+    
+    
+    // 배송지 추가 화면
+    @GetMapping("/mypage/addAddr")
+    public void getAddAdress(Model model, HttpSession session) throws Exception {
+        String email = (String) session.getAttribute("email");
+        model.addAttribute("member", service.memberInfo(email));
     }
     
     
     // 배송지 등록
+    @ResponseBody
     @PostMapping("/mypage/addAddress")
     public String postAddAddress(MemberAddressDTO address) throws Exception {
         memberService.addAddress(address);
@@ -265,6 +274,7 @@ public class MemberController {
     
 
     // 배송지 수정
+    @ResponseBody
     @PostMapping("/mypage/modifyAddress")
     public String postModifyAddress(MemberAddressDTO address) throws Exception {
         memberService.modifyAddress(address);
@@ -284,7 +294,10 @@ public class MemberController {
     @GetMapping("/mypage/memberInfo")
     public void getMemberInfo(Model model, HttpSession session) {
         String email = (String) session.getAttribute("email");
-        model.addAttribute("member", memberService.memberInfo(email));
+        MemberAddressDTO viewBasicAddr = service.viewBasicAddr(email);
+
+        model.addAttribute("member", service.memberInfo(email));
+        model.addAttribute("viewBasicAddr", viewBasicAddr);
     }
 
 

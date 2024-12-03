@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
@@ -40,6 +42,8 @@ import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.MemberReviewLikeEntity;
 import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.ProductFileEntity;
+import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
@@ -53,6 +57,7 @@ import com.dabkyu.dabkyu.util.PageUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
 
 @Controller
 @AllArgsConstructor
@@ -71,33 +76,43 @@ public class ShopController {
 	
 	}
 
+	public String getMethodName(@RequestParam String param) {
+		return new String();
+	}
+	
+
 	// 전체 상품 검색 화면
     @GetMapping("/shop/searchAll")
 	public void getSearchAll(
 		Model model,
-		@RequestParam(name="keyword",defaultValue="",required=false) String keyword)
-		throws Exception {
+		@RequestParam(name="page") int pageNum,
+		@RequestParam(name="keyword", defaultValue="", required=false) String keyword
+		) throws Exception {
 		
-		int postNum = 12; 
-		int pageListCount = 10; 
+		int postNum = 12;
+		int pageListCount = 10;
+
 		PageUtil page = new PageUtil();
+		
+		Page<ProductEntity> product = productService.productAllList(pageNum, postNum, keyword);
 
-		List<ProductEntity> product = productService.productAllList(keyword);
-
+		int totalCount = (int)product.getTotalElements();
 		List<Category1Entity> mist = productService.category1List();
 		List<Category2Entity> list2 = productService.category2List();
 		List<Category3Entity> list3 = productService.category3List();
 		
+		model.addAttribute("product", product);
+
 		// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
     	list2 = list2.stream()
 					.sorted(Comparator.comparingLong(Category2Entity::getCategory2Seqno)) // category2Seqno 기준 오름차순 정렬
 					.collect(Collectors.toList()); // 다시 리스트로 수집
+
 		model.addAttribute("mist", mist);
 		model.addAttribute("list2", list2);
 		model.addAttribute("list3", list3);
 		model.addAttribute("keyword", keyword);
-		model.addAttribute("product", product);
-		model.addAttribute("pageList", page.getPageList1(postNum, pageListCount, keyword));
+		model.addAttribute("pageList", page.getSearchPageList(pageNum, postNum, pageListCount, totalCount, keyword));
 	}
 
 	
@@ -109,6 +124,10 @@ public class ShopController {
 		List<Category2Entity> list2 = productService.category2List();
 		List<Category3Entity> list3 = productService.category3List();
 		List<ProductEntity> product = productService.productList();
+
+		
+		// List<ProductFileEntity> productFile = productService.productFileList();
+
 		// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
     	list2 = list2.stream()
 					.sorted(Comparator.comparingLong(Category2Entity::getCategory2Seqno)) // category2Seqno 기준 오름차순 정렬
@@ -118,68 +137,8 @@ public class ShopController {
 		model.addAttribute("list2", list2);
 		model.addAttribute("list3", list3);
 		model.addAttribute("product", product);
+		// model.addAttribute("productFile", productFile);
 	}	
-
-
-	// //카테고리별 상품 보기 (사이드바 카테고리 목록 보기 와 코드 동일)
-	// @GetMapping("/shop/list")
-	// public void getList(Model model) throws Exception {
-	// 	List<Category1Entity> list = productService.category1List();
-	// 	List<Category2Entity> list2 = productService.category2List();
-	// 	List<Category3Entity> list3 = productService.category3List();
-
-	// 	// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
-    // 	list2 = list2.stream()
-	// 				 .sorted(Comparator.comparingLong(Category2Entity::getCategory2Seqno)) // category2Seqno 기준 오름차순 정렬
-	// 			   	 .collect(Collectors.toList()); // 다시 리스트로 수집
-
-	// 	model.addAttribute("list", list);
-	// 	model.addAttribute("list2", list2);
-	// 	model.addAttribute("list3", list3);
-	// }
-	
-	//상품 목록 보기
-	@GetMapping("/shop/list")
-	public void getList(Model model,@RequestParam("page") int pageNum,
-			@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
-			@RequestParam(name="cate") Long CateSeqno,
-			@RequestParam(name = "category1Seqno",defaultValue = "", required = false) Long category1Seqno,
-			@RequestParam(name = "category2Seqno",defaultValue = "", required = false) Long category2Seqno,
-			@RequestParam(name = "category3Seqno",defaultValue = "", required = false) Long category3Seqno) throws Exception {
-		
-		int postNum = 10; 
-		int pageListCount = 10; 
-		
-		PageUtil page = new PageUtil();
-		Page<ProductEntity> list = productService.list(pageNum, postNum, keyword,category3Seqno);
-		log.info(list);
-		
-		int totalCount = (int)list.getTotalElements();
-
-		List<Category1Entity> mist = productService.category1List();
-		List<Category2Entity> list2 = productService.category2List();
-		List<Category3Entity> list3 = productService.category3List();
-
-		model.addAttribute("list", list);
-		model.addAttribute("listIsEmpty", list.hasContent() ? "N" : "Y");
-		model.addAttribute("totalElement", totalCount);
-		model.addAttribute("postNum", postNum);
-		model.addAttribute("page", pageNum);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("category1Seqno", category1Seqno);  
-		model.addAttribute("category2Seqno", category2Seqno); 
-		model.addAttribute("category3Seqno", category3Seqno); 
-		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword,CateSeqno));
-
-		// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
-    	list2 = list2.stream()
-					.sorted(Comparator.comparingLong(Category2Entity::getCategory2Seqno)) // category2Seqno 기준 오름차순 정렬
-					.collect(Collectors.toList()); // 다시 리스트로 수집
-
-		model.addAttribute("mist", mist);
-		model.addAttribute("list2", list2);
-		model.addAttribute("list3", list3);
-	}
 
 	// 카테고리별 상품 리스트
 	@GetMapping("/shop/categoryProduct")
@@ -187,7 +146,7 @@ public class ShopController {
 		Model model,
 		@RequestParam(name="cate") Long CateSeqno,
 		@RequestParam(name="page") int pageNum,
-		@RequestParam(name="keyword",defaultValue="",required=false) String keyword
+		@RequestParam(name="keyword", defaultValue="", required=false) String keyword
 		) throws Exception {
 
 		int postNum = 12;
@@ -198,7 +157,6 @@ public class ShopController {
 		Page<ProductEntity> list = productService.list(pageNum, postNum, keyword, CateSeqno);
 
 		int totalCount = (int)list.getTotalElements();
-		
 		List<Category1Entity> mist = productService.category1List();
 		List<Category2Entity> list2 = productService.category2List();
 		List<Category3Entity> list3 = productService.category3List();
@@ -214,7 +172,7 @@ public class ShopController {
 		model.addAttribute("list2", list2);
 		model.addAttribute("list3", list3);
 		model.addAttribute("keyword", keyword);
-		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount,totalCount,keyword,CateSeqno));
+		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount, totalCount, keyword, CateSeqno));
 	}
 
 	//상품 조회 테스트
@@ -245,22 +203,28 @@ public class ShopController {
 	@GetMapping("/shop/view")
 	public void getView(
 		Model model,
-		@RequestParam(name="productSeqno") Long productSeqno, 
+		@RequestParam(name="productSeqno") Long productSeqno,
 		@RequestParam(name="page") int pageNum,
-		@RequestParam(name="keyword",defaultValue="",required=false) String keyword,
 		HttpSession session) throws Exception {
-		
+
+		int postNum = 5; //한 화면에 보여지는 게시물 행의 갯수
+		int pageListCount = 5; //화면 하단에 보여지는 페이지리스트의 페이지 갯수
+
+		PageUtil page = new PageUtil();
+		//리뷰내용 가져오기
+		Page<ReviewEntity> reviewList = reviewService.productReviewList(pageNum, postNum, productSeqno);
+
+		int totalCount = (int)reviewList.getTotalElements();
 		List<Category1Entity> mist = productService.category1List();
 		List<Category2Entity> list2 = productService.category2List();
 		List<Category3Entity> list3 = productService.category3List();
-
+		List<ProductFileEntity> productFileList = productService.productFileList(productSeqno);
+		List<ProductInfoFileEntity> productInfoFileList = productService.productInfoFileList(productSeqno);
+		
+		model.addAttribute("reviewList", reviewList);
+		model.addAttribute("view", productService.view(productSeqno));
 		//String sessionEmail = (String)session.getAttribute("email");
-        model.addAttribute("view", productService.view(productSeqno));
-		model.addAttribute("page", pageNum);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("pre_seqno", productService.pre_seqno(productSeqno,keyword));		
-		model.addAttribute("next_seqno", productService.next_seqno(productSeqno,keyword));
-		// model.addAttribute("fileListView", productService.fileListView(productSeqno));	
+		// model.addAttribute("fileListView", productService.fileListView(productSeqno));
 
 		// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
     	list2 = list2.stream()
@@ -270,6 +234,10 @@ public class ShopController {
 		model.addAttribute("mist", mist);
 		model.addAttribute("list2", list2);
 		model.addAttribute("list3", list3);
+		model.addAttribute("productFileList", productFileList);
+		model.addAttribute("productInfoFileList", productInfoFileList);
+		model.addAttribute("pageList", page.getProductReviewList(pageNum, postNum, pageListCount, totalCount, productSeqno));
+
     }
 
 	// 장바구니 보기
@@ -364,17 +332,24 @@ public class ShopController {
         return "{\"message\":\"good\"}";
     }
 
+	// // 결제 화면 보기
+	// @GetMapping("/shop/pay")
+	// public void getPay(
+	// 	HttpSession session,
+	// 	@RequestParam("toPayOrderProductList")
+	// 	List<Long> toPayOrderProductList,
+	// 	@RequestParam("orderInfo") OrderInfoDTO orderInfo,
+	// 	@RequestParam("memberAddress") MemberAddressDTO memberAddress,
+	// 	@RequestParam("memberCoupon") MemberCouponDTO memberCoupon,
+	// 	@RequestParam("member") MemberDTO member
+	// 	) {}
+
 	// 결제 화면 보기
 	@GetMapping("/shop/pay")
-	public void getPay(
-		HttpSession session,
-		@RequestParam("toPayOrderProductList")
-		List<Long> toPayOrderProductList,
-		@RequestParam("orderInfo") OrderInfoDTO orderInfo,
-		@RequestParam("memberAddress") MemberAddressDTO memberAddress,
-		@RequestParam("memberCoupon") MemberCouponDTO memberCoupon,
-		@RequestParam("member") MemberDTO member
-		) {}
+	public void getPay() {
+
+	}
+	
 
 
 	// 결제 
@@ -521,28 +496,6 @@ public class ShopController {
 		}
 		
 		return "{\"message\":\"good\"}";
-	}
-
-	// 상품 리뷰 내역 보기
-	@GetMapping("/shop/reviewList")
-	public void getReviewList(Model model,@RequestParam("page") int pageNum,
-			@RequestParam(name="cate") Long CateSeqno,
-			@RequestParam(name="keyword",defaultValue="",required=false) String keyword) throws Exception {
-		
-		int postNum = 10; //한 화면에 보여지는 게시물 행의 갯수
-		int pageListCount = 10; //화면 하단에 보여지는 페이지리스트의 페이지 갯수	
-		
-		PageUtil page = new PageUtil();
-		Page<ReviewEntity> list = reviewService.list(pageNum, postNum, keyword);
-		int totalCount = (int)list.getTotalElements();
-
-		model.addAttribute("list", list);
-		model.addAttribute("listIsEmpty", list.hasContent()?"N":"Y");
-		model.addAttribute("totalElement", totalCount);
-		model.addAttribute("postNum", postNum);
-		model.addAttribute("page", pageNum);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("pageList", page.getReviewList(pageNum, postNum, pageListCount,totalCount,keyword));
 	}
 
 	// 상품 리뷰 상세 보기
