@@ -26,7 +26,7 @@ public class ProductDTO {
 	private String deliveryisFree;
 	private int likecnt;
 	// private String infoOrgImage;
-	// private String infoStoredImage;
+	private String thumbnail;
     private String secretYn;
     private List<ProductFileDTO> productFiles;
 

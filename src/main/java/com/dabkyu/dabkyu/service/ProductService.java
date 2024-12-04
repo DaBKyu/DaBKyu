@@ -24,6 +24,12 @@ public interface ProductService {
 	// seachAll에서 사용할 전체 상품 보기
 	public Page<ProductEntity> productAllList(int pageNum, int postNum, String keyword) throws Exception;
 
+	// main 썸네일 리스트
+	public List<ProductFileEntity> productFileMainList(List<ProductEntity> productList);
+
+	// 썸네일 주소 가져오기
+	public String getProductThumbnail(ProductEntity productEntity);
+
 	//상품 이미지 보기////
 	public List<ProductFileEntity> productFileList(Long productSeqno) throws Exception;
 	
