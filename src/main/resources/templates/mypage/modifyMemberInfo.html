@@ -119,6 +119,20 @@
         .delete-account-button:hover {
             background-color: #c82333;
         }
+        .edit-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -170,6 +184,7 @@
         <div class="form-section">
             <button id="editProfileLink">회원정보 수정</button>
         </div>
+        <a href="deleteID" class="edit-button">회원정보 탈퇴</a>
     </div>
 
     <!-- 이메일 인증 모달 -->
@@ -204,7 +219,7 @@
     </div>
 
     <!-- 회원탈퇴 버튼 -->
-    <button class="delete-account-button" onclick="window.location.href='deleteAccount.html'">회원탈퇴</button>
+    
 
     <script>
         // 이메일 변경 버튼 클릭 시 모달 열기

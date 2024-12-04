@@ -39,9 +39,9 @@ public class ProductInfoFileEntity {
 	@JoinColumn(name="product_seqno", nullable = false)
 	private ProductEntity productSeqno;
 	
-    @Column(name="org_filename", length=200, nullable=false)
+    @Column(name="org_filename", length=2000, nullable=false)
 	private String orgFilename;
 	
-	@Column(name="stored_filename", length=200, nullable=false)
+	@Column(name="stored_filename", length=2000, nullable=false)
 	private String storedFilename;
 }

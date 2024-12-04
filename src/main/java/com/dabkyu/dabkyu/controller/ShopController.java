@@ -3,6 +3,7 @@ package com.dabkyu.dabkyu.controller;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import com.dabkyu.dabkyu.dto.MemberCouponDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.OrderProductDTO;
+import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.QuestionDTO;
 import com.dabkyu.dabkyu.dto.QuestionFileDTO;
 import com.dabkyu.dabkyu.dto.ReviewDTO;
@@ -125,8 +127,14 @@ public class ShopController {
 		List<Category3Entity> list3 = productService.category3List();
 		List<ProductEntity> product = productService.productList();
 
-		
-		// List<ProductFileEntity> productFile = productService.productFileList();
+		List<ProductDTO> productList = new ArrayList<>();
+		for (ProductEntity productEntity : product) {
+			ProductDTO productDTO = new ProductDTO(productEntity);
+			String thumbnail = productService.getProductThumbnail(productEntity);
+			productDTO.setThumbnail(thumbnail);
+			log.info("--------------------thumbnail: {}-----------------------", thumbnail);
+			productList.add(productDTO);
+		}
 
 		// Category2 리스트를 category2Seqno 기준으로 오름차순 정렬
     	list2 = list2.stream()
@@ -136,8 +144,7 @@ public class ShopController {
 		model.addAttribute("mist", mist);
 		model.addAttribute("list2", list2);
 		model.addAttribute("list3", list3);
-		model.addAttribute("product", product);
-		// model.addAttribute("productFile", productFile);
+		model.addAttribute("product", productList);
 	}	
 
 	// 카테고리별 상품 리스트

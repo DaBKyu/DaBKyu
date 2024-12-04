@@ -54,7 +54,6 @@ border: solid 1px #e3e3e3;
 /* 각 카드 스타일 */
 .movie-card {
     width: 200px;
-    height: 200px;
     text-align: center;
     background-color: white;
     color: rgb(0, 0, 0);
@@ -107,9 +106,9 @@ button:hover {
         <div class="movie-slider">
             <div th:each="item : ${product}" class="movie-card">
                 <a th:href="@{'/shop/view?productSeqno=' + ${item.productSeqno}} + '&page=1'" style="text-decoration: none; text-decoration: none; color: inherit;">
-                <!-- <img th:if="${productFile.isThumb == 'Y'}" th:src="@{/shop/product/{imageName}(imageName=${productFile.productSeqno.orgFilename})}" style="width: 200px; height:150px; border-radius: 10px;"> -->
-                제품명 : <span th:text="${item.productName}"></span><br>
-                제품 가격 : <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')+'원'}" style="line-height: 3;"></span>
+                    <img th:src="@{'/product/thumbnails/' + ${item.thumbnail}}" style="width: 200px; height:150px; border-radius: 10px;">
+                    제품명 : <span th:text="${item.productName}"></span><br>
+                    제품 가격 : <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')+'원'}" style="line-height: 3;"></span>
                 </a>
             </div>
         </div>    
