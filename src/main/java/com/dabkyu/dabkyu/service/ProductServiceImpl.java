@@ -100,14 +100,13 @@ public class ProductServiceImpl implements ProductService{
     }
 
 	//상품 이미지 보기////
-	public List<ProductFileEntity> productFileList(Long productSeqno) throws Exception{
+	public List<ProductFileEntity> productFileList(Long productSeqno) throws Exception {
 		return productFileRepository.findByProductSeqno_ProductSeqno(productSeqno);
 	 
 	}
 	/////////////////////////////////
-	
 	//제품 설명 첨부 파일 보기
-	public List<ProductInfoFileEntity> productInfoFileList(Long productSeqno) throws Exception{
+	public List<ProductInfoFileEntity> productInfoFileList(Long productSeqno) throws Exception {
 		return productInfoFileRepository.findByProductSeqno_ProductSeqno(productSeqno);
 	}
 
@@ -156,7 +155,6 @@ public class ProductServiceImpl implements ProductService{
             return productRepository.findByProductNameContaining(keyword, pageRequest);
    		}		
 	}
-
 
    //가장 많이 팔린 상품 10개 조회
     @Override

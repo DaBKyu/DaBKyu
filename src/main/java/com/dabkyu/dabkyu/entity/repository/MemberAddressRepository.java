@@ -3,6 +3,7 @@ package com.dabkyu.dabkyu.entity.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
+import com.dabkyu.dabkyu.entity.MemberEntity;
 
 import java.util.List;
 
@@ -13,4 +14,6 @@ public interface MemberAddressRepository extends JpaRepository<MemberAddressEnti
     public MemberAddressEntity findByEmail_EmailAndIsBasic(String email, String isBasic);
 
     public List<MemberAddressEntity> findByMemberAddressSeqno(Long memberAddressSeqno);
+
+    public MemberAddressEntity findFirstByEmailAndIsBasic(MemberEntity email, String isBasic);
 }

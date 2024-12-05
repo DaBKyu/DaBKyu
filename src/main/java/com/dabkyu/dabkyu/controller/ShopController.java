@@ -162,6 +162,7 @@ public class ShopController {
 		PageUtil page = new PageUtil();	
 		//상품 리스트 호출 서비스
 		Page<ProductEntity> list = productService.list(pageNum, postNum, keyword, CateSeqno);
+		List<ProductDTO> productList = new ArrayList<>();
 
 		int totalCount = (int)list.getTotalElements();
 		List<Category1Entity> mist = productService.category1List();
@@ -179,6 +180,7 @@ public class ShopController {
 		model.addAttribute("list2", list2);
 		model.addAttribute("list3", list3);
 		model.addAttribute("keyword", keyword);
+		model.addAttribute("product", productList);
 		model.addAttribute("pageList", page.getPageList(pageNum, postNum, pageListCount, totalCount, keyword, CateSeqno));
 	}
 

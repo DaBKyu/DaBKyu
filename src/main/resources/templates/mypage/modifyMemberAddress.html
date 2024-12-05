@@ -138,11 +138,13 @@
 <script>
     window.onload = () => {
         btnModify.addEventListener('click',async ()=> {
+            if(addrName.value == '') { alert('배송지 이름을 입력하세요.'); addrName.focus(); return false; }
             if(address.value == '') { alert('배송지를 입력하세요.'); address.focus(); return false; }
             if(zipcode.value == '') { alert('우편번호를 입력하세요.'); zipcode.focus(); return false; }
             if(detailAddr.value == '') { alert('상세주소를 입력하세요.'); detailAddr.focus(); return false; }
             if(receiverName.value == '') { alert('받는분을 입력하세요.'); receiverName.focus(); return false; }
             if(receiverTelno.value == '') { alert('연락처를 입력하세요.'); receiverTelno.focus(); return false; }
+            if(request.value == '') { alert('배송 요청사항을 입력하세요.'); request.focus(); return false; }
             const formData = new FormData(ModifyForm);
 		
             await fetch('/mypage/modifyAddress', {
@@ -152,7 +154,7 @@
                 .then((data)=> {
                     if(data.message === 'good'){
                         alert("배송지가 수정되었습니다.");
-                        document.location.href = '/mypage/memberInfo';
+                        document.location.href = '/mypage/addrList';
                     } else {
                         alert("서버 장애로 배송지 수정에 실패했습니다.");
                     }
@@ -202,11 +204,13 @@
         </div>
         <div class="flex-container">
             <div class="rectangle2">이메일</div>
-            <input type="text" class="card" id="email" name="email" th:value="${viewAddr.email.email}">
+            <input type="text" class="card" id="email" name="email" th:value="${viewAddr.email.email}" readonly>
         </div>
-        <div class="flex-container">
-            <div class="card3" style="width: 170px;">기본배송지여부 (Y/N)</div>
-            <input type="text" class="card2" style="width: 700px;" id="request"name="request" th:value="${viewAddr.isBasic}">
+        <div class="flex-container" style="width: 920px;">
+            <div class="card3" style="width: 140px;">기본배송지 여부</div>
+            <input type="checkbox" style="width: 30px; margin-left: 5px; margin-top: 7px;" id="isBasic" name="isBasic" value="Y"
+                   th:checked="${viewAddr.isBasic == 'Y'}">
+            <input type="hidden" id="isBasicHidden" name="isBasicHidden" value="N">
         </div>
         <div class="button-container">
             <input type="button" class="square-button" value="취소" onclick="history.back()" style="margin-left:50px;">
