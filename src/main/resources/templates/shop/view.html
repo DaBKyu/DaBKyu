@@ -252,9 +252,9 @@ select {
             <span style="margin-left: 350px; font-size: 20px;">총 금액 : </span>&nbsp;
 					<span id="total_price" style="font-size: 20px;">[[${#numbers.formatInteger(view.price,3,'COMMA')}]]</span><span style="font-size: 20px;">원</span>
                     <br><br>
-            <input type="button" id="btn_save" value="구매하기" onclick="window.location.href='/shop/pay'" style="margin-left:350px;">
+            <input type="button" class="featureLink" value="구매하기" style="margin-left:350px;">
             <input type="button" id="btn_cancel" value="장바구니 담기" th:onclick="cart([[${session.email}]],[[${view.productSeqno}]],[[${amount}]])" style="margin-left:20px;">
-            <input type="button" id="btn_cancel" value="관심상품" onclick="" style="margin-left:20px;">
+            <input type="button" class="featureLink" value="관심상품" style="margin-left:20px;">
         </div>   
     </div>      
 
@@ -287,7 +287,7 @@ select {
                                                  margin-top: 10px; margin-bottom: 10px; border-bottom: 1px solid #e3e3e3; background-color: transparent;
                                                   border-top: none; border-left: none; border-right: none;"></div>
                         </div>
-                        <input type="button" id="btn_cancel" value="문의하기" onclick="window.location.href='/src/main/resources/templates/mypage/question.html'" style="margin-left: -1000px;">
+                        <input type="button" class="featureLink" value="문의하기" style="margin-left: -1000px;">
                         <table class="InfoTable">
                             <tr>
                                 <th>답변상태</th>
@@ -344,6 +344,14 @@ select {
                 notificationModal.style.display = 'none';
         }
     });
+    const featureLinks = document.querySelectorAll(".featureLink");
+    featureLinks.forEach(featureLink =>
+        featureLink.addEventListener('click', function(event) {
+            event.preventDefault(); // 링크 기본 동작 방지
+            alert("추후 보완 예정입니다.");
+        })
+    );
+
 </script>
 </body>
 </html>
