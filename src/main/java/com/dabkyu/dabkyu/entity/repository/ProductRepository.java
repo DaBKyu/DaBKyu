@@ -68,4 +68,25 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             Pageable pageable);
 
 	public List<ProductEntity> findByCategory3Seqno_Category3Seqno(Long category3Seqno);
+
+	// 로그인 안한 사용자에게 보여주는 전체 TOP8
+	@Query("SELECT op.productSeqno " +
+		"FROM orderDetail od " +
+		"join od.orderProductSeqno op " +
+		"GROUP BY op.productSeqno " +
+		"ORDER BY SUM(op.amount) DESC " +
+		"FETCH FIRST 8 ROWS ONLY")
+	public List<ProductEntity> findTop10SellingProducts();
+
+	// 로그인 한 사용자 나이대의 TOP8
+	@Query("SELECT op.productSeqno " +
+		"FROM orderDetail od " +
+		"join od.orderProductSeqno op " +
+		"join od.orderSeqno oi " +
+		"join oi.email m " +
+		"where FLOOR((EXTRACT(YEAR FROM SYSDATE) - EXTRACT(YEAR FROM m.birthDate)) / 10) * 10 =:age " +
+		"GROUP BY op.productSeqno " +
+		"ORDER BY SUM(op.amount) DESC " +
+		"FETCH FIRST 8 ROWS ONLY")
+	public List<ProductEntity> findByAge(@Param("age") int age);
 }

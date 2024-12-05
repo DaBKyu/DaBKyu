@@ -51,7 +51,6 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ShoppingCartEntity;
 import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.service.ProductService;
-import com.dabkyu.dabkyu.service.ProductServiceImpl.TopProduct;
 import com.dabkyu.dabkyu.service.QuestionService;
 import com.dabkyu.dabkyu.service.ReviewService;
 import com.dabkyu.dabkyu.service.ShoppingCartService;
@@ -121,11 +120,20 @@ public class ShopController {
 	//사이드바 카테고리 목록 보기
 	@GetMapping("/shop/main")
 	public void getMain(
-		Model model) throws Exception {
+		HttpSession session,
+		Model model
+		) throws Exception {
 		List<Category1Entity> mist = productService.category1List();
 		List<Category2Entity> list2 = productService.category2List();
 		List<Category3Entity> list3 = productService.category3List();
-		List<ProductEntity> product = productService.productList();
+
+		String email = (String) session.getAttribute("email"); 
+		List<ProductEntity> product = new ArrayList<>();
+		if (email != null) {
+			product = productService.getTopProductsByAgeForUser(email);
+		} else {
+			product = productService.getTop10BestSellingProducts();
+		}
 
 		List<ProductDTO> productList = new ArrayList<>();
 		for (ProductEntity productEntity : product) {
@@ -191,22 +199,22 @@ public class ShopController {
 	}
 
 	//가장 많이 팔린 상품 10개 조회
-	@ResponseBody
-	@GetMapping("/shop/topSelling")
-	public List<TopSellingProductDTO> getTopSellingProducts() throws Exception {
-		return productService.getTop10BestSellingProducts();
-	}
+	// @ResponseBody
+	// @GetMapping("/shop/topSelling")
+	// public List<TopSellingProductDTO> getTopSellingProducts() throws Exception {
+	// 	return productService.getTop10BestSellingProducts();
+	// }
 	
 	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
-	@ResponseBody
-	@GetMapping("/shop/topProductsByAgeForLoggedUser")
-	public Map<String, List<TopProduct>> getTopProductsForLoggedUser(HttpSession session) throws Exception {
-		String email = (String) session.getAttribute("email"); 
-		if (email != null) {
-			return productService.getTopProductsByAgeForUser(email); 
-		}
-		throw new IllegalStateException("사용자가 로그인되지 않았습니다.");
-	}
+	// @ResponseBody
+	// @GetMapping("/shop/topProductsByAgeForLoggedUser")
+	// public Map<String, List<TopProduct>> getTopProductsForLoggedUser(HttpSession session) throws Exception {
+	// 	String email = (String) session.getAttribute("email"); 
+	// 	if (email != null) {
+	// 		return productService.getTopProductsByAgeForUser(email); 
+	// 	}
+	// 	throw new IllegalStateException("사용자가 로그인되지 않았습니다.");
+	// }
 
   //상품 상세 보기
 	@GetMapping("/shop/view")
