@@ -236,8 +236,8 @@ public class MasterController{
 
     }
     
-    @GetMapping("/master/getMiddleCategories")
     @ResponseBody
+    @GetMapping("/master/getMiddleCategories")
     public List<Category2DTO> getMiddleCategories(@RequestParam("category1Seqno") Long category1Seqno) {
         // Category2Entity 목록을 가져옴
         List<Category2Entity> category2List = masterService.getCategories2ByCategory1(category1Seqno);
@@ -539,7 +539,7 @@ public class MasterController{
 
     //주문 상태 변경 //newStatus : 상품준비중 - 배송중 - 배송완료?
     @ResponseBody
-    @PostMapping("/master/modifyOrder")
+    @GetMapping("/master/modifyOrder")
     public String postModifyOrder(@RequestParam("orderSeqno") Long orderSeqno,
                                 @RequestParam("orderStatus") String orderStatus)
                                 throws Exception {
@@ -700,32 +700,26 @@ public class MasterController{
 
     //문의 상세보기
     @GetMapping("/master/questionDetail")
-    public String getQuestionView(@RequestParam("queSeqno") Long queSeqno, @RequestParam("page") int pageNum,
+    public void getQuestionView(@RequestParam("queSeqno") Long queSeqno, @RequestParam("page") int pageNum,
             @RequestParam(name="queType",defaultValue="",required=false) String queType,
             Model model) throws Exception {
 
-                try {
-                    // 문의 정보 가져오기
-                    QuestionDTO question = questionService.view(queSeqno);
-                    List<QuestionFileDTO> questionFiles = questionService.fileListView(queSeqno);
+        // 문의 정보 가져오기
+        QuestionDTO question = questionService.view(queSeqno);
+        List<QuestionFileDTO> questionFiles = questionService.fileListView(queSeqno);
+
+        // 이전/다음 문의 번호 가져오기
+        Long preSeqno = questionService.pre_seqno(queSeqno, queType);
+        Long nextSeqno = questionService.next_seqno(queSeqno, queType);
+
+        // 모델에 데이터 추가
+        model.addAttribute("question", question);
+        model.addAttribute("questionFiles", questionFiles);
+        model.addAttribute("pre_seqno", preSeqno);
+        model.addAttribute("next_seqno", nextSeqno);
+        model.addAttribute("page", pageNum);
+        model.addAttribute("queType", queType);
             
-                    // 이전/다음 문의 번호 가져오기
-                    Long preSeqno = questionService.pre_seqno(queSeqno, queType);
-                    Long nextSeqno = questionService.next_seqno(queSeqno, queType);
-            
-                    // 모델에 데이터 추가
-                    model.addAttribute("question", question);
-                    model.addAttribute("questionFiles", questionFiles);
-                    model.addAttribute("pre_seqno", preSeqno);
-                    model.addAttribute("next_seqno", nextSeqno);
-                    model.addAttribute("page", pageNum);
-                    model.addAttribute("queType", queType);
-            
-                    return "master/questionDetail";
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return "error/500";
-                }
     }
 
     //문의 답변 등록 및 수정
@@ -755,7 +749,7 @@ public class MasterController{
 
     //문의 삭제 
     @Transactional
-    @GetMapping("/master/question/delete")
+    @PostMapping("/master/question/delete")
     public ResponseEntity<?> deleteQuestion(@RequestParam("queSeqno") Long queSeqno) {
         try {
             // 첨부 파일 삭제
@@ -782,7 +776,7 @@ public class MasterController{
 
     //문의 답변 삭제
     @Transactional
-    @GetMapping("/master/question/replydelete")
+    @PostMapping("/master/question/replydelete")
     public ResponseEntity<String> deleteReply(@RequestParam("queSeqno") Long queSeqno) throws Exception {
         QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
         
@@ -813,7 +807,7 @@ public class MasterController{
     } 
 
     //리뷰 상세보기
-    @GetMapping("/master/reviewList/{reviewSeqno}")
+    @PostMapping("/master/reviewList/{reviewSeqno}")
     @ResponseBody
     public Map<String, Object> getReviewView(@PathVariable Long reviewSeqno) throws Exception {
         Map<String, Object> response = new HashMap<>();
@@ -846,7 +840,7 @@ public class MasterController{
 
     //리뷰 신고 삭제
     @Transactional
-    @GetMapping("/master/reviewReport/delete")
+    @PostMapping("/master/reviewReport/delete")
     public String getDeleteRoport(@RequestParam("reportSeqno") Long reportSeqno) throws Exception{
         masterService.deleteReport(reportSeqno);
         return "redirect:/master/reviewReport";
@@ -854,7 +848,7 @@ public class MasterController{
 
     //리뷰 삭제 
     @Transactional
-    @GetMapping("/master/review/delete")
+    @PostMapping("/master/review/delete")
     public String getDeleteReview(@RequestParam("reviewSeqno") Long reviewSeqno) throws Exception{
         List<ReviewFileDTO> reviewFiles = reviewService.fileListView(reviewSeqno);
         if (reviewFiles != null) {
@@ -864,7 +858,7 @@ public class MasterController{
         }
         masterService.deleteReview(reviewSeqno); //리뷰삭제
 
-        return "redirect:/master/reviewList?page=1";  
+        return "redirect:/master/reviewList?page=1";
     }
 
     //쿠폰 리스트보기 
@@ -986,7 +980,7 @@ public class MasterController{
     }
 
     // 결제 취소 및 환불 신청 내역 보기
-    @GetMapping("/master/paymentCancelAndRefund")
+    @PostMapping("/master/paymentCancelAndRefund")
     public List<OrderDetailEntity> getCancelAndRefund() {
     
         return masterService.getCancelAndRefundDetails();
@@ -1046,8 +1040,7 @@ public class MasterController{
 
     //통계 페이지(매출통계,가입통계,방문통계)
     @GetMapping("/master/statisticsPage")
-    public String getStatisticsPage() {
-        return "master/statisticsPage";
+    public void getStatisticsPage() {
     }
 
     /* 매출통계
@@ -1061,8 +1054,7 @@ public class MasterController{
     */
     //-카테고리별 매출 통계
     @GetMapping("/master/salesByCategory")
-    public String getSalesByCategoryPage() {
-        return "master/salesByCategory"; // Thymeleaf 템플릿 이름
+    public void getSalesByCategoryPage() {
     }
 
     @GetMapping("/master/salesByCategoryData")
@@ -1073,8 +1065,7 @@ public class MasterController{
 
     //일별 매출 통계
     @GetMapping("/master/salesByDaily")
-    public String getSalesByDailyPage() {
-        return "master/salesByDaily"; // Thymeleaf 템플릿 이름
+    public void getSalesByDailyPage() {
     }
 
     @GetMapping("/master/salesByDailyData")
@@ -1089,8 +1080,7 @@ public class MasterController{
 
     //월별 매출 통계
     @GetMapping("/master/salesByYear")
-    public String getSalesByYearPage() {
-        return "master/salesByYear";
+    public void getSalesByYearPage() {
     }
     
     @GetMapping("/master/salesByYearData")
@@ -1102,8 +1092,7 @@ public class MasterController{
 
     //회원별 매출 통계
     @GetMapping("/master/salesByMember")
-    public String getSalesByMemberPage() {
-        return "master/salesByMember";
+    public void getSalesByMemberPage() {
     }
     
     @GetMapping("/master/salesByMemberData")
@@ -1114,8 +1103,7 @@ public class MasterController{
 
     //연령대별 매출 통계
     @GetMapping("/master/salesByAge")
-    public String getSalesByAgePage() {
-        return "master/salesByAge";
+    public void getSalesByAgePage() {
     }
     
     @GetMapping("/master/salesByAgeData")
@@ -1126,8 +1114,7 @@ public class MasterController{
 
     //등급별 매출 통계
     @GetMapping("/master/salesByGrade")
-    public String getSalesByGradePage() {
-        return "master/salesByGrade";
+    public void getSalesByGradePage() {
     }
     
     @GetMapping("/master/salesByGradeData")
@@ -1138,8 +1125,7 @@ public class MasterController{
     
     //상품별 매출 통계
     @GetMapping("/master/salesByProduct")
-    public String getSalesByProductPage() {
-        return "master/salesByProduct";
+    public void getSalesByProductPage() {
     }
     
     @GetMapping("/master/salesByProductData")
@@ -1157,8 +1143,7 @@ public class MasterController{
 
     //가입일 기준 가입 통계
     @GetMapping("/master/signupDateStat")
-    public String getSignupDateStatPage() {
-        return "master/signupDateStat";
+    public void getSignupDateStatPage() {
     }
     
     @GetMapping("/master/signupDateStatData")
@@ -1180,8 +1165,7 @@ public class MasterController{
 
     //성별 기준 가입 통계
     @GetMapping("/master/signupGenderStat")
-    public String getSignupGenderStatPage() {
-        return "master/signupGenderStat";
+    public void getSignupGenderStatPage() {
     }
     
     @GetMapping("/master/signupGenderStatData")
@@ -1192,8 +1176,7 @@ public class MasterController{
 
     //연령대 기준 가입 통계
     @GetMapping("/master/signupAgeStat")
-    public String getSignupAgeStatPage() {
-        return "master/signupAgeStat";
+    public void getSignupAgeStatPage() {
     }
     
     @GetMapping("/master/signupAgeStatData")
@@ -1209,8 +1192,7 @@ public class MasterController{
 
     // 일별 방문자 통계 페이지
     @GetMapping("/master/visitorsByDaily")
-    public String getVisitorsByDailyPage() {
-        return "master/visitorsByDaily"; // Thymeleaf 템플릿 이름
+    public void getVisitorsByDailyPage() {
     }
 
     @GetMapping("/master/visitorsByDailyData")

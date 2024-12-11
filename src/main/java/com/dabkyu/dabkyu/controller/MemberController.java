@@ -68,7 +68,7 @@ public class MemberController {
     public void postLogin() {}
 
 
-    // Spring Security 이후 로그인 처리
+    // Spring Security 이전 로그인 처리
     @ResponseBody
     @PostMapping("/member/loginCheck")
     public String postLoginCheck(MemberDTO member) throws Exception {

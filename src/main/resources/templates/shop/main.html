@@ -4,38 +4,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>카테고리</title>
+<title>Dabkyu</title>
 <link rel="stylesheet" type="text/css" href="/css/board.css">
 <link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
 <style>
+body {
+    padding-left: 200px;
+    padding-right: 180px;
+    margin: 0; /* 기본 margin 제거 */
+}
+
+/* 다중줄 제한을 위한 스타일 */
 .multiline-ellipsis {
-    display: -webkit-box;              /* Flexbox 기반으로 동작 */
-    -webkit-box-orient: vertical;     /* 수직 레이아웃 설정 */
-    -webkit-line-clamp: 3;          /* 최대 줄 수를 3줄로 제한 */
-    line-clamp: 3; 
-    overflow: hidden;                 /* 넘치는 내용 숨기기 */
-    text-overflow: ellipsis;          /* 말줄임표 추가 */
-    line-height: 1.5;                 /* 줄 간격 조정 (필요에 따라 변경) */
-    max-height: calc(1.5em * 3);      /* 최대 높이 계산 (줄 간격 × 줄 수) */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    max-height: calc(1.5em * 3);
 }
 aside {
-width: 200px;
-margin-top: 64px;
+width: 230px;
+margin-top: 140px;
 position: absolute;
 top: 0;
-bottom: 0;
 background: rgb(255, 255, 255);
 transform: translateX(0); /* 메뉴를 처음에는 왼쪽으로 숨김 */
 transition: transform 0.3s ease; /* 슬라이딩 애니메이션 */
 z-index: 9999;
-border: solid 1px #e3e3e3;
+border-top: solid 1px #e3e3e3;
+border-bottom: solid 1px #e3e3e3;
+font-family: "Roboto", sans-serif;
+font-weight: 400;
+font-style: normal;
+
 }
 .slider-container {
     position: relative;
     width: 100%;
     max-width: 930px;
-    height: 50vh;
-    margin: auto; /* 좌우 자동 여백 */
+    height: 65vh;
+    margin: auto 70px auto auto; /* 좌우 자동 여백 */
     overflow: hidden;
     padding: 5px 0; /* 상하 여백 추가 */
     display: grid;
@@ -64,12 +75,13 @@ border: solid 1px #e3e3e3;
 /* 각 카드 스타일 */
 .movie-card {
     width: 200px;
-    text-align: center;
+    text-align: left;
     background-color: white;
     color: rgb(0, 0, 0);
     border-radius: 10px;
     overflow: hidden;
     font-size: 12px;
+    /* border: 1px solid #11b8eb; */
 }
 
 /* 좌우 버튼 스타일 */
@@ -105,25 +117,102 @@ button:hover {
     top: 380px;
     z-index: 1;
 }
+.sidebanner {
+    width: 230px;
+    height: 700px;
+    background: linear-gradient(135deg, #11b8eb, #8de4df); /* 그라데이션 배경 */
+    color: white;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+    line-height: 700px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 */
+    position: relative;
+}
+.menu-toggle{
+    display: none;
+}
+.ad-banner {
+    width: 230px;
+    height: 700px;
+    background: linear-gradient(to bottom, #ffcc00, #ff6600);
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    margin-top: -60px;
+}
 
+.ad-banner h1 {
+    font-size: 24px;
+    margin: 20px 0;
+}
+
+.ad-banner p {
+    font-size: 16px;
+    margin: 10px 0 20px;
+}
+
+.ad-banner .cta-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #ffffff;
+    color: #ff6600;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s, color 0.3s;
+}
+
+.ad-banner .cta-button:hover {
+    background: #ff6600;
+    color: #ffffff;
+}
+
+.ad-banner img {
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+    border-radius: 5px;
+}
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <th:block th:replace="~{layout/shopHeader::header}"></th:block>
-    <h2 style="text-align: center; margin-top: 50px; margin-left:-820px; margin-bottom: 40px;">Product</h2>
+    <th:block th:replace="~{layout/ShopHeader}"></th:block>
+    <h2 style="text-align: center; margin-top: 30px; margin-left:0px; margin-bottom: 40px;position: relative; width: 1525px;"><i class="fas fa-crown" style="color: gold;"></i> 이달의 베스트셀러 TOP 8 <i class="fas fa-crown" style="color: gold;"></i></h2>
     <button class="prev-btn" id="prevButton">&#60;</button>
+    <div style="display: flex; position: relative; width: 1525px; margin: 0 auto;">
     <div class="slider-container">
         <div class="movie-slider">
             <div th:each="item : ${product}" class="movie-card">
                 <a th:href="@{'/shop/view?productSeqno=' + ${item.productSeqno}} + '&page=1'" style="text-decoration: none; text-decoration: none; color: inherit;">
                     <img th:src="@{'/product/thumbnails/' + ${item.thumbnail}}" style="width: 200px; height:150px; border-radius: 10px;">
-                    <span th:text="${item.productName}" style="font-weight: bold;"></span><br>
-                    <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')+'원'}" style="line-height: 3;"></span>
+                    <span th:text="${item.productName}" style="font-size: 16px;"></span><br>
+                    <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')+'원'}" 
+                        style="line-height: 2; font-size: 19px; font-weight: bold; color: rgb(40, 123, 248);"></span><br>
+                    <span th:text="${#numbers.formatInteger(item.price * 0.02, 0, 'COMMA') + '포인트 적립'}" 
+                        style="font-size: 14px; padding: 2px 5px; border: 1px solid #d8a10b; border-radius: 50px;"></span>
                 </a>
             </div>
         </div>    
     </div>
+    <div class="ad-banner">
+        <h1>멤버십 가입</h1>
+        <p>지금 가입하고 <br> 특별한 혜택을 받아보세요!</p>
+        <a href="#" class="cta-button">지금 가입하기</a>
+        <img src="https://via.placeholder.com/230x400" alt="광고 이미지">
+    </div>
+</div>
     <button class="next-btn" id="nextButton">&#62;</button>
+    <th:block th:replace="~{layout/ShopFooter}"></th:block>
 <script>
 const nextButton = document.getElementById('nextButton');
 const prevButton = document.getElementById('prevButton');

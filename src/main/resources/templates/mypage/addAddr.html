@@ -244,8 +244,13 @@
         </div>
         <div class="flex-container" style="width: 920px">
             <div class="rectangle2" style="width: 200px;" >기본배송지로 설정</div>
-            <input type="checkbox" style="width: 30px; margin-left: 5px; margin-top: 7px;" id="isBasic" name="isBasic" value="Y" 
-                   onchange="updateIsBasicValue()">
+            <input 
+    type="checkbox" 
+    style="width: 30px; margin-left: 5px; margin-top: 7px;" 
+    id="isBasic" 
+    name="isBasic" 
+    value="N" 
+    onchange="updateIsBasicValue()">
             <input type="hidden" id="isBasicHidden" name="isBasic" value="N">
         </div>
         <div class="button-container">
@@ -259,15 +264,15 @@
 <script>
 // 체크박스 상태에 따라 hidden input의 값을 업데이트하는 함수
 function updateIsBasicValue() {
-        var isBasic = document.getElementById("isBasic");
-        var isBasicHidden = document.getElementById("isBasicHidden");
+    var isBasic = document.getElementById("isBasic");
 
-        // 체크박스가 체크되었으면 'Y', 체크되지 않으면 'N'
-        if (isBasic.checked) {
-            isBasicHidden.value = "Y";
-        } else {
-            isBasicHidden.value = "N";
-        }
+// 체크박스가 체크되었을 때 value를 'Y'로 설정, 아니면 'N'으로 설정
+if (isBasic.checked) {
+    isBasic.value = "Y";
+} else {
+    isBasic.value = "N";
+}
+
     }
      // 페이지 로드 시 초기 상태를 설정
      window.onload = function() {
