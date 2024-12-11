@@ -82,6 +82,7 @@ public class WebSecurityConfig {
         //접근권한 설정(Access Control)
         http.authorizeHttpRequests(
             (authz) -> authz
+            .requestMatchers("/").permitAll()
             .requestMatchers("/member/**").permitAll()
             .requestMatchers("/mypage/**").hasAnyAuthority("USER", "MASTER")
             .requestMatchers("/shop/**").permitAll()

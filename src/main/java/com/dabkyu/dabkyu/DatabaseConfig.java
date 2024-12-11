@@ -9,19 +9,13 @@ import javax.sql.DataSource;
 @Configuration
 public class DatabaseConfig {
 
-    private final Dotenv dotenv;
-
-    public DatabaseConfig(Dotenv dotenv) {
-        this.dotenv = dotenv;
-    }
-
     @Bean
     public DataSource dataSource() {
         return DataSourceBuilder.create()
             .driverClassName("oracle.jdbc.driver.OracleDriver")
-            .url(dotenv.get("DATABASE_URL"))
-            .username(dotenv.get("DATABASE_USERNAME"))
-            .password(dotenv.get("DATABASE_PASSWORD"))
+            .url("jdbc:oracle:thin:@//112.154.193.5:1521/dabkyupdb")
+            .username("dabkyudev")
+            .password("12345")
             .build();
     }
 }

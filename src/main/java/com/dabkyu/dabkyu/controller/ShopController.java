@@ -71,6 +71,12 @@ public class ShopController {
 	private final QuestionService questionService;
 	private final ReviewService reviewService;
 
+	@GetMapping("/")
+	public String getMainPage() {
+		return "redirect:/shop/main";
+	}
+	
+
 	// 내 알림 화면
     @GetMapping("/shop/notice")
 	public void getNotice() {
@@ -194,8 +200,7 @@ public class ShopController {
 
 	//상품 조회 테스트
 	@GetMapping("/shop/shopmainTest")
-	public String shopMain() {
-		return "shop/shopmainTest"; // 템플릿 파일의 경로가 맞는지 확인
+	public void shopMain() {
 	}
 
 	//가장 많이 팔린 상품 10개 조회
@@ -259,7 +264,7 @@ public class ShopController {
 
 	// 장바구니 보기
     @GetMapping("/mypage/shoppingCart")
-    public List<ShoppingCartEntity> getCartItems(
+    public void getCartItems(
 		Model model,
 		HttpSession session
 	) throws Exception {
@@ -282,7 +287,6 @@ public class ShopController {
 		model.addAttribute("list3", list3);
 		model.addAttribute("product", product);
 		
-		return null;
     }
 
     // 장바구니에 상품 추가
@@ -401,19 +405,19 @@ public class ShopController {
 		}
 	}
 		 
-	 // 환불 신청
-	 @PostMapping("/purchase/refundRequest")
-	 public String requestRefund(
-			 HttpSession session,
-			 @RequestParam Long orderSeqno) { 
-		 String email = (String) session.getAttribute("email");
-		 try {
-			 shoppingCartService.refundRequest(email,orderSeqno);
-			 return "{\"message\":\"good\"}";
-		 } catch (RuntimeException e) {
-			 return e.getMessage();
-		 }
-	 }
+	// 환불 신청
+	@PostMapping("/purchase/refundRequest")
+	public String requestRefund(
+			HttpSession session,
+			@RequestParam Long orderSeqno) { 
+		String email = (String) session.getAttribute("email");
+		try {
+			shoppingCartService.refundRequest(email,orderSeqno);
+			return "{\"message\":\"good\"}";
+		} catch (RuntimeException e) {
+			return e.getMessage();
+		}
+	}
 
 	// 상품 문의 내역 보기
 	@GetMapping("/purchase/questionList")
@@ -590,7 +594,7 @@ public class ShopController {
 	}
 	// 상품 리뷰 삭제
 	@Transactional
-	@GetMapping("/shop/reviewDelete")
+	@PostMapping("/shop/reviewDelete")
 	public String getDelete(@RequestParam("reviewSeqno") Long reviewSeqno) throws Exception {
 
 		Map<String, Object> data = new HashMap<>();

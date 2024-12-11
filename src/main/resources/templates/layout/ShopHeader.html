@@ -8,29 +8,38 @@
 <body>
     <div th:fragment="header">
     <nav>
-        <div style="display: flex; align-items: center; width: 100%;">
+        <div style="display: flex; align-items: center; width: 100%; position: relative; ">
             <!-- 메뉴 토글 아이콘 -->
-                <i class="fi fi-br-menu-burger" href="#" id="menu-toggle" style="font-size: 25px; margin-top: 1.5px;"></i>
-                <a style="margin-left: 70px; font-size: 20px; text-decoration: none; text-decoration: none; color: inherit;" href="/shop/main">DABKYU</a>   
+                <i class="fi fi-br-menu-burger menu-toggle" href="#" id="menu-toggle" style="font-size: 25px; margin-top: 1.5px; margin-left: 20px;"></i>
+                <a style="margin-left: 50px; font-size: 45px; text-decoration: none; text-decoration: none; color: #31b8da; font-weight: bold;" href="/shop/main">DABKYU</a>   
              <!-- 검색창 -->
-            <div style="flex-grow: 1; position: relative; max-width: 1000px; margin-left: 300px;">
+            <div style="flex-grow: 1; position: relative; max-width: 700px; margin-left: 140px; ">
                 <input type="text" name="keyword" id="keyword" 
-                       style="width: 100%; height: 30px; border: 2px solid #e3e3e3; font-size: 16px; border-radius: 20px; padding-left: 10px;"
-                       placeholder="검색어를 입력하세요." onkeydown="press()">
+                       style="width: 700px; height: 35px; border: 2px solid #b0ece9; font-size: 16px; border-radius: 20px; padding-left: 10px; outline: none;"
+                       placeholder="상품을 검색해보세요!" onkeydown="press()">
                 <i class="fi fi-br-search" onclick="search()"
                    style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); height: 17px;"></i>
             </div>
             <!-- 아이콘들 -->
-            <div style="display: flex; gap: 30px; align-items: center;  margin-left: auto; margin-right: 10px;">
+            <div style="display: flex; gap: 30px; align-items: center;  margin-left: auto; margin-right: 10px; position: relative;">
                 <th:block th:if="${session.email == null}">
-			        <a href="/member/login">로그인</a>
+			        <a href="/member/login" style="text-decoration: none;">로그인</a>
 		        </th:block>
                 <th:block th:if="${session.email != null}"> 
-                    <a href="/member/logout">로그아웃</a>
+                    <a href="/member/logout" style="text-decoration: none;">로그아웃</a>
 		        </th:block>
-                <a href="/mypage/memberInfo" style="text-decoration: none; color: inherit;" ><i class="fi fi-rr-user" style="font-size: 20px; cursor: pointer;"></i></a>
-                <a href="/mypage/shoppingCart" style="text-decoration: none; color: inherit;"><i class="fi fi-rr-shopping-cart" style="font-size: 20px; cursor: pointer;"></i></a>
-                <a style="text-decoration: none; color: inherit;"><i class="fi fi-rs-bell" id="notificationBtn" style="font-size: 20px; cursor: pointer;"></i></a>
+                <a href="/mypage/memberInfo" style="text-decoration: none; color: inherit; display: inline-block; text-align: center; position: relative;">
+                    <i class="fi fi-rr-user" style="font-size: 32px; cursor: pointer; position: relative;"></i><br>
+                    <span style="font-size: 14px; color: #333;">마이페이지</span>
+                </a>
+                <a href="/mypage/shoppingCart" style="text-decoration: none; color: inherit; display: inline-block; text-align: center; position: relative;">
+                    <i class="fi fi-rr-shopping-cart" style="font-size: 32px; cursor: pointer; position: relative;"></i><br>
+                    <span style="font-size: 14px; color: #333;">장바구니</span>
+                </a>
+                <a style="text-decoration: none; color: inherit; display: inline-block; text-align: center; position: relative;">
+                    <i class="fi fi-rs-bell" id="notificationBtn" style="font-size: 32px; cursor: pointer; position: relative;"></i><br>
+                    <span style="font-size: 14px; color: #333;">알림</span>
+                </a>
             </div>
         </div>
     </nav>
@@ -38,7 +47,7 @@
         <ul>
             <li th:each="item : ${mist}" class="dropdown">
                 <a th:if="${item.category1Seqno == 1}">
-                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
+                    <span th:text="${item.category1Name}" style="font-size: 17px;"></span>
                 </a>
                 <ul>
                     <li th:each="item : ${list2}" class="dropdown_two">
@@ -105,7 +114,7 @@
             </li>
             <li th:each="item : ${mist}" class="dropdown">
                 <a th:if="${item.category1Seqno == 2}">
-                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
+                    <span th:text="${item.category1Name}" style="font-size: 17px;"></span>
                 </a>
                 <ul>
                     <li th:each="item : ${list2}" class="dropdown_two">
@@ -148,7 +157,7 @@
             </li>
             <li th:each="item : ${mist}" class="dropdown">
                 <a th:if="${item.category1Seqno == 3}">
-                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
+                    <span th:text="${item.category1Name}" style="font-size: 17px;"></span>
                 </a>
                 <ul>
                     <li th:each="item : ${list2}" class="dropdown_two">
@@ -179,7 +188,7 @@
             </li>
             <li th:each="item : ${mist}" class="dropdown">
                 <a th:if="${item.category1Seqno == 4}">
-                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
+                    <span th:text="${item.category1Name}" style="font-size: 17px;"></span>
                 </a>
                 <ul>
                     <li th:each="item : ${list2}" class="dropdown_two">
@@ -246,7 +255,7 @@
             </li>
             <li th:each="item : ${mist}" class="dropdown">
                 <a th:if="${item.category1Seqno == 5}">
-                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
+                    <span th:text="${item.category1Name}" style="font-size: 17px;"></span>
                 </a>
                 <ul>
                     <li th:each="item : ${list2}" class="dropdown_two">

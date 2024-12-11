@@ -52,7 +52,7 @@ public interface ProductService {
     //상품 목록 보기
 	public Page<ProductEntity> list(int pageNum, int postNum, String keyword, Long cateSeqno) throws Exception;
 
-	// //카테고리별 상품 목록 보기
+	// 카테고리별 상품 목록 보기
 	// public Page<ProductEntity> categoryProduct(int pageNum, int postNum, Long cateSeqno, String keyword) throws Exception;
 
 	//가장 많이 팔린 상품 10개 조회
