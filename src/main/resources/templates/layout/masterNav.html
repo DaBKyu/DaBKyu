@@ -13,8 +13,8 @@
                             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">상품관리</a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" th:href="@{/master/productList?page=1}">상품관리</a></li>
-                                <li><a class="dropdown-item" th:href="@{/master/categoryManage}">카테고리 관리</a></li>
-                                <li><a class="dropdown-item" th:href="@{/master/productUpload}">상품 등록</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/manageCategory}">카테고리 관리</a></li>
+                                <li><a class="dropdown-item" th:href="@{/master/postProduct}">상품 등록</a></li>
                             </ul>
                         </li>
         
@@ -55,7 +55,13 @@
                                 <li><a class="dropdown-item" th:href="@{/master/couponList?page=1}">생성된 쿠폰 리스트</a></li>
                             </ul>
                         </li>
-        
+                        <!-- 통계 Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">통계</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" th:href="@{/master/statisticsPage}">통계</a></li>
+                            </ul>
+                        </li>
                     </ul>
         
                     <!-- Admin Username Display -->

@@ -146,47 +146,51 @@
     <div class="center-container">
     <form id="ModifyForm" name="ModifyForm" method="POST" enctype="multipart/form-data">
         <div style="display: flex;">
-        <input type="button" value="이전으로" onclick="history.back()" class="square-button" style="margin-top: 10px;">
+        <input type="button" value="이전으로" onclick="location.href='/mypage/memberInfo'" class="square-button" style="margin-top: 10px;">
         <div class="button-container">
             <a href="/mypage/addAddr" class="square-button" style="text-decoration: none; width:100px; margin-left: 320px; margin-top: -10px;" >배송지 추가</a>
         </div>
         </div>
         <div th:each="addr : ${addressList}">
             <div class="flex-container"> 
-                <input type="text" class="card" id="addrName" name="addrName" th:value="${addr.addrName}" style="font-weight: bold; margin-left: 55px; border: none;" placeholder="배송지 별명을 입력하세요.">
+                <input type="text" class="card" id="addrName" name="addrName" th:value="${addr.addrName}" style="font-weight: bold; margin-left: 55px; border: none;" placeholder="배송지 별명을 입력하세요." readonly>
             </div>
             <div class="flex-container">
                 <div class="rectangle1">배송지</div>   
-                <input type="text" id="address" name="address" class="card" th:value="${addr.address}">
+                <input type="text" id="address" name="address" class="card" th:value="${addr.address}" readonly>
             </div>
             <div class="flex-container">
                 <div class="rectangle2">우편번호</div>   	
-                <input type="text" id="zipcode" name="zipcode" class="card" th:value="${addr.zipcode}">
+                <input type="text" id="zipcode" name="zipcode" class="card" th:value="${addr.zipcode}" readonly>
             </div>
             <div class="flex-container">
                 <div class="rectangle2">상세주소</div>   
-                <input type="text" id="detailAddr" name="detailAddr" class="card" th:value="${addr.detailAddr}">
+                <input type="text" id="detailAddr" name="detailAddr" class="card" th:value="${addr.detailAddr}" readonly>
             </div>
-            <input type="hidden" id="addrSeqno" name="memberAddressSeqno" th:value="${addr.memberAddressSeqno}"> 
+            <input type="hidden" id="addrSeqno" name="memberAddressSeqno" th:value="${addr.memberAddressSeqno}" readonly> 
             <div class="flex-container">
                 <div class="rectangle2">받는분</div>
-                <input type="text" class="card" id="receiverName"name="receiverName" th:value="${addr.receiverName}">
+                <input type="text" class="card" id="receiverName"name="receiverName" th:value="${addr.receiverName}" readonly>
             </div>
             <div class="flex-container">
                 <div class="rectangle2">연락처</div>   
-                <input type="text" class="card" id="receiverTelno" name="receiverTelno" th:value="${addr.receiverTelno}">
+                <input type="text" class="card" id="receiverTelno" name="receiverTelno" th:value="${addr.receiverTelno}" readonly>
             </div>
             <div class="flex-container">
                 <div class="card3">배송 요청사항</div>
-                <input type="text" class="card2" id="request"name="request" th:value="${addr.request}">
+                <input type="text" class="card2" id="request"name="request" th:value="${addr.request}" readonly>
             </div>
             <div class="flex-container">
                 <div class="rectangle2">이메일</div>
-                <input type="text" class="card" id="email" name="email" th:value="${addr.email.email}">
+                <input type="text" class="card" id="email" name="email" th:value="${addr.email.email}" readonly>
             </div>
             <div class="flex-container" style="width: 920px;">
                 <div class="card3" style="width: 140px;">기본배송지 여부</div>
-                <input type="text" class="card2" id="request"name="request" th:value="${addr.isBasic}">
+                <input type="checkbox" style="width: 30px; margin-left: 5px; margin-top: 7px;" id="isBasic" name="isBasic" value="Y"
+                       th:checked="${addr.isBasic == 'Y'}" 
+                       onchange="updateIsBasicValue()" 
+                       onclick="return false;" >
+                <input type="hidden" id="isBasicHidden" name="isBasicHidden" value="N">
             </div>
             <div class="button-container">
                 <a th:href="@{'/mypage/modifyMemberAddress?memberAddressSeqno=' + ${addr.memberAddressSeqno}}" class="square-button" style="text-decoration: none; width:100px; margin-left: 450px; margin-top: -10px;" >배송지 수정</a>
@@ -194,7 +198,11 @@
         </div>
     </form>
 </div> 
+<script>
+    function updateIsBasicValue() {
+}
 
+</script>
     
     
 </body>

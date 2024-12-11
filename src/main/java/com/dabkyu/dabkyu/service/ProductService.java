@@ -17,12 +17,17 @@ import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
-import com.dabkyu.dabkyu.service.ProductServiceImpl.TopProduct;
 
 public interface ProductService {
 	////////////내가만든거/////////////
 	// seachAll에서 사용할 전체 상품 보기
 	public Page<ProductEntity> productAllList(int pageNum, int postNum, String keyword) throws Exception;
+
+	// main 썸네일 리스트
+	public List<ProductFileEntity> productFileMainList(List<ProductEntity> productList);
+
+	// 썸네일 주소 가져오기
+	public String getProductThumbnail(ProductEntity productEntity);
 
 	//상품 이미지 보기////
 	public List<ProductFileEntity> productFileList(Long productSeqno) throws Exception;
@@ -51,10 +56,10 @@ public interface ProductService {
 	// public Page<ProductEntity> categoryProduct(int pageNum, int postNum, Long cateSeqno, String keyword) throws Exception;
 
 	//가장 많이 팔린 상품 10개 조회
-	public List<TopSellingProductDTO> getTop10BestSellingProducts() throws Exception;
+	public List<ProductEntity> getTop10BestSellingProducts() throws Exception;
 
 	//로그인한 사용자의 연령대별 가장 많이 팔린 상품 10개 조회
-	public Map<String, List<TopProduct>> getTopProductsByAgeForUser(String email) throws Exception;
+	public List<ProductEntity> getTopProductsByAgeForUser(String email) throws Exception;
 
     //상품 상세 보기
 	public ProductDTO view(Long productSeqno) throws Exception;

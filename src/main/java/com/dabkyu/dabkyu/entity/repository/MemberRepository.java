@@ -1,5 +1,6 @@
 package com.dabkyu.dabkyu.entity.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,5 +98,12 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
                "ORDER BY FLOOR(MONTHS_BETWEEN(CURRENT_DATE, member.birth_date) / 12 / 10) * 10", 
        nativeQuery = true)
     public List<Object[]> findSignupAgeStat();
+
+    //로그인한 회원의 연령대 
+    @Query(value = "SELECT FLOOR((EXTRACT(YEAR FROM SYSDATE) - EXTRACT(YEAR FROM :memberBirthDate)) / 10) * 10 AS ageGroup " +
+               "FROM dual",
+       nativeQuery = true)
+    int findAgeGroup(@Param("memberBirthDate") LocalDate memberBirthDate);
+
 
 }

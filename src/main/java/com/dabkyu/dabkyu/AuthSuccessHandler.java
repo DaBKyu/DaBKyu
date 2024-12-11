@@ -58,7 +58,7 @@ public class AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         if (reDate.compareTo(today) < 0) {
             url = "/member/checkPasswordNotice";
         } else if (member.getRole().equals("MASTER")) {
-            url = "/master/main";
+            url = "/shop/main";
         }
 
         setDefaultTargetUrl(url);

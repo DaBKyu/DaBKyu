@@ -138,11 +138,7 @@
 <script>
     // window.onload = () => {
     //     btnModify.addEventListener('click',async ()=> {
-    //         if(address.value == '') { alert('배송지를 입력하세요.'); address.focus(); return false; }
-    //         if(zipcode.value == '') { alert('우편번호를 입력하세요.'); zipcode.focus(); return false; }
-    //         if(detailAddr.value == '') { alert('상세주소를 입력하세요.'); detailAddr.focus(); return false; }
-    //         if(receiverName.value == '') { alert('받는분을 입력하세요.'); receiverName.focus(); return false; }
-    //         if(receiverTelno.value == '') { alert('연락처를 입력하세요.'); receiverTelno.focus(); return false; }
+    //         
     //         const formData = new FormData(ModifyForm);
 		
     //         await fetch('/mypage/addAddress', {
@@ -162,10 +158,18 @@
     //     })
     // }
 
+
     //배송지 관리
  
         const pRVAddrManage = async (type) => {
-            
+            if(addrName.value == '') { alert('배송지 이름을 입력하세요.'); addrName.focus(); return false; }
+            if(address.value == '') { alert('배송지를 입력하세요.'); address.focus(); return false; }
+            if(zipcode.value == '') { alert('우편번호를 입력하세요.'); zipcode.focus(); return false; }
+            if(detailAddr.value == '') { alert('상세주소를 입력하세요.'); detailAddr.focus(); return false; }
+            if(receiverName.value == '') { alert('받는분을 입력하세요.'); receiverName.focus(); return false; }
+            if(receiverTelno.value == '') { alert('연락처를 입력하세요.'); receiverTelno.focus(); return false; }
+            if(request.value == '') { alert('배송 요청사항을 입력하세요.'); request.focus(); return false; }
+               
             if(type === 'registry')
                 if(!confirm("새로운 배송 정보를 등록하시겠습니까?")) return false;
             
@@ -180,7 +184,6 @@
             formData.append("detailAddr", detailAddr.value);
             formData.append("email", email.value);
             formData.append("isBasic", isBasic.value);
-
             await fetch('/mypage/addAddress',{
                 method: 'POST',
                 body: formData
@@ -188,11 +191,11 @@
             .then((response) => response.json())
             .then((data) => {
                 if(data.message === 'good'){
-                    alert("처리 요청이 완료되었습니다.");
+                    alert("배송지 추가 완료되었습니다.");
                     document.location.href = '/mypage/addrList';
                 } else {
                     console.log("data",data);
-                    alert("시스템 장애로 업무 요청이 실패하였습니다.");
+                    alert("배송지 추가 실패하였습니다.");
                 }
             });		
         }
@@ -227,7 +230,6 @@
             <div class="rectangle2">받는분</div>
             <input type="text" class="card" id="receiverName" name="receiverName" >
         </div>
-        <!-- <input type="hidden" id="email" name="email" value="${member.email}">  -->
         <div class="flex-container">
             <div class="rectangle2">연락처</div>   
             <input type="text" class="card" id="receiverTelno" name="receiverTelno" >
@@ -238,36 +240,40 @@
         </div>
         <div class="flex-container">
             <div class="rectangle2">이메일</div>
-            <input type="text" class="card" id="email" name="email" >
+            <input type="text" class="card" id="email" name="email" th:value="${member.email}" readonly>
         </div>
         <div class="flex-container" style="width: 920px">
-            <div class="rectangle2" style="width: 200px">기본배송지여부 (Y/N)</div>
-            <input type="text" class="card" id="isBasic" name="isBasic" >
+            <div class="rectangle2" style="width: 200px;" >기본배송지로 설정</div>
+            <input type="checkbox" style="width: 30px; margin-left: 5px; margin-top: 7px;" id="isBasic" name="isBasic" value="Y" 
+                   onchange="updateIsBasicValue()">
+            <input type="hidden" id="isBasicHidden" name="isBasic" value="N">
         </div>
         <div class="button-container">
             <input type="button" class="square-button" value="취소" onclick="history.back()" style="margin-left:50px;">
             <input type="button" class="square-button" style="margin-left:20px;" onclick="pRVAddrManage('registry')" value="등록">
         </div>
     </form>
-    </div>
-        <!-- 배송지 추가 페이지로 연결되는 링크 -->
-        <!-- <a href="addAddress" style="text-decoration: none; color: inherit;">
-            <div class="fileuploadForm">
-                <input type="file" id="inputFile" name="uploadFile" style="display:none" multiple>
-                <div class="fileZone" id="fileZone">
-                    배송지를 추가하려면 클릭하세요.<br>(배송지 저장은 최대 3개 까지 가능합니다.)
-                </div>
-            </div>
-        </a>
-                <div class="button-container">
-                    <input type="button" value="저장" onclick="history.back();" style="margin-left:50px;">
-                    <input type="button" value="취소" onclick="history.back();" style="margin-left:20px;">
-                </div>
-             -->
-    
+    </div>   
 </body>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
+// 체크박스 상태에 따라 hidden input의 값을 업데이트하는 함수
+function updateIsBasicValue() {
+        var isBasic = document.getElementById("isBasic");
+        var isBasicHidden = document.getElementById("isBasicHidden");
+
+        // 체크박스가 체크되었으면 'Y', 체크되지 않으면 'N'
+        if (isBasic.checked) {
+            isBasicHidden.value = "Y";
+        } else {
+            isBasicHidden.value = "N";
+        }
+    }
+     // 페이지 로드 시 초기 상태를 설정
+     window.onload = function() {
+        updateIsBasicValue();
+    };
+
     function searchAddress() {
     new daum.Postcode({
         oncomplete: function(data) {

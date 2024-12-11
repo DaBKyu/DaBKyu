@@ -98,13 +98,11 @@
             <a th:href="@{'/shop/view?productSeqno=' + ${item.productSeqno}} + '&page=1'">
             <!-- 카드 외부에 위치할 텍스트들 -->
             <div class="product-name">
-                <p>제품명: <span th:text="${item.productName}"></span></p>
+                <span th:text="${item.productName}" style="font-weight: bold;"></span>
             </div>
             <div class="product-price">
-                <p>제품 가격: <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')+'원'}"></span></p>
+                <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')+'원'}"></span>
             </div>
-            <!-- <img th:if="${item.infoStoredImage != null && item.infoStoredImage != ''}" th:src="@{/shop/product/{imageName}(imageName=${item.infoStoredImage})}" style="width: 200px; height:150px; border-radius: 10px;">
-            <img th:unless="${item.infoStoredImage == null || item.infoStoredImage == ''}" src=""> -->
             </a>
         </div>
     </div>

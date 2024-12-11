@@ -218,7 +218,10 @@ cursor:pointer;
 		});
 	}
 
-	
+	document.getElementById('featureLink').addEventListener('click', function(event) {
+		event.preventDefault(); // 링크 기본 동작 방지
+		alert("추후 보완 예정입니다.");
+    });
 </script>
 
 <!--<script src="/js/logout.js"></script>-->
@@ -288,9 +291,9 @@ cursor:pointer;
 			<tr>
 				<td colspan="3"><br>
 					<div class="deleteItems" style="text-align:left">
-						<input type="button" class="btn_cart" value="장바구니 비우기" onclick="cartManage('deleteAll')">	
-						<input type="button" class="btn_cart" value="선택삭제" onclick="cartManage('delete')">
-						<input type="button" class="btn_cart" value="주문서 작성하기" onclick="cartManage('register')">
+						<input type="button" id="featureLink" class="btn_cart" value="장바구니 비우기" onclick="alert('추후 보완 예정입니다.')">	
+						<input type="button" id="featureLink" class="btn_cart" value="선택삭제" onclick="alert('추후 보완 예정입니다.')">
+						<input type="button" id="featureLink" class="btn_cart" value="주문서 작성하기" onclick="alert('추후 보완 예정입니다.')">
 					</div>
 				</td>
 				<td colspan="5"><br>

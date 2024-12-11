@@ -22,6 +22,12 @@
             </div>
             <!-- 아이콘들 -->
             <div style="display: flex; gap: 30px; align-items: center;  margin-left: auto; margin-right: 10px;">
+                <th:block th:if="${session.email == null}">
+			        <a href="/member/login">로그인</a>
+		        </th:block>
+                <th:block th:if="${session.email != null}"> 
+                    <a href="/member/logout">로그아웃</a>
+		        </th:block>
                 <a href="/mypage/memberInfo" style="text-decoration: none; color: inherit;" ><i class="fi fi-rr-user" style="font-size: 20px; cursor: pointer;"></i></a>
                 <a href="/mypage/shoppingCart" style="text-decoration: none; color: inherit;"><i class="fi fi-rr-shopping-cart" style="font-size: 20px; cursor: pointer;"></i></a>
                 <a style="text-decoration: none; color: inherit;"><i class="fi fi-rs-bell" id="notificationBtn" style="font-size: 20px; cursor: pointer;"></i></a>
@@ -32,6 +38,147 @@
         <ul>
             <li th:each="item : ${mist}" class="dropdown">
                 <a th:if="${item.category1Seqno == 1}">
+                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
+                </a>
+                <ul>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 1}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">                        
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 1}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>               
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 2}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 2}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 3}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 3}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 4}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 4}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 5}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 5}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li th:each="item : ${mist}" class="dropdown">
+                <a th:if="${item.category1Seqno == 2}">
+                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
+                </a>
+                <ul>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 6}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 6}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 7}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 7}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 8}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 8}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li th:each="item : ${mist}" class="dropdown">
+                <a th:if="${item.category1Seqno == 3}">
+                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
+                </a>
+                <ul>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 9}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 9}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 10}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 10}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li th:each="item : ${mist}" class="dropdown">
+                <a th:if="${item.category1Seqno == 4}">
                     <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
                 </a>
                 <ul>
@@ -83,58 +230,13 @@
                             </li>
                         </ul>
                     </li>
-                </ul>
-            </li>
-            <li th:each="item : ${mist}" class="dropdown">
-                <a th:if="${item.category1Seqno == 2}">
-                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
-                </a>
-                <ul>
                     <li th:each="item : ${list2}" class="dropdown_two">
-                        <a th:if="${item.category2Seqno == 21}">
+                        <a th:if="${item.category2Seqno == 15}">
                             <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
                         </a>
                         <ul>
                             <li th:each="item : ${list3}">      
-                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 21}">
-                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-            <li th:each="item : ${mist}" class="dropdown">
-                <a th:if="${item.category1Seqno == 3}">
-                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
-                </a>
-                <ul>
-                    <li th:each="item : ${list2}" class="dropdown_two">
-                        <a th:if="${item.category2Seqno == 31}">
-                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
-                        </a>
-                        <ul>
-                            <li th:each="item : ${list3}">      
-                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 31}">
-                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-            <li th:each="item : ${mist}" class="dropdown">
-                <a th:if="${item.category1Seqno == 4}">
-                    <span th:text="${item.category1Name}" style="font-size: 12px;"></span>
-                </a>
-                <ul>
-                    <li th:each="item : ${list2}" class="dropdown_two">
-                        <a th:if="${item.category2Seqno == 41}">
-                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
-                        </a>
-                        <ul>
-                            <li th:each="item : ${list3}">      
-                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 41}">
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 15}">
                                     <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
                                 </a>
                             </li>
@@ -148,12 +250,36 @@
                 </a>
                 <ul>
                     <li th:each="item : ${list2}" class="dropdown_two">
-                        <a th:if="${item.category2Seqno == 51}">
+                        <a th:if="${item.category2Seqno == 16}">
                             <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
                         </a>
                         <ul>
                             <li th:each="item : ${list3}">      
-                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 51}">
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 16}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 17}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 17}">
+                                    <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:each="item : ${list2}" class="dropdown_two">
+                        <a th:if="${item.category2Seqno == 18}">
+                            <span th:text="${item.category2Name}" style="font-size: 12px;"></span>
+                        </a>
+                        <ul>
+                            <li th:each="item : ${list3}">      
+                                <a th:href="@{'/shop/categoryProduct?cate=' + ${item.category3Seqno}} + '&page=1'" style="text-decoration: none; color: inherit;" th:if="${item.category2Seqno.category2Seqno == 18}">
                                     <span th:text="${item.category3Name}" style="font-size: 12px;"></span>
                                 </a>
                             </li>

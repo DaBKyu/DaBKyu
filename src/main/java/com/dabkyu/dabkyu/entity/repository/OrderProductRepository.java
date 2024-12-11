@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import com.dabkyu.dabkyu.dto.ProductSalesDTO;
 import com.dabkyu.dabkyu.dto.TopSellingProductDTO;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
+import com.dabkyu.dabkyu.entity.ProductEntity;
 
 public interface OrderProductRepository extends JpaRepository<OrderProductEntity, Long> {
     
@@ -45,12 +46,5 @@ public interface OrderProductRepository extends JpaRepository<OrderProductEntity
        "FETCH FIRST 10 ROWS ONLY")
     public List<TopSellingProductDTO> findTop10SellingProducts();
      */
-    @Query("SELECT new com.dabkyu.dabkyu.dto.TopSellingProductDTO(p.productName, SUM(op.amount), pf.storedFilename, p.productSeqno) " +
-       "FROM orderProduct op " +
-       "JOIN op.productSeqno p " +
-       "JOIN productFile pf ON pf.productSeqno = p AND pf.isThumb = 'Y' " + // 썸네일 이미지 조건 추가
-       "GROUP BY p.productSeqno, p.productName, pf.storedFilename " +
-       "ORDER BY SUM(op.amount) DESC " +
-       "FETCH FIRST 10 ROWS ONLY")
-    public List<TopSellingProductDTO> findTop10SellingProducts();
+
 }
