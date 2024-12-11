@@ -365,3 +365,4 @@ gradle-app.setting
 
 .env
 **/images/
+src/main/resources/application.properties
