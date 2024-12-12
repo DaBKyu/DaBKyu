@@ -69,11 +69,4 @@ public class ProductEntity {
 
 	@Column(name="secret_yn",length = 2,nullable=false)
 	private String secretYn;
-
-	@OneToMany(mappedBy = "productSeqno", fetch = FetchType.LAZY)
-	private List<ProductFileEntity> productFiles;
-
-	public List<ProductFileEntity> getProductFiles() {
-		return productFiles;
-	}
 }

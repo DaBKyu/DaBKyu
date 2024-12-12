@@ -10,12 +10,16 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.OrderDetailDTO;
+import com.dabkyu.dabkyu.dto.OrderInfoDTO;
+import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
@@ -39,15 +43,18 @@ import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderInfoRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
+import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionFileRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewRepository;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Service
 @AllArgsConstructor
+@Log4j2
 public class MemberServiceImpl implements MemberService {
     
     private final MemberRepository memberRepository;
@@ -63,6 +70,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberLogRepository memberLogRepository;
     private final OrderInfoRepository orderInfoRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final ProductFileRepository productFileRepository;
     
     // 회원가입
     @Override
@@ -115,16 +123,56 @@ public class MemberServiceImpl implements MemberService {
                                                                                     .toList();
         }
 
-    int start = (int) pageRequest.getOffset();
-    int end = Math.min((start + pageRequest.getPageSize()), orderDetailEntities.size());
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), orderDetailEntities.size());
 
-    if (start > end) {
-        return new PageImpl<>(Collections.emptyList(), pageRequest, orderDetailEntities.size());
+        if (start > end) {
+            return new PageImpl<>(Collections.emptyList(), pageRequest, orderDetailEntities.size());
+        }
+
+        List<OrderDetailEntity> pagedOrderDetails  = orderDetailEntities.subList(start, end);
+
+        return new PageImpl<>(pagedOrderDetails , pageRequest, orderDetailEntities.size());
     }
 
-    List<OrderDetailEntity> pagedOrderDetails  = orderDetailEntities.subList(start, end);
+    // NEW 주문정보리스트
+    @Override
+    public Page<OrderInfoDTO> getOrderInfoList(String email, String keyword, Pageable pageable) {
 
-    return new PageImpl<>(pagedOrderDetails , pageRequest, orderDetailEntities.size());
+        log.info("-----------------------OrderInfo 조회------------------------");
+        // OrderInfo 조회
+        Page<OrderInfoEntity> orderInfoEntities = orderInfoRepository.findByEmail_Email(email, pageable);
+
+        // 각 OrderInfo에 해당하는 OrderDetail 조회 후 DTO로 변환
+        log.info("-----------------------DTO로 변환------------------------");
+        return orderInfoEntities.map(orderInfo -> {
+            if (keyword != null && !keyword.isEmpty()) {
+                log.info("-----------------------키워드 필터 후 변환------------------------");
+                List<OrderDetailDTO> orderDetails = orderDetailRepository.findByOrderSeqno(orderInfo)
+                                                                                                                .stream()
+                                                                                                                .filter(orderDetail  -> orderDetail .getOrderProductSeqno().getProductSeqno().getProductName().contains(keyword))
+                                                                                                                .map(orderDetail -> new OrderDetailDTO(orderDetail))
+                                                                                                                .toList();
+                
+                log.info("----------------------- DTO 매칭 ------------------------");
+                // OrderInfoDTO에 매칭
+                return OrderInfoDTO.matchOrderDetailDTO(orderInfo, orderDetails);
+            }
+            log.info("-----------------------키워드 필터 없이 DTO로 변환------------------------");
+            List<OrderDetailDTO> orderDetails = orderDetailRepository.findByOrderSeqno(orderInfo)
+                                                                                                            .stream()
+                                                                                                            .map(orderDetail -> new OrderDetailDTO(orderDetail))
+                                                                                                            .peek(dto -> dto.setProduct(
+                                                                                                                new ProductDTO(
+                                                                                                                    dto.getOrderProductSeqno().getProductSeqno(),
+                                                                                                                    productFileRepository.findFirstByProductSeqnoAndIsThumb(dto.getOrderProductSeqno().getProductSeqno(), "Y")
+                                                                                                                )))
+                                                                                                            .toList();
+            
+            log.info("----------------------- DTO 매칭 ------------------------");
+            // OrderInfoDTO에 매칭
+            return OrderInfoDTO.matchOrderDetailDTO(orderInfo, orderDetails);
+        });
     }
 
     // 배송지 목록 조회

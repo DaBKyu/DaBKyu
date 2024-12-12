@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.ProductFileEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,10 +27,8 @@ public class ProductDTO {
 	private int stockAmount;
 	private String deliveryisFree;
 	private int likecnt;
-	// private String infoOrgImage;
 	private String thumbnail;
     private String secretYn;
-    private List<ProductFileDTO> productFiles;
 
     public ProductDTO(ProductEntity entity) {
         this.productSeqno = entity.getProductSeqno();
@@ -39,10 +39,20 @@ public class ProductDTO {
         this.stockAmount = entity.getStockAmount();
         this.deliveryisFree = entity.getDeliveryisFree();
         this.likecnt = entity.getLikecnt();
-        // this.infoOrgImage = entity.getInfoOrgImage();
-        // this.infoStoredImage = entity.getInfoStoredImage(); 
         this.secretYn = entity.getSecretYn();
-        this.productFiles = new ArrayList<>();
+    }
+
+    public ProductDTO(ProductEntity entity, ProductFileEntity file) {
+        this.productSeqno = entity.getProductSeqno();
+        this.category3Seqno = entity.getCategory3Seqno();
+        this.productName = entity.getProductName();
+        this.productInfo = entity.getProductInfo();
+        this.price = entity.getPrice();
+        this.stockAmount = entity.getStockAmount();
+        this.deliveryisFree = entity.getDeliveryisFree();
+        this.likecnt = entity.getLikecnt();
+        this.secretYn = entity.getSecretYn();
+        this.thumbnail = file==null?"isNull":file.getStoredFilename();
     }
 
     public ProductEntity dtoToEntity(ProductDTO dto) {
@@ -55,8 +65,6 @@ public class ProductDTO {
                                             .stockAmount(dto.getStockAmount())
                                             .deliveryisFree(dto.getDeliveryisFree())
                                             .likecnt(dto.getLikecnt())
-                                            // .infoOrgImage(dto.getInfoOrgImage())
-                                            // .infoStoredImage(dto.getInfoStoredImage())
                                             .secretYn(dto.getSecretYn())
                                             .build();
         return entity;

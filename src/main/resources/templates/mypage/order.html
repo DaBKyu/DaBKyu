@@ -71,321 +71,67 @@
             margin-top: 20px;
         }
 
-        .delivery-years {
-            display: flex;
-            /* 가로 배치 */
-            gap: 10px;
-            /* 날짜 간의 간격 */
+        .order-box {
+            width: 800px;
+            border-radius: 12px;
+            box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 4px 0px, rgba(0, 0, 0, 0.16) 0px 0px 1px 0px;
+            background-color: rgb(255, 255, 255);
+            margin-bottom: 20px;
+            padding: 24px 24px 16px;
         }
 
-        .delivery-years span {
-            padding: 5px 10px;
-            /* 날짜 패딩 */
-            border: 1px solid #ccc;
-            /* 테두리 추가 */
-            border-radius: 5px;
-            /* 모서리 둥글게 */
+        .order-detail-box {
+            border-radius: 8px;
+            border: 1px solid rgb(238, 238, 238);
+            background-color: rgb(255, 255, 255);
+            margin-top: 16px;
         }
 
-        .delivery-period {
-            margin-top: 20px;
-            /* 간격 조정 */
-        }
-
-        .order-summary {
-            margin-top: 20px;
-            /* 간격 조정 */
-        }
-
-        .order-details {
-            margin-top: 10px;
-            /* 간격 조정 */
-        }
-
-        .period-selection {
-            margin-top: 10px;
-        }
-
-        .period-select {
-            padding: 8px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        /* Modal 스타일 */
-        .modal {
-            display: none;
-            /* 기본적으로 숨김 */
-            position: fixed;
-            /* 고정 위치 */
-            z-index: 1000;
-            /* 최상위 */
-            left: 0;
-            top: 0;
-            width: 100%;
-            /* 전체 너비 */
-            height: 100%;
-            /* 전체 높이 */
-            overflow: auto;
-            /* 필요 시 스크롤 */
-            background-color: rgb(0, 0, 0);
-            /* 기본 배경 색상 */
-            background-color: rgba(0, 0, 0, 0.4);
-            /* 반투명 배경 */
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            /* 중앙 배치 */
+        .product-container {
             padding: 20px;
-            border: 1px solid #888;
-            width: 60%;
-            /* 화면 크기에 따라 조정 가능 */
-        }
-
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .review-form {
             display: flex;
+            vertical-align: top;
+        }
+
+        .product-thumbnail >a > img {
+            width: 64px;
+        }
+
+        .product-thumbnail {
+            display: flex;
+            width: 64px;
+            position: relative;
+            margin-right: 16px;
+        }
+
+        .product-info {
+            display: flex;
+            flex: 110%;
+            overflow: hidden;
             flex-direction: column;
         }
 
-        .review-form textarea {
-            margin-bottom: 15px;
-            padding: 10px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            resize: vertical;
-            min-height: 150px;
-        }
-
-        .review-form button {
-            padding: 10px;
-            font-size: 1rem;
-            color: white;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
+        .btn-order {
+            height: 2.25rem;
+            text-decoration: none;
+            outline: none;
             cursor: pointer;
-        }
-
-        .review-form button:hover {
-            background-color: #0056b3;
-        }
-
-        .period-select-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            /* 드롭다운과 아이콘 사이의 간격 */
-        }
-
-        .search-icon {
-            font-size: 1.25rem;
-            /* 아이콘 크기 조정 */
-            color: #888;
-            cursor: pointer;
-        }
-
-        /* 이미지 크기 조정 및 위치 설정 */
-        .order-item {
-            position: relative;
-        }
-
-        .item-image {
-            display: block;
-            /* 이미지를 블록 요소로 설정하여 아래 텍스트와 구분되도록 */
-            width: 64px;
-            /* 이미지 크기 설정 */
-            height: 64px;
-            /* 이미지 크기 설정 */
-            margin-bottom: 10px;
-            /* 이미지와 텍스트 사이에 간격 설정 */
-            object-fit: cover;
-            /* 이미지 비율 유지 */
-        }
-
-        .reason-category {
-            margin-bottom: 20px;
-        }
-
-        .reason-category h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .reason-category ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .reason-category li {
-            margin-bottom: 8px;
-        }
-
-        .reason-category label {
-            font-size: 1rem;
-        }
-
-        /* 별점 스타일 */
-        .star-rating {
-            display: inline-block;
-            font-size: 2rem;
-            cursor: pointer;
-            direction: rtl;
-            /* 별을 오른쪽에서 왼쪽으로 나열 */
-            margin-bottom: 10px;
-        }
-
-        .star-rating label {
-            color: #ccc;
-            /* 기본 회색 */
-        }
-
-        .star-rating input:checked~label {
-            color: gold;
-            /* 선택된 별은 금색 */
-        }
-
-        .star-rating input:checked+label {
-            color: gold;
-        }
-
-        .star-rating input {
-            display: none;
-            /* 라디오 버튼은 숨기고 레이블을 클릭하면 선택되도록 */
-        }
-
-        .star-rating label:hover,
-        .star-rating label:hover~label {
-            color: gold;
-            /* 마우스 호버시 별을 금색으로 */
-        }
-
-        #nextStepFromExchangeReturnBtn {
-            display: none;
-
-        }
-
-        /* 전체 radio-container 스타일 */
-        .radio-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            /* 각 구역 사이 간격 */
-            margin-top: 20px;
-        }
-
-        /* 각각의 박스 구역 스타일 */
-        .radio-box {
-            flex: 1;
-            background-color: #f9f9f9;
-            /* 배경색 */
-            border: 1px solid #ddd;
-            /* 테두리 */
-            border-radius: 8px;
-            /* 모서리 둥글게 */
-            padding: 20px;
-            /* 내부 여백 */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            /* 그림자 */
-            transition: box-shadow 0.3s ease, transform 0.2s ease;
-            /* 박스에 트랜지션 추가 */
-            display: flex;
-            align-items: center;
+            border-radius: 4px;
+            background-color: rgb(255, 255, 255);
+            border: 1px solid rgb(221, 221, 221);
+            -webkit-tap-highlight-color: rgba(52, 106, 255, 0.1);
+            font-size: 0.875rem;
+            display: inline-flex;
+            -webkit-box-pack: center;
             justify-content: center;
-            cursor: pointer;
-            /* 전체 박스를 클릭할 수 있게 커서 변경 */
-            position: relative;
-            /* 후속 요소를 정확하게 배치하기 위해 */
-        }
-
-        /* 라디오 버튼 체크 표시 */
-        .radio-box input[type="radio"] {
-            display: none;
-            /* 라디오 버튼 숨기기 */
-        }
-
-        /* 라디오 버튼 체크마크 스타일 */
-        .radio-box input[type="radio"]+.radio-checkmark {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #007bff;
-            border-radius: 50%;
-            margin-right: 10px;
-            position: relative;
-            background-color: white;
-            transition: background 0.3s ease, border-color 0.3s ease;
-        }
-
-        /* 라디오 버튼이 클릭되었을 때 박스 강조 */
-        .radio-box input[type="radio"]:checked+.radio-checkmark {
-            background-color: #007bff;
-            border-color: #007bff;
-            /* 선택된 라디오 버튼 스타일 */
-        }
-
-        .radio-box input[type="radio"]:checked+.radio-checkmark::after {
-            content: '';
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            width: 8px;
-            height: 8px;
-            background-color: white;
-            border-radius: 50%;
-        }
-
-        /* 라디오 버튼 텍스트와 체크박스 구분없이 클릭되게 스타일 */
-        .radio-box label {
-            display: flex;
+            -webkit-box-align: center;
             align-items: center;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
+            padding: 0px 12px;
+            min-height: 2.25rem;
         }
 
-        /* 호버 효과 */
-        .radio-box label:hover .radio-checkmark {
-            border-color: #0056b3;
-            transform: scale(1.1);
-        }
-
-        /* 포커스 시 라디오 버튼 테두리 강조 */
-        .radio-box input[type="radio"]:focus+.radio-checkmark {
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-            /* 포커스 효과 */
-        }
-
-        /* 클릭 후 박스의 강조 효과 */
-        .radio-box input[type="radio"]:checked+.radio-checkmark {
-            border-color: #0056b3;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
-            transform: scale(1.05);
-        }
-
-        /* 마우스 hover 시 강조 */
-        .radio-box:hover {
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            /* 박스에 그림자 추가 */
-            transform: scale(1.05);
-            /* 박스를 확대하여 강조 */
+        .btn-order:active {
+            background-color: rgba(100, 148, 237, 0.397);
         }
     </style>
 </head>
@@ -394,42 +140,70 @@
 <th:block th:replace="~{layout/MyPageHeader}"></th:block>
 <div class="" style="display: flex; width: 1400px;">
     <th:block th:replace="~{layout/SideMenu}"></th:block>
-    <div class="order-list">
+    <div class="order-list-container">
         <span class="order-list-title">주문목록</span>
 
         <form th:action="@{/mypage/order}" method="get" class="search-container">
             <input  class="search-input" type="text" name="keyword" placeholder="주문한 상품을 검색할 수 있어요" th:value="${keyword}">
             <button type="submit" class="btn btn-outline-dark">검색</button>
         </form>
+        <!--  주문 목록 -->
 
-        <!-- 주문 목록 -->
-        <table class="orderTable">
-            <thead>
-                <tr>
-                    <th>상품명</th>
-                    <th>가격</th>
-                    <th>수량</th>
-                    <th>배송 상태</th>
-                    <th>리뷰</th>
-                    <th>교환/환불</th>
-                </tr>
-            </thead>
-            <tbody>
-                <th:block th:if="${#strings.equals(listIsEmpty, 'Y')}">
-                    <td colspan="6">주문 내역이 없습니다.</td>
-                </th:block>
-                <tr th:each="orderDetail:${orderDetailList}">
-                    <td th:text="${orderDetail.orderProductSeqno.productSeqno.productName}"></td>
-                    <td><span th:text="${#numbers.formatInteger(orderDetail.orderProductSeqno.productSeqno.price,3,'COMMA')+'원'}"></span></td>
-                    <td th:text="${orderDetail.orderProductSeqno.amount}"></td>
-                    <td th:text="${orderDetail.orderSeqno.orderStatus}"></td>
-                    <td th:text="${orderDetail.orderProductSeqno.reviewYn}"></td>
-                    <td>교환/환불</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="order-list">
+            <div class="order-box" th:each="order: ${orderList}">
+                <h3>[[${#temporals.format(order.orderDate, 'yyyy.MM.dd')}]] 주문</h3>
+                <h3>[[${order.orderStatus}]]</h3>
+                <div class="order-detail-box" th:each="detail:${order.orderDetails}">
+                    <table class="order-detail-table">
+                        <colgroup>
+                            <col width="600">
+                            <col>
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <td class="product-container">
+                                    <div class="product-thumbnail">
+                                        <a th:href="@{'/shop/view?productSeqno=' + ${detail.product.productSeqno}} + '&page=1'">
+                                            <img th:src="@{'/product/thumbnails/' + ${detail.product.thumbnail}}" alt="">
+                                        </a>
+                                    </div>
+                                    <div class="product-info">
+                                        <a th:href="@{'/shop/view?productSeqno=' + ${detail.product.productSeqno}} + '&page=1'">
+                                            <span th:text="${detail.product.productName}"></span>
+                                        </a>
+                                        <div>
+                                            <div>
+                                                <span>[[${detail.product.price}]] 원</span>
+                                                <span>·</span>
+                                                <span>[[${detail.orderProductSeqno.amount}]] 개</span>
+                                            </div>
+                                            <div>
+                                                <button class="btn-order" onclick="addToCart()">장바구니 담기</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="btn-container">
+                                    <button class="btn-order">배송문의</button>
+                                    <button class="btn-order" th:if="${order.orderStatus == '배송준비중'}">주문취소</button>
+                                    <button  class="btn-order" th:if="${order.orderStatus == '배송중'}">주문·배송 취소</button>
+                                    <button  class="btn-order" th:if="${order.orderStatus == '배송완료'}">교환, 반품 신청</button>
+                                    <button  class="btn-order" th:if="${order.orderStatus == '배송완료'}">리뷰 작성</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
-</body>
 
+<script>
+const addToCart = () => {
+
+}
+</script>
+</body>
 </html>

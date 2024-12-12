@@ -20,6 +20,7 @@ public class OrderDetailDTO {
 	private OrderProductEntity orderProductSeqno;
     private String cancelYn;
     private String refundYn;
+    private ProductDTO product;
 
     public OrderDetailDTO(OrderDetailEntity entity) {
         this.orderDetailSeqno = entity.getOrderDetailSeqno();

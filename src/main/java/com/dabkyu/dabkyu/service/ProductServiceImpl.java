@@ -83,10 +83,9 @@ public class ProductServiceImpl implements ProductService{
     @Override
 	public List<ProductFileEntity> productFileMainList(List<ProductEntity> productList) {
         List<ProductFileEntity> productFileMainList = new ArrayList<>();
-        String isThumb = "Y";
         for (ProductEntity product : productList) {
 
-            productFileMainList.add(productFileRepository.findFirstByProductSeqnoAndIsThumb(product, isThumb));
+            productFileMainList.add(productFileRepository.findFirstByProductSeqnoAndIsThumb(product, "Y"));
         }
         return productFileMainList;
     }

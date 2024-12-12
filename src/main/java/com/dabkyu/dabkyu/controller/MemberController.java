@@ -12,6 +12,9 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -24,6 +27,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.OrderDetailDTO;
+import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
@@ -202,20 +207,29 @@ public class MemberController {
         log.info("-----------------------주문 상세 리스트 조회------------------------");
         String email = (String) session.getAttribute("email");
 
-        int orderNum = 10;   // 한 번에 보여줄 주문 갯수
+        int orderNum = 5;   // 한 번에 보여줄 주문 갯수
         int pagelistNum = 10;   // 페이지 리스트 갯수
 
         PageUtil pageUtil = new PageUtil();
-        Page<OrderDetailEntity> orderDetailList = memberService.orderDetailList(email, page, orderNum, keyword);
-        log.info("--------------------주문제품 갯수: {}-----------------------", orderDetailList.getSize());
-        for (OrderDetailEntity orderDetailEntity : orderDetailList) {
-            log.info("---------------------주문제품: {}-------------------------", orderDetailEntity.getOrderProductSeqno().getProductSeqno().getProductName());
-            log.info("---------------------주문제품: {}-------------------------", orderDetailEntity.getOrderProductSeqno().getProductSeqno().getPrice());
-        }
-        int totalCount = (int) orderDetailList.getTotalElements();
+        // Page<OrderDetailEntity> orderDetailList = memberService.orderDetailList(email, page, orderNum, keyword);
 
-        model.addAttribute("orderDetailList", orderDetailList);
-        model.addAttribute("listIsEmpty", orderDetailList.hasContent()?"N":"Y");
+        PageRequest pageRequest = PageRequest.of(page -1, orderNum, Sort.by(Direction.DESC, "orderDate"));
+        Page<OrderInfoDTO> orderInfoPage = memberService.getOrderInfoList(email, keyword, pageRequest);
+
+        int totalCount = (int) orderInfoPage.getTotalElements();
+        log.info("----------------------- 페이지 뽑기 완료, 전체 갯수: {} ------------------------", totalCount);
+
+        for (OrderInfoDTO order : orderInfoPage) {
+            log.info("----------------------- 오더번호: {} ------------------------", order.getOrderSeqno());
+            log.info("----------------------- 주문 상세 갯수: {}  ------------------------", order.getOrderDetails().size());
+            for (OrderDetailDTO detail : order.getOrderDetails()) {
+                log.info("----------------------- 주문 상세 번호: {}  ------------------------", detail.getOrderDetailSeqno());
+                log.info("----------------------- 주문 제품: {}  ------------------------", detail.getProduct());
+            }
+        }
+
+        model.addAttribute("orderList", orderInfoPage.getContent());
+        model.addAttribute("listIsEmpty", orderInfoPage.hasContent()?"N":"Y");
         model.addAttribute("totalCount", totalCount);
         model.addAttribute("page", page);
         model.addAttribute("orderNum", orderNum);

@@ -3,9 +3,11 @@ package com.dabkyu.dabkyu.service;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
@@ -27,6 +29,8 @@ public interface MemberService {
 
 	// 회원 주문제품 내역
 	public Page<OrderDetailEntity> orderDetailList(String email, int page, int orderNum, String keyword);
+
+	public Page<OrderInfoDTO> getOrderInfoList(String email, String keyword, Pageable pageable);
 
 	// 취소, 환불, 교환 내역 조회
 

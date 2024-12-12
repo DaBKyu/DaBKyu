@@ -1,6 +1,8 @@
 package com.dabkyu.dabkyu.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import lombok.AllArgsConstructor;
@@ -28,6 +30,7 @@ public class OrderInfoDTO {
 	private String resTelno;
 	private int totalPrice;
     private int deliveryPrice;
+    private List<OrderDetailDTO> orderDetails;
 
     public OrderInfoDTO(OrderInfoEntity entity) {
         this.orderSeqno = entity.getOrderSeqno();
@@ -62,5 +65,25 @@ public class OrderInfoDTO {
                                                 .deliveryPrice(dto.getDeliveryPrice())
                                                 .build();
          return entity;                                        
+    }
+
+    public static OrderInfoDTO matchOrderDetailDTO(OrderInfoEntity entity, List<OrderDetailDTO> details) {
+        OrderInfoDTO dto = OrderInfoDTO.builder()
+                                                                .orderSeqno(entity.getOrderSeqno())
+                                                                .email(entity.getEmail())
+                                                                .orderDate(entity.getOrderDate())
+                                                                .orderReq(entity.getOrderReq())
+                                                                .orderStatus(entity.getOrderStatus())
+                                                                .exptDate(entity.getExptDate())
+                                                                .pay(entity.getPay())
+                                                                .resName(entity.getResName())
+                                                                .resAddress(entity.getResAddress())
+                                                                .resZipcode(entity.getResZipcode())
+                                                                .resTelno(entity.getResTelno())
+                                                                .totalPrice(entity.getTotalPrice())
+                                                                .deliveryPrice(entity.getDeliveryPrice())
+                                                                .orderDetails(details)
+                                                                .build();
+        return dto;
     }
 }
