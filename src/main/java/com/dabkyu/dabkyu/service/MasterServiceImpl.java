@@ -254,6 +254,11 @@ public class MasterServiceImpl implements MasterService {
     }
 
     @Override
+    public List<Category1Entity> getCategories1() {
+        return category1Repository.findAll();
+    }
+
+    @Override
     public List<Category2Entity> getCategories2ByCategory1(Long category1Seqno) {
         return category2Repository.findByCategory1Seqno(category1Repository.findById(category1Seqno).get());
     }
@@ -1254,7 +1259,33 @@ public class MasterServiceImpl implements MasterService {
     public Category3Entity findCategoryBySeqno(Long category3Seqno) {
         return category3Repository.findByCategory3Seqno(category3Seqno);
     }
+
+    //관리자페이지 메인 방문자 수
+    @Override
+    public int getTodayVisitorCount() {
+        LocalDateTime referenceDate = LocalDateTime.now();
+        return memberLogRepository.getVisitorCount(referenceDate);
+    }
     
+    //관리자페이지 메인 오늘 리뷰 수 
+    @Override
+    public int getTodayReviewCount() {
+        LocalDateTime referenceDate = LocalDateTime.now();
+        return reviewRepository.getReviewCount(referenceDate);
+    }
+
+    // 관리자페이지 메인 오늘 문의 수 
+    @Override
+    public int getTodayQuestionCount() {
+        LocalDateTime referenceDate = LocalDateTime.now();
+        return questionRepository.getQuestionCount(referenceDate);
+    }
+
+    //관리자페이지 메인 답변 대기수
+    @Override
+    public int getNumberOfPendingQuestions() {
+        return questionRepository.getPendingQuestions();
+    }
 }
 
     

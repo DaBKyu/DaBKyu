@@ -229,5 +229,10 @@ public class ProductServiceImpl implements ProductService{
 		reportRepository.save(report.dtoToEntity(report));
 	}
 
+	@Override
+	// 전체 상품 목록을 조회하는 메소드
+    public List<ProductEntity> getAllProducts() {
+        return productRepository.findAll(); // JPA에서 제공하는 findAll() 메소드 사용
+    }
 	
 }

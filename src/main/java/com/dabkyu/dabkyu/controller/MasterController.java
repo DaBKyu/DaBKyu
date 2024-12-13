@@ -107,7 +107,7 @@ public class MasterController{
     private final ReviewService reviewService;
     
     //메인페이지
-    @GetMapping("/master") 
+    @GetMapping("/master/main") 
     public void getMaster() {}
 
     //고객정보페이지
@@ -206,6 +206,7 @@ public class MasterController{
 		model.addAttribute("pageList", page.getPageProduct(pageNum, postNum, pageListCount,totalCount,productName));
     }
 
+    /*
     //상품 상세보기 
     @GetMapping("/master/getProductDetail/{productSeqno}")
     public void getProductDetail(@PathVariable Long productSeqno, 
@@ -222,20 +223,10 @@ public class MasterController{
         model.addAttribute("category2view", masterService.getCategory2ByProduct(productSeqno)); 
         model.addAttribute("category3view", masterService.getCategory3ByProduct(productSeqno));          
     }
+    */
 
-    //상품 등록 화면보기 
-    @GetMapping("/master/postProduct")
-    public void getPostProduct(Model model) {
-        List<Category1Entity> allCategory1 = masterService.getAllCategories1();
-        List<Category2Entity> allCategory2 = masterService.getAllCategories2();
-        List<Category3Entity> allCategory3 = masterService.getAllCategories3();
-        
-        model.addAttribute("allcategory1", allCategory1);
-        model.addAttribute("allcategory2", allCategory2);
-        model.addAttribute("allcategory3", allCategory3);
-
-    }
     
+    /* 
     @ResponseBody
     @GetMapping("/master/getMiddleCategories")
     public List<Category2DTO> getMiddleCategories(@RequestParam("category1Seqno") Long category1Seqno) {
@@ -270,6 +261,7 @@ public class MasterController{
         
         return category3DTOList;
     }
+    */
     
     //상품 수정 화면보기 >> 수정 눌렀을 때 
     @GetMapping("/master/modifyProduct")
@@ -296,6 +288,18 @@ public class MasterController{
 
         model.addAttribute("needsModification", isTemporaryCategory); //임시 카테고리 //[수정] 알림을 위한
     }
+    /*//상품 등록 화면보기 
+    @GetMapping("/master/postProduct")
+    public void getPostProduct(Model model) {
+        List<Category1Entity> allCategory1 = masterService.getAllCategories1();
+        List<Category2Entity> allCategory2 = masterService.getAllCategories2();
+        List<Category3Entity> allCategory3 = masterService.getAllCategories3();
+        
+        model.addAttribute("allcategory1", allCategory1);
+        model.addAttribute("allcategory2", allCategory2);
+        model.addAttribute("allcategory3", allCategory3);
+
+    }
 
     //상품 등록 및 수정  
     @ResponseBody
@@ -317,12 +321,12 @@ public class MasterController{
 		String productImgPath;
         String productDetailImgPath;
 
-		if(os.contains("win")){
-            productImgPath = "c:\\Repository\\productfile\\productImages\\";
-            productDetailImgPath = "c:\\Repository\\productfile\\detailimage\\";
+		if(os.contains("win")){ 
+            productImgPath = "c:\\Repository\\dabkyu\\product\\images\\";
+            productDetailImgPath = "c:\\Repository\\dabkyu\\product\\thumbnails\\";
         }else{
-            productImgPath = "/home/gladius/Repository/productfile/productImages/";
-            productDetailImgPath = "/home/gladius/Repository/productfile/detailimage/";
+            productImgPath = "/home/gladius/Repository/dabkyu/product/images/";
+            productDetailImgPath = "/home/gladius/Repository/dabkyu/product/thumbnails/";
         }
 			
         File pImg = new File(productImgPath);
@@ -483,7 +487,7 @@ public class MasterController{
 
         return "{\"message\":\"good\"}"; 
     }
-
+*/
     
 
     //상품 삭제 (활성 비활성) 
@@ -1064,6 +1068,7 @@ public class MasterController{
     }
 
     //일별 매출 통계
+    /* 
     @GetMapping("/master/salesByDaily")
     public void getSalesByDailyPage() {
     }
@@ -1077,6 +1082,7 @@ public class MasterController{
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
         return masterService.getDailySales(startDateTime, endDateTime);
     }
+    */
 
     //월별 매출 통계
     @GetMapping("/master/salesByYear")
@@ -1190,6 +1196,7 @@ public class MasterController{
     -방문자수 
     */
 
+    /* 
     // 일별 방문자 통계 페이지
     @GetMapping("/master/visitorsByDaily")
     public void getVisitorsByDailyPage() {
@@ -1205,6 +1212,7 @@ public class MasterController{
         
         return masterService.getDailyVisitors(startDateTime, endDateTime);
     }
+    */
 }
 
 

@@ -82,4 +82,5 @@ public interface ProductService {
 	// 리뷰 신고
 	public void report(ReportDTO report) throws Exception;
 
+	public List<ProductEntity> getAllProducts();
 }

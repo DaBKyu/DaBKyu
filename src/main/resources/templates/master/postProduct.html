@@ -81,6 +81,58 @@
             var subCategory = document.getElementById('subCategory');
 
 
+            // 메인 카테고리가 변경될 때마다
+            mainCategory.addEventListener('change', function() {
+                var category1Seqno = this.value;
+
+                // 중간 카테고리 업데이트
+                fetch(`/master/getMiddleCategories?category1Seqno=${category1Seqno}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // 기존 옵션 삭제
+                        middleCategory.innerHTML = '<option value="" selected>선택하세요</option>';
+                        // 데이터가 있을 경우 중간 카테고리 업데이트
+                        if (data.length > 0) {
+                            data.forEach(function(category) {
+                                var option = document.createElement('option');
+                                option.value = category.category2Seqno;
+                                option.textContent = category.category2Name;
+                                middleCategory.appendChild(option);
+                            });
+                        } else {
+                            middleCategory.innerHTML = '<option value="" selected>중간 카테고리가 없습니다</option>';
+                        }
+                        // 세부 카테고리 초기화
+                        subCategory.innerHTML = '<option value="" selected>선택하세요</option>';
+                    })
+                    .catch(error => console.error('Error fetching middle categories:', error));
+            });
+
+            // 중간 카테고리가 변경될 때마다
+            middleCategory.addEventListener('change', function() {
+                var category2Seqno = this.value;
+
+                // 세부 카테고리 업데이트
+                fetch(`/master/getSubCategories?category2Seqno=${category2Seqno}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // 기존 옵션 삭제
+                        subCategory.innerHTML = '<option value="" selected>선택하세요</option>';
+                        // 데이터가 있을 경우 세부 카테고리 업데이트
+                        if (data.length > 0) {
+                            data.forEach(function(category) {
+                                var option = document.createElement('option');
+                                option.value = category.category3Seqno;
+                                option.textContent = category.category3Name;
+                                subCategory.appendChild(option);
+                            });
+                        } else {
+                            subCategory.innerHTML = '<option value="" selected>세부 카테고리가 없습니다</option>';
+                        }
+                    })
+                    .catch(error => console.error('Error fetching sub categories:', error));
+            });
+        });
 
     // 미리보기
     function previewFile(file) {
@@ -109,7 +161,7 @@
     }
 
 
-        });
+        
     window.onload = () => {
     // 파일 업로드 영역 1
     const fileZone1 = document.querySelector('#fileZone1');
@@ -356,7 +408,22 @@ const registerProduct = async () => {
 
             <!-- 카테고리 선택 -->
             <div class="mb-3 row">
+                <div class="col-md-4">
+                    <label for="mainCategory" class="form-label">메인 카테고리</label>
+                    <select class="form-select" id="mainCategory" name="mainCategory">
+                        <option value="" selected>선택하세요</option>
+                        <option th:each="category : ${allcategory1}" 
+                                th:value="${category.category1Seqno}" 
+                                th:text="${category.category1Name}"></option>
+                    </select> 
+                </div>
 
+                <div class="col-md-4">
+                    <label for="middleCategory" class="form-label">중간 카테고리</label>
+                    <select class="form-select" id="middleCategory" name="middleCategory">
+                        <option selected>선택하세요</option>
+                    </select>
+                </div>
                 <div class="col-md-4">
                     <label for="subCategory" class="form-label">세부 카테고리</label>
                     <select class="form-select" id="subCategory" name="subCategory">
@@ -378,17 +445,17 @@ const registerProduct = async () => {
             <div class="mb-3" id="option-container">
                 <label for="option" class="form-label">옵션</label>
                 <div class="option-item">
-                    <input type="text" class="form-control" name="optionMap[optName][]" placeholder="옵션명">
-                    <input type="text" class="form-control" name="optionMap[optCategory][]" placeholder="옵션카테고리">
-                    <input type="number" class="form-control" name="optionMap[optPrice][]" placeholder="옵션가격">
+                    <input type="text" class="form-control" name="optionMap[0][optName]" placeholder="옵션명">
+                    <input type="text" class="form-control" name="optionMap[0][optCategory]" placeholder="옵션카테고리">
+                    <input type="number" class="form-control" name="optionMap[0][optPrice]" placeholder="옵션가격">
                 </div>
             </div>
             <!-- 추가 상품 입력 필드 -->
             <div class="mb-3">
                 <label for="relatedproduct" class="form-label">추가 상품</label>
-                <input type="text" class="form-control" id="relatedproductName" name="relatedproductName" placeholder="추가 상품명">
-                <input type="text" class="form-control" id="relatedproductCategory" name="relatedproductCategory" placeholder="추가 상품카테고리">
-                <input type="number" class="form-control" id="relatedproductPrice" name="relatedproductPrice" placeholder="추가 상품가격">
+                <input type="text" class="form-control" name="relatedProductMap[0][relatedproductName]" placeholder="추가 상품명">
+                <input type="text" class="form-control"  name="relatedProductMap[0][relatedproductCategory]" placeholder="추가 상품카테고리">
+                <input type="number" class="form-control" name="relatedProductMap[0][relatedproductPrice]" placeholder="추가 상품가격">
             </div>
 
             <!-- 무료배송 여부 -->

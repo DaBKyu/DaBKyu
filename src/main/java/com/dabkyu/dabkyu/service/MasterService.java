@@ -283,11 +283,25 @@ public interface MasterService {
     //일별 방문자 통계 
     public List<DailyVisitorDTO> getDailyVisitors(LocalDateTime startDate, LocalDateTime endDate);
 
+    public List<Category1Entity> getCategories1();
+
     public List<Category2Entity> getCategories2ByCategory1(Long category1Seqno);
 
     public List<Category3Entity> getCategories3ByCategory2(Long category2Seqno);
 
     //카테고리3 찾기
     public Category3Entity findCategoryBySeqno(Long category3Seqno);
+
+    //관리자페이지 메인 오늘 방문자 수 
+    public int getTodayVisitorCount();
+
+    //관리자페이지 메인 오늘 리뷰 수 
+    public int getTodayReviewCount();
+
+    // 관리자페이지 메인 오늘 문의 수
+    public int getTodayQuestionCount();
+
+    //관리자페이지 메인 답변 대기수
+    public int getNumberOfPendingQuestions();
 
 }

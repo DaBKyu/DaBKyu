@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -49,6 +51,23 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
 
     //문의 타입 검색
     public Page<QuestionEntity> findByQueType(String queType, Pageable pageable);
+
+    //관리자페이지 메인 오늘 문의 수 
+    @Query(value = "SELECT COUNT(*) AS QUESTION_COUNT " +
+        "FROM question q " +
+        "WHERE TRUNC(q.que_date) = TRUNC(:referenceDate)", 
+    nativeQuery = true)
+    public int getQuestionCount(@Param("referenceDate") LocalDateTime referenceDate);
+
+    //관리자페이지 메인 답변 대기수
+    @Query("SELECT COUNT(q) FROM question q WHERE q.queType = '답변전'")
+    public int getPendingQuestions();
+
+
+ 
+
+
+
 
 }
 
