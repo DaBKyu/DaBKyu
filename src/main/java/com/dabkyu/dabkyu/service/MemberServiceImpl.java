@@ -28,7 +28,6 @@ import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.MemberLogEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
-import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
@@ -42,7 +41,6 @@ import com.dabkyu.dabkyu.entity.repository.MemberLogRepository;
 import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderInfoRepository;
-import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionFileRepository;
 import com.dabkyu.dabkyu.entity.repository.QuestionRepository;
@@ -58,7 +56,6 @@ import lombok.extern.log4j.Log4j2;
 public class MemberServiceImpl implements MemberService {
     
     private final MemberRepository memberRepository;
-    private final OrderProductRepository orderProductRepository;
     private final MemberAddressRepository memberAddressRepository;
 	private final QuestionFileRepository questionFileRepository;
 	private final ReviewFileRepository reviewFileRepository;
@@ -84,8 +81,8 @@ public class MemberServiceImpl implements MemberService {
                                                                                   .memberGrade("BRONZE")
                                                                                   .regdate(LocalDateTime.now())
                                                                                   .lastpwDate(LocalDateTime.now())
+                                                                                  .lastpwcheckDate(LocalDateTime.now())
                                                                                   .fromSocial("N")
-                                                                                  .pwcheck(0)
                                                                                   .point(0)
                                                                                   .role("USER")
                                                                                   .notificationYn(member.getNotificationYn())
@@ -296,7 +293,9 @@ public class MemberServiceImpl implements MemberService {
     // 30일이후 비밀번호 변경 연기
     @Override
     public void modifyPasswordAfter30(String email) {
-        memberRepository.modifyPasswordAfter30(email);
+        // memberRepository.modifyPasswordAfter30(email);
+        MemberEntity memberEntity = memberRepository.findById(email).get();
+        memberEntity.setLastpwcheckDate(LocalDateTime.now());
     }
 
     // 아이디 찾기
@@ -318,6 +317,20 @@ public class MemberServiceImpl implements MemberService {
        return memberRepository.findById(email)
                                                 .map((member) -> new MemberDTO(member))
                                                 .get();
+    }
+
+    // authkey 회원 정보
+    @Override
+	public MemberEntity memberAuthkey(String authkey) {
+        return memberRepository.findByAuthkey(authkey);
+    }
+
+    // authkey 업데이트
+    @Override
+	public void authkeyUpdate(MemberDTO member) {
+        MemberEntity memberEntity = memberRepository.findById(member.getEmail()).get();
+        memberEntity.setAuthkey(member.getAuthkey());
+        memberRepository.save(memberEntity);
     }
 
     // 로그인, 로그아웃, 패스워드 변경 시간 업데이트, 로그인/로그아웃 로그 등록

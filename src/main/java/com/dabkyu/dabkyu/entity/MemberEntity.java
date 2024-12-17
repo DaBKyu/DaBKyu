@@ -61,17 +61,14 @@ public class MemberEntity {
 	@Column(name="lastpw_date",nullable=true)
 	private LocalDateTime lastpwDate;
 
+	@Column(name="lastpwcheck_date",nullable=true)
+	private LocalDateTime lastpwcheckDate;
+
     @Column(name="fromSocial",length=2,nullable=false)
 	private String fromSocial;
 
-    @Column(name="pwcheck",nullable=false)
-	private int pwcheck;
-
     @Column(name="point")
 	private int point;
-
-    // @Column(name="my_categories",length=200,nullable=true)
-	// private String myCategories;
 
 	@Column(name="role",length=20,nullable=true)
 	private String role;

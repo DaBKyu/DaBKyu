@@ -22,17 +22,19 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
 
     public Optional<MemberEntity> findByUsernameAndTelno(String username, String telno);
 
+    public MemberEntity findByAuthkey(String authkey);
+
     Page<MemberEntity> findByMemberGrade(String memberGrade, Pageable pageable); // 회원등급으로 검색
 
 
     // 패스워드 변경 30일 이후로 연기
-    @Transactional
-    @Modifying
-    @Query(value="update member set pwcheck = "
-                + "(select nvl(pwcheck,0) from member "
-                + "where email = :email) + 1 where email =:email",
-                nativeQuery = true)
-    public void modifyPasswordAfter30(@Param("email") String email);
+//     @Transactional
+//     @Modifying
+//     @Query(value="update member set pwcheck = "
+//                 + "(select nvl(pwcheck,0) from member "
+//                 + "where email = :email) + 1 where email =:email",
+//                 nativeQuery = true)
+//     public void modifyPasswordAfter30(@Param("email") String email);
 
     //회원 등급/이름으로 검색
     public Page<MemberEntity> findByMemberGradeOrUsernameContaining
@@ -68,7 +70,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity, String> {
             "GROUP BY m.memberGrade " +
             "ORDER BY SUM(m.totalPvalue) DESC")
     public List<SalesByMemberGradeDTO> findSalesByGrade();
-
 
 
     //가입일 기준 가입 통계

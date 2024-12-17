@@ -4,11 +4,14 @@ import java.io.File;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.Page;
@@ -16,14 +19,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
@@ -31,6 +35,7 @@ import com.dabkyu.dabkyu.dto.OrderDetailDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
+import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
@@ -40,55 +45,128 @@ import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 import com.dabkyu.dabkyu.service.EmailService;
 import com.dabkyu.dabkyu.service.MemberService;
+import com.dabkyu.dabkyu.util.JWTUtil;
 import com.dabkyu.dabkyu.util.PageUtil;
 import com.dabkyu.dabkyu.util.PasswordMaker;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 
-
-
 @AllArgsConstructor
-@Controller
+@RestController
 @Log4j2
 public class MemberController {
     
     private final MemberService memberService;
     private final EmailService emailService;
     private final BCryptPasswordEncoder pwdEncoder;
+    private final JWTUtil jwtUtil;
 
     private final RedisTemplate<String, String> redisTemplate;
-    
-
-    // 로그인 화면
-    @GetMapping("/member/login")
-    public void getLogin() {}
-    
-
-    // 로그인(Spring Security)
-    @PostMapping("/member/login")
-    public void postLogin() {}
 
 
-    // Spring Security 이전 로그인 처리
-    @ResponseBody
+    // 로그인
     @PostMapping("/member/loginCheck")
-    public String postLoginCheck(MemberDTO member) throws Exception {
+    public ResponseEntity<String> postLoginCheck(
+        MemberDTO loginData,
+        HttpSession session,
+        @RequestParam("autoLogin") String autoLogin,
+        HttpServletRequest request
+    ) throws Exception {
+
+        String authkey = "";
+        String accessToken = "";
+        String refreshToken = "";
+        String responseStr = "";
+
+        // 자동로그인
+        if(autoLogin.equals("PASS")) {		
+			MemberEntity member = memberService.memberAuthkey(authkey);
+			if(member != null) {
+				
+				// 패스워드 변경 기한 도래 여부 확인
+				LocalDateTime lastpwcheckDate = member.getLastpwcheckDate();
+				int addedDate = 90;
+				LocalDateTime reDate = lastpwcheckDate.plusDays(addedDate);
+				LocalDateTime today = LocalDateTime.now();
+
+				if(reDate.compareTo(today) < 0)  {
+                    // 90일 초과
+					responseStr = "{\"message\":\"expired\"}";
+					return ResponseEntity.ok().body(responseStr);
+				} else {
+                    // 90일 이하
+					responseStr = "{\"message\":\"good\"}";
+					return ResponseEntity.ok().body(responseStr);
+				}
+			} else {
+                // authkey와 일치하는 유저 없음
+				responseStr = "{\"message\":\"bad\"}";
+				return ResponseEntity.badRequest().body(responseStr);
+			}
+		}
         
         // 아이디 체크  
-        if (memberService.idCheck(member.getEmail()) == 0) {
-            return "{\"message\":\"ID_NOT_FOUND\"}";
+        if (memberService.idCheck(loginData.getEmail()) == 0) {
+            responseStr = "{\"message\":\"ID_NOT_FOUND\"}";
+            return ResponseEntity.badRequest().body(responseStr);
         }
 
+        MemberDTO member = memberService.memberInfo(loginData.getEmail());
+        
         // 비밀번호 체크
-        if (!pwdEncoder.matches(member.getPassword(), memberService.memberInfo(member.getEmail()).getPassword().toString())) {
-            return "{\"message\":\"PASSWORD_NOT_FOUND\"}";
+        if (!pwdEncoder.matches(loginData.getPassword(), member.getPassword().toString())) {
+            responseStr = "{\"message\":\"PASSWORD_NOT_FOUND\"}";
+            return ResponseEntity.badRequest().body(responseStr);
         }
+        
+        // 수동 로그인
+        if(autoLogin.equals("NEW")) {
+			
+			//authkey 생성 및 DB 저장 
+			authkey = UUID.randomUUID().toString().replaceAll("-", ""); 
+			member.setAuthkey(authkey);
+			memberService.authkeyUpdate(member);
+			
+			//토큰 생성
+			Map<String,Object> token = new HashMap<>();
+			token.put("email", loginData.getEmail());
+			//token.put("password", loginData.getPassword());
+			accessToken = jwtUtil.generateToken(token, 1);
+			refreshToken = jwtUtil.generateToken(token, 5);			
 
-        return "{\"message\":\"good\"}";
+			//패스워드 변경 기한 도래 여부 확인			
+			LocalDateTime lastpwcheckDate = member.getLastpwcheckDate();
+			int addedDate = 30;
+			LocalDateTime reDate = lastpwcheckDate.plusDays(addedDate);
+			LocalDateTime today = LocalDateTime.now();
+
+            //authkey, accessToken, refreshToken, username, role 값들을 JSON 타입으로 client에게로 전달
+            responseStr = "{\"message\":\"good\"," +
+                                    "\"authkey\":\"" + member.getAuthkey() +
+                                    "\",\"accessToken\":\"" + accessToken +
+                                    "\",\"refreshToken\":\"" + refreshToken + 
+                                    "\",\"username\":\"" + URLEncoder.encode(member.getUsername(),"UTF-8") +
+                                    "\",\"role\":\"" + member.getRole() + "\"}";
+
+			if(reDate.compareTo(today) < 0) {
+                responseStr = "{\"message\":\"expired\"," +
+                                        "\"authkey\":\"" + member.getAuthkey() +
+                                        "\",\"accessToken\":\"" + accessToken +
+                                        "\",\"refreshToken\":\"" + refreshToken + 
+                                        "\",\"username\":\"" + URLEncoder.encode(member.getUsername(),"UTF-8") +
+                                        "\",\"role\":\"" + member.getRole() + "\"}";
+			}	
+			
+			//로그인 로그 정보 기록
+			memberService.lastdateUpdate(loginData.getEmail(), "login");
+			
+		} 
+		return ResponseEntity.ok().body(responseStr);
     }
     
 
@@ -217,16 +295,6 @@ public class MemberController {
         Page<OrderInfoDTO> orderInfoPage = memberService.getOrderInfoList(email, keyword, pageRequest);
 
         int totalCount = (int) orderInfoPage.getTotalElements();
-        log.info("----------------------- 페이지 뽑기 완료, 전체 갯수: {} ------------------------", totalCount);
-
-        for (OrderInfoDTO order : orderInfoPage) {
-            log.info("----------------------- 오더번호: {} ------------------------", order.getOrderSeqno());
-            log.info("----------------------- 주문 상세 갯수: {}  ------------------------", order.getOrderDetails().size());
-            for (OrderDetailDTO detail : order.getOrderDetails()) {
-                log.info("----------------------- 주문 상세 번호: {}  ------------------------", detail.getOrderDetailSeqno());
-                log.info("----------------------- 주문 제품: {}  ------------------------", detail.getProduct());
-            }
-        }
 
         model.addAttribute("orderList", orderInfoPage.getContent());
         model.addAttribute("listIsEmpty", orderInfoPage.hasContent()?"N":"Y");
@@ -337,6 +405,15 @@ public class MemberController {
         model.addAttribute("myCategoryList", memberService.myCategoryList(email));
         model.addAttribute("isEmpty", memberService.myCategoryList(email).isEmpty()?"Y":"N");
     }
+
+    // 관심 카테고리 수정
+    @PostMapping("/mypage/myCategories")
+    public String postMyCategories(@RequestBody String entity) {
+        //TODO: process POST request
+        
+        return entity;
+    }
+    
     
 
     // 찜한 상품 화면
@@ -538,21 +615,6 @@ public class MemberController {
         memberService.lastdateUpdate(email, "password");
         return "{\"message\":\"good\"}";
     }
-    
-
-    // 30일 이후 비밀번호 변경 화면 보기
-    @GetMapping("/mypage/checkPasswordNotice")
-    public void getCheckPasswordNotice(
-        Model model,
-        HttpSession session
-    ) throws Exception {
-        
-        String email = (String) session.getAttribute("email");
-        MemberDTO member = memberService.memberInfo(email);
-        int addedDate = 30 * (member.getPwcheck() + 1);
-        model.addAttribute("addedDate", addedDate);
-    }
-    
 
     // 비밀번호 변경 30일 이후로 연기
     @GetMapping("/mypage/modifyPasswordAfter30")

@@ -31,6 +31,7 @@ public class MemberDTO {
     private LocalDateTime lastloginDate;
     private LocalDateTime lastlogoutDate;
     private LocalDateTime lastpwDate;
+    private LocalDateTime lastpwcheckDate;
     private String fromSocial;
     private int pwcheck;
     private int point;
@@ -55,8 +56,8 @@ public class MemberDTO {
         this.lastloginDate = memberEntity.getLastloginDate();
         this.lastlogoutDate = memberEntity.getLastlogoutDate();
         this.lastpwDate = memberEntity.getLastpwDate();
+        this.lastpwcheckDate = memberEntity.getLastpwcheckDate();
         this.fromSocial = memberEntity.getFromSocial();
-        this.pwcheck = memberEntity.getPwcheck();
         this.point = memberEntity.getPoint();
         this.role = memberEntity.getRole();
         this.notificationYn = memberEntity.getNotificationYn();
@@ -81,8 +82,8 @@ public class MemberDTO {
                                                 .lastloginDate(dto.getLastloginDate())
                                                 .lastlogoutDate(dto.getLastlogoutDate())
                                                 .lastpwDate(dto.getLastpwDate())
+                                                .lastpwcheckDate(dto.getLastpwcheckDate())
                                                 .fromSocial(dto.getFromSocial())
-                                                .pwcheck(dto.getPwcheck())
                                                 .point(dto.getPoint())
                                                 .role(dto.getRole())
                                                 .notificationYn(dto.getNotificationYn())

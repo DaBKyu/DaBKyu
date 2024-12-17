@@ -11,6 +11,7 @@ import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
+import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
@@ -81,6 +82,12 @@ public interface MemberService {
 	
 	// 회원 정보
 	public MemberDTO memberInfo(String email);
+
+	// authkey 회원 정보
+	public MemberEntity memberAuthkey(String authkey);
+
+	// authkey 업데이트
+	public void authkeyUpdate(MemberDTO member);
 	
 	// 회원 로그인, 로그아웃, 패스워드변경시간 등록(update)
 	public void lastdateUpdate(String email, String status);
