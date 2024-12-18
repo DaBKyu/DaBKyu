@@ -14,7 +14,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -28,7 +27,6 @@ import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService {
 
     private final PasswordEncoder pwdEncoder;
-    private final HttpSession session;
     private final MemberRepository memberRepository;
 
     @Override
@@ -76,18 +74,6 @@ public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService {
         memberOAuth2DTO.setAuthorities(grantedAuthorities);
         memberOAuth2DTO.setName(member.getUsername());
         
-        // 세션 설정
-        session.setAttribute("email", email);
-        session.setAttribute("username", member.getUsername());
-        session.setAttribute("role", member.getRole());
-        session.setAttribute("FromSocial", member.getFromSocial());
-
-        log.info("----------OAuth2 로그인 단계 : 세션 설정----------");
-        log.info("----------세션 email : {}", (String)session.getAttribute("email"));
-        log.info("----------세션 username : {}", (String)session.getAttribute("username"));
-        log.info("----------세션 FromSocial : {}", (String)session.getAttribute("FromSocial"));
-        
-        
         return memberOAuth2DTO;
     }
 
@@ -107,11 +93,10 @@ public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService {
                                           .password(pwdEncoder.encode("12345"))
                                           .role("USER")
                                           .memberGrade("BRONZE")
-                                          .pwcheck(0)
                                           .regdate(LocalDateTime.now())
                                           .fromSocial("Y")
-                                          .notificationYn("Y")
-                                          .emailRecept("Y")
+                                          .notificationYn("N")
+                                          .emailRecept("N")
                                           .totalPvalue(0)
                                           .build();
         memberRepository.save(member);

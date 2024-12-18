@@ -14,11 +14,13 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.boot.autoconfigure.cache.CacheProperties.Redis;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.ui.Model;
@@ -31,13 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dabkyu.dabkyu.dto.MemberAddressDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
-import com.dabkyu.dabkyu.dto.OrderDetailDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.MemberAddressEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
-import com.dabkyu.dabkyu.entity.OrderDetailEntity;
-import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
@@ -70,10 +69,10 @@ public class MemberController {
 
 
     // 로그인
+    // Refresh토큰 저장 관리 필요
     @PostMapping("/member/loginCheck")
     public ResponseEntity<String> postLoginCheck(
         MemberDTO loginData,
-        HttpSession session,
         @RequestParam("autoLogin") String autoLogin,
         HttpServletRequest request
     ) throws Exception {
@@ -137,7 +136,10 @@ public class MemberController {
 			token.put("email", loginData.getEmail());
 			//token.put("password", loginData.getPassword());
 			accessToken = jwtUtil.generateToken(token, 1);
-			refreshToken = jwtUtil.generateToken(token, 5);			
+			refreshToken = jwtUtil.generateToken(token, 7);
+
+            // Redis에 refreshToken 저장
+            redisTemplate.opsForValue().set(loginData.getEmail(), refreshToken, 7, TimeUnit.DAYS); // 일주일 유효
 
 			//패스워드 변경 기한 도래 여부 확인			
 			LocalDateTime lastpwcheckDate = member.getLastpwcheckDate();
@@ -170,31 +172,19 @@ public class MemberController {
     }
     
 
-    // 로그아웃 전처리
-    @GetMapping("/member/beforeLogout")
-    public String getBeforeLogout(HttpSession session) throws Exception {
+    // 로그아웃 처리
+    // 토큰 처리 필요.
+    @PostMapping("/member/logout")
+    public ResponseEntity<?> postLogout(@RequestParam("email") String email) throws Exception {
         
-        String email = (String) session.getAttribute("email");
         memberService.lastdateUpdate(email, "logout");
-        session.invalidate();
-        return "redirect:/member/logout";
+        return ResponseEntity.ok().build();
     }
-
-
-    // 로그아웃(Spring Security)
-    @GetMapping("/member/logout")
-    public void getLogout(HttpSession session) throws Exception {}
-
-
-    // 회원가입 화면
-    @GetMapping("/member/signup")
-    public void getSignup() {}
     
 
     // 회원가입, 회원 정보 수정
-    @ResponseBody
     @PostMapping("/member/signup")
-    public String postSignup(
+    public ResponseEntity<Map<String, String>> postSignup(
         MemberDTO member,
         @RequestParam("kind") String kind
     ) throws Exception {
@@ -206,6 +196,7 @@ public class MemberController {
             member.setBirthDate(LocalDate.parse(birthDate, formatter));
             member.setPassword(pwdEncoder.encode(member.getPassword()));
             memberService.signup(member);
+            redisTemplate.delete(member.getEmail());
             log.info("회원등록: {\"username\":" + member.getUsername() + "\", \"status\":\"good\"}");
         }
 
@@ -215,60 +206,75 @@ public class MemberController {
             log.info("회원정보수정: {\"username\":" + member.getUsername() + "\", \"status\":\"good\"}");
         }
 
-        return "{\"username\":" + URLEncoder.encode(member.getUsername(), "UTF-8") + "\", \"status\":\"good\"}";
+        // OAuth2 추가 정보 입력
+        if (kind.equals("O")) {
+            memberService.modifyMemberInfo(member);
+        }
+
+        Map<String, String> data = new HashMap<>();
+        data.put("status", "good");
+        data.put("username", URLEncoder.encode(member.getUsername(), "UTF-8"));
+
+        return ResponseEntity.ok().body(data);
     }
 
 
     // 이메일 인증번호 발송
-    @ResponseBody
     @PostMapping("/member/sendEmail")
-    public String postSendEmail(@RequestBody Map<String, String> request) throws Exception {
+    public ResponseEntity<String> postSendEmail(@RequestBody Map<String, String> request) throws Exception {
         
-        String email = request.get("email");
+        try {
+            
+            String responseStr = "";
+            String email = request.get("email");
         
-        // 이메일 중복 체크
-        if (memberService.idCheck(email) == 1) {
-            return "{\"status\": 1}"; // 0: 성공, 1: 이미 존재하는 이메일, 2: 서버 오류
+            // 이메일 중복 체크
+            if (memberService.idCheck(email) == 1) {
+                responseStr = "{\"status\": 1}"; // 0: 성공, 1: 이미 존재하는 이메일, 2: 서버 오류
+            return ResponseEntity.badRequest().body(responseStr);
+            }
+            
+            String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            StringBuilder authCodeBuilder = new StringBuilder();
+            Random random = new Random();
+            
+            for (int i = 0; i < 6; i++) {
+                int index = random.nextInt(chars.length());
+                authCodeBuilder.append(chars.charAt(index));
+            }
+
+            String authCode = authCodeBuilder.toString();
+            redisTemplate.opsForValue().set(email, authCode, 5, TimeUnit.MINUTES); // Redis에 저장, 5분 동안 유효
+            
+            emailService.sendAuthCode(email, authCode); // 이메일 발송
+            
+            responseStr =  "{\"status\": 0}"; // 0: 성공, 1: 이미 존재하는 이메일, 2: 서버 오류
+            return ResponseEntity.ok().body(responseStr);
+
+        } catch (Exception e) {
+            log.info("이메일 발송 오류 발생: {}", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder authCodeBuilder = new StringBuilder();
-        Random random = new Random();
-
-        for (int i = 0; i < 6; i++) {
-            int index = random.nextInt(chars.length());
-            authCodeBuilder.append(chars.charAt(index));
-        }
-
-        String authCode = authCodeBuilder.toString();
-        redisTemplate.opsForValue().set(email, authCode, 5, TimeUnit.MINUTES); // Redis에 저장, 5분 동안 유효
-
-        emailService.sendAuthCode(email, authCode); // 이메일 발송
-
-        return "{\"status\": 0}"; // 0: 성공, 1: 이미 존재하는 이메일, 2: 서버 오류
     }
 
 
     // 이메일 인증번호 확인
-    @ResponseBody
-    @PostMapping("/member/checkAuth")
-    public String postCheckAuth(@RequestBody Map<String, String> request) throws Exception {
+    @GetMapping("/member/checkAuth")
+    public ResponseEntity<String> getCheckAuth(@RequestBody Map<String, String> request) throws Exception {
         
+        String responseStr = "";
         String email = request.get("email");
         String authNum = request.get("authNum");
 
         String authCode = redisTemplate.opsForValue().get(email);
         if (!authCode.equals(authNum)) {
-            return "{\"status\": 1}"; // 0: 성공, 1: 일치하지 않음, 2: 서버 오류
+            responseStr = "{\"status\": 1}"; // 0: 성공, 1: 일치하지 않음, 2: 서버 오류
+            return ResponseEntity.badRequest().body(responseStr);
         }
 
-        return "{\"status\": 0}"; // 0: 성공, 1: 일치하지 않음, 2: 서버 오류
+        responseStr = "{\"status\": 0}"; // 0: 성공, 1: 일치하지 않음, 2: 서버 오류
+        return ResponseEntity.ok().body(responseStr);
     }
-    
-
-    // OAuth2 회원가입
-    @PostMapping("/member/oauth2Signup")
-    public void postOAuth2Signup() throws Exception {}
 
 
     // 마이페이지
@@ -535,11 +541,6 @@ public class MemberController {
     }
     
 
-    // 아이디 찾기 화면
-    @GetMapping("/member/searchID")
-    public void getSearchID() {}
-    
-
     // 아이디 찾기
     @ResponseBody
     @PostMapping("/member/searchID")
@@ -555,11 +556,6 @@ public class MemberController {
 
         return "{\"message\":\"" + email + "\"}";
     }
-    
-
-    // 비밀번호 찾기 화면
-    @GetMapping("/member/searchPassword")
-    public void getSearchPassword() {}
 
 
     // 비밀번호 찾기(임시 비밀번호)
@@ -587,11 +583,6 @@ public class MemberController {
         
         return "{\"message\":\"good\"}";
     }
-    
-
-    // 비밀번호 변경 화면
-    @GetMapping("/mypage/modifyMemberPassword")
-    public void getModifyMemberPassword() {}
     
 
     // 비밀번호 변경
@@ -677,9 +668,6 @@ public class MemberController {
 
         // 회원 정보 삭제
         memberService.deleteID(email);
-
-        // 세션 삭제
-        session.invalidate();
 
         return "redirect:/";
     }

@@ -26,7 +26,7 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
 
         log.info("-------------- OAuth2 로그인 실패 --------------");
 
-        setDefaultFailureUrl("/member/login");
+        setDefaultFailureUrl("http://localhost:3000/member/login");
         super.onAuthenticationFailure(request, response, exception);
     }
 }
