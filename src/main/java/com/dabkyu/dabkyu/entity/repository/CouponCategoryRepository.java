@@ -21,5 +21,10 @@ public interface CouponCategoryRepository extends JpaRepository<CouponCategoryEn
    @Query("DELETE FROM couponCategory cc WHERE cc.couponSeqno.couponSeqno = :couponSeqno AND cc.category3Seqno.category3Seqno = :category3Seqno")
    public void deleteByCouponSeqnoAndCategory3Seqno(@Param("couponSeqno") Long couponSeqno, 
                                                     @Param("category3Seqno") Long category3Seqno);
-                                                
+                                                    
+   //쿠폰 상세 쿠폰카테고리 조회
+   @Query("select cc from couponCategory cc where couponSeqno = :coupon")
+   public List<CouponCategoryEntity> findDetailByCouponSeqno(CouponEntity coupon);
+
+
 }

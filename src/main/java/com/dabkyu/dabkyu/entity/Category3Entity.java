@@ -45,4 +45,7 @@ public class Category3Entity {
 
 	@Column(name="is_temporary", length=2 , nullable=true)
 	private String isTemporary;
+
+	@Column(name="category3_order", nullable=false)
+    private int category3Order; // 카테고리 순서
 }

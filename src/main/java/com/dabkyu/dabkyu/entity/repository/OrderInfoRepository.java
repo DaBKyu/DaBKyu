@@ -72,4 +72,10 @@ public interface OrderInfoRepository extends JpaRepository<OrderInfoEntity, Long
            nativeQuery = true)
     public List<Object[]> findMonthlySalesByYear(@Param("year") int year);
 
+    //첫 주문 회원 조회(주문내역이 한 개만 있는 경우)
+    @Query("SELECT o.email FROM orderInfo o " +
+       "GROUP BY o.email " +
+       "HAVING COUNT(o) = 1")
+    public List<MemberEntity> findFirstOrderMembers();
+
 }

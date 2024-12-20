@@ -35,6 +35,7 @@ public class Category2Entity {
 	@Column(name="category2_seqno")
 	private Long category2Seqno;
 
+	
     @ManyToOne(fetch = FetchType.LAZY)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name="category1_seqno", nullable = false)
@@ -42,4 +43,7 @@ public class Category2Entity {
 	
 	@Column(name="category2_name", length=20, nullable=false)
 	private String category2Name;
+
+	@Column(name="category2_order", nullable=false)
+    private int category2Order; // 카테고리 순서
 }

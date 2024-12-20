@@ -3,6 +3,8 @@ package com.dabkyu.dabkyu.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import com.dabkyu.dabkyu.dto.Category1DTO;
@@ -85,7 +87,7 @@ public interface MasterService {
     public List<ProductInfoFileDTO> getProductInfoFiles(Long productSeqno) throws Exception;
 
     //상품등록
-    public Long productPost(ProductDTO productDTO) throws Exception;
+    public ProductEntity productPost(ProductDTO productDTO) throws Exception;
 
     //상품수정
     public void productModify(ProductDTO productDTO) throws Exception;
@@ -175,9 +177,9 @@ public interface MasterService {
     public void saveCategories(List<Category1DTO> list1, List<Category2DTO> list2, List<Category3DTO> list3) throws Exception;
 
     //카테고리 삭제
-    public void deleteCategory1(Long category1Seqno) throws Exception;
-    public void deleteCategory2(Long category2Seqno) throws Exception;
-    public void deleteCategory3(Long category3Seqno) throws Exception;
+    public void deleteCategory1(Long categoryId) throws Exception;
+    public void deleteCategory2(Long categoryId) throws Exception;
+    public void deleteCategory3(Long categoryId) throws Exception;
 
     //쿠폰 리스트
     public Page<Map<String,Object>> couponList(int pageNum, int postNum) throws Exception;
@@ -213,7 +215,8 @@ public interface MasterService {
     public void deleteCouponTarget(Long couponSeqno, Long productSeqno) throws Exception;
 
     //쿠폰 배포 (자동-관리자가)
-    public void couponToUser(Long couponSeqno, boolean isAllMembers, String role, boolean isBirthday, boolean isNewMember) throws Exception;
+    public void couponToUser(Long couponSeqno, boolean isAllMembers, String memberGrade, boolean isBirthday, boolean isNewMember,
+    boolean isFirstOrderMember,boolean isNoOrdersLastYearMember) throws Exception;
 
     //쿠폰 배포 (수동) - 회원이 다운로드
     public void downloadCoupon(Long couponSeqno, String email) throws Exception;
@@ -303,5 +306,61 @@ public interface MasterService {
 
     //관리자페이지 메인 답변 대기수
     public int getNumberOfPendingQuestions();
+
+    //카테고리 1 저장
+    public void saveCategory1(Category1Entity category1);
+
+    //카테고리 1 찾기
+    public Category1Entity findCategory1ById(Long category1Seqno);
+
+    //카테고리 2 저장
+    public void saveCategory2(Category2Entity category2);
+
+    //카테고리 2 찾기
+    public Category2Entity findCategory2ById(Long category2Seqno);
+
+    //카테고리 3 저장
+    public void saveCategory3(Category3Entity category3);
+
+    //카테고리 3 찾기
+    public Category3Entity findCategory3ById(Long category3Seqno);
+
+    //카테고리 순서 변경
+    public void updateCategoryOrder(int level, Long categoryId, String direction);
+
+    //모든 쿠폰 가져오기
+    public List<CouponEntity> getAllCoupons();
+
+    //쿠폰 상세 보기
+    public Map<String, Object> getAllCouponDetail(Long couponSeqno);
+
+    //쿠폰 생성 시 카테고리 3 조회
+    public Category3Entity findCategory3BySeqno(Long category3Seqno);
+
+    //쿠폰 찾기
+    public CouponEntity findCouponBySeqno(Long couponSeqno);
+
+    //카테고리 정보 저장
+    public void saveCouponCategories(Category3Entity category3Entity, CouponEntity couponEntity);
+    
+    //상품 찾기
+    public ProductEntity findProductBySeqno(Long productSeqno);
+
+    //타겟 정보 저장
+    public void saveCouponTargets(ProductEntity productEntity, CouponEntity couponEntity);
+
+    //쿠폰에 연결된 카테고리 정보 삭제
+    public void deleteCouponCategories(CouponEntity couponEntity);
+
+    //쿠폰에 연결된 타겟 정보 삭제
+    public void deleteCouponTargets(CouponEntity couponEntity);
+
+    //회원 리스트 조회
+    public List<MemberEntity> getAllMembers();
+    
+
+    
+
+
 
 }

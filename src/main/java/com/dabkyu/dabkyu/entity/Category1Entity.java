@@ -31,6 +31,9 @@ public class Category1Entity {
 	
 	@Column(name="category1_name", length=20, nullable=false)
 	private String category1Name;
+
+	@Column(name="category1_order", nullable=false)
+    private int category1Order; // 카테고리 순서
 	
 
 }

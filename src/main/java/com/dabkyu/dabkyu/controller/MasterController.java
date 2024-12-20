@@ -552,6 +552,7 @@ public class MasterController{
         return "redirect:/master/order";
     }
 
+    /*
     //카테고리 리스트 화면보기
     @GetMapping("/master/manageCategory")
     public void getManageCategory(Model model) {
@@ -573,6 +574,7 @@ public class MasterController{
         model.addAttribute("categories2", category2DTOs);
         model.addAttribute("categories3", category3DTOs);
     }
+
 
     
     //카테고리 추가 및 수정 및 삭제 
@@ -677,6 +679,7 @@ public class MasterController{
             return ResponseEntity.status(500).body("Error saving categories: " + e.getMessage());
         }
     } 
+    */
         
 
 
@@ -866,6 +869,7 @@ public class MasterController{
     }
 
     //쿠폰 리스트보기 
+    /*
     @GetMapping("/master/couponList")
     public void getCouponList(Model model,
                 @RequestParam("page") int pageNum) 
@@ -884,6 +888,7 @@ public class MasterController{
         model.addAttribute("page", pageNum);
         model.addAttribute("pageList", page.getPageCoupon(pageNum, postNum, pageListCount, totalCount));
     }
+    */
 
     //쿠폰 등록 화면보기
     @GetMapping("/master/createCoupon")
@@ -904,6 +909,7 @@ public class MasterController{
 
     //쿠폰 등록, 수정
     //쿠폰 타입 A(전체상품적용), T(특정상품적용(카테고리)), C(단일상품적용) 
+    /* 
     @ResponseBody
     @PostMapping("/master/createCoupon")
     public String postCreateCoupon(CouponDTO couponDTO, 
@@ -954,18 +960,23 @@ public class MasterController{
         }
         return "{\"message\":\"good\"}"; 
     }
+        */
 
-    //쿠폰-사용자 배포 (자동)
+    /*
+    //쿠폰-사용자 배포 (자동) 
     @PostMapping("/master/distributionCoupon")
     public void clientCoupon(@RequestParam("couponSeqno") Long couponSeqno,
                 @RequestParam(name = "isAllMembers", required = false) boolean isAllMembers,
                 @RequestParam(name = "memberGrade", required = false) String memberGrade,
                 @RequestParam(name = "isBirthday", required = false) boolean isBirthday,
-                @RequestParam(name = "isNewMember", required = false) boolean isNewMember) 
+                @RequestParam(name = "isNewMember", required = false) boolean isNewMember,
+                @RequestParam(name = "isFirstOrderMember", required = false) boolean isFirstOrderMember,
+                @RequestParam(name = "isNoOrdersLastYearMember", required = false) boolean isNoOrdersLastYearMember) 
                 throws Exception{
-        //자동: 특정 회원 지정 발행, 웅영자 지정 대상 자동 발행(신규회원, 첫주문 완료 회원, 생일인 회원) ///구매한지 1년 후 쿠폰 발급??              
-        masterService.couponToUser(couponSeqno, isAllMembers, memberGrade, isBirthday, isNewMember); 
+        //자동: 특정 회원 지정 발행, 운영자 지정 대상 자동 발행(신규회원, 첫주문 완료 회원, 생일인 회원) ///구매한지 1년 후 쿠폰 발급??              
+        masterService.couponToUser(couponSeqno, isAllMembers, memberGrade, isBirthday, isNewMember, isFirstOrderMember, isNoOrdersLastYearMember); 
     }
+    */
 
     //쿠폰 다운로드 
     @PostMapping("/master/downloadCoupon")

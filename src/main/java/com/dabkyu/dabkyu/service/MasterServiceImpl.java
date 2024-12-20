@@ -8,10 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -96,6 +99,7 @@ import com.dabkyu.dabkyu.entity.repository.RelatedProductRepository;
 import com.dabkyu.dabkyu.entity.repository.ReportRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ReviewRepository;
+import com.dabkyu.dabkyu.util.CouponCodeMaker;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -187,10 +191,17 @@ public class MasterServiceImpl implements MasterService {
 
     //상품 상세보기
     //productSeqno로 상품 정보 가져오기
-    @Override
+    /*@Override
     public ProductEntity getProductBySeqno(Long productSeqno) throws Exception {
         return productRepository.findById(productSeqno).get();
     }
+    */
+    @Override
+    public ProductEntity getProductBySeqno(Long productSeqno) {
+        return productRepository.findById(productSeqno)
+                .orElseThrow(() -> new NoSuchElementException("Product with seqno " + productSeqno + " not found"));
+    }
+
 
     //상품 옵션 정보 가져오기
     @Override
@@ -271,10 +282,10 @@ public class MasterServiceImpl implements MasterService {
 
     //상품등록
     @Override
-    public Long productPost(ProductDTO productDTO) throws Exception{
+    public ProductEntity productPost(ProductDTO productDTO) throws Exception{
         ProductEntity productEntity = productDTO.dtoToEntity(productDTO);
         productEntity = productRepository.save(productEntity); 
-        return productEntity.getProductSeqno();
+        return productEntity;
     }
 
     //상품수정
@@ -631,22 +642,35 @@ public class MasterServiceImpl implements MasterService {
         }
     }
 
-    //카테고리 1 삭제
+    // 카테고리 1 삭제
+    @Transactional
     @Override
-    public void deleteCategory1(Long category1Seqno) throws Exception {
-        Category1Entity category1Entity = category1Repository.findById(category1Seqno).get();
+    public void deleteCategory1(Long categoryId) throws Exception {
+        Category1Entity category1 = category1Repository.findById(categoryId).get();
 
-        category1Repository.delete(category1Entity);
+        category1Repository.delete(category1);
+        
     }
 
     // 카테고리 2 삭제
+    @Transactional
     @Override
-    public void deleteCategory2(Long category2Seqno) throws Exception {
-        Category2Entity category2Entity = category2Repository.findById(category2Seqno).get();
+    public void deleteCategory2(Long categoryId) throws Exception {
+        Category2Entity category2Entity = category2Repository.findById(categoryId).get();
 
         category2Repository.delete(category2Entity);
     }
 
+    // 카테고리 3 삭제
+    @Transactional
+    @Override
+    public void deleteCategory3(Long categoryId) throws Exception {
+        Category3Entity category3Entity = category3Repository.findById(categoryId).get();
+
+        category3Repository.delete(category3Entity);
+    }
+
+    /*
     // 카테고리 3 삭제
     @Override
     public void deleteCategory3(Long category3Seqno) throws Exception {
@@ -671,6 +695,7 @@ public class MasterServiceImpl implements MasterService {
 
         category3Repository.delete(category3Entity);
     }   
+     */
 
     //쿠폰 리스트 
     @Override
@@ -725,8 +750,12 @@ public class MasterServiceImpl implements MasterService {
     //쿠폰 등록 (쿠폰 seqno가져오기)
     @Override
     public Long writeCoupon(CouponDTO couponDTO) throws Exception{
-        String couponCode = generateCouponCode(); //쿠폰 코드 난수로 생성
-        couponDTO.setCouponCode(couponCode); //쿠폰 코드 설정
+        //String couponCode = generateCouponCode(); //쿠폰 코드 난수로 생성
+        //couponDTO.setCouponCode(couponCode); //쿠폰 코드 설정
+        //쿠폰코드 생성
+        CouponCodeMaker couponcodemaker = new CouponCodeMaker();
+        String tempCouponCode = couponcodemaker.tempCouponCodeMaker();
+        couponDTO.setCouponCode(tempCouponCode); 
         CouponEntity couponEntity = couponDTO.dtoToEntity(couponDTO);
         couponRepository.save(couponEntity);
         return couponEntity.getCouponSeqno();
@@ -791,7 +820,8 @@ public class MasterServiceImpl implements MasterService {
 
     //쿠폰 배포 (자동)
     @Override
-    public void couponToUser(Long couponSeqno, boolean isAllMembers, String memberGrade, boolean isBirthday, boolean isNewMember) throws Exception{
+    public void couponToUser(Long couponSeqno, boolean isAllMembers, String memberGrade, boolean isBirthday, boolean isNewMember,
+    boolean isFirstOrderMember,boolean isNoOrdersLastYearMember) throws Exception{
         CouponEntity couponEntity = couponRepository.findById(couponSeqno).get();
 
         List<MemberEntity> members = memberRepository.findAll();
@@ -811,9 +841,15 @@ public class MasterServiceImpl implements MasterService {
                 }
                 if(isNewMember && isNewMember(member)){//신규 회원
                     distribute = true;
-                }
-                //첫주문 회원
 
+                }if(isFirstOrderMember && isFirstOrderMember(member)){//첫주문 회원
+                    distribute = true;
+                    
+                }if(isNoOrdersLastYearMember && isNoOrdersLastYearMember(member)){//최근 1년내의 구매이력이 없는 회원
+                    distribute = true;
+                }
+                
+                
             }
 
             if(distribute){
@@ -874,6 +910,22 @@ public class MasterServiceImpl implements MasterService {
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         return member.getRegdate().isAfter(oneMonthAgo); 
     }
+
+    //첫 주문 회원
+    private boolean isFirstOrderMember(MemberEntity member) {
+        List<MemberEntity> firstOrderMembers = orderInfoRepository.findFirstOrderMembers();
+        return firstOrderMembers.contains(member);
+    }
+
+    //최근 1년내의 구매이력이 없는 회원
+    private boolean isNoOrdersLastYearMember(MemberEntity member) {
+        LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+        List<MemberEntity> noOrderMembers = orderInfoRepository.findMembersWithNoOrderInLastYear(oneYearAgo);
+        return noOrderMembers.contains(member);
+    }
+    
+
+    
 
     //쿠폰 코드 랜덤 생성
     private String generateCouponCode() {
@@ -1286,6 +1338,241 @@ public class MasterServiceImpl implements MasterService {
     public int getNumberOfPendingQuestions() {
         return questionRepository.getPendingQuestions();
     }
+
+    /*@Override
+    public Long getMaxCategory1Seqno() {
+        return category1Repository.findTopByOrderByCategory1SeqnoDesc()
+            .map(Category1Entity::getCategory1Seqno)
+            .orElse(0L); // 만약 Category1Seqno가 없으면 0을 반환
+    }
+    */
+
+    //카테고리1 저장
+    @Override
+    public void saveCategory1(Category1Entity category1) {
+        category1Repository.save(category1);
+    }
+
+    //카테고리 1 찾기
+    @Override
+    public Category1Entity findCategory1ById(Long category1Seqno) {
+        return category1Repository.findById(category1Seqno).get();
+    }
+
+    //카테고리2 저장
+    @Override
+    public void saveCategory2(Category2Entity category2) {
+        category2Repository.save(category2);
+    }
+
+    //카테고리 2 찾기
+    @Override
+    public Category2Entity findCategory2ById(Long category2Seqno) {
+        return category2Repository.findById(category2Seqno).get();
+    }
+
+    //카테고리3 저장
+    @Override
+    public void saveCategory3(Category3Entity category3) {
+        category3Repository.save(category3);
+    }
+    
+    //카테고리 3 찾기
+    @Override
+    public Category3Entity findCategory3ById(Long category3Seqno) {
+        return category3Repository.findById(category3Seqno).get();
+    }
+
+    // 카테고리 순서 변경
+    @Override
+    public void updateCategoryOrder(int level, Long categoryId, String direction) {
+        try {
+            if (level == 1) {
+                Category1Entity category1 = category1Repository.findById(categoryId)
+                        .orElseThrow(() -> new IllegalArgumentException("카테고리1을 찾을 수 없습니다."));
+                adjustOrderForCategory1(category1, direction);
+            } else if (level == 2) {
+                Category2Entity category2 = category2Repository.findById(categoryId)
+                        .orElseThrow(() -> new IllegalArgumentException("카테고리2를 찾을 수 없습니다."));
+                adjustOrderForCategory2(category2, direction);
+            } else if (level == 3) {
+                Category3Entity category3 = category3Repository.findById(categoryId)
+                        .orElseThrow(() -> new IllegalArgumentException("카테고리3을 찾을 수 없습니다."));
+                adjustOrderForCategory3(category3, direction);
+            } else {
+                throw new IllegalArgumentException("유효하지 않은 레벨입니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+        // 카테고리1 순서 조정
+        private void adjustOrderForCategory1(Category1Entity category1, String direction) {
+            int currentOrder = category1.getCategory1Order();
+            int targetOrder = "up".equals(direction) ? currentOrder - 1 : currentOrder + 1;
+
+            // 대상 순서의 항목 조회
+            Optional<Category1Entity> targetCategoryOpt = category1Repository.findByCategory1Order(targetOrder);
+
+            if (targetCategoryOpt.isPresent()) {
+                // 대상 항목의 순서를 현재 항목의 순서로 변경
+                Category1Entity targetCategory = targetCategoryOpt.get();
+                targetCategory.setCategory1Order(currentOrder);
+                category1Repository.save(targetCategory);
+            }
+
+            // 현재 항목의 순서를 변경
+            category1.setCategory1Order(targetOrder);
+            category1Repository.save(category1);
+        }
+
+        // 카테고리2 순서 조정
+        private void adjustOrderForCategory2(Category2Entity category2, String direction) {
+            int currentOrder = category2.getCategory2Order();
+            int targetOrder = "up".equals(direction) ? currentOrder - 1 : currentOrder + 1;
+        
+            // 같은 부모(Category1Entity) 내에서 대상 순서를 가진 항목을 조회
+            Optional<Category2Entity> targetCategoryOpt = category2Repository.findByCategory2OrderAndCategory1Seqno(
+                targetOrder, category2.getCategory1Seqno());
+        
+            if (targetCategoryOpt.isPresent()) {
+                // 대상 항목과 순서 교환
+                Category2Entity targetCategory = targetCategoryOpt.get();
+                targetCategory.setCategory2Order(currentOrder);
+                category2Repository.save(targetCategory);
+            }
+        
+            // 현재 항목의 순서를 변경
+            category2.setCategory2Order(targetOrder);
+            category2Repository.save(category2);
+        }
+        
+
+        // 카테고리3 순서 조정
+        private void adjustOrderForCategory3(Category3Entity category3, String direction) {
+            int currentOrder = category3.getCategory3Order();
+            int targetOrder = "up".equals(direction) ? currentOrder - 1 : currentOrder + 1;
+        
+            // 같은 부모(Category2Entity) 내에서 대상 순서를 가진 항목을 조회
+            Optional<Category3Entity> targetCategoryOpt = category3Repository.findByCategory3OrderAndCategory2Seqno(
+                targetOrder, category3.getCategory2Seqno());
+        
+            if (targetCategoryOpt.isPresent()) {
+                // 대상 항목과 순서 교환
+                Category3Entity targetCategory = targetCategoryOpt.get();
+                targetCategory.setCategory3Order(currentOrder);
+                category3Repository.save(targetCategory);
+            }
+        
+            // 현재 항목의 순서를 변경
+            category3.setCategory3Order(targetOrder);
+            category3Repository.save(category3);
+        }
+        
+
+
+    //모든 쿠폰 가져오기
+    @Override
+    public List<CouponEntity> getAllCoupons() {
+        return couponRepository.findAll();
+    }
+
+    //모든 쿠폰과 관련된 쿠폰 타겟 및 쿠폰 카테고리를 가져오는 메소드
+    @Override
+    public Map<String, Object> getAllCouponDetail(Long couponSeqno) {
+        // 쿠폰 조회
+        CouponEntity coupon = couponRepository.findById(couponSeqno)
+                .orElseThrow(() -> new EntityNotFoundException("Coupon not found for id: " + couponSeqno));
+
+        // 결과를 담을 Map 생성
+        Map<String, Object> couponDetail = new HashMap<>();
+        couponDetail.put("coupon", coupon);
+        
+        // 쿠폰에 관련된 타겟 상품 조회 (타겟이 없다면 빈 리스트 반환)
+        List<CouponTargetEntity> targets = couponTargetRepository.findDetailByCouponSeqno(coupon);
+        if (targets == null || targets.isEmpty()) {
+            targets = new ArrayList<>(); 
+        }
+        couponDetail.put("targets", targets);
+
+        // 쿠폰에 관련된 카테고리 조회 (카테고리가 없다면 빈 리스트 반환)
+        List<CouponCategoryEntity> categories = couponCategoryRepository.findDetailByCouponSeqno(coupon);
+        if (categories == null || categories.isEmpty()) {
+            categories = new ArrayList<>(); 
+        }
+        couponDetail.put("categories", categories);
+
+        return couponDetail;
+    }
+
+    //쿠폰 생성 시 카테고리 3 조회
+    @Override
+    public Category3Entity findCategory3BySeqno(Long category3Seqno) {
+        return category3Repository.findById(category3Seqno).get();
+    }
+
+    //쿠폰 찾기
+    @Override
+    public CouponEntity findCouponBySeqno(Long couponSeqno) {
+        return couponRepository.findById(couponSeqno).get();
+    }
+
+    //카테고리 정보 저장
+    @Override
+    public void saveCouponCategories(Category3Entity category3Entity,CouponEntity couponEntity) {
+        CouponCategoryEntity couponCategory = new CouponCategoryEntity();
+        couponCategory.setCouponSeqno(couponEntity);
+        couponCategory.setCategory3Seqno(category3Entity);
+        couponCategoryRepository.save(couponCategory);
+    }
+
+    //상품 찾기
+    @Override
+    public ProductEntity findProductBySeqno(Long productSeqno) {
+        return productRepository.findById(productSeqno).get();
+    }
+
+    //타겟 정보 저장
+    @Override
+    public void saveCouponTargets(ProductEntity productEntity, CouponEntity couponEntity) {
+        CouponTargetEntity couponTarget = new CouponTargetEntity();
+        couponTarget.setCouponSeqno(couponEntity);
+        couponTarget.setProductSeqno(productEntity);
+        couponTargetRepository.save(couponTarget);
+    }
+
+
+    //쿠폰에 연결된 카테고리 정보 삭제
+    @Override
+    public void deleteCouponCategories(CouponEntity couponEntity) {
+    // 쿠폰과 관련된 모든 카테고리 정보 삭제
+    List<CouponCategoryEntity> couponCategories = couponCategoryRepository.findDetailByCouponSeqno(couponEntity);
+    
+    // 카테고리 정보가 있다면 삭제
+    if (!couponCategories.isEmpty()) {
+        couponCategoryRepository.deleteAll(couponCategories);  // 연관된 카테고리 정보 삭제
+        }
+    }   
+
+    // 쿠폰에 연결된 대상 제품 정보 삭제
+    @Override
+    public void deleteCouponTargets(CouponEntity couponEntity) {
+    // 쿠폰과 관련된 모든 대상 제품 정보 삭제
+    List<CouponTargetEntity> couponTargets = couponTargetRepository.findDetailByCouponSeqno(couponEntity);
+    
+    // 대상 제품 정보가 있다면 삭제
+    if (!couponTargets.isEmpty()) {
+        couponTargetRepository.deleteAll(couponTargets);  // 연관된 대상 제품 정보 삭제
+        }
+    }   
+    
+    //회원 조회
+    @Override
+    public List<MemberEntity> getAllMembers() {
+        return memberRepository.findAll();
+    }
+
 }
 
     
