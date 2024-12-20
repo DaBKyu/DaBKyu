@@ -78,7 +78,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(
             (authz) -> authz.requestMatchers("/").permitAll()
                                         .requestMatchers("/member/**").permitAll()
-                                        .requestMatchers("/mypage/**").hasAnyAuthority("USER", "MASTER")
+                                        .requestMatchers("/mypage/**").hasAnyAuthority("USER", "MASTER", "TEMP")
                                         .requestMatchers("/shop/**").permitAll()
                                         .requestMatchers("/purchase/**").hasAnyAuthority("USER", "MASTER")
                                         .requestMatchers("/master/**").hasAnyAuthority("MASTER")
@@ -108,7 +108,7 @@ public class WebSecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000","http://www.boardreact.com","https://www.boardreact.com")); // 허용할 출처
+        configuration.setAllowedOrigins(List.of("http://localhost:3000","http://www.dabkyu.com","https://www.dabkyu.com")); // 허용할 출처
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드
         configuration.setAllowedHeaders(List.of("*")); // 허용할 헤더
         configuration.setAllowCredentials(true); // 자격 증명 전송 허용

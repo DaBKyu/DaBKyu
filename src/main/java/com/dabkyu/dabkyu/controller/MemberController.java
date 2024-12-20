@@ -14,7 +14,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.boot.autoconfigure.cache.CacheProperties.Redis;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -42,6 +41,7 @@ import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.QuestionFileEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
+import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 import com.dabkyu.dabkyu.service.EmailService;
 import com.dabkyu.dabkyu.service.MemberService;
 import com.dabkyu.dabkyu.util.JWTUtil;
@@ -62,6 +62,7 @@ public class MemberController {
     
     private final MemberService memberService;
     private final EmailService emailService;
+    private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder pwdEncoder;
     private final JWTUtil jwtUtil;
 
@@ -116,6 +117,12 @@ public class MemberController {
         }
 
         MemberDTO member = memberService.memberInfo(loginData.getEmail());
+
+        // 소셜 계정 수동로그인 차단
+        if (member.getFromSocial().equals("Y")) {
+            responseStr = "{\"message\":\"FROM_SOCIAL\"}";
+            return ResponseEntity.badRequest().body(responseStr);
+        }
         
         // 비밀번호 체크
         if (!pwdEncoder.matches(loginData.getPassword(), member.getPassword().toString())) {
@@ -275,6 +282,37 @@ public class MemberController {
         responseStr = "{\"status\": 0}"; // 0: 성공, 1: 일치하지 않음, 2: 서버 오류
         return ResponseEntity.ok().body(responseStr);
     }
+
+
+    // OAuth2 추가정보 입력
+    @PostMapping("/mypage/additional-info")
+    public ResponseEntity<?> postAdditionalInfo(@RequestBody MemberDTO memberInfo) {
+        
+        MemberEntity member = MemberEntity.builder()
+                                                                        .email(memberInfo.getEmail())
+                                                                        .password("12345")
+                                                                        .telno(memberInfo.getTelno())
+                                                                        .gender(memberInfo.getGender())
+                                                                        .birthDate(memberInfo.getBirthDate())
+                                                                        .username(memberInfo.getUsername())
+                                                                        .role("USER")
+                                                                        .memberGrade("BRONZE")
+                                                                        .regdate(LocalDateTime.now())
+                                                                        .lastpwDate(LocalDateTime.now())
+                                                                        .lastpwcheckDate(LocalDateTime.now())
+                                                                        .fromSocial("Y")
+                                                                        .point(0)
+                                                                        .notificationYn(memberInfo.getNotificationYn())
+                                                                        .emailRecept(memberInfo.getEmailRecept())
+                                                                        .emailReceptDate(null)
+                                                                        .emailReceptDate(LocalDateTime.parse("2000-01-01, 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd, HH:mm:ss")))
+                                                                        .totalPvalue(0)
+                                                                        .build();
+        memberRepository.save(member);
+        
+        return ResponseEntity.ok().body("{\"status\": \"good\"}");
+    }
+    
 
 
     // 마이페이지

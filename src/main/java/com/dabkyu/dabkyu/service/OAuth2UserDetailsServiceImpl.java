@@ -2,6 +2,7 @@ package com.dabkyu.dabkyu.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +27,6 @@ import com.dabkyu.dabkyu.entity.repository.MemberRepository;
 @Log4j2
 public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService {
 
-    private final PasswordEncoder pwdEncoder;
     private final MemberRepository memberRepository;
 
     @Override
@@ -48,58 +48,29 @@ public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService {
             email = oAuth2User.getAttribute("email");
         }
 
-        log.info("----------OAuth2 로그인 단계 : Provider 정보 확보({})----------", provider);
-		log.info("----------OAuth2 로그인 단계 : ProviderID 정보 확보({})----------", providerId);
-		log.info("----------OAuth2 로그인 단계 : email 정보 확보({})----------", email);
+        log.info("----------OAuth2 로그인 단계 : Provider 정보 ({})----------", provider);
+		log.info("----------OAuth2 로그인 단계 : ProviderID 정보({})----------", providerId);
+		log.info("----------OAuth2 로그인 단계 : email 정보 ({})----------", email);
 
         oAuth2User.getAttributes().forEach((k, v) -> {
             log.info(k + ": " + v);
         });
 
-        // 회원 정보 가져오기(첫 로그인 시 정보 저장)
-        MemberEntity member = saveSocialMember(email,provider);
-
-        // Role값을 가져와 SimpleGrantedAuthority 객체(사용자 Role값을 받는 객체)에 저장.
-        // SimpleGrantedAuthority 리스트에 저장.
-        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
-        SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getRole());
-        grantedAuthorities.add(grantedAuthority);
-
-        log.info("----------OAuth2 로그인 단계 : Role 설정----------");
+        // 기존 회원이 SNS로그인 할 경우 기존 회원 정보를 리턴
+        Optional<MemberEntity> result = memberRepository.findById(email);
 
         // attributes, authorities, name을 memberOAuth2DTO에 저장.
         MemberOAuth2DTO memberOAuth2DTO = new MemberOAuth2DTO();
 
         memberOAuth2DTO.setAttribute(oAuth2User.getAttributes());
-        memberOAuth2DTO.setAuthorities(grantedAuthorities);
-        memberOAuth2DTO.setName(member.getUsername());
+        memberOAuth2DTO.setName(email);
+        memberOAuth2DTO.setAuthorities(
+            result.isPresent()?
+            Collections.singletonList(new SimpleGrantedAuthority(result.get().getRole())):
+            Collections.singletonList(new SimpleGrantedAuthority("TEMP"))
+        );
         
         return memberOAuth2DTO;
     }
 
-    private MemberEntity saveSocialMember(String email, String provider) {
-        // 구글 회원 계정으로 로그인 한 회원 정보를 입력받기
-
-        // 기존 회원이 SNS로그인 할 겨우 기존 회원 정보를 리턴
-        Optional<MemberEntity> result = memberRepository.findById(email);
-        if (result.isPresent()) {
-            return result.get();
-        }
-
-        // 타기관으로부터 정보를 넘겨받고 추가 입력 창에서 입력 받을 지 상의 필요.
-        MemberEntity member = MemberEntity.builder()
-                                          .email(email)
-                                          .username(provider.toUpperCase() + "회원")
-                                          .password(pwdEncoder.encode("12345"))
-                                          .role("USER")
-                                          .memberGrade("BRONZE")
-                                          .regdate(LocalDateTime.now())
-                                          .fromSocial("Y")
-                                          .notificationYn("N")
-                                          .emailRecept("N")
-                                          .totalPvalue(0)
-                                          .build();
-        memberRepository.save(member);
-        return member;
-    }
 }

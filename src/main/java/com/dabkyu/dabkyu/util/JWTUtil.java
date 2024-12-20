@@ -38,7 +38,7 @@ public class JWTUtil {
 	}
 	
 	//토큰 생성
-	public String generateToken(Map<String,Object> payloads, int days) { //time : 분단위
+	public String generateToken(Map<String,Object> payloads, int mins) { //time : 분단위
 		
 		//헤더 부분 설정
 		Map<String, Object> headers = new HashMap<String, Object>();
@@ -49,7 +49,7 @@ public class JWTUtil {
 	    						.setHeader(headers)
 	    						.setClaims(payloads)
 	    						.setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-	    						.setExpiration(Date.from(ZonedDateTime.now().plusDays(days).toInstant()))
+	    						.setExpiration(Date.from(ZonedDateTime.now().plusMinutes(mins).toInstant()))
 	    						.signWith(createKey(), signatureAlgorithm);
 
 	    String result = builder.compact(); //
