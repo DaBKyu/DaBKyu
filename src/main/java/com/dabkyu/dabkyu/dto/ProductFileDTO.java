@@ -34,7 +34,7 @@ public class ProductFileDTO {
                                                     .productFileSeqno(dto.getProductFileSeqno())
                                                     .productSeqno(dto.getProductSeqno())
                                                     .orgFilename(dto.getOrgFilename())
-                                                    .storedFilename(dto.getOrgFilename())
+                                                    .storedFilename(dto.getStoredFilename())
                                                     .isThumb(dto.getIsThumb())
                                                     .build();
         return entity;

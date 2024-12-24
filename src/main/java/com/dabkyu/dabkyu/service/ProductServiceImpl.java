@@ -95,7 +95,7 @@ public class ProductServiceImpl implements ProductService{
     @Override
 	public String getProductThumbnail(ProductEntity productEntity) {
         ProductFileEntity productFileEntity = productFileRepository.findFirstByProductSeqnoAndIsThumb(productEntity, "Y");
-        log.info("--------------------productFileEntity: {}-----------------------", productFileEntity);
+        //log.info("--------------------productFileEntity: {}-----------------------", productFileEntity);
         return productFileEntity==null?"isNull":productFileEntity.getStoredFilename();
     }
 

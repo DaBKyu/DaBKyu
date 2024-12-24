@@ -122,6 +122,7 @@ public class MemberController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             member.setBirthDate(LocalDate.parse(birthDate, formatter));
             member.setPassword(pwdEncoder.encode(member.getPassword()));
+            member.setIsActive("Y");
             memberService.signup(member);
             log.info("회원등록: {\"username\":" + member.getUsername() + "\", \"status\":\"good\"}");
         }

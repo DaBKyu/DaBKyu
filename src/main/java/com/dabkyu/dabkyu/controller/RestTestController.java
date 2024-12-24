@@ -1,6 +1,10 @@
 package com.dabkyu.dabkyu.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +34,7 @@ import com.dabkyu.dabkyu.dto.Category3DTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.DailySalesDTO;
 import com.dabkyu.dabkyu.dto.DailyVisitorDTO;
+import com.dabkyu.dabkyu.dto.MemberDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
@@ -43,6 +48,8 @@ import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.CouponTargetEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.ProductFileEntity;
+import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
 import com.dabkyu.dabkyu.service.MasterService;
 import com.dabkyu.dabkyu.service.ProductService;
 
@@ -58,6 +65,7 @@ public class RestTestController{
 
     private final MasterService masterService; 
     private final ProductService productService;
+    private final ObjectMapper objectMapper;
 
     //관리자페이지 메인 오늘 방문자 수
     @GetMapping("/master/visitorCount")
@@ -209,7 +217,8 @@ public class RestTestController{
                                                            .map(category -> new Category2DTO(
                                                                                 category.getCategory2Seqno(), 
                                                                                 category.getCategory1Seqno().getCategory1Seqno(),
-                                                                                category.getCategory2Name()))
+                                                                                category.getCategory2Name(),
+                                                                                category.getCategory2Order()))
                                                            .collect(Collectors.toList());
         
         return ResponseEntity.status(HttpStatus.OK).body(category2DTOList);
@@ -226,7 +235,9 @@ public class RestTestController{
                 .map(category -> new Category3DTO(
                         category.getCategory3Seqno(),
                         category.getCategory2Seqno().getCategory2Seqno(), 
-                        category.getCategory3Name()))
+                        category.getCategory3Name(),
+                        category.getIsTemporary(),
+                        category.getCategory3Order()))
                 .collect(Collectors.toList());
         
         return ResponseEntity.status(HttpStatus.OK).body(category3DTOList);
@@ -239,173 +250,347 @@ public class RestTestController{
             @RequestParam(name = "category3Seqno", required = false) Long category3Seqno,
             @RequestParam(name = "productImages", required = false) List<MultipartFile> productImages,
             @RequestParam(name = "productDetailImages", required = false) List<MultipartFile> productDetailImages,
-            @RequestParam(name = "optionMap", required = false) Map<String, String> optionMap,
-            @RequestParam(name = "relatedProductMap", required = false) Map<String, String> relatedProductMap) throws Exception {
+            @RequestParam(name = "optionMap", required = false) String optionMapJson,
+            @RequestParam(name = "relatedProductMap", required = false) String relatedProductMapJson) {
 
-        List<Category1Entity> allCategory1 = masterService.getAllCategories1();
-        List<Category2Entity> allCategory2 = masterService.getAllCategories2();
-        List<Category3Entity> allCategory3 = masterService.getAllCategories3();
+            List<Category1Entity> allCategory1 = masterService.getAllCategories1();
+            List<Category2Entity> allCategory2 = masterService.getAllCategories2();
+            List<Category3Entity> allCategory3 = masterService.getAllCategories3();
 
-        model.addAttribute("allcategory1", allCategory1);
-        model.addAttribute("allcategory2", allCategory2);
-        model.addAttribute("allcategory3", allCategory3);
+            model.addAttribute("allcategory1", allCategory1);
+            model.addAttribute("allcategory2", allCategory2);
+            model.addAttribute("allcategory3", allCategory3);
 
-        //운영체제에 따라 이미지가 저장될 디렉토리 구조 설정 시작
-        String os = System.getProperty("os.name").toLowerCase();
-        String productImgPath;
-        String productDetailImgPath;
+        try {
+            // 운영체제에 따라 이미지 저장 경로 설정
+            String os = System.getProperty("os.name").toLowerCase();
+            String productImgPath = os.contains("win") 
+                    ? "c:\\Repository\\dabkyu\\product\\thumbnails\\" 
+                    : "/home/gladius/Repository/dabkyu/product/thumbnails/";
+            String productDetailImgPath = os.contains("win") 
+                    ? "c:\\Repository\\dabkyu\\product\\images\\" 
+                    : "/home/gladius/Repository/dabkyu/product/images/";
 
-        if (os.contains("win")) {
-            productImgPath = "c:\\Repository\\dabkyu\\product\\thumbnails\\";
-            productDetailImgPath = "c:\\Repository\\dabkyu\\product\\images\\";
-        } else {
-            productImgPath = "/home/gladius/Repository/dabkyu/product/thumbnails/";
-            productDetailImgPath = "/home/gladius/Repository/dabkyu/product/images/";
-        }
-
-        //디렉토리가 존재하는지 체크해서 없다면 생성
-        File pImg = new File(productImgPath);
-        File pdetailImg = new File(productDetailImgPath);
-        if (!pImg.exists()) pImg.mkdir();
-        if (!pdetailImg.exists()) pdetailImg.mkdir();
-        //운영체제에 따라 이미지가 저장될 디렉토리 구조 설정 종료
-
-        Long seqno = 0L;
-
-        //상품 등록
-        if (productDTO.getProductSeqno() == null) {
-            productDTO.setLikecnt(0);
-            Category3Entity category3 = masterService.findCategoryBySeqno(category3Seqno);
-            //세부카테고리(category3) 설정
-            productDTO.setCategory3Seqno(category3);
-            ProductEntity productEntity = masterService.productPost(productDTO);
-            productDTO.setProductSeqno(productEntity.getProductSeqno());
-        
-
-            productEntity = masterService.getProductBySeqno(seqno);
-
-        //옵션 추가
-        List<ProductOptionDTO> productOptionDTOList = new ArrayList<>();
-        if (optionMap != null) {
-            for (Map.Entry<String, String> entry : optionMap.entrySet()) {
-                String[] keys = entry.getKey().split(",");
-                String optCategory = keys[0];
-                String optName = keys[1];
-                int optPrice = Integer.parseInt(entry.getValue());
-
-                ProductOptionDTO optionDTO = new ProductOptionDTO();
-                optionDTO.setProductSeqno(productEntity);
-                //옵션카테고리
-                optionDTO.setOptCategory(optCategory);
-                //옵션명
-                optionDTO.setOptName(optName);
-                //옵션가격
-                optionDTO.setOptPrice(optPrice);
-                productOptionDTOList.add(optionDTO);
+            // 디렉토리 확인 및 생성
+            File productImgDir = new File(productImgPath);
+            if (!productImgDir.exists() && !productImgDir.mkdirs()) {
+                throw new IOException("상품 이미지 디렉토리 생성 실패");
             }
-        }
 
-        //옵션 db저장
-        productOptionDTOList.forEach(optionDTO -> {
-            try {
-                masterService.saveProductOption(optionDTO);
-            } catch (Exception e) {
-                throw new RuntimeException("옵션 저장 중 오류 발생", e);
+            File productDetailImgDir = new File(productDetailImgPath);
+            if (!productDetailImgDir.exists() && !productDetailImgDir.mkdirs()) {
+                throw new IOException("상품 상세 이미지 디렉토리 생성 실패");
             }
-        });
 
-        //추가상품 추가
-        List<RelatedProductDTO> relatedProductDTOList = new ArrayList<>();
-        if (relatedProductMap != null) {
-            for (Map.Entry<String, String> entry : relatedProductMap.entrySet()) {
-                String[] keys = entry.getKey().split(",");
-                String relatedproductCategory = keys[0];
-                String relatedproductName = keys[1];
-                int relatedproductPrice = Integer.parseInt(entry.getValue());
+            Long seqno = 0L;
 
-                RelatedProductDTO relatedProductDTO = new RelatedProductDTO();
-                relatedProductDTO.setProductSeqno(productEntity);
-                //추가상품카테고리
-                relatedProductDTO.setRelatedproductCategory(relatedproductCategory);
-                //추가상품명
-                relatedProductDTO.setRelatedproductName(relatedproductName);
-                //추가상품가격
-                relatedProductDTO.setRelatedproductPrice(relatedproductPrice);
-                relatedProductDTOList.add(relatedProductDTO);
-            }
-        }
+            // 상품 등록 처리
+            if (productDTO.getProductSeqno() == null) {
+                productDTO.setLikecnt(0);
+                Category3Entity category3 = masterService.findCategoryBySeqno(category3Seqno);
+                productDTO.setCategory3Seqno(category3);
 
-        //추가상품 db저장
-        relatedProductDTOList.forEach(relatedProductDTO -> {
-            try {
-                masterService.saveRelatedProduct(relatedProductDTO);
-            } catch (Exception e) {
-                throw new RuntimeException("추가상품 저장 중 오류 발생", e);
-            }
-        });
+                ProductEntity productEntity = masterService.productPost(productDTO);
+                seqno = productEntity.getProductSeqno();
 
-        //상품 이미지 파일 저장
-        if (productImages != null && !productImages.isEmpty()) {
-            try {
-                boolean firstImage = true;
-                for (MultipartFile mpr : productImages) {
-                    String org_filename = mpr.getOriginalFilename();
-                    String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));
-                    String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
+            // 옵션 저장
+            if (optionMapJson != null && !optionMapJson.isEmpty()) {
+                // 하나의 옵션 데이터만 저장
+                List<Map<String, String>> optionMapList = objectMapper.readValue(optionMapJson, new TypeReference<List<Map<String, String>>>() {});
+                for (Map<String, String> option : optionMapList) {
+                    String optCategory = option.get("optCategory");
+                    String optName = option.get("optName");
+                    int optPrice = 0;
+                    try {
+                        optPrice = Integer.parseInt(option.get("optPrice"));
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid price: " + option.get("optPrice"));
+                    }
 
-                    File targetFile = new File(productImgPath + stored_filename);
-                    mpr.transferTo(targetFile);
-
-                    String isThumb = firstImage ? "Y" : "N"; // 썸네일 지정
-                    firstImage = false;
-
-                    // ProductFileDTO 객체 생성 및 DB 저장
-                    ProductFileDTO pImgFile = ProductFileDTO.builder()
-                            .productSeqno(productEntity)  
-                            .orgFilename(org_filename)
-                            .storedFilename(stored_filename)
-                            .isThumb(isThumb)
-                            .build();
-
-                    masterService.productImgFile(pImgFile);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("파일 업로드 실패: " + e.getMessage());
-            }
-        }
-
-        //상품 설명 이미지 파일 저장
-        if (productDetailImages != null) {
-            for (MultipartFile mprd : productDetailImages) {
-                String org_filename = mprd.getOriginalFilename();
-                String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));
-                String stored_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
-
-                try {
-                    File targetFile = new File(productDetailImgPath + stored_filename);
-                    mprd.transferTo(targetFile);
-
-                    ProductInfoFileDTO pDImgFile = ProductInfoFileDTO.builder()
-                            .productSeqno(productEntity)  
-                            .orgFilename(org_filename)
-                            .storedFilename(stored_filename)
-                            .build();
-                    masterService.productDetailImgFile(pDImgFile);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    // 옵션 데이터 하나만 저장
+                    ProductOptionDTO optionDTO = new ProductOptionDTO();
+                    optionDTO.setProductSeqno(productEntity);
+                    optionDTO.setOptCategory(optCategory);
+                    optionDTO.setOptName(optName);
+                    optionDTO.setOptPrice(optPrice);
+                    masterService.saveProductOption(optionDTO);
                 }
             }
+            //추가상품 저장
+            if (relatedProductMapJson != null && !relatedProductMapJson.isEmpty()) {
+                    List<Map<String, String>> relatedProductMapList = objectMapper.readValue(relatedProductMapJson, new TypeReference<List<Map<String, String>>>() {});
+                    for (Map<String, String> relatedProduct : relatedProductMapList) {
+                            String relatedProductCategory = relatedProduct.get("relatedProductCategory");
+                            String relatedProductName = relatedProduct.get("relatedProductName");
+                            int relatedProductPrice = 0;
+                            try {
+                                relatedProductPrice = Integer.parseInt(relatedProduct.get("relatedProductPrice"));
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid value: " + relatedProduct.get("relatedProductPrice"));
+                            }
+                            RelatedProductDTO relatedProductDTO = new RelatedProductDTO();
+                            relatedProductDTO.setProductSeqno(productEntity);
+                            relatedProductDTO.setRelatedproductCategory(relatedProductCategory);
+                            relatedProductDTO.setRelatedproductName(relatedProductName);
+                            relatedProductDTO.setRelatedproductPrice(relatedProductPrice);
+                            masterService.saveRelatedProduct(relatedProductDTO);
+                        }
+                    }
+                
+
+                // 상품 이미지 저장
+                if (productImages != null && !productImages.isEmpty()) {
+                    boolean isFirstImage = true;
+                    for (MultipartFile file : productImages) {
+                        saveFile(file, productImgPath, productEntity, isFirstImage);
+                        isFirstImage = false;
+                    }
+                }
+
+                // 상품 상세 이미지 저장
+                if (productDetailImages != null && !productDetailImages.isEmpty()) {
+                    System.out.println("상품 상세 이미지 수: " + productDetailImages.size());
+                    for (MultipartFile file : productDetailImages) {
+                        saveDetailFile(file, productDetailImgPath, productEntity);
+                    }
+                } else {
+                    System.out.println("상품 상세 이미지가 제공되지 않았습니다.");
+                }
+                
+            }
+            return ResponseEntity.ok().body(Map.of("status", "success", "productSeqno", seqno));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상품 등록 중 오류 발생: " + e.getMessage());
         }
+    }
+
+    private void saveFile(MultipartFile file, String path, ProductEntity productEntity, boolean isThumb) throws Exception {
+        String orgFilename = file.getOriginalFilename();
+        String ext = orgFilename.substring(orgFilename.lastIndexOf("."));
+        String storedFilename = UUID.randomUUID().toString().replaceAll("-", "") + ext;
+
+        File targetFile = new File(path + storedFilename);
+        file.transferTo(targetFile);
+
+        ProductFileDTO fileDTO = ProductFileDTO.builder()
+                                                .productSeqno(productEntity)
+                                                .orgFilename(orgFilename)
+                                                .storedFilename(storedFilename)
+                                                .isThumb(isThumb ? "Y" : "N")
+                                                .build();
+        masterService.productImgFile(fileDTO);
+    }
+
+    private void saveDetailFile(MultipartFile file, String path, ProductEntity productEntity) {
+        try {
+            // 파일 이름 및 확장자 처리
+            String orgFilename = file.getOriginalFilename();
+            if (orgFilename == null || orgFilename.isEmpty()) {
+                throw new IllegalArgumentException("파일 이름이 유효하지 않습니다.");
+            }
+
+            String ext = orgFilename.substring(orgFilename.lastIndexOf("."));
+            String storedFilename = UUID.randomUUID().toString().replaceAll("-", "") + ext;
+
+            // 파일 저장 경로 확인 및 저장
+            File targetFile = new File(path + storedFilename);
+            file.transferTo(targetFile);
+
+            // 파일 정보 DTO 생성 및 저장
+            ProductInfoFileDTO detailFileDTO = ProductInfoFileDTO.builder()
+                                                                .productSeqno(productEntity)
+                                                                .orgFilename(orgFilename)
+                                                                .storedFilename(storedFilename)
+                                                                .build();
+            masterService.productDetailImgFile(detailFileDTO);
+
+            System.out.println("상품 상세 이미지 저장 성공: " + orgFilename);
+        } catch (Exception e) {
+            // 오류 로그 출력
+            System.err.println("상품 상세 이미지 저장 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
         }
-        return ResponseEntity.ok().body(Map.of("status", "success", "productSeqno", seqno));
-        
     }
 
     //상품 수정
+    @PutMapping("/master/updateProduct/{productSeqno}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long productSeqno, 
+                                            ProductDTO productDTO, Model model,
+                                            @RequestParam(name = "category3Seqno", required = false) Long category3Seqno,
+                                            @RequestParam(name = "productImages", required = false) List<MultipartFile> productImages,
+                                            @RequestParam(name = "productDetailImages", required = false) List<MultipartFile> productDetailImages,
+                                            @RequestParam(name = "optionMap", required = false) String optionMapJson,
+                                            @RequestParam(name = "relatedProductMap", required = false) String relatedProductMapJson,
+                                            @RequestParam(name = "deleteOptionSeqnos", required = false) List<Long> deleteOptionSeqnos,
+                                            @RequestParam(name = "deleteRelatedProductSeqnos", required = false) List<Long> deleteRelatedProductSeqnos) {
+        List<Category1Entity> allCategory1 = masterService.getAllCategories1();
+        List<Category2Entity> allCategory2 = masterService.getAllCategories2();
+        List<Category3Entity> allCategory3 = masterService.getAllCategories3();
+    
+        model.addAttribute("allcategory1", allCategory1);
+        model.addAttribute("allcategory2", allCategory2);
+        model.addAttribute("allcategory3", allCategory3);
+    
+        try {
+            // 운영체제에 따라 이미지 저장 경로 설정
+            String os = System.getProperty("os.name").toLowerCase();
+            String productImgPath = os.contains("win") 
+                    ? "c:\\Repository\\dabkyu\\product\\thumbnails\\" 
+                    : "/home/gladius/Repository/dabkyu/product/thumbnails/";
+            String productDetailImgPath = os.contains("win") 
+                    ? "c:\\Repository\\dabkyu\\product\\images\\" 
+                    : "/home/gladius/Repository/dabkyu/product/images/";
+    
+            // 디렉토리 확인 및 생성
+            File productImgDir = new File(productImgPath);
+            if (!productImgDir.exists() && !productImgDir.mkdirs()) {
+                throw new IOException("상품 이미지 디렉토리 생성 실패");
+            }
+    
+            File productDetailImgDir = new File(productDetailImgPath);
+            if (!productDetailImgDir.exists() && !productDetailImgDir.mkdirs()) {
+                throw new IOException("상품 상세 이미지 디렉토리 생성 실패");
+            }
+            // 상품 정보 업데이트 처리
+            ProductEntity existingProduct = masterService.findProductBySeqno(productSeqno);
+            if (existingProduct == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("상품을 찾을 수 없습니다.");
+            }
+    
+            // 카테고리 업데이트
+            if (category3Seqno != null) {
+                Category3Entity category3 = masterService.findCategoryBySeqno(category3Seqno);
+                existingProduct.setCategory3Seqno(category3);
+            }
+    
+            masterService.productModify(productDTO);
+    
+            // 옵션 삭제
+            if (deleteOptionSeqnos != null && !deleteOptionSeqnos.isEmpty()) {
+                for (Long optionSeqno : deleteOptionSeqnos) {
+                    //ProductOptionDTO optionDTO = masterService.findProductOptionBySeqno(optionSeqno);
+                    //if (optionDTO != null) {
+                    //    masterService.deleteProductOption(optionDTO);
+                    //}
+                }
+            }
+    
+            // 추가상품 삭제
+            if (deleteRelatedProductSeqnos != null && !deleteRelatedProductSeqnos.isEmpty()) {
+                for (Long relatedProductSeqno : deleteRelatedProductSeqnos) {
+                    //RelatedProductDTO relatedProductDTO = masterService.findRelatedProductBySeqno(relatedProductSeqno);
+                    //if (relatedProductDTO != null) {
+                    //    masterService.deleteRelatedProduct(relatedProductDTO);
+                    //}
+                }
+            }
+    
+            // 옵션 업데이트
+            if (optionMapJson != null && !optionMapJson.isEmpty()) {
+                List<Map<String, String>> optionMapList = objectMapper.readValue(optionMapJson, new TypeReference<List<Map<String, String>>>() {});
+                for (Map<String, String> option : optionMapList) {
+                    String optCategory = option.get("optCategory");
+                    String optName = option.get("optName");
+                    int optPrice = Integer.parseInt(option.get("optPrice"));
+    
+                    // 옵션 업데이트 로직
+                    ProductOptionDTO optionDTO = new ProductOptionDTO();
+                    optionDTO.setProductSeqno(existingProduct);
+                    optionDTO.setOptCategory(optCategory);
+                    optionDTO.setOptName(optName);
+                    optionDTO.setOptPrice(optPrice);
+                    masterService.saveProductOption(optionDTO);
+                }
+            }
+    
+            // 추가상품 업데이트
+            if (relatedProductMapJson != null && !relatedProductMapJson.isEmpty()) {
+                List<Map<String, String>> relatedProductMapList = objectMapper.readValue(relatedProductMapJson, new TypeReference<List<Map<String, String>>>() {});
+                for (Map<String, String> relatedProduct : relatedProductMapList) {
+                    String relatedProductCategory = relatedProduct.get("relatedProductCategory");
+                    String relatedProductName = relatedProduct.get("relatedProductName");
+                    int relatedProductPrice = Integer.parseInt(relatedProduct.get("relatedProductPrice"));
+    
+                    // 추가상품 업데이트 로직
+                    RelatedProductDTO relatedProductDTO = new RelatedProductDTO();
+                    relatedProductDTO.setProductSeqno(existingProduct);
+                    relatedProductDTO.setRelatedproductCategory(relatedProductCategory);
+                    relatedProductDTO.setRelatedproductName(relatedProductName);
+                    relatedProductDTO.setRelatedproductPrice(relatedProductPrice);
+                    masterService.saveRelatedProduct(relatedProductDTO);
+                }
+            }
+    
+            // 이미지 업데이트
+            if (productImages != null && !productImages.isEmpty()) {
+                for (MultipartFile file : productImages) {
+                    // 기존 이미지를 삭제
+                    deleteExistingProductImages(existingProduct, productImgPath);
+                    
+                    // 새로운 상품 이미지 저장
+                    saveFile(file, productImgPath, existingProduct, true);
+                }
+            }
+    
+            // 상세 이미지 업데이트
+            if (productDetailImages != null && !productDetailImages.isEmpty()) {
+                for (MultipartFile file : productDetailImages) {
+                    // 기존 상품 상세 이미지 삭제
+                    deleteExistingProductDetailImages(existingProduct, productDetailImgPath);
+                    
+                    // 새로운 상품 상세 이미지 저장
+                    saveDetailFile(file, productDetailImgPath, existingProduct);
+                }
+            }
+    
+            return ResponseEntity.ok().body(Map.of("status", "success", "productSeqno", productSeqno));
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상품 수정 중 오류 발생: " + e.getMessage());
+        }
+    }
+    
 
-    //상품 비활성화
+    private void deleteExistingProductImages(ProductEntity productEntity, String productImgPath) {
+        List<ProductFileEntity> existingFiles = masterService.getProductImagesByProductSeqno(productEntity);
+        for (ProductFileEntity existingFile : existingFiles) {
+            // 기존 파일 삭제
+            String filePath = productImgPath + existingFile.getStoredFilename();
+            File file = new File(filePath);
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println("기존 상품 이미지 삭제 성공: " + filePath);
+                } else {
+                    System.err.println("기존 상품 이미지 삭제 실패: " + filePath);
+                }
+            }
+            
+            // DB에서 이미지 정보 삭제 (필요한 경우)
+            masterService.deleteProductImage(existingFile);
+        }
+    }
+    
+    private void deleteExistingProductDetailImages(ProductEntity productEntity, String productDetailImgPath) {
+        List<ProductInfoFileEntity> existingFiles = masterService.getProductDetailImagesByProductSeqno(productEntity);
+        for (ProductInfoFileEntity existingFile : existingFiles) {
+            // 기존 파일 삭제
+            String filePath = productDetailImgPath + existingFile.getStoredFilename();
+            File file = new File(filePath);
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println("기존 상품 상세 이미지 삭제 성공: " + filePath);
+                } else {
+                    System.err.println("기존 상품 상세 이미지 삭제 실패: " + filePath);
+                }
+            }
+            
+            // DB에서 이미지 정보 삭제 (필요한 경우)
+            masterService.deleteProductDetailImage(existingFile);
+        }
+    }
+    
 
     //카테고리 리스트 조회
     @GetMapping("/master/categoryList")
@@ -416,11 +601,11 @@ public class RestTestController{
             .collect(Collectors.toList());
     
         List<Category2DTO> category2DTOs = masterService.getAllCategories2().stream()
-            .map(entity -> new Category2DTO(entity.getCategory2Seqno(), entity.getCategory1Seqno().getCategory1Seqno(), entity.getCategory2Name()))
+            .map(entity -> new Category2DTO(entity.getCategory2Seqno(), entity.getCategory1Seqno().getCategory1Seqno(), entity.getCategory2Name(),entity.getCategory2Order()))
             .collect(Collectors.toList());
     
         List<Category3DTO> category3DTOs = masterService.getAllCategories3().stream()
-            .map(entity -> new Category3DTO(entity.getCategory3Seqno(), entity.getCategory2Seqno().getCategory2Seqno(), entity.getCategory3Name()))
+            .map(entity -> new Category3DTO(entity.getCategory3Seqno(), entity.getCategory2Seqno().getCategory2Seqno(), entity.getCategory3Name(),entity.getIsTemporary(),entity.getCategory3Order()))
             .collect(Collectors.toList());
     
         Map<String, Object> response = new HashMap<>();
@@ -435,8 +620,13 @@ public class RestTestController{
     @PostMapping("/master/category1")
     public ResponseEntity<Map<String, Object>> addCategory1(@RequestParam("category1Name") String category1Name) {
 
+        // 가장 큰 category1Order 조회
+        Integer maxOrder = masterService.findMaxCategory1Order();
+        int category1Order = (maxOrder == null) ? 1 : maxOrder + 1;
+
         Category1Entity entity = new Category1Entity();
         entity.setCategory1Name(category1Name);
+        entity.setCategory1Order(category1Order);
 
         //카테고리 저장
         masterService.saveCategory1(entity);
@@ -448,29 +638,37 @@ public class RestTestController{
 
     // 카테고리 2 추가
     @PostMapping("/master/category2")
-    public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DTO category2dto){
-        // Category1Entity 조회
-        Category1Entity category1 = masterService.findCategory1ById(category2dto.getCategory1Seqno());
-        if (category1 == null) {
-            // Category1Entity가 없을 경우 예외 처리
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "Category 1 not found for the given id.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        }
-        Category2Entity entity = new Category2Entity();
-        entity.setCategory1Seqno(category1); 
-        entity.setCategory2Name(category2dto.getCategory2Name());  
-    
-        // 중간 카테고리 저장
-        masterService.saveCategory2(entity);
-    
-        // 응답 데이터 구성
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "카테고리2가 추가되었습니다.");
-    
-        return ResponseEntity.ok(response);
+public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DTO category2dto) {
+    // Category1Entity 조회
+    Category1Entity category1 = masterService.findCategory1ById(category2dto.getCategory1Seqno());
+    if (category1 == null) {
+        // Category1Entity가 없을 경우 예외 처리
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            Map.of("message", "Category 1 not found for the given id.")
+        );
     }
-    
+
+    // category1Seqno가 같은 항목 중 가장 큰 category2Order 조회
+    Integer maxOrder = masterService.findMaxCategory2OrderByCategory1(category1.getCategory1Seqno());
+    int category2Order = (maxOrder == null) ? 1 : maxOrder + 1;
+
+    // Category2Entity 생성 및 설정
+    Category2Entity entity = new Category2Entity();
+    entity.setCategory1Seqno(category1);
+    entity.setCategory2Name(category2dto.getCategory2Name());
+    entity.setCategory2Order(category2Order);
+
+    // 중간 카테고리 저장
+    masterService.saveCategory2(entity);
+
+    // 응답 데이터 구성
+    Map<String, Object> response = new HashMap<>();
+    response.put("message", "카테고리2가 추가되었습니다.");
+    response.put("category2Id", entity.getCategory2Seqno()); // ID 추가
+
+    return ResponseEntity.ok(response);
+}
+
     // 카테고리 3 추가
     @PostMapping("/master/category3")
     public ResponseEntity<Map<String, Object>> addCategory3(@RequestBody Category3DTO category3dto) {
@@ -482,9 +680,14 @@ public class RestTestController{
             errorResponse.put("message", "Category 2 not found for the given id.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
+         // category2Seqno가 같은 항목 중 가장 큰 category3Order 조회
+        Integer maxOrder = masterService.findMaxCategory3OrderByCategory2(category2.getCategory2Seqno());
+        int category3Order = (maxOrder == null) ? 1 : maxOrder + 1;
+
         Category3Entity entity = new Category3Entity();
         entity.setCategory2Seqno(category2);
         entity.setCategory3Name(category3dto.getCategory3Name());
+        entity.setCategory3Order(category3Order);
         
         masterService.saveCategory3(entity);
         
@@ -594,7 +797,6 @@ public class RestTestController{
         return ResponseEntity.ok( "카테고리 순서가 변경되었습니다.");
     }
 
-
     // 쿠폰 리스트 조회
     @GetMapping("/master/couponList")
     public ResponseEntity<Map<String, Object>> getCouponList() {
@@ -655,14 +857,12 @@ public class RestTestController{
       return ResponseEntity.ok( "쿠폰이 성공적으로 생성되었습니다.");
     }
 
-    
     // 쿠폰 수정
     @PutMapping("/master/updateCoupon")
-    public ResponseEntity<String> updateCoupon(@RequestBody CouponDTO couponDTO, 
-                                            @RequestParam(required = false) List<Long> category3Seqnos,
-                                            @RequestParam(required = false) List<Long> productSeqnos,
-                                            @RequestParam(required = false) Boolean deleteCategories,
-                                            @RequestParam(required = false) Boolean deleteProducts) throws Exception {
+    public ResponseEntity<String> updateCoupon(
+            @RequestBody CouponDTO couponDTO,
+            @RequestParam(required = false) List<Long> category3Seqnos,
+            @RequestParam(required = false) List<Long> productSeqnos) throws Exception {
 
         // 기존 쿠폰 번호가 없으면 에러 반환
         if (couponDTO.getCouponSeqno() == null) {
@@ -675,42 +875,53 @@ public class RestTestController{
             return ResponseEntity.badRequest().body("해당 쿠폰을 찾을 수 없습니다.");
         }
 
+        // 쿠폰 정보 수정
         masterService.modifyCoupon(couponDTO);
 
-        // 카테고리 정보 수정 (여러 개)
+        // 카테고리 정보 수정
         if (category3Seqnos != null) {
-            // 카테고리 삭제 여부 확인 후 삭제
-            if (deleteCategories != null && deleteCategories) {
-                // 기존 카테고리 정보 삭제
-                masterService.deleteCouponCategories(coupon);
-            }
-            
-            // 새 카테고리 정보 저장
-            for (Long categorySeqno : category3Seqnos) {
-                Category3Entity category3Entity = masterService.findCategory3BySeqno(categorySeqno);
-                masterService.saveCouponCategories(category3Entity, coupon);
-            }
+            updateCouponCategories(coupon, category3Seqnos);
         }
 
-        // 대상 제품 정보 수정 (여러 개)
+        // 대상 제품 정보 수정
         if (productSeqnos != null) {
-            // 대상 제품 삭제 여부 확인 후 삭제
-            if (deleteProducts != null && deleteProducts) {
-                // 기존 대상 제품 정보 삭제
-                masterService.deleteCouponTargets(coupon);
-            }
-
-            // 새 대상 제품 정보 저장
-            for (Long productSeqno : productSeqnos) {
-                ProductEntity productEntity = masterService.findProductBySeqno(productSeqno);
-                masterService.saveCouponTargets(productEntity, coupon);
-            }
+            updateCouponProducts(coupon, productSeqnos);
         }
 
         return ResponseEntity.ok("쿠폰이 성공적으로 수정되었습니다.");
     }
 
-    // 쿠폰 배포
+    private void updateCouponCategories(CouponEntity coupon, List<Long> category3Seqnos) {
+        // 추가할 카테고리 처리
+        if (category3Seqnos != null) {
+            // 기존 카테고리 삭제
+            masterService.deleteCouponCategories(coupon.getCouponSeqno());
+            for (Long categorySeqno : category3Seqnos) {
+                Category3Entity category3Entity = masterService.findCategory3BySeqno(categorySeqno);
+                if (category3Entity == null) {
+                    throw new IllegalArgumentException("유효하지 않은 카테고리 번호: " + categorySeqno);
+                }
+                masterService.saveCouponCategories(category3Entity, coupon);
+            }
+        }
+    }
+
+    private void updateCouponProducts(CouponEntity coupon, List<Long> productSeqnos) {
+        // 추가할 대상 제품 처리
+        if (productSeqnos != null) {
+            // 기존 제품 삭제
+            masterService.deleteCouponProducts(coupon.getCouponSeqno());
+            for (Long productSeqno : productSeqnos) {
+                ProductEntity productEntity = masterService.findProductBySeqno(productSeqno);
+                if (productEntity == null) {
+                    throw new IllegalArgumentException("유효하지 않은 제품 번호: " + productSeqno);
+                }
+                masterService.saveCouponTargets(productEntity, coupon);
+            }
+        }
+    }
+
+    //쿠폰 배포
     @PostMapping("/master/distributionCoupon")
     public ResponseEntity<String> clientCoupon(
             @RequestParam("couponSeqno") Long couponSeqno,
@@ -731,7 +942,7 @@ public class RestTestController{
         }
     }
 
-    // 쿠폰 비활성화
+    // 쿠폰 비활성화(회원쿠폰 비활성화)
 
     // 회원 리스트 조회
     @GetMapping("/master/memberList")
@@ -743,11 +954,47 @@ public class RestTestController{
         return ResponseEntity.ok(response);
     }
 
-    // 회원 상세 보기 
+    // 회원 상세 보기
+    @GetMapping("/master/memberDetail/{email}")
+    public ResponseEntity<Map<String, Object>> getMemberDetail(@PathVariable String email) {
+        Map<String, Object> memberDetails = masterService.getAllMemberDetail(email);
+        
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("member", memberDetails);
+        return ResponseEntity.ok(response);
+    } 
 
     // 회원 등급 수정
+    @PutMapping("/master/updateGrade/{email}")
+    public ResponseEntity<String> updateMemberGrade(@PathVariable("email") String email, @RequestBody MemberDTO memberDTO) {
+        try {
+            masterService.updateMemberGrade(email, memberDTO.getMemberGrade());
+            return ResponseEntity.ok("회원 등급이 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("회원 등급 수정에 실패하였습니다: " + e.getMessage());
+        }
+    }
 
-    // 회원 비활성화 컬럼 추가
+   // 회원 활성화여부 수정 
+    @PutMapping("/master/changeMemberActive/{email}")
+    public ResponseEntity<String> changeMemberActivityStatus(@PathVariable("email") String email, @RequestBody MemberDTO memberDTO) {
+        try {
+            // 회원 활성화 여부를 수정
+            masterService.changeMemberActive(email, memberDTO.getIsActive());
+
+            // 수정이 성공적으로 이루어진 경우
+            return ResponseEntity.ok("회원 활성화 여부가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            // 오류 발생 시
+            return ResponseEntity.status(400).body("회원 활성화 여부 수정에 실패하였습니다: " + e.getMessage());
+        }
+    }
+
+
+    //주문,
+    //문의,리뷰,리뷰신고,
+    //메일,통계
 
 
    

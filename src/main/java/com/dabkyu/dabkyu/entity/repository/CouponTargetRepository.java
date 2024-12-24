@@ -29,5 +29,11 @@ public interface CouponTargetRepository extends JpaRepository<CouponTargetEntity
     // 쿠폰 상세 타겟 조회
     @Query("SELECT ct FROM couponTarget ct WHERE ct.couponSeqno = :coupon")
     public List<CouponTargetEntity> findDetailByCouponSeqno(@Param("coupon") CouponEntity coupon);
+
+    // 특정 쿠폰과 관련된 모든 카테고리 삭제
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM couponTarget ct WHERE ct.couponSeqno.couponSeqno = :couponSeqno")
+    void deleteByCouponSeqno(@Param("couponSeqno") Long couponSeqno);
          
 }

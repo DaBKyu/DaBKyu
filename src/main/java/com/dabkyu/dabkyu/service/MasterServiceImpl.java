@@ -55,8 +55,10 @@ import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
+import com.dabkyu.dabkyu.entity.CouponCategoryEntityID;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.CouponTargetEntity;
+import com.dabkyu.dabkyu.entity.CouponTargetEntityID;
 import com.dabkyu.dabkyu.entity.MemberCouponEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.MemberNotificationEntity;
@@ -66,6 +68,8 @@ import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.ProductFileEntity;
+import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
 import com.dabkyu.dabkyu.entity.ProductOptionEntity;
 import com.dabkyu.dabkyu.entity.QuestionCommentEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
@@ -1339,13 +1343,11 @@ public class MasterServiceImpl implements MasterService {
         return questionRepository.getPendingQuestions();
     }
 
-    /*@Override
-    public Long getMaxCategory1Seqno() {
-        return category1Repository.findTopByOrderByCategory1SeqnoDesc()
-            .map(Category1Entity::getCategory1Seqno)
-            .orElse(0L); // 만약 Category1Seqno가 없으면 0을 반환
+    //카테고리1 순서 구하기
+    @Override
+    public Integer findMaxCategory1Order() {
+        return category1Repository.findMaxCategory1Order();
     }
-    */
 
     //카테고리1 저장
     @Override
@@ -1357,6 +1359,12 @@ public class MasterServiceImpl implements MasterService {
     @Override
     public Category1Entity findCategory1ById(Long category1Seqno) {
         return category1Repository.findById(category1Seqno).get();
+    }
+
+    // 카테고리2 순서 구하기
+    @Override
+    public Integer findMaxCategory2OrderByCategory1(Long category1Seqno) {
+        return category2Repository.findMaxCategory2OrderByCategory1(category1Seqno);
     }
 
     //카테고리2 저장
@@ -1371,18 +1379,24 @@ public class MasterServiceImpl implements MasterService {
         return category2Repository.findById(category2Seqno).get();
     }
 
-    //카테고리3 저장
-    @Override
-    public void saveCategory3(Category3Entity category3) {
-        category3Repository.save(category3);
-    }
-    
     //카테고리 3 찾기
     @Override
     public Category3Entity findCategory3ById(Long category3Seqno) {
         return category3Repository.findById(category3Seqno).get();
     }
 
+    //카테고리3 순서 구하기
+    @Override
+    public Integer findMaxCategory3OrderByCategory2(Long category2Seqno) {
+        return category3Repository.findMaxCategory3OrderByCategory2(category2Seqno);
+    }
+
+    //카테고리3 저장
+    @Override
+    public void saveCategory3(Category3Entity category3) {
+        category3Repository.save(category3);
+    }
+    
     // 카테고리 순서 변경
     @Override
     public void updateCategoryOrder(int level, Long categoryId, String direction) {
@@ -1431,46 +1445,53 @@ public class MasterServiceImpl implements MasterService {
         private void adjustOrderForCategory2(Category2Entity category2, String direction) {
             int currentOrder = category2.getCategory2Order();
             int targetOrder = "up".equals(direction) ? currentOrder - 1 : currentOrder + 1;
-        
-            // 같은 부모(Category1Entity) 내에서 대상 순서를 가진 항목을 조회
-            Optional<Category2Entity> targetCategoryOpt = category2Repository.findByCategory2OrderAndCategory1Seqno(
-                targetOrder, category2.getCategory1Seqno());
-        
+            Long category1Seqno = category2.getCategory1Seqno().getCategory1Seqno(); // 동일한 Category1Seqno를 가진 Category2들 찾기
+
+            // 동일한 Category1Seqno를 가진 Category2 항목들을 조회
+            List<Category2Entity> category2List = category2Repository.findCategory2ByCategory1Seqno(category1Seqno);
+
+            // Category2 항목들 중 순서가 targetOrder인 항목을 찾음
+            Optional<Category2Entity> targetCategoryOpt = category2List.stream()
+                    .filter(c -> c.getCategory2Order() == targetOrder)
+                    .findFirst();
+
             if (targetCategoryOpt.isPresent()) {
-                // 대상 항목과 순서 교환
+                // 대상 항목의 순서를 현재 항목의 순서로 변경
                 Category2Entity targetCategory = targetCategoryOpt.get();
                 targetCategory.setCategory2Order(currentOrder);
                 category2Repository.save(targetCategory);
             }
-        
+
             // 현재 항목의 순서를 변경
             category2.setCategory2Order(targetOrder);
             category2Repository.save(category2);
         }
-        
 
         // 카테고리3 순서 조정
         private void adjustOrderForCategory3(Category3Entity category3, String direction) {
             int currentOrder = category3.getCategory3Order();
             int targetOrder = "up".equals(direction) ? currentOrder - 1 : currentOrder + 1;
-        
-            // 같은 부모(Category2Entity) 내에서 대상 순서를 가진 항목을 조회
-            Optional<Category3Entity> targetCategoryOpt = category3Repository.findByCategory3OrderAndCategory2Seqno(
-                targetOrder, category3.getCategory2Seqno());
-        
+            Long category2Seqno = category3.getCategory2Seqno().getCategory2Seqno(); // 동일한 Category2Seqno를 가진 Category3들 찾기
+
+            // 동일한 Category2Seqno를 가진 Category3 항목들을 조회
+            List<Category3Entity> category3List = category3Repository.findCategory3ByCategory2Seqno(category2Seqno);
+
+            // Category3 항목들 중 순서가 targetOrder인 항목을 찾음
+            Optional<Category3Entity> targetCategoryOpt = category3List.stream()
+                    .filter(c -> c.getCategory3Order() == targetOrder)
+                    .findFirst();
+
             if (targetCategoryOpt.isPresent()) {
-                // 대상 항목과 순서 교환
+                // 대상 항목의 순서를 현재 항목의 순서로 변경
                 Category3Entity targetCategory = targetCategoryOpt.get();
                 targetCategory.setCategory3Order(currentOrder);
                 category3Repository.save(targetCategory);
             }
-        
+
             // 현재 항목의 순서를 변경
             category3.setCategory3Order(targetOrder);
             category3Repository.save(category3);
         }
-        
-
 
     //모든 쿠폰 가져오기
     @Override
@@ -1543,35 +1564,99 @@ public class MasterServiceImpl implements MasterService {
     }
 
 
-    //쿠폰에 연결된 카테고리 정보 삭제
+    //기존 쿠폰에 연결된 카테고리 삭제
     @Override
-    public void deleteCouponCategories(CouponEntity couponEntity) {
-    // 쿠폰과 관련된 모든 카테고리 정보 삭제
-    List<CouponCategoryEntity> couponCategories = couponCategoryRepository.findDetailByCouponSeqno(couponEntity);
-    
-    // 카테고리 정보가 있다면 삭제
-    if (!couponCategories.isEmpty()) {
-        couponCategoryRepository.deleteAll(couponCategories);  // 연관된 카테고리 정보 삭제
-        }
-    }   
+    public void deleteCouponCategories(Long couponSeqno) {
+        // 삭제 로직
+        couponCategoryRepository.deleteByCouponSeqno(couponSeqno);
+    }
 
-    // 쿠폰에 연결된 대상 제품 정보 삭제
+    //기존 쿠폰에 연결된 제품 삭제
     @Override
-    public void deleteCouponTargets(CouponEntity couponEntity) {
-    // 쿠폰과 관련된 모든 대상 제품 정보 삭제
-    List<CouponTargetEntity> couponTargets = couponTargetRepository.findDetailByCouponSeqno(couponEntity);
-    
-    // 대상 제품 정보가 있다면 삭제
-    if (!couponTargets.isEmpty()) {
-        couponTargetRepository.deleteAll(couponTargets);  // 연관된 대상 제품 정보 삭제
-        }
-    }   
+    public void deleteCouponProducts(Long couponSeqno) {
+        // 삭제 로직
+        couponTargetRepository.deleteByCouponSeqno(couponSeqno);
+    }
+
     
     //회원 조회
     @Override
     public List<MemberEntity> getAllMembers() {
         return memberRepository.findAll();
     }
+
+    //회원 상세 보기
+    @Override
+    public Map<String, Object> getAllMemberDetail(String email) {
+        //회원 조회
+        MemberEntity member = memberRepository.findById(email).get();
+
+        // 결과를 담을 Map 생성
+        Map<String, Object> memberDetail = new HashMap<>();
+        memberDetail.put("member", member);
+
+        return memberDetail;
+    }
+
+    // 회원 등급 수정
+    @Override
+    public void updateMemberGrade(String email, String newGrade) {
+        MemberEntity member = memberRepository.findById(email).get();
+
+        // 새 등급으로 수정
+        member.setMemberGrade(newGrade);
+
+        // 수정된 회원 정보를 저장
+        memberRepository.save(member);
+    }
+
+    // 회원 활성화 여부 수정
+    @Override
+    public void changeMemberActive(String email, String newActive) {
+        // 이메일에 해당하는 회원을 찾음
+        Optional<MemberEntity> optionalMember = memberRepository.findById(email);
+
+        // 회원이 존재하는지 확인
+        if (!optionalMember.isPresent()) {
+            throw new IllegalArgumentException("회원이 존재하지 않습니다.");
+        }
+
+        // 회원을 수정할 수 있도록 불러옴
+        MemberEntity member = optionalMember.get();
+
+        // 새 활성화 상태로 수정
+        member.setIsActive(newActive);
+
+        // 수정된 회원 정보를 저장
+        memberRepository.save(member);
+    }
+
+    // 상품 이미지 찾기
+    @Override
+    public List<ProductFileEntity> getProductImagesByProductSeqno(ProductEntity productEntity) {
+        return productFileRepository.findByProductSeqno(productEntity.getProductSeqno());
+    }
+
+    // 상품 이미지 삭제
+    @Override
+    public void deleteProductImage(ProductFileEntity productFileEntity) {
+        // 데이터베이스에서 해당 엔티티 삭제
+        productFileRepository.delete(productFileEntity);
+    }
+
+    // 상품 상세 이미지 찾기
+    @Override
+    public List<ProductInfoFileEntity> getProductDetailImagesByProductSeqno(ProductEntity productEntity) {
+        return productInfoFileRepository.findByProductSeqno(productEntity.getProductSeqno());
+    }
+
+    // 상품 상세 이미지 삭제
+    @Override
+    public void deleteProductDetailImage(ProductInfoFileEntity productInfoFileEntity) {
+        // 데이터베이스에서 해당 엔티티 삭제
+        productInfoFileRepository.delete(productInfoFileEntity);
+    }
+
 
 }
 

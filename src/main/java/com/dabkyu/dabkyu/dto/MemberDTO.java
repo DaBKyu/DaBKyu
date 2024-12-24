@@ -41,6 +41,7 @@ public class MemberDTO {
     private String authkey;
     private int totalPvalue;
     private String birth;
+    private String isActive;
     
     public MemberDTO(MemberEntity memberEntity) {
         this.email = memberEntity.getEmail();
@@ -64,6 +65,7 @@ public class MemberDTO {
         this.emailReceptDate = memberEntity.getEmailReceptDate();
         this.authkey = memberEntity.getAuthkey();
         this.totalPvalue = memberEntity.getTotalPvalue();
+        this.isActive = memberEntity.getIsActive();
     }
 
     public MemberEntity dtoEntity(MemberDTO dto) {
@@ -90,6 +92,7 @@ public class MemberDTO {
                                                 .emailReceptDate(dto.getEmailReceptDate())
                                                 .authkey(dto.getAuthkey())
                                                 .totalPvalue(dto.getTotalPvalue())
+                                                .isActive(dto.getIsActive())
                                                 .build();
         return memberEntity;
     }

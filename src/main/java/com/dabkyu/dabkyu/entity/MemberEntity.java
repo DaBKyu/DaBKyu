@@ -90,6 +90,9 @@ public class MemberEntity {
 
 	@Column(name="total_pvalue")
 	private int totalPvalue;
+
+	@Column(name="is_active", length=2, nullable=false)
+    private String isActive;
 	
 	public void modifyMemberInfo(MemberDTO dto) {
         this.telno = dto.getTelno();

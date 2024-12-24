@@ -85,6 +85,7 @@ public class MemberServiceImpl implements MemberService {
                                                                                   .emailReceptDate(LocalDateTime.parse("2000-01-01, 00:00:00", formatter))
                                                                                   .gender(member.getGender())
                                                                                   .birthDate(member.getBirthDate())
+                                                                                  .isActive("Y")
                                                                                   .build();
         memberRepository.save(memberEntity);
     }

@@ -45,6 +45,8 @@ import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.entity.OrderProductEntity;
 import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
+import com.dabkyu.dabkyu.entity.ProductFileEntity;
+import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReportEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
@@ -307,11 +309,17 @@ public interface MasterService {
     //관리자페이지 메인 답변 대기수
     public int getNumberOfPendingQuestions();
 
+    //카테고리1 순서 구하기
+    public Integer findMaxCategory1Order(); 
+
     //카테고리 1 저장
     public void saveCategory1(Category1Entity category1);
 
     //카테고리 1 찾기
     public Category1Entity findCategory1ById(Long category1Seqno);
+
+    //카테고리2 순서 구하기
+    public Integer findMaxCategory2OrderByCategory1(Long category1Seqno);
 
     //카테고리 2 저장
     public void saveCategory2(Category2Entity category2);
@@ -319,11 +327,14 @@ public interface MasterService {
     //카테고리 2 찾기
     public Category2Entity findCategory2ById(Long category2Seqno);
 
-    //카테고리 3 저장
-    public void saveCategory3(Category3Entity category3);
-
     //카테고리 3 찾기
     public Category3Entity findCategory3ById(Long category3Seqno);
+
+    //카테고리3 순서 구하기
+    public Integer findMaxCategory3OrderByCategory2(Long category2Seqno);
+
+    //카테고리 3 저장
+    public void saveCategory3(Category3Entity category3);
 
     //카테고리 순서 변경
     public void updateCategoryOrder(int level, Long categoryId, String direction);
@@ -349,18 +360,34 @@ public interface MasterService {
     //타겟 정보 저장
     public void saveCouponTargets(ProductEntity productEntity, CouponEntity couponEntity);
 
-    //쿠폰에 연결된 카테고리 정보 삭제
-    public void deleteCouponCategories(CouponEntity couponEntity);
+    //기존 쿠폰에 연결된 카테고리 삭제
+    public void deleteCouponCategories(Long couponSeqno);
 
-    //쿠폰에 연결된 타겟 정보 삭제
-    public void deleteCouponTargets(CouponEntity couponEntity);
+    //기존 쿠폰에 연결된 제품 삭제
+    public void deleteCouponProducts(Long couponSeqno);
 
     //회원 리스트 조회
     public List<MemberEntity> getAllMembers();
-    
 
-    
+    //회원 상세 보기
+    public Map<String, Object> getAllMemberDetail(String email);
 
+    //회원 등급 수정
+    public void updateMemberGrade(String email, String newGrade);
 
+    //회원 활성화여부 수정
+    public void changeMemberActive(String email, String newActive);
+
+    //상품 이미지 찾기
+    public List<ProductFileEntity> getProductImagesByProductSeqno(ProductEntity productEntity);
+
+    //상품 이미지 삭제
+    public void deleteProductImage(ProductFileEntity productFileEntity);
+
+    //상품 상세 이미지 찾기
+    public List<ProductInfoFileEntity> getProductDetailImagesByProductSeqno(ProductEntity productEntity);
+
+    //상품 상세 이미지 삭제
+    public void deleteProductDetailImage(ProductInfoFileEntity productInfoFileEntity);
 
 }

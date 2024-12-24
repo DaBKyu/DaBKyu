@@ -30,7 +30,7 @@ public class ProductInfoFileEntity {
 
     @Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PRODUCTINFOFILE_SEQ")
-	@SequenceGenerator(name="PRODUCINFOTFILE_SEQ", sequenceName = "product_info_file_seq", initialValue = 1, allocationSize = 1)
+	@SequenceGenerator(name="PRODUCTINFOFILE_SEQ", sequenceName = "product_info_file_seq", initialValue = 1, allocationSize = 1)
     @Column(name="productinfofile_seqno", nullable=false)
     private Long productInfoFileSeqno;
 	

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
@@ -18,4 +19,8 @@ public interface ProductFileRepository extends JpaRepository<ProductFileEntity, 
     public List<ProductFileEntity> findByProductSeqno_ProductSeqno(Long productSeqno);
 
     public ProductFileEntity findFirstByProductSeqnoAndIsThumb(ProductEntity product, String isThumb);
+
+    //상품이미지 찾기
+    @Query("SELECT p FROM productFile p WHERE p.productSeqno = :productSeqno")
+    public List<ProductFileEntity> findByProductSeqno(@Param("productSeqno") Long productSeqno);
 }

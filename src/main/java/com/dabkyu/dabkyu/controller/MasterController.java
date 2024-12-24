@@ -262,7 +262,7 @@ public class MasterController{
         return category3DTOList;
     }
     */
-    
+    /* 
     //상품 수정 화면보기 >> 수정 눌렀을 때 
     @GetMapping("/master/modifyProduct")
     public void getmMdifyProduct(@RequestParam("productSeqno") Long productSeqno,
@@ -288,6 +288,7 @@ public class MasterController{
 
         model.addAttribute("needsModification", isTemporaryCategory); //임시 카테고리 //[수정] 알림을 위한
     }
+        */
     /*//상품 등록 화면보기 
     @GetMapping("/master/postProduct")
     public void getPostProduct(Model model) {

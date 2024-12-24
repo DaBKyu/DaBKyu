@@ -29,11 +29,11 @@ public class ProductInfoFileDTO {
 
     public ProductInfoFileEntity dtoToEntity(ProductInfoFileDTO dto) {
         ProductInfoFileEntity entity = ProductInfoFileEntity.builder()
-                                                                                        .productInfoFileSeqno(dto.getProductInfoFileSeqno())
-                                                                                        .productSeqno(dto.getProductSeqno())
-                                                                                        .orgFilename(dto.getOrgFilename())
-                                                                                        .storedFilename(dto.getOrgFilename())
-                                                                                        .build();
+                                                            .productInfoFileSeqno(dto.getProductInfoFileSeqno())
+                                                            .productSeqno(dto.getProductSeqno())
+                                                            .orgFilename(dto.getOrgFilename())
+                                                            .storedFilename(dto.getStoredFilename())
+                                                            .build();
         return entity;                                 
     }
 }
