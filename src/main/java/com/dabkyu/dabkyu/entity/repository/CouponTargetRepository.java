@@ -34,6 +34,6 @@ public interface CouponTargetRepository extends JpaRepository<CouponTargetEntity
     @Transactional
     @Modifying
     @Query("DELETE FROM couponTarget ct WHERE ct.couponSeqno.couponSeqno = :couponSeqno")
-    void deleteByCouponSeqno(@Param("couponSeqno") Long couponSeqno);
+    public void deleteByCouponSeqno(@Param("couponSeqno") Long couponSeqno);
          
 }

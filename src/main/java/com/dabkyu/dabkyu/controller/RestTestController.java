@@ -47,9 +47,11 @@ import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
 import com.dabkyu.dabkyu.entity.CouponTargetEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
+import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
+import com.dabkyu.dabkyu.entity.ProductOptionEntity;
 import com.dabkyu.dabkyu.service.MasterService;
 import com.dabkyu.dabkyu.service.ProductService;
 
@@ -412,186 +414,173 @@ public class RestTestController{
             e.printStackTrace();
         }
     }
-
     //상품 수정
     @PutMapping("/master/updateProduct/{productSeqno}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long productSeqno, 
-                                            ProductDTO productDTO, Model model,
-                                            @RequestParam(name = "category3Seqno", required = false) Long category3Seqno,
-                                            @RequestParam(name = "productImages", required = false) List<MultipartFile> productImages,
-                                            @RequestParam(name = "productDetailImages", required = false) List<MultipartFile> productDetailImages,
-                                            @RequestParam(name = "optionMap", required = false) String optionMapJson,
-                                            @RequestParam(name = "relatedProductMap", required = false) String relatedProductMapJson,
-                                            @RequestParam(name = "deleteOptionSeqnos", required = false) List<Long> deleteOptionSeqnos,
-                                            @RequestParam(name = "deleteRelatedProductSeqnos", required = false) List<Long> deleteRelatedProductSeqnos) {
-        List<Category1Entity> allCategory1 = masterService.getAllCategories1();
-        List<Category2Entity> allCategory2 = masterService.getAllCategories2();
-        List<Category3Entity> allCategory3 = masterService.getAllCategories3();
-    
-        model.addAttribute("allcategory1", allCategory1);
-        model.addAttribute("allcategory2", allCategory2);
-        model.addAttribute("allcategory3", allCategory3);
-    
-        try {
-            // 운영체제에 따라 이미지 저장 경로 설정
-            String os = System.getProperty("os.name").toLowerCase();
-            String productImgPath = os.contains("win") 
-                    ? "c:\\Repository\\dabkyu\\product\\thumbnails\\" 
-                    : "/home/gladius/Repository/dabkyu/product/thumbnails/";
-            String productDetailImgPath = os.contains("win") 
-                    ? "c:\\Repository\\dabkyu\\product\\images\\" 
-                    : "/home/gladius/Repository/dabkyu/product/images/";
-    
-            // 디렉토리 확인 및 생성
-            File productImgDir = new File(productImgPath);
-            if (!productImgDir.exists() && !productImgDir.mkdirs()) {
-                throw new IOException("상품 이미지 디렉토리 생성 실패");
-            }
-    
-            File productDetailImgDir = new File(productDetailImgPath);
-            if (!productDetailImgDir.exists() && !productDetailImgDir.mkdirs()) {
-                throw new IOException("상품 상세 이미지 디렉토리 생성 실패");
-            }
-            // 상품 정보 업데이트 처리
-            ProductEntity existingProduct = masterService.findProductBySeqno(productSeqno);
-            if (existingProduct == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("상품을 찾을 수 없습니다.");
-            }
-    
-            // 카테고리 업데이트
-            if (category3Seqno != null) {
-                Category3Entity category3 = masterService.findCategoryBySeqno(category3Seqno);
-                existingProduct.setCategory3Seqno(category3);
-            }
-    
-            masterService.productModify(productDTO);
-    
-            // 옵션 삭제
-            if (deleteOptionSeqnos != null && !deleteOptionSeqnos.isEmpty()) {
-                for (Long optionSeqno : deleteOptionSeqnos) {
-                    //ProductOptionDTO optionDTO = masterService.findProductOptionBySeqno(optionSeqno);
-                    //if (optionDTO != null) {
-                    //    masterService.deleteProductOption(optionDTO);
-                    //}
-                }
-            }
-    
-            // 추가상품 삭제
-            if (deleteRelatedProductSeqnos != null && !deleteRelatedProductSeqnos.isEmpty()) {
-                for (Long relatedProductSeqno : deleteRelatedProductSeqnos) {
-                    //RelatedProductDTO relatedProductDTO = masterService.findRelatedProductBySeqno(relatedProductSeqno);
-                    //if (relatedProductDTO != null) {
-                    //    masterService.deleteRelatedProduct(relatedProductDTO);
-                    //}
-                }
-            }
-    
-            // 옵션 업데이트
-            if (optionMapJson != null && !optionMapJson.isEmpty()) {
-                List<Map<String, String>> optionMapList = objectMapper.readValue(optionMapJson, new TypeReference<List<Map<String, String>>>() {});
-                for (Map<String, String> option : optionMapList) {
-                    String optCategory = option.get("optCategory");
-                    String optName = option.get("optName");
-                    int optPrice = Integer.parseInt(option.get("optPrice"));
-    
-                    // 옵션 업데이트 로직
-                    ProductOptionDTO optionDTO = new ProductOptionDTO();
-                    optionDTO.setProductSeqno(existingProduct);
-                    optionDTO.setOptCategory(optCategory);
-                    optionDTO.setOptName(optName);
-                    optionDTO.setOptPrice(optPrice);
-                    masterService.saveProductOption(optionDTO);
-                }
-            }
-    
-            // 추가상품 업데이트
-            if (relatedProductMapJson != null && !relatedProductMapJson.isEmpty()) {
-                List<Map<String, String>> relatedProductMapList = objectMapper.readValue(relatedProductMapJson, new TypeReference<List<Map<String, String>>>() {});
-                for (Map<String, String> relatedProduct : relatedProductMapList) {
-                    String relatedProductCategory = relatedProduct.get("relatedProductCategory");
-                    String relatedProductName = relatedProduct.get("relatedProductName");
-                    int relatedProductPrice = Integer.parseInt(relatedProduct.get("relatedProductPrice"));
-    
-                    // 추가상품 업데이트 로직
-                    RelatedProductDTO relatedProductDTO = new RelatedProductDTO();
-                    relatedProductDTO.setProductSeqno(existingProduct);
-                    relatedProductDTO.setRelatedproductCategory(relatedProductCategory);
-                    relatedProductDTO.setRelatedproductName(relatedProductName);
-                    relatedProductDTO.setRelatedproductPrice(relatedProductPrice);
-                    masterService.saveRelatedProduct(relatedProductDTO);
-                }
-            }
-    
-            // 이미지 업데이트
-            if (productImages != null && !productImages.isEmpty()) {
-                for (MultipartFile file : productImages) {
-                    // 기존 이미지를 삭제
-                    deleteExistingProductImages(existingProduct, productImgPath);
-                    
-                    // 새로운 상품 이미지 저장
-                    saveFile(file, productImgPath, existingProduct, true);
-                }
-            }
-    
-            // 상세 이미지 업데이트
-            if (productDetailImages != null && !productDetailImages.isEmpty()) {
-                for (MultipartFile file : productDetailImages) {
-                    // 기존 상품 상세 이미지 삭제
-                    deleteExistingProductDetailImages(existingProduct, productDetailImgPath);
-                    
-                    // 새로운 상품 상세 이미지 저장
-                    saveDetailFile(file, productDetailImgPath, existingProduct);
-                }
-            }
-    
-            return ResponseEntity.ok().body(Map.of("status", "success", "productSeqno", productSeqno));
-    
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상품 수정 중 오류 발생: " + e.getMessage());
-        }
-    }
-    
+        public ResponseEntity<?> updateProduct(@PathVariable Long productSeqno, 
+                                                ProductDTO productDTO, Model model,
+                                                @RequestParam(name = "category3Seqno", required = false) Long category3Seqno,
+                                                @RequestParam(name = "productImages", required = false) List<MultipartFile> productImages,
+                                                @RequestParam(name = "productDetailImages", required = false) List<MultipartFile> productDetailImages,
+                                                @RequestParam(name = "optionMap", required = false) String optionMapJson,
+                                                @RequestParam(name = "relatedProductMap", required = false) String relatedProductMapJson,
+                                                @RequestParam(name = "deleteOptionSeqnos", required = false) List<Long> deleteOptionSeqnos,
+                                                @RequestParam(name = "deleteRelatedProductSeqnos", required = false) List<Long> deleteRelatedProductSeqnos,
+                                                @RequestParam(name = "deleteProductImageSeqnos", required = false) List<Long> deleteProductImageSeqnos,
+                                                @RequestParam(name = "deleteProductDetailImageSeqnos", required = false) List<Long> deleteProductDetailImageSeqnos
+                                                ) {
+            List<Category1Entity> allCategory1 = masterService.getAllCategories1();
+            List<Category2Entity> allCategory2 = masterService.getAllCategories2();
+            List<Category3Entity> allCategory3 = masterService.getAllCategories3();
 
-    private void deleteExistingProductImages(ProductEntity productEntity, String productImgPath) {
-        List<ProductFileEntity> existingFiles = masterService.getProductImagesByProductSeqno(productEntity);
-        for (ProductFileEntity existingFile : existingFiles) {
-            // 기존 파일 삭제
-            String filePath = productImgPath + existingFile.getStoredFilename();
-            File file = new File(filePath);
-            if (file.exists()) {
-                if (file.delete()) {
-                    System.out.println("기존 상품 이미지 삭제 성공: " + filePath);
-                } else {
-                    System.err.println("기존 상품 이미지 삭제 실패: " + filePath);
-                }
-            }
-            
-            // DB에서 이미지 정보 삭제 (필요한 경우)
-            masterService.deleteProductImage(existingFile);
-        }
-    }
-    
-    private void deleteExistingProductDetailImages(ProductEntity productEntity, String productDetailImgPath) {
-        List<ProductInfoFileEntity> existingFiles = masterService.getProductDetailImagesByProductSeqno(productEntity);
-        for (ProductInfoFileEntity existingFile : existingFiles) {
-            // 기존 파일 삭제
-            String filePath = productDetailImgPath + existingFile.getStoredFilename();
-            File file = new File(filePath);
-            if (file.exists()) {
-                if (file.delete()) {
-                    System.out.println("기존 상품 상세 이미지 삭제 성공: " + filePath);
-                } else {
-                    System.err.println("기존 상품 상세 이미지 삭제 실패: " + filePath);
-                }
-            }
-            
-            // DB에서 이미지 정보 삭제 (필요한 경우)
-            masterService.deleteProductDetailImage(existingFile);
-        }
-    }
-    
+            model.addAttribute("allcategory1", allCategory1);
+            model.addAttribute("allcategory2", allCategory2);
+            model.addAttribute("allcategory3", allCategory3);
 
+            try {
+                // 운영체제에 따라 이미지 저장 경로 설정
+                String os = System.getProperty("os.name").toLowerCase();
+                String productImgPath = os.contains("win") 
+                        ? "c:\\Repository\\dabkyu\\product\\thumbnails\\" 
+                        : "/home/gladius/Repository/dabkyu/product/thumbnails/";
+                String productDetailImgPath = os.contains("win") 
+                        ? "c:\\Repository\\dabkyu\\product\\images\\" 
+                        : "/home/gladius/Repository/dabkyu/product/images/";
+
+                // 디렉토리 확인 및 생성
+                File productImgDir = new File(productImgPath);
+                if (!productImgDir.exists() && !productImgDir.mkdirs()) {
+                    throw new IOException("상품 이미지 디렉토리 생성 실패");
+                }
+
+                File productDetailImgDir = new File(productDetailImgPath);
+                if (!productDetailImgDir.exists() && !productDetailImgDir.mkdirs()) {
+                    throw new IOException("상품 상세 이미지 디렉토리 생성 실패");
+                }
+
+                // 상품 정보 업데이트 처리
+                ProductEntity existingProduct = masterService.findProductBySeqno(productSeqno);
+                if (existingProduct == null) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("상품을 찾을 수 없습니다.");
+                }
+
+                // 카테고리 업데이트
+                if (category3Seqno != null) {
+                    Category3Entity category3 = masterService.findCategoryBySeqno(category3Seqno);
+                    existingProduct.setCategory3Seqno(category3);
+                }
+
+                masterService.productModify(productDTO);
+/* 
+                // 옵션 삭제
+                if (deleteOptionSeqnos != null && !deleteOptionSeqnos.isEmpty()) {
+                    for (Long optionSeqno : deleteOptionSeqnos) {
+                        ProductOptionEntity productOption = masterService.findProductOptionBySeqno(optionSeqno);
+                        if (productOption != null) {
+                            masterService.deleteProductOption(productOption);
+                        }
+                    }
+                }
+
+                // 추가상품 삭제
+                if (deleteRelatedProductSeqnos != null && !deleteRelatedProductSeqnos.isEmpty()) {
+                    for (Long relatedProductSeqno : deleteRelatedProductSeqnos) {
+                        RelatedProductDTO relatedProductDTO = masterService.findRelatedProductBySeqno(relatedProductSeqno);
+                        if (relatedProductDTO != null) {
+                            masterService.deleteRelatedProduct(relatedProductDTO);
+                        }
+                    }
+                }
+
+                // 이미지 삭제
+                if (deleteProductImageSeqnos != null && !deleteProductImageSeqnos.isEmpty()) {
+                    for (Long imageSeqno : deleteProductImageSeqnos) {
+                        ProductFileEntity  productImage = masterService.findProductImageBySeqno(imageSeqno);
+                        if (productImage != null) {
+                            // 이미지 파일 삭제
+                            File productImageFile = new File(productImgPath + productImage.getStoredFilename());
+                            if (productImageFile.exists()) {
+                                productImageFile.delete();
+                            }
+                            masterService.deleteProductImage(productImage);
+                        }
+                    }
+                }
+
+                // 상세 이미지 삭제
+                if (deleteProductDetailImageSeqnos != null && !deleteProductDetailImageSeqnos.isEmpty()) {
+                    for (Long detailImageSeqno : deleteProductDetailImageSeqnos) {
+                        ProductInfoFileEntity  productDetailImage = masterService.findProductDetailImageBySeqno(detailImageSeqno);
+                        if (productDetailImage != null) {
+                            // 상세 이미지 파일 삭제
+                            File productDetailImageFile = new File(productDetailImgPath + productDetailImage.getStoredFilename());
+                            if (productDetailImageFile.exists()) {
+                                productDetailImageFile.delete();
+                            }
+                            masterService.deleteProductDetailImage(productDetailImage);
+                        }
+                    }
+                }
+*/
+                // 옵션 업데이트
+                if (optionMapJson != null && !optionMapJson.isEmpty()) {
+                    List<Map<String, String>> optionMapList = objectMapper.readValue(optionMapJson, new TypeReference<List<Map<String, String>>>() {});
+                    for (Map<String, String> option : optionMapList) {
+                        String optCategory = option.get("optCategory");
+                        String optName = option.get("optName");
+                        int optPrice = Integer.parseInt(option.get("optPrice"));
+
+                        // 옵션 업데이트 로직
+                        ProductOptionDTO optionDTO = new ProductOptionDTO();
+                        optionDTO.setProductSeqno(existingProduct);
+                        optionDTO.setOptCategory(optCategory);
+                        optionDTO.setOptName(optName);
+                        optionDTO.setOptPrice(optPrice);
+                        masterService.saveProductOption(optionDTO);
+                    }
+                }
+
+                // 추가상품 업데이트
+                if (relatedProductMapJson != null && !relatedProductMapJson.isEmpty()) {
+                    List<Map<String, String>> relatedProductMapList = objectMapper.readValue(relatedProductMapJson, new TypeReference<List<Map<String, String>>>() {});
+                    for (Map<String, String> relatedProduct : relatedProductMapList) {
+                        String relatedProductCategory = relatedProduct.get("relatedProductCategory");
+                        String relatedProductName = relatedProduct.get("relatedProductName");
+                        int relatedProductPrice = Integer.parseInt(relatedProduct.get("relatedProductPrice"));
+
+                        // 추가상품 업데이트 로직
+                        RelatedProductDTO relatedProductDTO = new RelatedProductDTO();
+                        relatedProductDTO.setProductSeqno(existingProduct);
+                        relatedProductDTO.setRelatedproductCategory(relatedProductCategory);
+                        relatedProductDTO.setRelatedproductName(relatedProductName);
+                        relatedProductDTO.setRelatedproductPrice(relatedProductPrice);
+                        masterService.saveRelatedProduct(relatedProductDTO);
+                    }
+                }
+
+                // 이미지 업데이트
+                if (productImages != null && !productImages.isEmpty()) {
+                    for (MultipartFile file : productImages) {
+                        // 새로운 상품 이미지 저장
+                        saveFile(file, productImgPath, existingProduct, true);
+                    }
+                }
+
+                // 상세 이미지 업데이트
+                if (productDetailImages != null && !productDetailImages.isEmpty()) {
+                    for (MultipartFile file : productDetailImages) {
+                        // 새로운 상품 상세 이미지 저장
+                        saveDetailFile(file, productDetailImgPath, existingProduct);
+                    }
+                }
+
+                return ResponseEntity.ok().body(Map.of("status", "success", "productSeqno", productSeqno));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상품 수정 중 오류 발생: " + e.getMessage());
+            }
+        }
+    
     //카테고리 리스트 조회
     @GetMapping("/master/categoryList")
     public ResponseEntity<Map<String, Object>> getManageCategory() {
@@ -944,6 +933,40 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
 
     // 쿠폰 비활성화(회원쿠폰 비활성화)
 
+    // 관리자가 선택한 쿠폰을 isExpired를 "Y"로 업데이트해서 만료처리
+    @PutMapping("/master/deactivateCoupon/{couponSeqno}")
+    public ResponseEntity<String> deactivateCoupon(@PathVariable Long couponSeqno) {
+
+        masterService.markCouponAsInactive(couponSeqno);
+
+        return ResponseEntity.ok("선택한 쿠폰이 성공적으로 만료 처리되었습니다.");
+    }
+
+    // 관리자가 선택한 여러 쿠폰을 isExpired를 "Y"로 업데이트해서 만료처리
+    @PutMapping("/master/deactivateCoupons")
+    public ResponseEntity<Map<String, String>> deactivateCoupons(@RequestBody List<Long> couponSeqnos) {
+
+        masterService.markMultipleCouponsAsInactive(couponSeqnos);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "선택한 쿠폰이 만료 처리되었습니다.");
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    // 관리자가 쿠폰 종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
+    @PutMapping("/master/expiredUpdate")
+    public ResponseEntity<String> updateExpiredCoupons() {
+        LocalDateTime referenceDate = LocalDateTime.now();
+
+        // 만료된 쿠폰을 처리하는 서비스 메서드 호출
+        masterService.setExpiredCouponsToExpired(referenceDate);
+
+        // 성공적인 처리 후 상태 코드 200 반환
+        return ResponseEntity.ok("종료일이 지난 쿠폰들이 성공적으로 만료 처리되었습니다.");
+    }
+
+
     // 회원 리스트 조회
     @GetMapping("/master/memberList")
     public ResponseEntity<Map<String, Object>> getMemberList() {
@@ -992,8 +1015,39 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
     }
 
 
-    //주문,
+    //주문관리
+    //주문내역 조회
+    @GetMapping("/master/orderList")
+    public ResponseEntity<Map<String, Object>> getOrderList() {
+        List<OrderInfoEntity> orders = masterService.getAllOrders();
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("orders", orders);
+        return ResponseEntity.ok(response);
+    }
+
+    //주문 상세 조회
+    @GetMapping("/master/orderDetail/{orderSeqno}")
+    public ResponseEntity<Map<String, Object>> getOrderDetail(@PathVariable Long orderSeqno) {
+        Map<String, Object> orderInfoDetail = masterService.getAllOrderDetail(orderSeqno);
+        
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderInfoDetail", orderInfoDetail);
+        return ResponseEntity.ok(response);
+    } 
+
+
+    //주문 상태 변경
+    
+    //주문 취소
+    
+    //주문 환불
+
+
+
     //문의,리뷰,리뷰신고,
+
     //메일,통계
 
 

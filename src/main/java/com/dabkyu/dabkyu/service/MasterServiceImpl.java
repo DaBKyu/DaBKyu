@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import com.dabkyu.dabkyu.dto.Category1DTO;
@@ -92,6 +93,7 @@ import com.dabkyu.dabkyu.entity.repository.NotificationRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderDetailRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderInfoRepository;
 import com.dabkyu.dabkyu.entity.repository.OrderProductOptionRepository;
+import com.dabkyu.dabkyu.entity.repository.OrderProductRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductInfoFileRepository;
 import com.dabkyu.dabkyu.entity.repository.ProductOptionRepository;
@@ -141,6 +143,7 @@ public class MasterServiceImpl implements MasterService {
     private final Category2Repository category2Repository;
     private final Category3Repository category3Repository;
     private final MemberLogRepository memberLogRepository;
+    private final OrderProductRepository orderProductRepository;
 
     //맴버 리스트 보기
     @Override
@@ -1578,6 +1581,39 @@ public class MasterServiceImpl implements MasterService {
         couponTargetRepository.deleteByCouponSeqno(couponSeqno);
     }
 
+    //관리자가 선택한 쿠폰을 isExpired를 "Y"로 업데이트해서 만료처리
+    @Override
+    public void markCouponAsInactive(Long couponSeqno) {
+        CouponEntity coupon = couponRepository.findById(couponSeqno).get();
+        
+        // couponSeqno로 여러 개의 MemberCouponEntity를 찾음
+        List<MemberCouponEntity> memberCoupons = memberCouponRepository.findMemberCouponsByCouponSeqno(coupon);
+
+        // 모든 결과에 대해 isExpire 값을 "Y"로 설정
+        for (MemberCouponEntity memberCoupon : memberCoupons) {
+            memberCoupon.setIsExpire("Y");
+            memberCouponRepository.save(memberCoupon);
+        }
+    }
+
+    //관리자가 선택한 여러 쿠폰을 isExpired를 "Y"로 업데이트해서 만료처리
+    @Override
+    public void markMultipleCouponsAsInactive(List<Long> couponSeqnos) {
+        // 각 couponSeqno에 대해 CouponEntity를 찾고, 해당하는 MemberCouponEntity들을 업데이트
+        for (Long couponSeqno : couponSeqnos) {
+            // couponSeqno로 CouponEntity를 찾음
+            CouponEntity coupon = couponRepository.findById(couponSeqno).get();
+            
+            // couponSeqno로 여러 개의 MemberCouponEntity를 찾음
+            List<MemberCouponEntity> memberCoupons = memberCouponRepository.findMemberCouponsByCouponSeqno(coupon);
+
+            // 모든 결과에 대해 isExpire 값을 "Y"로 설정
+            for (MemberCouponEntity memberCoupon : memberCoupons) {
+                memberCoupon.setIsExpire("Y");
+                memberCouponRepository.save(memberCoupon);
+            }
+        }
+    }
     
     //회원 조회
     @Override
@@ -1655,6 +1691,57 @@ public class MasterServiceImpl implements MasterService {
     public void deleteProductDetailImage(ProductInfoFileEntity productInfoFileEntity) {
         // 데이터베이스에서 해당 엔티티 삭제
         productInfoFileRepository.delete(productInfoFileEntity);
+    }
+
+    // ProductOptionSeqno로 옵션 찾기
+    @Override
+    public ProductOptionEntity findProductOptionBySeqno(Long optionSeqno) {
+        // findBySeqno를 통해 상품 옵션을 조회
+        ProductOptionEntity productOptionEntity = productOptionRepository.findByOptionSeqno(optionSeqno);
+        
+        // 상품 옵션이 없다면 null 반환
+        return productOptionEntity;
+    }
+
+    // 주문 리스트 조회
+    @Override
+    public List<OrderInfoEntity> getAllOrders(){
+        return orderInfoRepository.findAll();
+    }
+
+    // 주문 상세 조회
+    @Override
+    public Map<String, Object> getAllOrderDetail(Long orderSeqno) {
+        Map<String, Object> orderInfoDetail = new HashMap<>();
+
+        // OrderInfo 조회
+        OrderInfoEntity orderInfoEntity = orderInfoRepository.findById(orderSeqno)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // OrderDetail 조회 (OrderInfo에 해당하는 모든 OrderDetail)
+        List<OrderDetailEntity> orderDetailList = orderDetailRepository.findByOrderSeqno(orderInfoEntity);
+
+        // OrderProduct 조회 (각 OrderDetail에 해당하는 모든 OrderProduct)
+        List<Map<String, Object>> orderProducts = new ArrayList<>();
+        for (OrderDetailEntity orderDetail : orderDetailList) {
+            OrderProductEntity orderProductEntity = orderDetail.getOrderProductSeqno();
+
+            // OrderProduct에 대한 데이터 설정
+            Map<String, Object> orderProductInfo = new HashMap<>();
+            orderProductInfo.put("product", orderProductEntity.getProductSeqno()); // Product 정보
+            orderProductInfo.put("amount", orderProductEntity.getAmount()); // 수량
+            orderProductInfo.put("reviewYn", orderProductEntity.getReviewYn()); // 리뷰 여부
+
+            // 주문 상세 정보에 추가
+            orderProducts.add(orderProductInfo);
+        }
+
+        // OrderInfo와 관련된 세부 정보들을 반환할 Map에 추가
+        orderInfoDetail.put("orderInfo", orderInfoEntity);
+        orderInfoDetail.put("orderDetails", orderDetailList);
+        orderInfoDetail.put("orderProducts", orderProducts);
+
+        return orderInfoDetail;
     }
 
 

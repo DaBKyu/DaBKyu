@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -47,4 +48,7 @@ public interface MemberCouponRepository extends JpaRepository<MemberCouponEntity
 
     public List<MemberCouponEntity> findByEmail_Email(String email);
 
+    // couponSeqno로 여러 개의 MemberCouponEntity를 찾는 쿼리
+    @Query("SELECT mc FROM memberCoupon mc WHERE mc.couponSeqno = :coupon")
+    public List<MemberCouponEntity> findMemberCouponsByCouponSeqno(@Param("coupon") CouponEntity coupon);
 }

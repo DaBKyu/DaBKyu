@@ -891,6 +891,7 @@ public class MasterController{
     }
     */
 
+    /*
     //쿠폰 등록 화면보기
     @GetMapping("/master/createCoupon")
     public void getCreateCoupon() {}
@@ -907,6 +908,7 @@ public class MasterController{
         model.addAttribute("allCategories", masterService.getAllCategories3()); //모든 카테고리
         model.addAttribute("allProducts", masterService.getAllProducts());  //모든 상품
     }
+    */
 
     //쿠폰 등록, 수정
     //쿠폰 타입 A(전체상품적용), T(특정상품적용(카테고리)), C(단일상품적용) 
@@ -1041,7 +1043,7 @@ public class MasterController{
         return "{\"message\":\"good\"}";
     }
 
-    
+    /*
     // 관리자가 쿠폰 종료일이 지난 쿠폰들을 isExpired를 "Y"로 업데이트해서 만료처리
     @PostMapping("/master/expiredUpdate")
     public void updateExpiredCoupons() {
@@ -1052,6 +1054,7 @@ public class MasterController{
 
         // 성공적인 처리 후 아무 것도 반환하지 않음 (HTTP 상태 200)
     }
+    */
     
 
     //통계 페이지(매출통계,가입통계,방문통계)

@@ -47,6 +47,7 @@ import com.dabkyu.dabkyu.entity.OrderProductOptionEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
+import com.dabkyu.dabkyu.entity.ProductOptionEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReportEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
@@ -366,6 +367,12 @@ public interface MasterService {
     //기존 쿠폰에 연결된 제품 삭제
     public void deleteCouponProducts(Long couponSeqno);
 
+    //관리자가 선택한 쿠폰을 isExpired를 "Y"로 업데이트해서 만료처리
+    public void markCouponAsInactive(Long couponSeqno);
+
+    //관리자가 선택한 여러 쿠폰을 isExpired를 "Y"로 업데이트해서 만료처리
+    public void markMultipleCouponsAsInactive(List<Long> couponSeqnos);
+
     //회원 리스트 조회
     public List<MemberEntity> getAllMembers();
 
@@ -389,5 +396,13 @@ public interface MasterService {
 
     //상품 상세 이미지 삭제
     public void deleteProductDetailImage(ProductInfoFileEntity productInfoFileEntity);
+
+    public ProductOptionEntity findProductOptionBySeqno(Long optionSeqno);
+
+    //주문 리스트 조회
+    public List<OrderInfoEntity> getAllOrders();
+
+    //주문 상세 조회
+    public Map<String, Object> getAllOrderDetail(Long orderSeqno);
 
 }

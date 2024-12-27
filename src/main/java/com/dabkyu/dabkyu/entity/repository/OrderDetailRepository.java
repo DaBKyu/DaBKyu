@@ -10,8 +10,11 @@ import org.springframework.data.repository.query.Param;
 
 import com.dabkyu.dabkyu.dto.CategorySalesDTO;
 import com.dabkyu.dabkyu.dto.ProductSalesDTO;
+import com.dabkyu.dabkyu.entity.CouponEntity;
+import com.dabkyu.dabkyu.entity.MemberCouponEntity;
 import com.dabkyu.dabkyu.entity.OrderDetailEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
+import com.dabkyu.dabkyu.entity.OrderProductEntity;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetailEntity, Long> {
     // 특정 주문에 해당하는 모든 주문 상세 정보 조회
