@@ -730,6 +730,7 @@ public class MasterController{
             
     }
 
+    /* 
     //문의 답변 등록 및 수정
     @ResponseBody
     @PostMapping("/master/question/reply")
@@ -754,7 +755,9 @@ public class MasterController{
         return "{\"message\":\"good\"}";
 
 	}
+    */
 
+    /* 
     //문의 삭제 
     @Transactional
     @PostMapping("/master/question/delete")
@@ -781,7 +784,9 @@ public class MasterController{
             return ResponseEntity.status(500).body("문의 삭제 중 오류가 발생했습니다.");
         }
     }
+    */
 
+    /* 
     //문의 답변 삭제
     @Transactional
     @PostMapping("/master/question/replydelete")
@@ -792,6 +797,7 @@ public class MasterController{
         
         return ResponseEntity.ok("답변이 성공적으로 삭제되었습니다.");
     }
+    */
 
     //리뷰 리스트 화면 
     @GetMapping("/master/reviewList")

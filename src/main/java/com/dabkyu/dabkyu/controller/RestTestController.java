@@ -1,6 +1,5 @@
 package com.dabkyu.dabkyu.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -35,23 +35,22 @@ import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.DailySalesDTO;
 import com.dabkyu.dabkyu.dto.DailyVisitorDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
+import com.dabkyu.dabkyu.dto.QuestionCommentDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
-import com.dabkyu.dabkyu.entity.CouponCategoryEntity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
-import com.dabkyu.dabkyu.entity.CouponTargetEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
-import com.dabkyu.dabkyu.entity.ProductFileEntity;
-import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
-import com.dabkyu.dabkyu.entity.ProductOptionEntity;
+import com.dabkyu.dabkyu.entity.QuestionCommentEntity;
+import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.service.MasterService;
 import com.dabkyu.dabkyu.service.ProductService;
 
@@ -932,7 +931,6 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
     }
 
     // 쿠폰 비활성화(회원쿠폰 비활성화)
-
     // 관리자가 선택한 쿠폰을 isExpired를 "Y"로 업데이트해서 만료처리
     @PutMapping("/master/deactivateCoupon/{couponSeqno}")
     public ResponseEntity<String> deactivateCoupon(@PathVariable Long couponSeqno) {
@@ -966,7 +964,7 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
         return ResponseEntity.ok("종료일이 지난 쿠폰들이 성공적으로 만료 처리되었습니다.");
     }
 
-
+    // 회원 관리
     // 회원 리스트 조회
     @GetMapping("/master/memberList")
     public ResponseEntity<Map<String, Object>> getMemberList() {
@@ -1015,8 +1013,8 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
     }
 
 
-    //주문관리
-    //주문내역 조회
+    // 주문 관리
+    // 주문 내역 조회
     @GetMapping("/master/orderList")
     public ResponseEntity<Map<String, Object>> getOrderList() {
         List<OrderInfoEntity> orders = masterService.getAllOrders();
@@ -1039,18 +1037,113 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
 
 
     //주문 상태 변경
+    @PutMapping("/master/changeOrderStatus/{orderSeqno}")
+    public ResponseEntity<String> changeOrderStatus(@PathVariable("orderSeqno") Long orderSeqno, @RequestBody OrderInfoDTO orderInfoDTO) {
+        try {
+            // 주문 상태 변경
+            masterService.changeOrderStatus(orderSeqno, orderInfoDTO.getOrderStatus());
+
+            // 변경이 성공적으로 이루어진 경우
+            return ResponseEntity.ok("주문상태를 변경하였습니다.");
+        } catch (Exception e) {
+            // 오류 발생 시
+            return ResponseEntity.status(400).body("주문상태 변경에 실패하였습니다: " + e.getMessage());
+        }
+    }
     
     //주문 취소
     
     //주문 환불
 
 
+    //문의 관리
+    //문의 리스트 조회
+    @GetMapping("/master/questionList")
+    public ResponseEntity<Map<String, Object>> getQuestionList() {
+        List<QuestionEntity> questions = masterService.getAllQuestions();
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("questions", questions);
+        return ResponseEntity.ok(response);
+    }
 
-    //문의,리뷰,리뷰신고,
+    //문의 상세 조회
+    @GetMapping("/master/questionDetail/{queSeqno}")
+    public ResponseEntity<Map<String, Object>> getQuestionDetail(@PathVariable Long queSeqno) {
+        Map<String, Object> questionDetail = masterService.getAllQuestionDetail(queSeqno);
+        
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("questionDetail", questionDetail);
+        return ResponseEntity.ok(response);
+    } 
 
-    //메일,통계
+    //문의 답변 등록
+    @PostMapping("/master/registerReply")
+    public ResponseEntity<Map<String, Object>> registerQuestionReply(@RequestBody QuestionCommentDTO commentDTO) throws Exception {
+        Long queSeqno = commentDTO.getQuestionSeqno();
+        //Question 찾기
+        QuestionEntity questionEntity = masterService.getQuestionSeqno(queSeqno);
+        commentDTO.setQueSeqno(questionEntity);
+        commentDTO.setEmail(questionEntity.getEmail());
+        //답변 등록
+        masterService.replyQuestion(commentDTO, questionEntity);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "답변이 등록되었습니다.");
+        return ResponseEntity.ok(response);
+    }
+    
+
+    //문의 답변 수정
+    @PutMapping("master/replyUpdate/{questionCommentSeqno}")
+    public ResponseEntity<Map<String, Object>> updateQuestionReply(
+        @PathVariable Long questionCommentSeqno, @RequestBody QuestionCommentDTO questionCommentDTO) throws Exception {
+
+        // QuestionComment 찾기
+        Optional<QuestionCommentEntity> questionCommentEntity = masterService.getQuestionCommentSeqno(questionCommentSeqno);
+
+        // QuestionComment가 존재하지 않으면 에러 처리
+        if (!questionCommentEntity.isPresent()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "해당 답변이 존재하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        // QuestionComment 수정: DTO를 Entity에 맞게 수정
+        QuestionCommentEntity entityToUpdate = questionCommentEntity.get();
+        entityToUpdate.setComContent(questionCommentDTO.getComContent());
+        entityToUpdate.setComDate(LocalDateTime.now());
+
+        // 수정된 엔티티를 저장
+        masterService.saveQuestionComment(entityToUpdate); 
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "답변이 수정되었습니다.");
+        return ResponseEntity.ok(response);
+    }
+
+    //문의 답변 삭제
+    @DeleteMapping("/master/replyDelete/{questionCommentSeqno}")
+    public ResponseEntity<Map<String, Object>> deleteQuestionReply(
+        @PathVariable Long questionCommentSeqno) throws Exception {
+        try {
+            //답변 삭제
+            masterService.deleteByQuestionCommentSeqno(questionCommentSeqno);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "답변이 삭제되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+           // 실패 시 응답
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "답변 삭제 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        
+    }
 
 
-   
+    //리뷰관리,리뷰신고관리 
     }
 

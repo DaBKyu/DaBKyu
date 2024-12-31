@@ -40,7 +40,7 @@ public class WebSecurityConfig {
     //스프링 시큐리티 적용 제외 대상 설정을 빈에 등록
     @Bean
     WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/images/**", "/css/**", "/js/**", "/product/images/**", "/product/thumbnails/**");
+        return (web) -> web.ignoring().requestMatchers("/images/**", "/css/**", "/js/**", "/product/images/**", "/product/thumbnails/**","/question/images/**");
     }
 
     //스프링 시큐리티 필터 빈에 등록
@@ -89,7 +89,8 @@ public class WebSecurityConfig {
             .requestMatchers("/mypage/**").hasAnyAuthority("USER", "MASTER")
             .requestMatchers("/shop/**").permitAll()
             .requestMatchers("/purchase/**").hasAnyAuthority("USER", "MASTER")
-            .requestMatchers("/master/**").hasAnyAuthority("MASTER")
+            //.requestMatchers("/master/**").hasAnyAuthority("MASTER")
+            .requestMatchers("/master/**").permitAll()
             .anyRequest().authenticated()
         );
 

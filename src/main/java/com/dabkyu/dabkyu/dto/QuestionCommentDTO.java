@@ -28,7 +28,6 @@ public class QuestionCommentDTO {
     public QuestionCommentDTO(QuestionCommentEntity entity) {
         this.questionCommentSeqno = entity.getQuestionCommentSeqno();
         this.queSeqno = entity.getQueSeqno();
-        this.email = entity.getEmail();
         this.comContent = entity.getComContent();
         this.comDate = entity.getComDate();
     }
@@ -37,7 +36,6 @@ public class QuestionCommentDTO {
         QuestionCommentEntity entity = QuestionCommentEntity.builder()
                                                             .questionCommentSeqno(dto.getQuestionCommentSeqno())
                                                             .queSeqno(dto.getQueSeqno())
-                                                            .email(dto.getEmail())
                                                             .comContent(dto.getComContent())
                                                             .comDate(dto.getComDate())
                                                             .build();

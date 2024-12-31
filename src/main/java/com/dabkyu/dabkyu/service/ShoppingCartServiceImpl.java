@@ -385,7 +385,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
 
         // 주문 상태 변경 (결제 취소)
-        orderInfo.setOrderStatus("결제 취소 신청");
+        orderInfo.setOrderStatus("취소 신청");
         orderInfoRepository.save(orderInfo);
     }
 

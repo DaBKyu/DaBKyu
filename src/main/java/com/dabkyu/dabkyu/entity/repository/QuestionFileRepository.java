@@ -18,5 +18,9 @@ public interface QuestionFileRepository extends JpaRepository<QuestionFileEntity
     public List<QuestionFileEntity> findByEmail(@Param("email") String email);
 
     public List<QuestionFileEntity> findByQueSeqno(QuestionEntity queSeqno);
+
+    //questionEntity로 questionFile찾기
+    @Query("SELECT qf FROM questionFile qf WHERE qf.queSeqno =:questionEntity")
+    public List<QuestionFileEntity> findQuestionFileByQueSeqno(@Param("questionEntity") QuestionEntity questionEntity);
     
 }

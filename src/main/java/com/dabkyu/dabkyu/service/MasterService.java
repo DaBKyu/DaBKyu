@@ -7,6 +7,10 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import com.dabkyu.dabkyu.dto.Category1DTO;
 import com.dabkyu.dabkyu.dto.Category2DTO;
 import com.dabkyu.dabkyu.dto.Category3DTO;
@@ -48,6 +52,7 @@ import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.ProductFileEntity;
 import com.dabkyu.dabkyu.entity.ProductInfoFileEntity;
 import com.dabkyu.dabkyu.entity.ProductOptionEntity;
+import com.dabkyu.dabkyu.entity.QuestionCommentEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
 import com.dabkyu.dabkyu.entity.ReportEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
@@ -156,11 +161,14 @@ public interface MasterService {
     //문의 queSeqno가져오기
     public QuestionEntity getQuestionSeqno(Long queSeqno) throws Exception;
 
+    //답변 questionCommentSeqno가져오기
+    public Optional<QuestionCommentEntity> getQuestionCommentSeqno(Long questionCommentSeqno) throws Exception;
+
     //문의 답변
     public void replyQuestion(QuestionCommentDTO commentDTO, QuestionEntity questionEntity) throws Exception;
 
     //문의 수정
-    public void replyQuestionModify(QuestionCommentDTO comment) throws Exception;
+    public void saveQuestionComment(QuestionCommentEntity questionCommentEntity) throws Exception;
 
     //문의 삭제
     public void deleteQuestion(Long queSeqno) throws Exception;
@@ -169,7 +177,7 @@ public interface MasterService {
     public void deleteQuestionFile(Long queSeqno) throws Exception;
 
     //문의 답변 삭제   
-    public void deleteQueComment(QuestionEntity queSeqno) throws Exception;
+    public void deleteByQuestionCommentSeqno(Long questionCommentSeqno) throws Exception;
 
     //카테고리 리스트
     public List<Category1Entity> getAllCategories1();
@@ -404,5 +412,14 @@ public interface MasterService {
 
     //주문 상세 조회
     public Map<String, Object> getAllOrderDetail(Long orderSeqno);
+
+    //주문 상태 변경
+    public void changeOrderStatus(Long orderSeqno, String newOrderStatus);
+
+    //문의 리스트 조회
+    public List<QuestionEntity> getAllQuestions();
+
+    //문의 상세 조회
+    public Map<String, Object> getAllQuestionDetail(Long queSeqno);
 
 }

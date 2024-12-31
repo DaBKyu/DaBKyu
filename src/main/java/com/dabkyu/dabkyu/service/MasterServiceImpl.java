@@ -485,7 +485,9 @@ public class MasterServiceImpl implements MasterService {
         return products;
     }
 
+    
     //문의 리스트
+    
     @Override
     public Page<Map<String, Object>> questionList(int pageNum, int postNum, String queType) throws Exception{
         PageRequest pageRequest = PageRequest.of(pageNum - 1, postNum, Sort.by(Direction.DESC, "queDate"));
@@ -527,12 +529,18 @@ public class MasterServiceImpl implements MasterService {
         return questionRepository.findById(queSeqno).get();
     }
 
+    //답변 questionCommentSeqno가져오기
+    @Override
+    public Optional<QuestionCommentEntity> getQuestionCommentSeqno(Long questionCommentSeqno) throws Exception {
+        return questionCommentRepository.findById(questionCommentSeqno);
+
+    }
+
     //문의 답변
     @Override
     public void replyQuestion(QuestionCommentDTO commentDTO, QuestionEntity questionEntity) throws Exception{
         QuestionCommentEntity commentEntity = QuestionCommentEntity.builder()
                                                 .queSeqno(questionEntity) 
-                                                .email(commentDTO.getEmail())
                                                 .comContent(commentDTO.getComContent())
                                                 .comDate(LocalDateTime.now()) 
                                                 .build();
@@ -542,19 +550,28 @@ public class MasterServiceImpl implements MasterService {
 
     //문의 수정
     @Override
+    public void saveQuestionComment(QuestionCommentEntity questionCommentEntity) throws Exception {
+    questionCommentRepository.save(questionCommentEntity);
+    }
+
+
+    /* 
+    //문의 수정
+    @Override
     public void replyQuestionModify(QuestionCommentDTO comment) throws Exception{
         QuestionCommentEntity questionCommentEntity = questionCommentRepository.findByQueSeqno(comment.getQueSeqno());
         questionCommentEntity.setComContent(comment.getComContent());
         questionCommentEntity.setComDate(LocalDateTime.now());
         questionCommentRepository.save(questionCommentEntity);
     }
+    */
 
     //문의 삭제
     @Override
     public void deleteQuestion(Long queSeqno) throws Exception{
         questionRepository.deleteById(queSeqno);
     }
-
+   
     //문의 첨부파일 삭제
     @Override 
     public void deleteQuestionFile(Long queSeqno) throws Exception{
@@ -568,14 +585,21 @@ public class MasterServiceImpl implements MasterService {
             }
             */
             questionFileRepository.delete(questionFile);
-        }
+        }    
     }
 
-    //문의 답변 삭제   
+    //문의 답변 삭제
+    public void deleteByQuestionCommentSeqno(Long questionCommentSeqno) throws Exception {
+        QuestionCommentEntity questionCommentEntity = questionCommentRepository.findById(questionCommentSeqno).get();
+        questionCommentRepository.delete(questionCommentEntity);
+
+    }
+    
+    /*//문의 답변 삭제   
     @Override
     public void deleteQueComment(QuestionEntity queSeqno) throws Exception {
         questionCommentRepository.deleteByQueSeqno(queSeqno);
-    }
+    } */  
 
     //카테고리 리스트
     @Override
@@ -931,9 +955,6 @@ public class MasterServiceImpl implements MasterService {
         return noOrderMembers.contains(member);
     }
     
-
-    
-
     //쿠폰 코드 랜덤 생성
     private String generateCouponCode() {
         return UUID.randomUUID().toString().substring(0, 15);
@@ -1077,7 +1098,7 @@ public class MasterServiceImpl implements MasterService {
         OrderInfoEntity orderInfo = orderInfoRepository.findByOrderSeqno(orderDetail.getOrderSeqno());
 
         // 결제 취소 또는 환불에 따른 주문 상태 변경
-        String statusMessage = isRefund ? "환불 완료" : "결제 취소 완료";
+        String statusMessage = isRefund ? "환불 완료" : "취소 완료";
         if (orderInfo.getOrderStatus().equals(statusMessage)) {
             throw new RuntimeException("이미 " + statusMessage + "된 주문입니다.");
         }
@@ -1744,6 +1765,35 @@ public class MasterServiceImpl implements MasterService {
         return orderInfoDetail;
     }
 
+    //주문 상태 변경
+    @Override
+    public void changeOrderStatus(Long orderSeqno, String newOrderStatus) {
+        OrderInfoEntity orderInfo = orderInfoRepository.findById(orderSeqno).get();
+        orderInfo.setOrderStatus(newOrderStatus);
+        orderInfoRepository.save(orderInfo);
+    }
+
+    // 문의 리스트 조회
+    @Override
+    public List<QuestionEntity> getAllQuestions() {
+        return questionRepository.findAll();
+    }
+
+    //문의 상세 조회
+    @Override
+    public Map<String, Object> getAllQuestionDetail(Long queSeqno) {
+        Map<String, Object> questionDetail = new HashMap<>();
+        QuestionEntity questionEntity = questionRepository.findById(queSeqno).get();
+        //questionEntity로 questionFileList 찾기
+        List<QuestionFileEntity> questionFileList = questionFileRepository.findQuestionFileByQueSeqno(questionEntity);
+        //questionEntity로 questionCommentList 찾기
+        List<QuestionCommentEntity> questionCommentList = questionCommentRepository.findQuestionCommentByQueSeqno(questionEntity);
+
+        questionDetail.put("question", questionEntity);
+        questionDetail.put("questionFiles", questionFileList);
+        questionDetail.put("questionComments", questionCommentList);
+        return questionDetail;
+    }
 
 }
 

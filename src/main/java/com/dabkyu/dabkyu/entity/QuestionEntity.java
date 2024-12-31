@@ -39,6 +39,11 @@ public class QuestionEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name="product_seqno", nullable = false)
+    private ProductEntity productSeqno;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="email",nullable=false)
     private MemberEntity email;
 
@@ -54,6 +59,5 @@ public class QuestionEntity {
     @Column(name="que_date", nullable=false)
 	private LocalDateTime queDate;
 
-    @Column(name="que_type_num", nullable=false)
-	private int queTypeNum;
+    
 }

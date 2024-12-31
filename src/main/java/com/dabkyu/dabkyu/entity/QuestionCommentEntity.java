@@ -42,11 +42,6 @@ public class QuestionCommentEntity {
 	@JoinColumn(name="que_seqno", nullable = false)
 	private QuestionEntity queSeqno;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JoinColumn(name="email", nullable = false)
-	private MemberEntity email;
-
     @Column(name="com_content",length = 2000, nullable=false)
 	private String comContent;
 
