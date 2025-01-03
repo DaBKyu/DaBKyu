@@ -58,5 +58,8 @@ public class ReportEntity {
 
     @Column(name="report_date",nullable=false)
 	private LocalDateTime reportDate;
+
+    @Column(name="process_status", length=2, nullable=true)
+    private String processStatus;
     
 }

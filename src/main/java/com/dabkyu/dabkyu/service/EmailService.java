@@ -1,6 +1,7 @@
 package com.dabkyu.dabkyu.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,20 +29,26 @@ public interface EmailService {
     //파일 저장
     public void saveEmailFile(Long maxSeqno, MultipartFile[] mailFileList);
 
+    //메일 리스트 조회
+    public List<EmailEntity> getAllMails();
+
+    //메일 상세 조회
+    public Map<String, Object> getAllEmailDetail(Long emailSeqno);
+    
     // 메일 발송 내역 조회
-	public Page<EmailEntity> list(int pageNum, int postNum, String keyword) throws Exception;
+	//public Page<EmailEntity> list(int pageNum, int postNum, String keyword) throws Exception;
 
 	//메일 상세 내용 보기
-	public EmailDTO view(Long emailSeqno) throws Exception;
+	//public EmailDTO view(Long emailSeqno) throws Exception;
 	
 	//메일 내용 이전 보기
-	public Long pre_seqno(Long emailSeqno,String keyword) throws Exception;
+	//public Long pre_seqno(Long emailSeqno,String keyword) throws Exception;
 	
 	//메일 내용 다음 보기
-	public Long next_seqno(Long emailSeqno,String keyword) throws Exception;
+	//public Long next_seqno(Long emailSeqno,String keyword) throws Exception;
 
     //첨부파일 목록 보기
-	public List<EmailFileDTO> fileListView(Long emailSeqno) throws Exception;
+	//public List<EmailFileDTO> fileListView(Long emailSeqno) throws Exception;
 
     //회원가입 인증코드 메일 발송
     public void sendAuthCode(String email, String authCode) throws Exception;

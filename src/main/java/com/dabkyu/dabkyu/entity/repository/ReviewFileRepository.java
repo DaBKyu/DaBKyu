@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.dabkyu.dabkyu.entity.QuestionCommentEntity;
+import com.dabkyu.dabkyu.entity.QuestionEntity;
+import com.dabkyu.dabkyu.entity.QuestionFileEntity;
 import com.dabkyu.dabkyu.entity.ReviewEntity;
 import com.dabkyu.dabkyu.entity.ReviewFileEntity;
 
@@ -19,4 +22,10 @@ public interface ReviewFileRepository extends JpaRepository<ReviewFileEntity, Lo
 
     // 리뷰 상세 페이지에서 첨부된 파일 목록 보기
     public List<ReviewFileEntity> findByReviewSeqno(ReviewEntity review);
+
+    //reviewEntity로 reviewFile찾기
+    @Query("SELECT rf FROM reviewFile rf WHERE rf.reviewSeqno =:reviewEntity")
+    public List<ReviewFileEntity> findReviewFileByReviewSeqno(@Param("reviewEntity") ReviewEntity reviewEntity);
+    
+   
 }

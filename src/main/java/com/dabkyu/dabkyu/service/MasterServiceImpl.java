@@ -1091,7 +1091,7 @@ public class MasterServiceImpl implements MasterService {
     // 결제 취소 처리 및 환불 처리(isRefund가 true면 환불, false면 결제취소 처리)
     @Override
     @Transactional
-    public void cancelOrRefundOrder(Long orderDetailSeqno, Long couponSeqno, int point, boolean isRefund) {
+    public void cancelOrRefundOrder(Long orderDetailSeqno, Long usedCouponSeqno, int usedPoint, boolean isRefund) {
         OrderDetailEntity orderDetail = orderDetailRepository.findById(orderDetailSeqno).get();
 
         // 주문 상세의 orderSeqno를 사용해서 OrderInfoEntity 조회
@@ -1124,6 +1124,10 @@ public class MasterServiceImpl implements MasterService {
             // 주문된 상품의 재고 복구
             ProductEntity product = orderProduct.getProductSeqno();
             product.setStockAmount(product.getStockAmount() + orderProduct.getAmount());
+
+            // OrderProduct 제거
+            orderProductRepository.delete(orderProduct);
+            
             productRepository.save(product);
         } 
 
@@ -1136,20 +1140,22 @@ public class MasterServiceImpl implements MasterService {
 
         // 사용한 포인트 및 쿠폰 복구 처리
         // 포인트 복구 처리
-        if (point != 0) {
-            member.setPoint(member.getPoint() + point); // 환불시 포인트 복구
+        if (usedPoint != 0) {
+            member.setPoint(member.getPoint() + usedPoint); // 환불시 포인트 복구
         }
 
-        // 쿠폰 복원 처리 (만료처리된 쿠폰 복원)
-        if (couponSeqno != null) {
-            //쿠폰 상태 업데이트 (사용 가능 상태로 변경)
-            //CouponEntity coupon = couponRepository.findById(couponSeqno).get();
-            //coupon.setIsExpire("N");
+        // 쿠폰 복구 처리
+        if (usedCouponSeqno != null) {
 
-            //membercoupon으로 변경
-            MemberCouponEntity memberCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqno(couponSeqno);
-            memberCoupon.setIsExpire("N");
+            // 쿠폰 정보 조회
+            MemberCouponEntity memberCoupon = memberCouponRepository.findByCouponSeqno_CouponSeqno(usedCouponSeqno);
+
+            // 쿠폰 상태 업데이트 (사용 가능 상태로 변경)
+            memberCoupon.setIsExpire("N"); // 만료 처리된 쿠폰을 다시 활성화
+            memberCouponRepository.save(memberCoupon);
+
         }
+
         memberRepository.save(member);  
 
         //회원 알림 설정
@@ -1794,6 +1800,76 @@ public class MasterServiceImpl implements MasterService {
         questionDetail.put("questionComments", questionCommentList);
         return questionDetail;
     }
+
+    //리뷰 리스트 조회
+    @Override
+    public List<ReviewEntity> getAllReviews() {
+        return reviewRepository.findAll();
+    }
+
+    //리뷰 상세 조회
+    @Override
+    public Map<String, Object> getAllReviewDetail(Long reviewSeqno) {
+        Map<String, Object> reviewDetail = new HashMap<>();
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewSeqno).get();
+        //reviewEntity로 reviewFileList 찾기
+        List<ReviewFileEntity> reviewFileList = reviewFileRepository.findReviewFileByReviewSeqno(reviewEntity);
+        //reviewEntity로 report 찾기
+        List<ReportEntity> reportList = reportRepository.findByReviewSeqno(reviewEntity);
+        reviewDetail.put("review", reviewEntity);
+        reviewDetail.put("reviewFiles", reviewFileList);
+        reviewDetail.put("report",reportList);
+        return reviewDetail;
+    }
+
+     //리뷰 삭제
+     @Override
+     public void deleteByReviewSeqno(Long reviewSeqno) throws Exception {
+        ReviewEntity reviewEntity = reviewRepository.findById(reviewSeqno).get();
+        reviewRepository.delete(reviewEntity);
+    }
+
+    //리뷰신고 리스트 조회
+    @Override
+    public List<ReportEntity> getAllReports() {
+        return reportRepository.findAll();
+    }
+
+    //리뷰신고 상세 조회
+    @Override
+    public Map<String, Object> getAllReportDetail(Long reportSeqno) {
+        Map<String, Object> reportDetail = new HashMap<>();
+        
+        ReportEntity reportEntity = reportRepository.findById(reportSeqno).get();
+
+        //reportEntity로 reviewFile찾기 
+        List<ReviewFileEntity> reviewFileList = reviewFileRepository.findReviewFileByReviewSeqno(reportEntity.getReviewSeqno());
+        
+        reportDetail.put("report", reportEntity);
+        reportDetail.put("reviewFiles", reviewFileList);
+        return reportDetail;
+    }
+
+
+    //리뷰신고 처리여부 변경
+    @Override
+    public void updateReportProcessStatus(Long reportSeqno,String newProcessStatus) {
+        ReportEntity report = reportRepository.findById(reportSeqno).get();
+
+        report.setProcessStatus(newProcessStatus);
+        
+        // 수정된 회원 정보를 저장
+        reportRepository.save(report);
+    }
+
+    //메일 발송 내역 조회
+
+    //메일 발송
+
+    //통계(매출,가입,방문)
+
+    
+
 
 }
 

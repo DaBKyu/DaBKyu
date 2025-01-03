@@ -42,15 +42,20 @@ import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
 import com.dabkyu.dabkyu.dto.QuestionCommentDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
+import com.dabkyu.dabkyu.dto.ReportDTO;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
 import com.dabkyu.dabkyu.entity.CouponEntity;
+import com.dabkyu.dabkyu.entity.EmailEntity;
 import com.dabkyu.dabkyu.entity.MemberEntity;
 import com.dabkyu.dabkyu.entity.OrderInfoEntity;
 import com.dabkyu.dabkyu.entity.ProductEntity;
 import com.dabkyu.dabkyu.entity.QuestionCommentEntity;
 import com.dabkyu.dabkyu.entity.QuestionEntity;
+import com.dabkyu.dabkyu.entity.ReportEntity;
+import com.dabkyu.dabkyu.entity.ReviewEntity;
+import com.dabkyu.dabkyu.service.EmailService;
 import com.dabkyu.dabkyu.service.MasterService;
 import com.dabkyu.dabkyu.service.ProductService;
 
@@ -66,6 +71,7 @@ public class RestTestController{
 
     private final MasterService masterService; 
     private final ProductService productService;
+    private final EmailService emailService;
     private final ObjectMapper objectMapper;
 
     //관리자페이지 메인 오늘 방문자 수
@@ -1051,9 +1057,40 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
         }
     }
     
-    //주문 취소
-    
-    //주문 환불
+    //주문 취소 처리
+    @PostMapping("/master/paymentCancel")
+    public ResponseEntity<String> getCancelOrder(
+        @RequestParam Long orderDetailSeqno,
+        @RequestParam(value = "usedCouponSeqno", required = false) Long usedCouponSeqno,
+        @RequestParam(value = "usedPoint", required = false) int usedPoint
+    ) {
+        try {
+        masterService.cancelOrRefundOrder(orderDetailSeqno,usedCouponSeqno, usedPoint, false);
+
+        return ResponseEntity.ok("주문 취소 처리를 하였습니다.");
+        }catch(Exception e) {
+        
+            return ResponseEntity.status(400).body("주문 취소 처리에 실패했습니다: " + e.getMessage());
+        }
+        
+    }
+  
+    //주문 환불 처리
+    @PutMapping("/master/paymentRefund")
+    public ResponseEntity<String> getRefundOrder(
+        @RequestParam Long orderDetailSeqno,
+        @RequestParam(value = "usedCouponSeqno", required = false) Long usedCouponSeqno,
+        @RequestParam(value = "usedPoint", required = false) int usedPoint
+    ) {
+        try {
+        masterService.cancelOrRefundOrder(orderDetailSeqno, usedCouponSeqno, usedPoint, true);
+
+        return ResponseEntity.ok("주문 환불 처리를 하였습니다.");
+        }catch(Exception e) {
+        
+            return ResponseEntity.status(400).body("주문 환불 처리에 실패했습니다: " + e.getMessage());
+        }
+    }  
 
 
     //문의 관리
@@ -1143,7 +1180,103 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
         
     }
 
+    //리뷰 리스트 조회
+    @GetMapping("/master/reviewList")
+    public ResponseEntity<Map<String, Object>> getReviewList() {
+        List<ReviewEntity> reviews = masterService.getAllReviews();
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("reviews", reviews);
+        return ResponseEntity.ok(response);
+    }
 
-    //리뷰관리,리뷰신고관리 
+    //리뷰 상세 조회
+    @GetMapping("/master/reviewDetail/{reviewSeqno}")
+    public ResponseEntity<Map<String, Object>> getReviewDetail(@PathVariable Long reviewSeqno) {
+        Map<String, Object> reviewDetail = masterService.getAllReviewDetail(reviewSeqno);
+        
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("reviewDetail", reviewDetail);
+        return ResponseEntity.ok(response);
+    } 
+
+    //리뷰 삭제
+    @DeleteMapping("/master/reviewDelete/{reviewSeqno}") 
+    public ResponseEntity<Map<String, Object>> deleteReview(
+        @PathVariable Long reviewSeqno) throws Exception {
+        try {
+            //리뷰 삭제
+            masterService.deleteByReviewSeqno(reviewSeqno);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "리뷰가 삭제되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+           // 실패 시 응답
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "리뷰 삭제 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
+    //리뷰신고 리스트 조회
+    @GetMapping("/master/reportList")
+    public ResponseEntity<Map<String, Object>> getReportList() {
+        List<ReportEntity> reports = masterService.getAllReports();
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("reports", reports);
+        return ResponseEntity.ok(response);
+    }
+
+    //리뷰신고 상세 조회 
+    @GetMapping("/master/reportDetail/{reportSeqno}")
+    public ResponseEntity<Map<String, Object>> getReportDetail(@PathVariable Long reportSeqno) {
+        Map<String, Object> reportDetail = masterService.getAllReportDetail(reportSeqno);
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("reportDetail", reportDetail);
+        return ResponseEntity.ok(response);
+    } 
+
+    //리뷰신고 처리여부 변경
+    @PutMapping("/master/updateReportProcess/{reportSeqno}")
+    public ResponseEntity<String> updateReportProcessStatus(@PathVariable("reportSeqno") Long reportSeqno, @RequestBody ReportDTO reportDTO) {
+        try {
+            masterService.updateReportProcessStatus(reportSeqno,reportDTO.getProcessStatus());
+            return ResponseEntity.ok("리뷰신고 처리여부가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("리뷰신고 처리여부 수정에 실패하였습니다: " + e.getMessage());
+        }
+    }
+
+    //메일 리스트 조회
+    @GetMapping("/master/mailList")
+    public ResponseEntity<Map<String, Object>> getMailList() {
+        List<EmailEntity> mails = emailService.getAllMails();
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("mails", mails);
+        return ResponseEntity.ok(response);
+    }
+
+    //메일 상세 조회
+    @GetMapping("/master/mailDetail/{emailSeqno}")
+    public ResponseEntity<Map<String, Object>> getEmailDetail(@PathVariable Long emailSeqno) {
+        Map<String, Object> emailDetail = emailService.getAllEmailDetail(emailSeqno);
+        // 결과 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("emailDetail", emailDetail);
+        return ResponseEntity.ok(response);
+    } 
+
+
+    //메일 발송
+    
+    //통계(매출,가입,방문)
+
+
     }
 

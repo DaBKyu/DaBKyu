@@ -242,6 +242,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                                                           .resAddress(orderInfo.getResAddress())
                                                           .resTelno(orderInfo.getResTelno())
                                                           .totalPrice((Integer) calculateResult.get("totalPrice"))
+                                                          .usedPoint((Integer) calculateResult.getOrDefault("usedPoint", 0)) // 사용된 포인트가 없으면 0으로 설정
+                                                          .usedCouponSeqno((Long) calculateResult.getOrDefault("usedCouponSeqno", 0L)) // 사용된 쿠폰이 없으면 0으로 설정
                                                           .deliveryPrice(calculateResult.get("isFree")=="Y"?0:3000)
                                                           .build();
         orderInfoRepository.save(orderInfoEntity);
@@ -341,12 +343,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     // 총 금액에서 포인트와 쿠폰 할인액 차감
     int amountAfterDiscounts = totalPrice + totalShippingFee - couponDiscount - point;
 
+    // 최종 결제 금액 계산
+    int totalPriceToSave = totalPrice - couponDiscount - point + totalShippingFee;
+
+
     Map<String, Object> priceInfo = new HashMap<>();
-    priceInfo.put("totalPrice", totalPrice);
+    priceInfo.put("totalPrice", totalPriceToSave);
     priceInfo.put("totalShippingFee", totalShippingFee);
     priceInfo.put("couponDiscount", couponDiscount);
     priceInfo.put("amountAfterDiscounts", amountAfterDiscounts);
-    //priceInfo.put("isFree", isFree);
+    priceInfo.put("usedPoint", point); // 사용된 포인트 추가
+    priceInfo.put("usedCouponSeqno", couponSeqno); // 사용된 쿠폰 시퀀스 추가
 
     return priceInfo;
 }

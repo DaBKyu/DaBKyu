@@ -422,4 +422,22 @@ public interface MasterService {
     //문의 상세 조회
     public Map<String, Object> getAllQuestionDetail(Long queSeqno);
 
+    //리뷰 리스트 조회
+    public List<ReviewEntity> getAllReviews();
+
+    //리뷰 상세 조회
+    public Map<String, Object> getAllReviewDetail(Long reviewSeqno);
+
+    //리뷰 삭제   
+    public void deleteByReviewSeqno(Long reviewSeqno) throws Exception;
+
+    //리뷰신고 리스트 조회
+    public List<ReportEntity> getAllReports();
+
+    //리뷰신고 상세 조회
+    public Map<String, Object> getAllReportDetail(Long reportSeqno);
+
+    //리뷰신고 처리여부 변경
+    public void updateReportProcessStatus(Long reportSeqno,String newProcessStatus);
+
 }

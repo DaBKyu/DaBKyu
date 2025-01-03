@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.core.io.ByteArrayResource;
@@ -192,16 +194,16 @@ public class EmailServiceImpl implements EmailService {
             }
         }
 
-    // 이메일 저장
-    private void saveEmail(String title, String content) {
-        EmailEntity emailEntity = EmailEntity.builder()
-                                             .emailTitle(title)
-                                             .emailContent(content)
-                                             .emailSendDate(LocalDateTime.now())
-                                             .build();
-        emailEntity = emailRepository.save(emailEntity);
-        System.out.println("이메일 저장");
-    }
+        // 이메일 저장
+        private void saveEmail(String title, String content) {
+            EmailEntity emailEntity = EmailEntity.builder()
+                                                .emailTitle(title)
+                                                .emailContent(content)
+                                                .emailSendDate(LocalDateTime.now())
+                                                .build();
+            emailEntity = emailRepository.save(emailEntity);
+            System.out.println("이메일 저장");
+        }
 
     // maxSeqno 찾기
     @Override
@@ -258,8 +260,27 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    // 메일 발송 내역 조회
+    //메일 리스트 조회
     @Override
+    public List<EmailEntity> getAllMails() {
+        List<EmailEntity> emailEntity = emailRepository.findAll();
+        return emailEntity;
+    }
+
+    //메일 상세 조회
+    @Override
+    public Map<String, Object> getAllEmailDetail(Long emailSeqno) {
+        Map<String, Object> emailDetail = new HashMap<>();
+        EmailEntity emailEntity = emailRepository.findById(emailSeqno).get();
+        // emailEntity로 emailFile 찾기
+        List<EmailFileEntity> emailFiles = emailFileRepository.findEmailFilesByEmailSeqno(emailEntity);
+        emailDetail.put("email", emailEntity);
+        emailDetail.put("emailFiles", emailFiles);
+        return emailDetail;
+    }
+
+    // 메일 발송 내역 조회
+    /*@Override
     public Page<EmailEntity> list(int pageNum, int postNum, String keyword) throws Exception {
         //페이징 기준을 설정 --> 시작점, 증가분, 정렬 방식
         // (시작페이지 --> 0부터 시작, 한 화면에 보이는 행의 수, 정렬기준(Sort.by)
@@ -272,6 +293,7 @@ public class EmailServiceImpl implements EmailService {
     public EmailDTO view(Long emailSeqno) throws Exception {
         return emailRepository.findById(emailSeqno).map(view -> new EmailDTO(view)).get();
     }
+        
 
     //메일 내용 이전 보기
     @Override
@@ -293,6 +315,7 @@ public class EmailServiceImpl implements EmailService {
         emailFileRepository.findByEmailSeqno(emailRepository.findById(emailSeqno).get()).stream().forEach(list-> fileDTOs.add(new EmailFileDTO(list)));
         return fileDTOs;
     }
+    */
 
     //회원가입 인증코드 메일 발송
     @Override

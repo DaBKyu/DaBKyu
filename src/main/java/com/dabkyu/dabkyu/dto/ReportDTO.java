@@ -26,6 +26,7 @@ public class ReportDTO {
 	private String reportContent;
 	private String reportSummary;
 	private LocalDateTime reportDate;
+    private String processStatus;
 
     public ReportDTO(ReportEntity entity) {
         this.reportSeqno = entity.getReportSeqno();
@@ -35,6 +36,7 @@ public class ReportDTO {
         this.reportContent = entity.getReportContent();
         this.reportSummary = entity.getReportSummary();
         this.reportDate = entity.getReportDate();
+        this.processStatus = entity.getProcessStatus();
     }
 
     public ReportEntity dtoToEntity(ReportDTO dto) {
@@ -46,6 +48,7 @@ public class ReportDTO {
                                                               .reportContent(dto.getReportContent())
                                                               .reportSummary(dto.getReportSummary())
                                                               .reportDate(dto.getReportDate())
+                                                              .processStatus(dto.getProcessStatus())
                                                               .build();
         return entity;
     }

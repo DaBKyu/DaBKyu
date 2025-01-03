@@ -27,6 +27,8 @@ public class OrderInfoDTO {
 	private String resZipcode;
 	private String resTelno;
 	private int totalPrice;
+    private int usedPoint;
+    private Long usedCouponSeqno;
     private int deliveryPrice;
 
     public OrderInfoDTO(OrderInfoEntity entity) {
@@ -42,6 +44,8 @@ public class OrderInfoDTO {
         this.resZipcode = entity.getResZipcode();
         this.resTelno = entity.getResTelno();
         this.totalPrice = entity.getTotalPrice();
+        this.usedPoint = entity.getUsedPoint();
+        this.usedCouponSeqno = entity.getUsedCouponSeqno();
         this.deliveryPrice = entity.getDeliveryPrice();
     }
 
@@ -59,6 +63,8 @@ public class OrderInfoDTO {
                                                 .resZipcode(dto.getResZipcode())
                                                 .resTelno(dto.getResTelno())
                                                 .totalPrice(dto.getTotalPrice())
+                                                .usedPoint(dto.getUsedPoint())
+                                                .usedCouponSeqno(dto.getUsedCouponSeqno())
                                                 .deliveryPrice(dto.getDeliveryPrice())
                                                 .build();
          return entity;                                        

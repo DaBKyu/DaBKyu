@@ -799,6 +799,7 @@ public class MasterController{
     }
     */
 
+    /*
     //리뷰 리스트 화면 
     @GetMapping("/master/reviewList")
     public void getReviewList(Model model, @RequestParam("page") int pageNum, 
@@ -874,6 +875,7 @@ public class MasterController{
 
         return "redirect:/master/reviewList?page=1";
     }
+         */
 
     //쿠폰 리스트보기 
     /*
@@ -1010,29 +1012,31 @@ public class MasterController{
         return masterService.getCancelAndRefundDetails();
     }
 
+    /*
     // 결제 취소 처리
     @PostMapping("/master/paymentCancel")
     public String getCancelOrder(
         @RequestParam Long orderDetailSeqno,
-        @RequestParam(value = "couponSeqno", required = false) Long couponSeqno,
-        @RequestParam(value = "point", required = false) int point
+        @RequestParam(value = "usedCouponSeqno", required = false) Long usedCouponSeqno,
+        @RequestParam(value = "usedPoint", required = false) int usedPoint
     ) {
-        masterService.cancelOrRefundOrder(orderDetailSeqno,couponSeqno, point, false);
+        masterService.cancelOrRefundOrder(orderDetailSeqno,usedCouponSeqno, usedPoint, false);
 
         return "{\"message\":\"good\"}";
     }
-  
+        
     // 환불 처리
     @PostMapping("/master/paymentRefund")
     public String getRefundOrder(
         @RequestParam Long orderDetailSeqno,
-	      @RequestParam(value = "couponSeqno", required = false) Long couponSeqno,
-	      @RequestParam(value = "point", required = false) int point
+	      @RequestParam(value = "usedCouponSeqno", required = false) Long usedCouponSeqno,
+	      @RequestParam(value = "usedPoint", required = false) int usedPoint
     ) {
-        masterService.cancelOrRefundOrder(orderDetailSeqno, couponSeqno, point, true);
+        masterService.cancelOrRefundOrder(orderDetailSeqno, usedCouponSeqno, usedPoint, true);
 
         return "{\"message\":\"good\"}";
     }  
+    */
 
     //매출, //통계 (관심카테고리, 찜목록, 구매) 
     @GetMapping("/master/Status")

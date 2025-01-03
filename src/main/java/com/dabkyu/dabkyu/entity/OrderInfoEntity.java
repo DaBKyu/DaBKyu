@@ -72,6 +72,12 @@ public class OrderInfoEntity {
     @Column(name="total_price", nullable=false)
 	private int totalPrice;
 
+	@Column(name = "used_point", nullable = true)
+	private Integer usedPoint;
+
+	@Column(name = "used_coupon_seqno", nullable = true)
+	private Long usedCouponSeqno;
+
 	@Column(name="delivery_price", nullable=false)
 	private int deliveryPrice;
   
