@@ -1,6 +1,6 @@
 # DaBKyu
 
-<div align: "center">
+<div align="center">
   <img src="README_img/Logo.png" alt="예제 이미지" width="300px">
 </div>
 <br>
