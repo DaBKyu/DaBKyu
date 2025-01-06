@@ -59,16 +59,11 @@
 <img src="https://img.shields.io/badge/VS Code-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white"></p>
 
 ## UI 구성
-<div style="display:flex; justify-content: center; gap: 100px">
-<div>
-<h3>메인 페이지</h3>
-  <img src="README_img/main.png" alt="예제 이미지" width="300px">
-</div>
-<div>
-<h3>관리자 페이지</h3>
-  <img src="README_img/admin.png" alt="예제 이미지" width="300px" height="304px">
-</div>
-</div>
+| 메인 페이지 | 관리자 페이지 |
+|-------------|----------------|
+| <img src="README_img/main.png" alt="메인 페이지" width="300px"> | <img src="README_img/admin.png" alt="관리자 페이지" width="300px" height="304px"> |
+
+
 
 ## 주요 기능🔎
 <h3>⭐사용자에 따라 맞춤 제공되는 추천 상품</h3>
@@ -86,13 +81,6 @@
 - 직관적인 디자인과 단순한 구조로 관리자의 웹사이트 운영 편의성을 향상
 
 ## 시스템 구성도 & 사이트맵
-<div style="display:flex; justify-content: center; gap: 100px;">
-<div>
-<h3>시스템 구성도</h3>
-  <img src="README_img/systemDiagram.png" alt="예제 이미지" width="300px">
-</div>
-<div>
-<h3>사이트맵</h3>
-  <img src="README_img/siteMap.png" alt="예제 이미지" width="300px" height="304px">
-</div>
-</div>
+| 시스템 구성도 | 사이트맵 |
+|-------------|----------------|
+| <img src="README_img/systemDiagram.png" alt="시스템 구성도" width="300px"> | <img src="README_img/siteMap.png" alt="사이트맵" width="300px" height="309px"> |
