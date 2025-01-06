@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상품페이지 미리보기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/master.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <!-- 네비게이션 바 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown" aria-expanded="false">상품관리</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="../master/productManage.html">상품관리</a></li>
+                            <li><a class="dropdown-item" href="../master/categoryManage.html">카테고리 관리</a></li>
+                            <li><a class="dropdown-item" href="../master/productUpload.html">상품 등록</a></li>
+                          </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="../master/userManage.html">회원관리</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../master/deliveryManage.html">배송관리</a></li>
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">문의/리뷰목록</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="../master/qnaList.html">문의 목록</a></li>
+                            <li><a class="dropdown-item" href="../master/reviewList.html">리뷰 목록</a></li>
+                          </ul>
+                    </li>
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">메일관리</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="../master/mailList.html">메일 발송 목록</a></li>
+                            <li><a class="dropdown-item" href="../master/mailSend.html">메일 발송</a></li>
+                          </ul>
+                    </li>
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">쿠폰</a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="../master/couponMake.html">쿠폰 생성</a></li>
+                        <li><a class="dropdown-item" href="../master/couponList.html">생성된 쿠폰 리스트</a></li>
+                      </ul>
+                    </li>
+                </ul>
+                <span class="navbar-text">Admin01</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 상품 정보 섹션 -->
+    <div class="container mt-4">
+        <h2 class="mb-4">미리보기
+            <!-- 다시 상품등록/수정 페이지로 이동하는 버튼 -->
+            <button type='button' onclick='window.history.back()' class='btn btn-outline-primary'>작성중 페이지로 이동</button>
+        </h2>
+
+        <div class="row">
+            <!-- 상품 이미지 들어갈곳-->
+            <div class="col-md-6 ">
+                <!-- 메인 상품 이미지 표시 -->
+                <div th:if="${imageUrls.size() > 0}">
+                    <img th:src="@{${imageUrls[0]}}" alt="${product.name}" style='width: 500px; height: 500px;'>
+                </div>
+
+                <!-- 추가 이미지 리스트 (작게 표시) -->
+                <div th:if="${imageUrls.size() > 1}">
+                    <ul style='list-style-type:none; padding-left:0;'>
+                        <li th:each='imageUrl, iterStat : ${imageUrls}' th:if="${iterStat.index > 0}" style='display:inline-block; margin-right:10px;'>
+                            <img th:src="@{${imageUrl}}" alt="" style='width: 50px; height: 50px;'>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 상품 정보 -->
+            <div class="col-md-6">
+                <h3 th:text="${product.name}">상품명</h3>
+
+                <!-- 카테고리 표시 (Category > Subcategory > Detailed Category) -->
+                <p th:text="${product.category.parentCategory.parentCategory.name} + ' > ' + ${product.category.parentCategory.name} + ' > ' + ${product.category.name}">
+                    카테고리>중간카테고리>세부카테고리
+                </p>
+                <p><strong>가격:</strong> 
+                    <span th:text="${#numbers.formatDecimal(product.price, 0)}"></span>원
+                </p>
+
+                <!-- 수량 선택 -->
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">수량</label>
+                    <input type="number" id="quantity" value="1" min="1" max="10" class="form-control w-25">
+                </div>
+
+                <!-- 옵션1 선택 -->
+                <div class="mb-3">
+                    <label for="colorSelect" class="form-label">색상</label>
+                    <select id="colorSelect" class="form-select w-50">
+                        <option value="">색상1</option>
+                        <option value="">색상2</option>
+                        <option value="">색상3</option>
+                    </select>
+                </div>
+
+                <!-- 옵션2 선택 -->
+                <div class="mb-3">
+                    <label for="storageSelect" class="form-label">용량</label>
+                    <select id="storageSelect" class="form-select w-50">
+                        <option value="">용량1</option>
+                        <option value="">용량2</option>
+                        <option value="">용량3</option>
+                    </select>
+                </div>
+
+                <!-- 옵션들 추가될곳-->
+
+                <!-- 추가 상품 구매-->
+
+                <!-- 기타 옵션 -->
+                <div class="mb-3">
+                    <p><strong>재고 수량:</strong> 
+                        <span th:text="${product.stockQuantity}"></span>
+                    </p>
+
+                    <p><strong>무료배송 여부:</strong> 
+                        <span th:text="${product.isFreeShipping ? '예' : '아니오'}"></span>
+                    </p>
+
+                    <p><strong>제품 숨김 여부:</strong> 
+                        <span th:text="${product.isHidden ? '숨김' : '공개'}"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상품 상세 정보 -->
+        <div class="mt-5 border-top pt-3">
+            <h4>상품상세내용</h4>
+            <!-- 제품 설명-->
+            <div th:text="${product.description}">
+                상품 설명
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

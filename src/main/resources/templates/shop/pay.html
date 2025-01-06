@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>상품 구매 페이지</title>
+<link rel="stylesheet" href="/css/board.css">
+<link rel="stylesheet" href="/css/shopHeader.css">
+<style>
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-top: 20px; /* 위쪽 여백 */
+    margin-right: 20%; /* 오른쪽 여백 */
+}
+
+.center-container {
+    display: flex;
+    justify-content: center; /* 가로 가운데 정렬 */
+    height: 100vh;          /* 화면 전체 높이 */
+    box-sizing: border-box; /* 패딩 포함 높이 계산 */
+}
+</style>
+</head>
+<body>
+    <nav>
+        <div style="display: flex; align-items: center; width: 100%;">
+            <p style="margin:auto; font-size: 20px;">주문/결제</p>
+        </div>
+    </nav>
+    <div>
+     <div class="flex-container" style="align-items: center;">
+        <div class="rectangle2" style="width: 200px; height: 100px;">상품 이미지</div>
+        <div style="margin-left: 20px;">
+            <div style="font-size: 20px; border: 1px solid #e3e3e3; border-top: none; border-left: none; border-right: none; padding: 5px 0; width: 600px">상품 이름</div>
+            <div class="flex-container" style="display: flex; align-items: center;">
+            <div style="font-size: 18px; color: #888;">상품 가격</div>
+            <div style="width: 40px; height: 30px; margin-top: 5px; border: 1px solid #e3e3e3; display: flex; align-items: center; justify-content: center; margin-left: 10px;">
+                수량
+            </div>
+            <div style="margin-left: 5px; margin-top: 5px; font-size: 18px;">2</div>
+        </div>
+    </div>
+</div>
+    <div class="flex-container">          
+        <div class="rectangle2">배송지</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">배송지</div>
+    </div>
+    <div class="flex-container">          
+        <div class="rectangle2" style="width: 80px; height: 40px;">상세 주소</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">상세 주소</div>
+    </div>
+    <div class="flex-container">
+        <div class="rectangle2">이름</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">이름</div>
+    </div>
+    <div class="flex-container">
+        <div class="rectangle2">연락처</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">연락처</div>
+    </div>
+    <div class="flex-container">
+        <div class="rectangle2" style="width: 120px; height: 40px; border: 1px solid #e3e3e3; margin-left: 50px; margin-top: 10px;
+        margin-bottom: 1px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+        text-align: center; font-weight: bold;">배송 요청사항</div>
+        <div class="field" style="width:800px;height:40px;font-size: 16px; margin-top: 10px; border: 1px solid #e3e3e3;">배송 요청사항</div>
+    </div>
+    <div class="flex-container">
+        <div class="rectangle2" style="width: 80px; height: 40px; border: 1px solid #e3e3e3; margin-left: 50px; margin-top: 10px;
+        margin-bottom: 1px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+        text-align: center; font-weight: bold;">카드 번호</div>   
+        <input type="text" name="keyword" id="keyword" 
+            style="width:800px;height:40px;font-size: 16px; margin-top: 10px; margin-bottom: 10px; border: 1px solid #e3e3e3;">
+    </div>
+    <div class="button-container">
+        <input type="button" id="btn_save" value="배송지 수정" onclick="window.location.href='/src/main/resources/templates/mypage/address.html'" style="margin-left:50px;">
+        <input type="button" id="btn_save" value="결제" onclick="window.location.href='/src/main/resources/templates/shop/payComplete.html'" style="margin-left:50px;">
+        <input type="button" id="btn_cancel" value="취소" onclick="history.back();" style="margin-left:20px;">
+        </div>
+    </div>
+    </body>
+</html>

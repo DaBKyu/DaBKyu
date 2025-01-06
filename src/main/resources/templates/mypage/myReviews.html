@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리뷰 모음</title>
+    <link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .myMenu {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .reviews-section {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .search-section {
+            margin-bottom: 20px;
+        }
+
+        .search-section input {
+            padding: 10px;
+            width: 80%;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-section button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-section button:hover {
+            background-color: #0056b3;
+        }
+
+        .review-item {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .review-item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .review-details {
+            flex: 1;
+        }
+
+        .review-title {
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .review-rating {
+            color: #ffcc00;
+        }
+
+        .review-info {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+        }
+
+        .close {
+            cursor: pointer;
+            color: #007bff;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <th:block th:replace="~{layout/MyPageHeader}"></th:block>
+    <div class="" style="display: flex; width: 1400px;">
+    <th:block th:replace="~{layout/SideMenu}"></th:block>
+    <div class="reviews-section" style="margin-left: 200px;">
+        <h2>리뷰 모음</h2>
+
+        <!-- 첫 번째 상품 -->
+        <div class="review-item" data-title="상품 제목 1" data-author="사용자1" data-date="2024-10-01" data-content="상품 내용 1"
+            data-image="https://via.placeholder.com/300">
+            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image">
+            <div class="review-details">
+                <p class="review-title">상품 제목 1</p>
+                <p class="review-rating">★ ★ ★ ★ ☆</p>
+                <p class="review-info">작성자: 사용자1 | 등록일: 2024-10-01 | 조회: 10</p>
+            </div>
+        </div>
+
+        <!-- 두 번째 상품 -->
+        <div class="review-item" data-title="상품 제목 2" data-author="사용자1" data-date="2024-10-02" data-content="상품 내용 2"
+            data-image="https://via.placeholder.com/300">
+            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image">
+            <div class="review-details">
+                <p class="review-title">상품 제목 2</p>
+                <p class="review-rating">★ ★ ★ ★ ★</p>
+                <p class="review-info">작성자: 사용자2 | 등록일: 2024-10-02 | 조회: 5</p>
+            </div>
+        </div>
+
+        <!-- 세 번째 상품 -->
+        <div class="review-item" data-title="상품 제목 3" data-author="사용자1" data-date="2024-10-03" data-content="상품 내용 3"
+            data-image="https://via.placeholder.com/300">
+            <img src="https://via.placeholder.com/50" alt="상품 이미지" class="review-image">
+            <div class="review-details">
+                <p class="review-title">상품 제목 3</p>
+                <p class="review-rating">★ ★ ★ ☆ ☆</p>
+                <p class="review-info">작성자: 사용자3 | 등록일: 2024-10-03 | 조회: 20</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 모달 팝업 -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle"></h2>
+            <p id="modalAuthor"></p>
+            <p id="modalDate"></p>
+            <p id="modalContent"></p>
+            <img id="modalImage" src="" alt="상품 이미지">
+            <div class="close" id="closeModal">닫기</div>
+        </div>
+    </div>
+
+    <script>
+        // 리뷰 항목 클릭 시 모달 열기
+        const reviewItems = document.querySelectorAll('.review-item');
+        reviewItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const title = this.dataset.title;
+                const author = this.dataset.author;
+                const date = this.dataset.date;
+                const content = this.dataset.content;
+                const image = this.dataset.image;
+
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalAuthor').textContent = `작성자: ${author}`;
+                document.getElementById('modalDate').textContent = `등록일: ${date}`;
+                document.getElementById('modalContent').textContent = content;
+                document.getElementById('modalImage').src = image;
+
+                document.getElementById('modal').style.display = 'flex';
+            });
+
+            // 이미지 클릭 시 모달 열리도록 이벤트 추가
+            const image = item.querySelector('.review-image');
+            image.addEventListener('click', function (event) {
+                event.stopPropagation(); // 리뷰 클릭 이벤트 방지
+                item.click(); // 리뷰 아이템 클릭 처리
+            });
+        });
+
+        // 모달 닫기
+        document.getElementById('closeModal').addEventListener('click', function () {
+            document.getElementById('modal').style.display = 'none';
+        });
+    </script>
+    </div>
+</body>
+
+</html>

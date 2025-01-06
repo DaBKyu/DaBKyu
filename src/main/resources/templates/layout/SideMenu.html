@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>SideMenu</title>
+<style>
+.myMenu {
+    width: 250px;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+</style>
+</head>
+<body>
+    <div th:fragment="SideMenu">
+    <div class="myMenu">
+        <h2>mypage</h2>
+        <div class="user-icon">
+            <i class="fas fa-user-circle"></i> <!-- 사용자 아이콘 -->
+        </div>
+        <nav1 style="padding: 20px;">
+            <div>
+                <div style="margin-bottom: 20px;">나의 쇼핑</div>
+                <ul style="margin-left: 30px;">
+                    <li><a href="order?page=1" title="주문목록/배송조회">주문/배송조회</a></li>
+                    <li><a href="cancelRefundChange" title="취소/환불/교환">취소/환불/교환</a></li>
+                </ul>
+            </div>
+            <div>
+                <div style="margin-bottom: 20px; margin-top: 20px;">나의 정보</div>
+                <ul style="margin-left: 30px;">
+                    <li><a href="memberInfo" title="회원정보 보기">회원정보 보기</a></li> 
+                    <li><a href="modifyMemberInfo" title="회원정보 수정">회원정보 수정</a></li>
+                    
+                </ul>
+            </div>
+            <div>
+                <div style="margin-bottom: 20px; margin-top: 20px;">나의 관심목록</div>
+                <ul style="margin-left: 30px;">
+                    <li><a href="myLikeProducts?page=1" title="찜한 상품">찜한 상품</a></li>
+                    <li><a href="myCategories" title=" 카테고리 "> 카테고리</a></li>
+                </ul>
+            </div>
+            <div>
+                <div style="margin-bottom: 20px; margin-top: 20px;">나의 활동</div>
+                <ul style="margin-left: 30px;">
+                    <li><a href="myReviews?page=1" title="리뷰 모음">리뷰 모음</a></li>
+                    <li><a href="myQuestion?page=1" title="문의 게시판">문의 게시판</a></li>
+                </ul>
+            </div>
+            <div>
+                <div style="margin-bottom: 20px; margin-top: 20px;">나의 혜택</div>
+                <ul style="margin-left: 30px;">
+                    <li><a href="myCouponList?page=1" title="할인쿠폰">할인쿠폰</a></li>
+                    <li><a href="myGrade" title="등급">등급페이지</a></li>
+                </ul>
+            </div>
+        </nav1>
+    </div>
+</div>
+</body>
+</html>

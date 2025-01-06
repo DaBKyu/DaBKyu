@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+				 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>알림페이지</title>
+<style>
+body {
+    margin: 0;
+}
+.ractangle{
+    border: 1px solid #e3e3e3;
+    border-radius: 10px;
+    width: 380px;
+    height: 100px;
+    background-color: #e3e3e3;
+    justify-content: left; /* 가로 중앙 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    padding-top: 5px; 
+}
+.banner{
+    border-bottom: 1px solid black;
+    height: 50px;
+    width: 410px;
+    background-color: #e3e3e3;
+    display: flex;
+    justify-content: left; /* 가로 중앙 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
+</head>
+<body>
+    <div class="banner">
+        <span style="margin-left: 20px; font-weight: bold;">알림목록</span>
+        <span style="margin-left: 100px; margin-right: 7px; font-size: 14px;">전체</span>
+        <span style="margin-right: 7px; font-size: 14px;">중요</span>
+        <span style="margin-right: 7px; font-size: 14px;">결제</span>
+        <span style="margin-right: 7px; font-size: 14px;">배송</span>
+        <span style="font-size: 14px;">문의목록</span>
+    </div>
+    <div>
+        <div class="ractangle">
+            <span style="margin-left: 5px;">아이폰17 Pro Max 신상 출시 임박</span>
+        </div>
+        <div class="ractangle">
+            <span style="margin-left: 5px;">갤럭시S26 신상 출시 임박</span>
+        </div>
+        <div class="ractangle">
+            <span style="margin-left: 5px;">benq 40인치 신상 출시 임박</span>
+        </div>
+</div>
+</body>
+</html>

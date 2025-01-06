@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주문관리페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../static/css/master.css" th:href="@{/css/master.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <!-- 네비게이션 바 -->
+    <div th:insert="~{layout/masterNav }"></div>
+        
+<div class="container mt-5">     
+    <h2 class="mt-4">주문관리</h2>
+
+        <!-- 카테고리 선택 -->
+        <div class="d-flex justify-content-end mb-2">
+            <select class="form-select w-auto" id="category" name="category" aria-label="카테고리 선택">
+                <option value="">전체 카테고리</option>
+                <option th:each="category : ${category}" 
+                        th:value="${category.id}" 
+                        th:text="${category.name}"></option>
+            </select>
+        </div>
+
+        <!-- 배송 관리 테이블 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">No.</th>
+                        <th scope="col">상품명</th>
+                        <th scope="col">배송상태</th>
+                        <th scope="col">배송일정</th>
+                        <th scope="col">카테고리</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <th:block  th:if="${#strings.equals(listIsEmpty,'N')}">
+                        <tr th:each="order, iterStat : ${orderList}">
+                            <th scope="row" th:text="${iterStat.count}">1</th>
+                            <td th:text="${order.productname}">iPhone 16 pro</td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <select class="form-select form-select-sm w-auto delivery_status" 
+                                            th:data-order-id="${order.id}"
+                                            aria-label="배송 상태">
+                                        <option value="">배송 상태</option>
+                                        <option value="배송준비중" th:selected="${order.orderStatus == '배송준비중'}">배송준비중</option>
+                                        <option value="배송중" th:selected="${order.orderStatus == '배송중'}">배송중</option>
+                                        <option value="배송완료" th:selected="${order.orderStatus == '배송완료'}">배송완료</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <!-- <td th:text="${#temporals.format(order.orderDate, 'yyyy.MM.dd')}">2024.10.29</td> -->
+                            <td th:text="${order.category}">스마트폰</td>
+                        </tr>
+                    </th:block>
+                    <!-- 목록이 비어 있을 경우 -->
+                    <th:block th:if="${#strings.equals(listIsEmpty,'Y')}">
+                        <td colspan="8" class="text-center">주문 정보가 없습니다.</td>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div th:text="${pageList}"></div>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            var categorySelect = document.getElementById('category');
+            categorySelect.addEventListener('change', function() {
+                var categoryId = this.value;
+                window.location.href = '/master/order?page=1&keyword=' + categoryId;
+            });
+    
+            var deliveryStatusSelects = document.querySelectorAll('.order_status');
+            deliveryStatusSelects.forEach(function(select) {
+                select.addEventListener('change', function() {
+                    var orderID = this.getAttribute('data-order-id');
+                    var status = this.value;
+                    updateOrderStatus(orderID, status);
+                });
+            });
+        });
+    
+        function updateOrderStatus(orderID, status) {
+            fetch('/master/order/' + orderID + '/status', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('배송 상태 업데이트 성공:', data);
+                // 성공 시 페이지 새로고침
+                window.location.reload();
+            })
+            .catch((error) => {
+                console.error('배송 상태 업데이트 실패:', error);
+                alert('배송 상태 업데이트에 실패했습니다. 다시 시도해 주세요.');
+            });
+        }
+        </script>
+    
+</body>
+</html>
+
+<!-- 백엔드 예시
+@RestController
+@RequestMapping("/master/delivery")
+public class OrderApiController {
+
+    @Autowired
+    private OrderService deliveryService;
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody OrderStatusUpdateRequest request) {
+        try {
+            OrderDTO updatedOrder = deliveryService.updateOrderStatus(id, request.getStatus());
+            return ResponseEntity.ok(updatedOrder);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("배송 상태 업데이트 실패");
+        }
+    }
+}
+
+@Service
+public class OrderService {
+
+    @Autowired
+    private OrderRepository deliveryRepository;
+
+    @Transactional
+    public OrderDTO updateOrderStatus(Long id, String status) {
+        Order delivery = deliveryRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("배송 정보를 찾을 수 없습니다."));
+        delivery.setStatus(status);
+        Order updatedOrder = deliveryRepository.save(delivery);
+        return convertToDTO(updatedOrder);
+    }
+
+    // DTO 변환 메서드
+    private OrderDTO convertToDTO(Order delivery) {
+        // Order 엔티티를 DTO로 변환하는 로직
+    }
+}
+-->

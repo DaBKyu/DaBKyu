@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>찜 리스트</title>
+    <link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .myMenu {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        #myinterest {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .product-list {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+        .product-item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .product-item button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .product-item button:hover {
+            background-color: #0056b3;
+        }
+
+        .select-all {
+            margin-bottom: 10px;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .close-button {
+            cursor: pointer;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+        }
+
+        .close-button:hover {
+            color: black;
+        }
+
+        /* 장바구니 팝업 스타일 */
+        #cartModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #cartModalContent {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #cartModalContent button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #cartModalContent button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <th:block th:replace="~{layout/MyPageHeader}"></th:block>
+    <div class="" style="display: flex; width: 1400px;">
+    <th:block th:replace="~{layout/SideMenu}"></th:block>
+    <div class="product-list" style="margin-left: 200px;">
+        <h2>찜리스트</h2>
+        <div class="select-all">
+            <input type="checkbox" id="selectAll"> 전체 선택
+            <button id="deleteSelectedBtn">선택 삭제</button>
+            <button id="addToCartBtn">장바구니 담기</button>
+        </div>
+
+        <div class="product-item">
+            <input type="checkbox" class="product-checkbox">
+            <img src="product1.jpg" alt="상품 이미지">
+            <div>상품 이름 1</div>
+            <button class="remove-btn">삭제</button>
+        </div>
+
+        <div class="product-item">
+            <input type="checkbox" class="product-checkbox">
+            <img src="product2.jpg" alt="상품 이미지">
+            <div>상품 이름 2</div>
+            <button class="remove-btn">삭제</button>
+        </div>
+
+        <div class="product-item">
+            <input type="checkbox" class="product-checkbox">
+            <img src="product3.jpg" alt="상품 이미지">
+            <div>상품 이름 3</div>
+            <button class="remove-btn">삭제</button>
+        </div>
+    </div>
+
+    <!-- 장바구니 담기 팝업 -->
+    <div id="cartModal" class="modal">
+        <div id="cartModalContent">
+            <h3>상품이 장바구니에 담겼습니다!</h3>
+            <button id="goToCartBtn">장바구니로 이동</button>
+        </div>
+    </div>
+
+    <script>
+        // 전체 선택 체크박스 기능
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const productCheckboxes = document.querySelectorAll('.product-checkbox');
+
+        selectAllCheckbox.addEventListener('change', function () {
+            productCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+
+        // 선택 삭제 버튼 기능
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        deleteSelectedBtn.addEventListener('click', function () {
+            productCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    checkbox.closest('.product-item').remove();
+                }
+            });
+        });
+
+        // 개별 삭제 버튼 기능
+        const removeBtns = document.querySelectorAll('.remove-btn');
+        removeBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                btn.closest('.product-item').remove();
+            });
+        });
+
+        // 장바구니 담기 버튼 클릭 시 팝업 띄우기
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        const cartModal = document.getElementById('cartModal');
+        const goToCartBtn = document.getElementById('goToCartBtn');
+
+        addToCartBtn.addEventListener('click', function () {
+            cartModal.style.display = 'block'; // 장바구니 담기 팝업 띄우기
+        });
+
+        // 장바구니 이동 버튼 클릭 시 장바구니 페이지로 이동
+        goToCartBtn.addEventListener('click', function () {
+            window.location.href = 'shoppingCart.html'; // 장바구니 페이지로 이동
+        });
+
+        // 모달 외부 클릭 시 찜리스트 페이지로 이동
+        window.onclick = function (event) {
+            if (event.target === cartModal) {
+                window.location.href = 'wishlist.html'; // 찜리스트 화면으로 이동
+            }
+        };
+    </script>
+    </div>
+</body>
+
+</html>

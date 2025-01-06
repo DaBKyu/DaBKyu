@@ -1,0 +1,145 @@
+<!--컨트롤러
+@Controller
+public class ProductController {
+
+    private final ProductService productService;
+    private final StorageService storageService;
+
+    @Autowired
+    public ProductController(ProductService productService, StorageService storageService) {
+        this.productService = productService;
+        this.storageService = storageService;
+    }
+
+    @GetMapping("/productEdit/{id}")
+    public String editProduct(@PathVariable Long id, Model model) {
+        // Fetch product by ID (this is just an example; adjust according to your service layer)
+        Product product = productService.findById(id);
+        
+        // Add product data to model
+        model.addAttribute("product", product);
+        
+        // Return Thymeleaf template for editing
+        return "productEdit";
+    }
+
+    @PostMapping("/updateProduct")
+    public String updateProduct(@ModelAttribute ProductDto productDto,
+                                @RequestParam("imageFiles") MultipartFile[] imageFiles,
+                                @RequestParam(value = "removeImages", required = false) String removeImagesJson) {
+        
+        // Handle image removals
+        if (removeImagesJson != null && !removeImagesJson.isEmpty()) {
+            List<String> removeImages = new ObjectMapper().readValue(removeImagesJson, new TypeReference<List<String>>() {});
+            for (String imageUrl : removeImages) {
+                storageService.deleteFile(imageUrl);  // Delete file from server
+            }
+        }
+
+        // Handle new image uploads
+        if (imageFiles != null && imageFiles.length > 0) {
+            for (MultipartFile file : imageFiles) {
+                if (!file.isEmpty()) {
+                    String newImageUrl = storageService.store(file);  // Store new image
+                    productDto.setImageUrl(newImageUrl);  // Update product with new image URL
+                }
+            }
+        }
+
+        // Update product in database
+        productService.updateProduct(productDto);
+
+        return "redirect:/productManage";  // Redirect after successful update
+    }
+
+    @PostMapping("/productPreview")
+    public String previewProduct(@ModelAttribute ProductDto productDto,
+                                 @RequestParam("imageFiles") MultipartFile[] imageFiles,
+                                 Model model) {
+        
+        // Add product data to model so Thymeleaf can render it in productPreview.html
+        model.addAttribute("product", productDto);
+        
+        // Handle uploaded images (if any)
+        List<String> imageUrls = new ArrayList<>();
+        
+        if (imageFiles != null && imageFiles.length > 0) {
+            for (MultipartFile file : imageFiles) {
+                if (!file.isEmpty()) {
+                    String imageUrl = storageService.store(file);  // Store image and get URL
+                    imageUrls.add(imageUrl);  // Add URL to list
+                }
+            }
+        }
+        
+        model.addAttribute("imageUrls", imageUrls);  // Pass list of image URLs to preview
+
+        return "productPreview";  // Render productPreview.html
+    }
+}
+}
+
+--서비스
+@Service
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    @Autowired
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    public void updateProduct(ProductDto productDto) {
+        // Convert DTO to entity and save it to the database
+        ProductEntity product = convertToEntity(productDto);
+        productRepository.save(product);
+    }
+
+    private ProductEntity convertToEntity(ProductDto dto) {
+        // Conversion logic from DTO to Entity (implement as needed)
+        return new ProductEntity(dto.getId(), dto.getName(), dto.getPrice(), dto.getStockQuantity(),
+                                 dto.getIsFreeShipping(), dto.getIsHidden(), dto.getLikesCount(), dto.getDescription(),
+                                 dto.getCategory(), dto.getImageUrl());
+    }
+}
+
+@Service
+public class StorageService {
+
+    private final Path rootLocation;
+
+    @Autowired
+    public StorageService(StorageProperties properties) {
+        this.rootLocation = Paths.get(properties.getLocation());
+    }
+
+    public String store(MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                throw new StorageException("Failed to store empty file.");
+            }
+            Path destinationFile = this.rootLocation.resolve(
+                    Paths.get(file.getOriginalFilename()))
+                    .normalize().toAbsolutePath();
+            Files.copy(file.getInputStream(), destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            return destinationFile.toString();  // Return stored file path or URL
+        } catch (IOException e) {
+            throw new StorageException("Failed to store file.", e);
+        }
+    }
+
+    public void deleteFile(String filename) {
+        try {
+            Path filePath = this.rootLocation.resolve(filename).normalize();
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            } else {
+                throw new FileStorageException("File not found: " + filename);
+            }
+        } catch (IOException e) {
+            throw new FileStorageException("Failed to delete file: " + filename, e);
+        }
+    }
+}
+-->

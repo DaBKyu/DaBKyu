@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>할인 쿠폰 페이지</title>
+    <link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .myMenu {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .order-list {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .order-list-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .tab {
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 2px solid #ccc;
+            margin-top: 20px;
+        }
+
+        .tab button {
+            flex: 1;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab button.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .tab-content {
+            margin-top: 20px;
+        }
+
+        .order-history table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .order-history th, .order-history td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .order-history th {
+            background-color: #f1f1f1;
+        }
+
+        .coupon-input {
+            margin-top: 20px;
+        }
+
+        .coupon-input input {
+            padding: 10px;
+            width: 70%;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .coupon-input button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .coupon-input button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 가운데 정렬을 위한 추가 스타일 */
+        .order-history table {
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <th:block th:replace="~{layout/MyPageHeader}"></th:block>
+    <div class="" style="display: flex; width: 1400px;">
+    <th:block th:replace="~{layout/SideMenu}"></th:block>
+    <div class="order-list" style="margin-left: 200px;">
+        <h2 class="order-list-title">할인 쿠폰 입력</h2>
+        <div class="coupon-input">
+            <input type="text" id="couponCode" placeholder="쿠폰 코드 입력">
+            <button id="submitCoupon">입력하기</button>
+        </div>
+
+        <!-- Tab Menu -->
+        <div class="tab">
+            <button class="active" id="activeTabBtn">사용 가능한 쿠폰</button>
+            <button id="expiredTabBtn">사용 완료/기간 완료</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <div id="availableCoupons" class="order-history">
+                <h3>사용 가능한 쿠폰 목록</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>쿠폰명</th>
+                            <th>할인액(율)</th>
+                            <th>사용조건</th>
+                            <th>유효기간</th>
+                            <th>쿠폰종류</th>
+                        </tr>
+                    </thead>
+                    <tbody id="couponTableBody">
+                        <tr>
+                            <td>여름 세일 쿠폰</td>
+                            <td>10,000원</td>
+                            <td>3만원 이상 구매 시</td>
+                            <td>2024-12-31 23:59</td> <!-- 시간 추가 -->
+                            <td>일반</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="expiredCoupons" class="order-history" style="display: none;">
+                <h3>사용 완료/기간 완료 쿠폰 목록</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>쿠폰명</th>
+                            <th>할인액(율)</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>추석 할인 쿠폰</td>
+                            <td>5,000원</td>
+                            <td>사용완료</td>
+                        </tr>
+                        <tr>
+                            <td>겨울 특가 쿠폰</td>
+                            <td>15,000원</td>
+                            <td>기간완료</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('submitCoupon').addEventListener('click', function() {
+            const couponCode = document.getElementById('couponCode').value;
+            alert(`쿠폰 코드 "${couponCode}"이(가) 입력되었습니다.`);
+            document.getElementById('couponCode').value = ''; // 입력 필드 초기화
+        });
+
+        // 탭 전환 기능
+        const activeTabBtn = document.getElementById('activeTabBtn');
+        const expiredTabBtn = document.getElementById('expiredTabBtn');
+        const availableCoupons = document.getElementById('availableCoupons');
+        const expiredCoupons = document.getElementById('expiredCoupons');
+
+        activeTabBtn.addEventListener('click', function() {
+            activeTabBtn.classList.add('active');
+            expiredTabBtn.classList.remove('active');
+            availableCoupons.style.display = 'block';
+            expiredCoupons.style.display = 'none';
+        });
+
+        expiredTabBtn.addEventListener('click', function() {
+            expiredTabBtn.classList.add('active');
+            activeTabBtn.classList.remove('active');
+            availableCoupons.style.display = 'none';
+            expiredCoupons.style.display = 'block';
+        });
+    </script>
+</div>
+</body>
+</html>

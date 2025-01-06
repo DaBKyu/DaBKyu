@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원가입페이지</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<style>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 화면 높이만큼 설정하여 수직 중앙 정렬 */
+    margin: 0;
+}
+.input_field {
+    width: 100%;
+}
+
+.has-validation > .form-floating > .is-invalid {
+    border-radius: .375em 0 0 .375em;
+}
+
+.has-validation > .form-floating > .is-valid {
+    border-radius: .375em 0 0 .375em;
+}
+
+</style>
+</head>
+<body>
+    <div class="RegistryForm" align="center">
+        <h1>회원가입</h1>
+        <form id="RegistryForm" name="RegistryForm" method="POST" style="margin-top: 40px;">
+            <div class="form_list">
+                <div class="input-group has-validation" id="divEmail">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="email" name="email" placeholder="이메일">
+                        <label for="email">이메일</label>
+                    </div>
+                    <button class="btn btn-outline-secondary input-group-text" type="button" onclick="sendEmail()">인증</button>
+                </div>
+                <div class="mb-3">
+                    <div class="error_text" id="emailMsg" style="display: none"></div>
+                </div>
+
+                <div class="input-group has-validation" id="divAuthNum" style="display: none">
+                    <div class="form-floating">
+                        <input type="text" class="form-control input_field" id="authNum" name="authNum" placeholder="인증번호">
+                        <label for="authNum">인증번호</label>
+                    </div>
+                    <button class="btn btn-outline-secondary input-group-text" type="button" onclick="checkAuth()">확인</button>
+                </div>
+                <div class="mb-3">
+                    <div class="error_text" id="authNumMsg" style="display: none"></div>
+                </div>
+
+                <div class="form-floating" id="divPassword">
+                    <input type="password" class="form-control input_field" id="password" name="password" placeholder="비밀번호" onblur="checkPassword()">
+                    <label for="floatingInput">비밀번호</label>
+                </div>
+                <div class="mb-3">
+                    <div class="error_text" id="pswdMsg" style="display: none"></div>
+                </div>
+                
+                <div class="form-floating" id="divPassword1">
+                    <input type="password" class="form-control input_field" id="password1" name="password1" placeholder="비밀번호 확인" onblur="matchPassword()">
+                    <label for="floatingInput">비밀번호 확인</label>
+                </div>
+                <div class="mb-3">
+                    <div class="error_text" id="pswd1Msg" style="display: none"></div>
+                </div>
+
+                <div class="form-floating mb-3" id="divUsername">
+                    <input type="text" class="form-control input_field" id="username" name="username" placeholder="이름" onblur="checkUsername()">
+                    <label for="floatingInput">이름</label>
+                </div>
+                <div class="mb-3">
+                    <div class="error_text" id="NameMsg" style="display: none"></div>
+                </div>
+
+                <div class="form-floating" id="divBirthDate">
+                    <input type="text" class="form-control input_field" id="birthDate" name="birth" placeholder="생년월일 8자리" onblur="checkBirth()">
+                    <label for="floatingInput">생년월일 8자리</label>
+                </div>
+                <div class="mb-3">
+                    <div class="error_text" id="birthDateMsg" style="display: none"></div>
+                </div>
+                <div class="mb-3">
+                    <div class="row" style="width: 100%">
+                        <input type="radio" class="btn-check" name="gender" id="identityGender1" value="M" autocomplete="off">
+                        <label class="btn btn-outline-dark col" for="identityGender1">남자</label>
+                        <input type="radio" class="btn-check" name="gender" id="identityGender2" value="F" autocomplete="off">
+                        <label class="btn btn-outline-dark col" for="identityGender2">여자</label>
+                    </div>
+                </div>
+                <div class="form-floating mb-3" id="divTelno">
+                    <input type="text" class="form-control input_field" id="telno" name="telno" placeholder="휴대전화번호">
+                    <label for="floatingInput">휴대전화번호</label>
+                </div>
+            </div>
+            <label for="emailRecept">이메일 수신 동의</label>
+            <input type="checkbox" id="emailRecept" name="emailRecept" value="Y">
+            <br>
+            <label for="notificationYn">알림 수신 동의</label>
+            <input type="checkbox" id="notificationYn" name="notificationYn" value="Y">
+            <br>
+            <input type="button" id="btn_register" class="btn_register" value="회원가입" onclick="" style="width: 300px; height: 40px; margin-top: 20px; background-color: black; color: white; border-radius: 5px; border: 1px solid black;">
+        </form>
+    </div>
+<script>
+let isInputPassword1 = 0;
+
+window.onload = () => {
+    btn_register.addEventListener('click', async () => {
+        if(email.value == '') {
+			alert("이메일을 입력하세요.");
+			email.focus();
+			return false;
+		}
+		if(username.value == '') {
+			alert("이름을 입력하세요.");
+			username.focus();
+			return false;
+		}
+		
+		const Pass = password.value;
+		const Pass1 = password1.value;
+		if(Pass == '') {
+			alert("암호를 입력하세요");
+			password.focus();
+			return false;
+		}
+		if(Pass1 == '') {
+			alert("암호를 입력하세요");
+			password1.focus();
+			return false;
+		}
+		if(Pass != Pass1) {
+			alert("입력된 암호를 확인하세요.");
+			password1.focus();
+			return false;
+		}
+        const birth = document.querySelector("#birthDate");
+
+        if(birth.value =="") {
+            alert("생년월일을 입력하세요");
+            birth.focus();
+            return false;
+        }
+        
+        const gender = document.querySelectorAll('input[name=gender]:checked');
+        if(gender.lenth == 0) {
+			alert("성별을 선택하세요");
+			return false;
+		}
+        if(telno.value == '') {
+			alert("전화번호를 입력하세요");
+			telno.focus();
+			return false;
+		}
+
+        //자바스크립트의 정규식(Regular Expression)을 이용해서 암호 규칙 확인
+		//암호 작성 규칙 --> 8-16자리 내의 영문,숫자,특수문자를 조합		
+		let num = Pass.search(/[0-9]/g); //0-9까지의 숫자가 들어 있는지 검색.검색해서 값이 없으면 -1을 리턴 
+		let eng = Pass.search(/[a-z]/ig); // i : 알파벳 대소문자 구분 없이 검색
+		let spe = Pass.search(/[`~!@#$%^&*|\\\'\";:\/?]/ig); //특수문자가 포함되어 있는지 검색
+		if(Pass.length < 8 || Pass.length > 16) {
+			alert("암호는 8자리 ~ 16자 이내로 입력해 주세요");
+			return false;
+		} else if(Pass.search(/\s/) != -1) {
+			alert("암호는 공백 없이 입력해 주세요.");
+			return false;
+		} else if(num <0 || eng < 0 || spe < 0) {
+			alert("암호는 영문,숫자,특수문자를 혼합하여 입력해 주세요.");
+			return false;
+		}
+
+        const beforeTelno = telno.value;
+		const afterTelno = beforeTelno.replace(/\-/ig,"").replace(/\ /ig,"").trim();
+		telno.value = afterTelno;
+
+        const formData = new FormData(RegistryForm);
+        formData.append("kind", "I");
+
+        const emailReceptCheckbox = document.getElementById('emailRecept');
+        const notificationCheckbox = document.getElementById('notificationYn');
+        // 체크박스가 선택되지 않으면 "N" 값을 추가
+        if (!emailReceptCheckbox.checked) {
+            formData.set('emailRecept', 'N'); // "N" 값 설정
+        }
+        if (!notificationCheckbox.checked) {
+            formData.set('notificationYn', 'N');
+        }
+		
+		await fetch('/member/signup', {
+			method: 'POST',
+			body: formData
+		}).then((response)=> response.json())
+			.then((data)=> {
+				if(data.status === 'good'){
+					alert(decodeURIComponent(data.username) + '님, 회원 가입을 축하 드립니다.');
+					document.location.href='/shop/main';
+				} else {
+					alert("서버 장애로 회원 가입에 실패했습니다.");
+				}
+		}).catch((error)=> {
+			console.log("error = " + error);
+		});
+    });
+};
+
+// 이메일 확인 및 인증번호 발송
+const sendEmail = async () => {
+    const emailInput = document.querySelector("#email");
+    const emailMsg = document.querySelector("#emailMsg");
+    const divAuthNum = document.querySelector("#divAuthNum");
+
+    // 이메일 유효성 검사
+    const email = emailInput.value;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+        emailMsg.style.color = "red";
+        emailMsg.style.display = "block";
+        emailMsg.innerHTML = "유효하지 않은 이메일 형식입니다.";
+        emailInput.setAttribute("class", "form-control is-invalid");
+        emailInput.focus();
+        return;
+    }
+
+    // 유효성 검사 통과
+    emailMsg.style.display = "none";
+    emailInput.setAttribute("class", "form-control");
+
+    await fetch("/member/sendEmail", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({email: email})
+    }).then((response) => response.json())
+    .then((data) => {
+        const emailMsg = document.querySelector("#emailMsg");
+        console.log(data);
+        if (data.status === 0) {
+            emailMsg.style.color = "green";
+            emailMsg.style.display = "block";
+            emailInput.setAttribute("class", "form-control is-valid");
+            emailMsg.innerHTML = "인증번호를 전송했습니다.";
+            divAuthNum.style.display = "";
+        } else if (data.status === 1) {
+            emailMsg.style.color = "red";
+            emailMsg.style.display = "block";
+            emailInput.setAttribute("class", "form-control is-invalid");
+            emailMsg.innerHTML = "이미 사용중인 이메일입니다.";
+            emailInput.focus();
+        } else {
+            emailMsg.style.color = "red";
+            emailMsg.style.display = "block";
+            emailInput.setAttribute("class", "form-control is-invalid");
+            emailMsg.innerHTML = "서버 오류로 인증번호 전송을 실패했습니다.";
+        }
+    }).catch((error) => {
+        console.error();
+        console.log("error: " + error);
+    });
+};
+
+// 인증번호 확인
+const checkAuth = async() => {
+    const email = document.querySelector("#email").value;
+    const authNumInput = document.querySelector("#authNum");
+    const authNumMsg = document.querySelector("#authNumMsg");
+    const authData = {
+        email: email,
+        authNum: authNumInput.value
+    }
+
+    await fetch("/member/checkAuth", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(authData)
+    }).then((response) => response.json())
+    .then((data) => {
+        console.log(data);
+        if (data.status === 0) {
+            authNumInput.setAttribute("class", "form-control is-valid");
+            authNumMsg.style.color = "green";
+            authNumMsg.style.display = "block";
+            authNumMsg.innerHTML = "인증되었습니다.";
+        } else if (data.status === 1) {
+            authNumMsg.style.color = "red";
+            authNumMsg.style.display = "block";
+            authNumInput.setAttribute("class", "form-control is-invalid");
+            authNumMsg.innerHTML = "인증번호가 다릅니다.";
+        } else {
+            authNumMsg.style.color = "red";
+            authNumMsg.style.display = "block";
+            authNumInput.setAttribute("class", "form-control is-invalid");
+            authNumMsg.innerHTML = "서버오류로 실패했습니다.";
+        }
+    }).catch((error) => {
+        console.error();
+        console.log("error: " + error);
+    });
+};
+
+// 비밀번호 유효성 검사
+const checkPassword = () => {
+    const passwordInput = document.querySelector("#password");
+    const pswdMsg = document.querySelector("#pswdMsg");
+    const password = passwordInput.value;
+
+    if (isInputPassword1 === 1) {
+        matchPassword();
+    }
+    // 정규식: 8~16자, 영문 대소문자, 숫자, 특수문자 포함
+    const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[`~!@#$%^&*|\\\'\";:\/?]).{8,16}$/;
+
+    if (!passwordPattern.test(password)) {
+        pswdMsg.style.color = "red";
+        pswdMsg.style.display = "block";
+        pswdMsg.innerHTML = "비밀번호는 8~16자 영문 대소문자, 숫자, 특수문자를 포함해야 합니다.";
+        passwordInput.setAttribute("class", "form-control is-invalid");
+        return false;
+    } else {
+        pswdMsg.style.display = "none";
+        passwordInput.setAttribute("class", "form-control is-valid");
+        return true;
+    }
+};
+
+// 비밀번호 확인 검사
+const matchPassword = () => {
+    isInputPassword1 = 1;
+    const passwordInput = document.querySelector("#password");
+    const password1Input = document.querySelector("#password1");
+    const pswd1Msg = document.querySelector("#pswd1Msg");
+
+    if (password1Input.value !== passwordInput.value) {
+        pswd1Msg.style.color = "red";
+        pswd1Msg.style.display = "block";
+        pswd1Msg.innerHTML = "비밀번호가 일치하지 않습니다.";
+        password1Input.setAttribute("class", "form-control is-invalid");
+        return false;
+    } else {
+        pswd1Msg.style.display = "none";
+        password1Input.setAttribute("class", "form-control is-valid");
+        return true;
+    }
+};
+
+// 이름 유효성 검사
+const checkUsername = () => {
+    console.log("이름 유효성 체크");
+    const usernameInput = document.querySelector("#username");
+    const usernameMsg = document.querySelector("#NameMsg");
+    const username = usernameInput.value;
+
+    // 정규식: 한글, 영문 대소문자만 허용, 특수문자와 공백 불가
+    const usernamePattern = /^[가-힣a-zA-Z]+$/;
+    let spe = username.search(/[`~!@#$%^&*|\\\'\";:\/?]/ig);    // 특수문자
+    let namespace = username.search(/\s/);  // 공백
+
+    if (namespace !=-1 || spe !=-1 || !usernamePattern.test(username))  {
+        usernameMsg.style.color = "red";
+        usernameMsg.style.display = "block";
+        usernameMsg.innerHTML = "한글, 영문 대/소문자를 사용해 주세요. (특수기호, 공백 사용 불가)";
+        usernameInput.setAttribute("class", "form-control is-invalid");
+        return false;
+    } else {
+        usernameMsg.style.display = "none";
+        usernameInput.setAttribute("class", "form-control is-valid");
+        return true;
+    }
+};
+
+const checkBirth = () => {
+    const birthdate = document.querySelector("#birthDate");
+    const birthdateMsg = document.querySelector("#birthDateMsg");
+
+    // 사용자 입력 값 가져오기
+    let birthdateValue = birthdate.value.trim().replace(/\s/g, "");
+    const regexNumeric = /^[0-9.]+$/; // 숫자와 '.'만 허용
+    if (!regexNumeric.test(birthdateValue)) {
+        birthdateMsg.style.color = "red";
+        birthdateMsg.style.display = "block";
+        birthdateMsg.innerHTML = "생년월일은 8자리 숫자로 입력해주세요.";
+        birthdate.setAttribute("class", "form-control is-invalid");
+        return false;
+    }
+
+    // 기본 포맷: YYYY.MM.DD로 통일
+    let formattedDate = "";
+
+    // 유효성 검사
+    const regexYYYYMMDD = /^\d{8}$/; // 20241202 형태
+    const regexYYYYDotMMDotDD = /^\d{4}\.\d{2}\.\d{2}$/; // 2024.12.02 형태
+
+    // 입력이 두 가지 형태 중 하나인지 확인
+    if (regexYYYYMMDD.test(birthdateValue)) {
+        // 20241202 형태일 경우
+        formattedDate = birthdateValue.replace(/(\d{4})(\d{2})(\d{2})/, "$1.$2.$3");
+    } else if (regexYYYYDotMMDotDD.test(birthdateValue)) {
+        // 이미 2024.12.02 형태일 경우
+        formattedDate = birthdateValue;
+    } else {
+        // 형식이 맞지 않으면 에러 메시지
+        birthdateMsg.style.color = "red";
+        birthdateMsg.style.display = "block";
+        birthdateMsg.innerHTML = "생년월일은 8자리 숫자로 입력해주세요.";
+        birthdate.setAttribute("class", "form-control is-invalid");
+        return false;
+    }
+
+    // 포맷된 날짜에서 연, 월, 일 추출
+    const [year, month, day] = formattedDate.split(".");
+
+    // 연도, 월, 일 유효성 확인
+    if (parseInt(year) < 1900) {
+        birthdateMsg.style.color = "red";
+        birthdateMsg.style.display = "block";
+        birthdateMsg.innerHTML = "생년월일이 정확한지 확인해 주세요.";
+        birthdate.setAttribute("class", "form-control is-invalid");
+        return false;
+    }
+
+    if (parseInt(month) < 1 || parseInt(month) > 12) {
+        birthdateMsg.style.color = "red";
+        birthdateMsg.style.display = "block";
+        birthdateMsg.innerHTML = "생년월일이 정확한지 확인해 주세요.";
+        birthdate.setAttribute("class", "form-control is-invalid");
+        return false;
+    }
+
+    // 해당 월의 최대 일 확인
+    const maxDays = new Date(year, month, 0).getDate(); // 월의 마지막 날 계산
+    if (parseInt(day) < 1 || parseInt(day) > maxDays) {
+        birthdateMsg.style.color = "red";
+        birthdateMsg.style.display = "block";
+        birthdateMsg.innerHTML = "생년월일이 정확한지 확인해 주세요.";
+        birthdate.setAttribute("class", "form-control is-invalid");
+        return false;
+    }
+
+    // 모든 유효성 검사를 통과한 경우
+    birthdateMsg.style.display = "none";
+    birthdate.setAttribute("class", "form-control is-valid");
+
+    // 입력 필드를 YYYY.MM.DD 형태로 변경
+    birthdate.value = formattedDate;
+    return true;
+};
+
+</script>
+</body>
+</html>

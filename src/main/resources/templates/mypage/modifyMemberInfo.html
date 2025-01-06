@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 정보 수정페이지</title>
+    <link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .myMenu {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .user-icon {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .order-list {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .order-list-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .form-section {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-input {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex: 1;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close-button {
+            cursor: pointer;
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .delete-account-section {
+            margin-top: 20px;
+        }
+
+        /* 회원탈퇴 버튼 스타일 */
+        .delete-account-button {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 9999; /* 우선순위 높은 z-index 추가 */
+        }
+
+        .delete-account-button:hover {
+            background-color: #c82333;
+        }
+        .edit-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <th:block th:replace="~{layout/MyPageHeader}"></th:block>
+    <div class="" style="display: flex; width: 1400px;">
+    <th:block th:replace="~{layout/SideMenu}"></th:block>
+    <div class="order-list" style="margin-left: 200px;">
+        <div class="order-list-title">회원 정보</div>
+        <div class="form-section">
+            <label for="name">이름:</label>
+            <input type="text" id="name" class="modal-input" placeholder="이름 입력">
+        </div>
+        <div class="form-section">
+            <label for="email">이메일:</label>
+            <input type="email" id="email" class="modal-input" placeholder="이메일 입력">
+            <button id="emailChangeBtn">이메일 변경</button>
+        </div>
+        <div class="form-section">
+            <label for="password">비밀번호:</label>
+            <input type="password" id="password" class="modal-input" placeholder="비밀번호 입력">
+            <button id="passwordChangeBtn">비밀번호 변경</button>
+        </div>
+        <div class="form-section">
+            <label for="address">기본 배송지:</label>
+            <input type="text" id="address" class="modal-input" placeholder="배송지 입력">
+            <a href="address.html">
+                <button>변경</button>
+            </a>
+        </div>
+
+        <!-- 이벤트와 혜택 수신 여부 질문을 기본 배송지 밑으로 이동 -->
+        <div class="form-section">
+            <label>이벤트와 혜택에 대한 속시 안내를 이메일로 받으시겠습니까?</label>
+        </div>
+
+        <!-- 이메일 수신 여부 수정 -->
+        <div class="form-section">
+            <label for="emailOptInYes">
+                <input type="radio" id="emailOptInYes" name="emailOptIn" value="yes">
+                수신 동의
+            </label>
+            <label for="emailOptInNo">
+                <input type="radio" id="emailOptInNo" name="emailOptIn" value="no">
+                수신 안함
+            </label>
+        </div>
+
+        <!-- 회원정보 수정 버튼을 회원탈퇴 링크 바로 위로 이동 -->
+        <div class="form-section">
+            <button id="editProfileLink">회원정보 수정</button>
+        </div>
+        <a href="deleteID" class="edit-button">회원정보 탈퇴</a>
+    </div>
+
+    <!-- 이메일 인증 모달 -->
+    <div id="emailVerificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeEmailModal">&times;</span>
+            <h3>이메일 인증</h3>
+            <p>새 이메일 주소를 입력하세요:</p>
+            <input type="email" id="newEmail" class="modal-input" placeholder="새 이메일 입력">
+            <button id="requestVerificationCodeBtn">인증번호 요청</button>
+            <p id="verificationSection" style="display:none; margin-top: 20px;">
+                인증번호 입력: 
+                <input type="text" id="verificationCode" class="modal-input" placeholder="인증번호 입력">
+                <button id="verifyCodeBtn">확인</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- 비밀번호 변경 모달 -->
+    <div id="passwordChangeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closePasswordModal">&times;</span>
+            <h3>비밀번호 변경</h3>
+            <p>기존 비밀번호:</p>
+            <input type="password" id="currentPassword" class="modal-input" placeholder="기존 비밀번호 입력">
+            <p>신규 비밀번호:</p>
+            <input type="password" id="newPassword" class="modal-input" placeholder="신규 비밀번호 입력">
+            <p>신규 비밀번호 확인:</p>
+            <input type="password" id="confirmNewPassword" class="modal-input" placeholder="신규 비밀번호 다시 입력">
+            <button id="confirmPasswordChangeBtn">비밀번호 변경</button>
+        </div>
+    </div>
+
+    <!-- 회원탈퇴 버튼 -->
+    
+
+    <script>
+        // 이메일 변경 버튼 클릭 시 모달 열기
+        const emailChangeBtn = document.getElementById('emailChangeBtn');
+        const emailVerificationModal = document.getElementById('emailVerificationModal');
+        const closeEmailModal = document.getElementById('closeEmailModal');
+        const requestVerificationCodeBtn = document.getElementById('requestVerificationCodeBtn');
+        const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+        const verificationSection = document.getElementById('verificationSection');
+        const newEmail = document.getElementById('newEmail');
+        const verificationCode = document.getElementById('verificationCode');
+
+        emailChangeBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // 링크 기본 동작 방지
+            emailVerificationModal.style.display = 'block'; // 모달 열기
+        });
+
+        closeEmailModal.addEventListener('click', function() {
+            emailVerificationModal.style.display = 'none';
+        });
+
+        // 인증번호 요청 버튼 클릭 시
+        requestVerificationCodeBtn.addEventListener('click', function() {
+            const email = newEmail.value;
+            if (email) {
+                alert("인증번호가 요청되었습니다. 이메일을 확인해주세요.");
+                verificationSection.style.display = 'block'; // 인증번호 입력 필드 보이기
+            } else {
+                alert("이메일 주소를 입력해주세요.");
+            }
+        });
+
+        // 인증번호 확인 버튼 클릭 시
+        verifyCodeBtn.addEventListener('click', function() {
+            const code = verificationCode.value;
+            if (code) {
+                alert("인증이 완료되었습니다.");
+                emailVerificationModal.style.display = 'none'; // 모달 닫기
+            } else {
+                alert("인증번호를 입력해주세요.");
+            }
+        });
+
+        // 비밀번호 변경 버튼 클릭 시 모달 열기
+        const passwordChangeBtn = document.getElementById('passwordChangeBtn');
+        const passwordChangeModal = document.getElementById('passwordChangeModal');
+        const closePasswordModal = document.getElementById('closePasswordModal');
+        const confirmPasswordChangeBtn = document.getElementById('confirmPasswordChangeBtn');
+
+        passwordChangeBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            passwordChangeModal.style.display = 'block'; // 모달 열기
+        });
+
+        closePasswordModal.addEventListener('click', function() {
+            passwordChangeModal.style.display = 'none';
+        });
+
+        // 비밀번호 변경 확인 버튼 클릭 시
+        confirmPasswordChangeBtn.addEventListener('click', function() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            if (currentPassword && newPassword && confirmNewPassword) {
+                if (newPassword === confirmNewPassword) {
+                    alert("비밀번호가 변경되었습니다.");
+                    passwordChangeModal.style.display = 'none'; // 모달 닫기
+                } else {
+                    alert("신규 비밀번호가 일치하지 않습니다.");
+                }
+            } else {
+                alert("모든 필드를 입력해주세요.");
+            }
+        });
+
+        // 회원정보 수정 버튼 클릭 시
+        const editProfileLink = document.getElementById('editProfileLink');
+        editProfileLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            alert("회원정보가 수정되었습니다.");
+        });
+
+        // 모달 외부 클릭 시 모달 닫기
+        window.onclick = function(event) {
+            if (event.target == emailVerificationModal) {
+                emailVerificationModal.style.display = "none";
+            }
+            if (event.target == passwordChangeModal) {
+                passwordChangeModal.style.display = "none";
+            }
+        }
+    </script>
+    </div>
+</body>
+</html>

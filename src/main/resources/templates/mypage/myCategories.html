@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관심 카테고리 페이지</title>
+    <link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .myMenu {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .order-list {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .order-list-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .category-form {
+            margin-bottom: 20px;
+        }
+
+        .category-form select, .category-form input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .category-form button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .category-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .category-list {
+            margin-top: 20px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .category-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 20px;
+        }
+
+        .category-item span {
+            font-size: 1rem;
+            flex: 1;
+        }
+
+        .category-item p {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .category-item button {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .category-item button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <th:block th:replace="~{layout/MyPageHeader}"></th:block>
+    <div class="" style="display: flex; width: 1400px;">
+    <th:block th:replace="~{layout/SideMenu}"></th:block>
+    <div class="order-list" style="margin-left: 200px;">
+        <h3>관심 카테고리 관리</h3>
+
+        <!-- 카테고리 추가 폼 -->
+        <div class="category-form">
+            <select id="categorySelect">
+                <option value="">관심 카테고리 선택</option>
+                <option value="컴퓨터 부품1">컴퓨터 부품1</option>
+                <option value="컴퓨터 부품2">컴퓨터 부품2</option>
+                <option value="컴퓨터 부품3">컴퓨터 부품3</option>
+                <option value="컴퓨터 부품4">컴퓨터 부품4</option>
+            </select>
+            <input type="text" id="categoryInput" placeholder="또는 카테고리 입력" />
+            <button id="addCategoryBtn">카테고리 추가</button>
+        </div>
+
+        <!-- 관심 카테고리 목록 -->
+        <div class="category-list" id="categoryList">
+            <!-- 카테고리 항목들이 여기에 추가될 것입니다. -->
+        </div>
+    </div>
+
+    <script>
+        // 카테고리 추가 버튼 클릭 시
+        document.getElementById('addCategoryBtn').addEventListener('click', function() {
+            var categorySelect = document.getElementById('categorySelect');
+            var categoryInput = document.getElementById('categoryInput');
+            var categoryName = categorySelect.value.trim() || categoryInput.value.trim(); // 선택된 값 또는 입력된 값
+
+            if (categoryName !== '') {
+                addCategoryToList(categoryName);
+                categorySelect.value = ''; // 선택 초기화
+                categoryInput.value = ''; // 입력 초기화
+            } else {
+                alert('카테고리를 선택하거나 입력하세요.');
+            }
+        });
+
+        // 카테고리 삭제 함수
+        function deleteCategory(categoryName) {
+            var categoryList = document.getElementById('categoryList');
+            var categories = categoryList.getElementsByClassName('category-item');
+
+            for (var i = 0; i < categories.length; i++) {
+                var item = categories[i];
+                if (item.querySelector('span').textContent === categoryName) {
+                    item.remove();
+                    break;
+                }
+            }
+        }
+
+        // 카테고리 목록에 항목 추가 함수
+        function addCategoryToList(categoryName) {
+            var categoryList = document.getElementById('categoryList');
+
+            // 새 카테고리 항목 생성
+            var categoryItem = document.createElement('div');
+            categoryItem.className = 'category-item';
+
+            // 카테고리 이름 텍스트
+            var categoryText = document.createElement('span');
+            categoryText.textContent = categoryName;
+
+            // 제품 설명 텍스트 (카테고리별로 다르게 설정)
+            var productDesc = document.createElement('p');
+            switch (categoryName) {
+                case '컴퓨터 부품1':
+                    productDesc.textContent = "컴퓨터 부품1: CPU, 메모리, 그래픽 카드 등을 포함한 고성능 부품들.";
+                    break;
+                case '컴퓨터 부품2':
+                    productDesc.textContent = "컴퓨터 부품2: 마더보드, 파워 서플라이, 저장 장치 등을 포함한 필수 부품들.";
+                    break;
+                case '컴퓨터 부품3':
+                    productDesc.textContent = "컴퓨터 부품3: 케이스, 쿨러, 키보드, 마우스 등 주변기기들.";
+                    break;
+                case '컴퓨터 부품4':
+                    productDesc.textContent = "컴퓨터 부품4: 컴퓨터 성능을 높여주는 고급 부품들, 예를 들어 SSD, 고급 GPU 등.";
+                    break;
+                default:
+                    productDesc.textContent = "이 제품은 고품질 컴퓨터 부품입니다. 빠른 속도와 안정성을 자랑합니다.";
+            }
+
+            // 카테고리 이미지
+            var categoryImage = document.createElement('img');
+            categoryImage.src = 'https://via.placeholder.com/80'; // 더미 이미지 (실제 이미지 URL로 교체 가능)
+            categoryImage.alt = categoryName;
+
+            // 삭제 버튼
+            var deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '삭제';
+            deleteBtn.addEventListener('click', function() {
+                deleteCategory(categoryName);
+            });
+
+            // 카테고리 항목에 텍스트, 설명, 이미지 및 삭제 버튼 추가
+            categoryItem.appendChild(categoryImage);
+            categoryItem.appendChild(categoryText);
+            categoryItem.appendChild(productDesc);
+            categoryItem.appendChild(deleteBtn);
+
+            // 목록에 추가
+            categoryList.appendChild(categoryItem);
+        }
+    </script>
+</div>
+</body>
+</html>

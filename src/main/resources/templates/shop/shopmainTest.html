@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Top Selling Products</title>
+</head>
+<body>
+    <!-- 전체 판매량이 많은 상품 리스트를 담을 컨테이너 -->
+    <div class="movie-slider"></div>
+
+    <!-- 로그인한 사용자의 연령대별로 판매된 상품을 담을 컨테이너 -->
+    <div id="age-group-products"></div>
+
+    <!--테스트용 로그인-->
+    <div>
+    <form action="/member/login" method="POST">
+        <input type="email" name="email" value="1234@example.com">
+        <input type="password" name="password" value="12345">
+        <input type="submit" value="전송">
+    </form>
+    </div>
+
+    <script>
+        // 첫 번째 fetch: 전체 판매량이 많은 상품
+        fetch('/shop/topSelling')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("받아온 데이터:", data); // 데이터 구조 확인
+
+                const sliderContainer = document.querySelector('.movie-slider');
+                
+                // 만약 데이터가 비어 있으면 처리
+                if (!Array.isArray(data) || data.length === 0) {
+                    sliderContainer.innerHTML = `
+                        <p>현재 판매 기록이 없습니다.</p>
+                    `;
+                    return;
+                }
+
+                // 데이터를 순회하며 상품 카드 생성
+                data.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'movie-card';
+
+                    const productImage = item.storedFilename 
+                        ? `/shop/product/${item.storedFilename}` // 유효한 이미지
+                        : '/default-image.jpg'; // 기본 이미지
+
+                    card.innerHTML = `
+                        <a href="/shop/view?productSeqno=${item.productSeqno || ''}" 
+                           style="text-decoration: none; color: inherit;">
+                            <div>
+                                <p>순위: ${index + 1}</p> <!-- 순위 추가 -->
+                                <img src="${productImage}" alt="${item.productName}" 
+                                     style="width: 200px; height: 150px; border-radius: 10px;">
+                                <p>${item.productName}</p>
+                            </div>
+                        </a>
+                    `;
+                    sliderContainer.appendChild(card);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching top-selling products:', error);
+                const sliderContainer = document.querySelector('.movie-slider');
+                sliderContainer.innerHTML = `
+                    <p>상품 데이터를 불러오는 데 실패했습니다. 다시 시도해 주세요.</p>
+                `;
+            });
+
+        // 로그인한 사용자의 연령대별 가장 많이 팔린 상품을 조회하는 fetch
+        fetch('/shop/topProductsByAgeForLoggedUser')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            console.log("응답 내용:", response); // 응답 내용 확인
+            return response.json();
+        })
+        .then(data => {
+            console.log("받아온 데이터:", data); // 데이터 구조 확인
+
+            const ageGroupContainer = document.querySelector('#age-group-products');
+
+            // 만약 데이터가 비어 있으면 처리
+            if (!data || Object.keys(data).length === 0) {
+                ageGroupContainer.innerHTML = `<p>연령대별로 판매된 상품이 없습니다.</p>`;
+                return;
+            }
+
+            // 각 연령대별로 상품 리스트 출력
+            for (const [ageGroup, products] of Object.entries(data)) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'age-group';
+
+                // 연령대 제목
+                const ageGroupTitle = document.createElement('h2');
+                ageGroupTitle.textContent = `${ageGroup}의 판매량이 많은 상품`;
+                groupDiv.appendChild(ageGroupTitle);
+
+                // 상품 카드 생성
+                if (!products || products.length === 0) {
+                    groupDiv.innerHTML += `<p>해당 연령대의 상품이 없습니다.</p>`;
+                } else {
+                    const productList = document.createElement('div');
+                    products.forEach((item, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'product-card';
+
+                        // 이미지가 0인 경우 기본 이미지로 처리
+                        const productImage = item.storedFilename !== "0" 
+                            ? `/shop/product/${item.storedFilename}` // 유효한 이미지
+                            : '/default-image.jpg'; // 기본 이미지
+
+                        // 상품 정보 표시
+                        card.innerHTML = `
+                            <a href="/shop/view?productSeqno=${item.productSeqno || ''}" 
+                               style="text-decoration: none; color: inherit;">
+                                <div>
+                                    <p>순위: ${index + 1}</p> <!-- 순위 추가 -->
+                                    <img src="${productImage}" alt="${item.productName}" 
+                                         style="width: 200px; height: 150px; border-radius: 10px;">
+                                    <p>${item.productName}</p>
+                                </div>
+                            </a>
+                        `;
+                        productList.appendChild(card);
+                    });
+                    groupDiv.appendChild(productList);
+                }
+
+                ageGroupContainer.appendChild(groupDiv);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching top products by age group:', error);
+            const ageGroupContainer = document.querySelector('#age-group-products');
+            ageGroupContainer.innerHTML = `<p>상품 데이터를 불러오는 데 실패했습니다. 다시 시도해 주세요.</p>`;
+        });
+    </script>
+
+    <!-- 추가 스크립트 -->
+    <script src="/src/main/resources/static/js/ajax.js"></script>
+    <script src="/src/main/resources/static/js/menuToggle copy.js"></script>
+</body>
+</html>

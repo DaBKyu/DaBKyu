@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카테고리</title>
+<link rel="stylesheet" type="text/css" href="/css/board.css">
+<link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
+<style>
+body {
+    padding-left: 200px;
+    padding-right: 200px;
+    margin: 0; /* 기본 margin 제거 */
+}
+.search-input {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #b0ece9;
+    border-radius: 4px;
+    width: 250px;
+}
+
+.cate-button {
+    padding: 8px 16px;
+    font-size: 16px;
+    background-color: #b0ece9;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+aside {
+width: 230px;
+margin-top: 140px;
+position: absolute;
+top: 0;
+background: rgb(255, 255, 255);
+transform: translateX(0); /* 메뉴를 처음에는 왼쪽으로 숨김 */
+transition: transform 0.3s ease; /* 슬라이딩 애니메이션 */
+z-index: 9999;
+border-top: solid 1px #e3e3e3;
+border-bottom: solid 1px #e3e3e3;
+font-family: "Roboto", sans-serif;
+font-weight: 400;
+font-style: normal;
+
+}
+
+.cate-button:hover {
+    background-color: #bdbdbd;
+}
+/* 각 카드 스타일 */
+.card {
+    width: 200px;
+    height: 150px;
+    text-align: center;
+    color: white;
+    border-radius: 10px;
+    overflow: flex;
+    position: relative; /* 카드 내에 텍스트를 카드 밖으로 배치할 수 있게 */
+    margin-top: 50px;
+}
+
+/* 카드들을 담고 있는 슬라이더 */
+.slider {
+    max-width: 930px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 한 줄에 4개의 카드 */
+    grid-template-rows: repeat(2, 1fr); /* 두 줄 */
+    gap: 20px; /* 카드 간격 */
+    width: 100%; /* 슬라이더 전체 너비 */
+    transition: transform 0.5s ease-in-out;
+    margin: auto;
+
+}
+
+/* 카드 밖으로 배치된 텍스트 스타일 */
+.card .product-name, .card .product-info, .card .product-price {
+    position: absolute; /* 카드 밖으로 배치할 때 사용 */
+    bottom: -30px; /* 카드 하단에 텍스트를 배치 */
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    color: #333; /* 카드 밖의 텍스트 색상을 설정 */
+    background-color: #fff; /* 텍스트 배경을 흰색으로 설정 */
+    padding: 5px;
+}
+
+/* 카드 간의 텍스트 간격을 좀 더 넓게 설정 */
+.card .product-name {
+    bottom: 10px; /* 제품명 위치를 조금 더 아래로 */
+}
+
+.card .product-price {
+    bottom: -55px; /* 제품 가격 위치 */
+}
+
+/* 페이지네이션 텍스트 스타일 */
+.page-nav {
+    text-align: center;
+    margin-top: 20px;
+}
+.menu-toggle{
+    display: none;
+}
+</style>
+</head>
+<body>
+    <th:block th:replace="~{layout/ShopHeader}"></th:block>
+    <h2 style="text-align: center; margin-top: 20px; margin-left: -20px; margin-bottom: 5px;">ddd</h2>
+    <!-- 카테고리 내 검색창 -->
+    <div class="search-container" style="display: flex; justify-content: center; margin-left: 1270px; height: 40px;">
+        <input type="text" class="search-input" name="catekeyword" id="catekeyword"
+               placeholder="카테고리 내 검색" onkeydown="catepress()">
+        <button onclick="catesearch()" class="cate-button" style="margin-left: 10px;">검색</button>
+    </div>
+    <div class="slider">
+        <div id="productList" th:each="item : ${list}" class="card" th:data-cate-seqno="${item.category3Seqno.category3Seqno}">
+            <a th:href="@{'/shop/view?productSeqno=' + ${item.productSeqno}} + '&page=1'">
+            <div class="product-name">
+                <span th:text="${item.productName}" style="font-size: 16px;"></span>
+            </div>
+            <div class="product-price">
+                <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')+'원'}"
+                    style="line-height: 2; font-size: 19px; font-weight: bold; color: rgb(40, 123, 248);"></span><br>
+                <span th:text="${#numbers.formatInteger(item.price * 0.02, 0, 'COMMA') + '포인트 적립'}" 
+                    style="font-size: 14px; padding: 2px 5px; border: 1px solid #d8a10b; border-radius: 50px;"></span>
+            </div>
+            </a>
+        </div>
+    </div>
+    <br><br><br><br><br>
+    <div style="text-align: center;">[(${pageList})]</div>
+<script src="../js/menuToggle_ShopHeader.js"></script>
+<script>
+    const catesearch = () => {
+        const catekeyword = document.querySelector('#catekeyword');
+        const productList = document.querySelector('#productList');
+        const cateSeqno = productList.getAttribute("data-cate-seqno");
+        document.location.href='/shop/categoryProduct?cate='+ cateSeqno +'&page=1&keyword='+ catekeyword.value;
+    }
+
+    const catepress = () => {
+        if(event.keyCode == 13) catesearch();
+    };
+</script>
+</body>
+</html>

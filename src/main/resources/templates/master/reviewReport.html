@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리뷰신고페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/master.css" th:href="@{/css/master.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        const search = () => {
+            const keyword = document.querySelector('#reportTitle');
+            document.location.href='/master/reviewReport?page=1&reportTitle=' + keyword.value;
+        }
+
+        const press = () => {
+            if(event.keyCode == 13) search();
+        }
+
+        const deleteReview = async (reportSeqnos) => {
+        try {
+            for (const reportSeqno of reportSeqnos) {
+                const response = await fetch(`/master/reviewReport/delete?reportSeqno=${reportSeqno}`, { method: 'GET' });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        alert(`신고 번호 ${reportSeqno}를 찾을 수 없습니다.`);
+                    } else if (response.status === 500) {
+                        alert(`신고 번호 ${reportSeqno} 삭제 중 오류가 발생했습니다.`);
+                    }
+                }
+            }
+            alert("선택한 신고가 성공적으로 삭제되었습니다.");
+            window.location.href = '/master/reviewReport?page=1&reportTitle=';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('시스템 장애로 인해 일부 신고 삭제가 실패했습니다.');
+        }
+    };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkAll = document.getElementById('checkAll');
+            var deleteButton = document.getElementById('deleteButton');
+    
+            checkAll.addEventListener('change', function() {
+                var checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = checkAll.checked;
+                });
+            });
+    
+            deleteButton.addEventListener('click', function() {
+                var selectedReviews = Array.from(document.querySelectorAll('tbody input[type="checkbox"]:checked'))
+                                           .map(cb => cb.value);
+                if (selectedReviews.length > 0) {
+                    if (confirm('선택한 리뷰신고를 삭제하시겠습니까?')) {
+                        deleteReview(selectedReviews);
+                    }
+                } else {
+                    alert('삭제할 리뷰신고를 선택해주세요.');
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <!-- 네비게이션 바 -->
+    <div th:insert="~{layout/masterNav }"></div>
+        
+    <div class="container mt-4">     
+        <h2 class="mt-4">리뷰신고목록</h2>
+
+        <!-- 카테고리 선택 -->
+        <div class="d-flex mb-3">
+            <div class="me-auto w-100 p-2">
+                <div class="input-group">
+                    <input type="text" name="reportTitle" id="reportTitle" class="form-control" placeholder="제목 검색" onkeydown="press()">
+                    <button type="button" value="검색" class="btn btn-primary" onclick="search()">검색</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 리뷰 목록 테이블 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                        <th scope="col">번호</th>
+                        <th scope="col">작성자</th>
+                        <th scope="col">제목</th>
+                        <th scope="col">내용</th>
+                        <th scope="col">요약</th>
+                        <th scope="col">작성일</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <th:block  th:if="${#strings.equals(listIsEmpty,'N')}">
+                        <tr th:each="report, index : ${list}">
+                            <td><input class="form-check-input" type="checkbox" th:value="${report.reportSeqno}"></td>
+                            <td th:text="${totalElement - (page-1)*postNum - index.count + 1}">1</td>
+                            <td th:text="${report.email.email}"></td>
+                            <td><span th:text="${report.reportTitle}"></span></td>
+                            <td><span th:text="${report.reportContent}"></span></td>
+                            <td><span th:text="${report.reportSummary}"></span></td>
+                            <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd')}">2024.10.29</td>
+                        </tr>
+                    </th:block>
+                    <!-- 목록이 비어 있을 경우 -->
+                    <th:block th:if="${#strings.equals(listIsEmpty,'Y')}">
+                        <td colspan="8" class="text-center">정보가 없습니다.</td>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 삭제버튼 -->
+        <button type="button" class="btn btn-danger" id="deleteButton">삭제</button>
+
+        <!-- 페이지네이션 -->
+        <div class="mt-4" th:text="${pageList}"></div>
+    </div>
+
+</body>
+</html>

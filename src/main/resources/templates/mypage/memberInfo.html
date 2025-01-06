@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원정보 페이지</title>
+    <link rel="stylesheet" type="text/css" href="/css/shopHeader.css">
+    <style>
+        body {
+
+            font-family: Arial, sans-serif;
+        }
+
+        .placeholder-link {
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .myMenu {
+            width: 250px; 
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .user-icon {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .order-list {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .order-list-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .search-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-icon {
+            margin-left: 10px;
+            color: #888;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .order-table {
+            margin-top: 20px;
+        }
+
+        .delivery-years {
+            display: flex;
+            gap: 10px;
+        }
+
+        .delivery-years span {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .delivery-period {
+            margin-top: 20px;
+        }
+
+        .order-summary {
+            margin-top: 20px;
+        }
+
+        .order-details {
+            margin-top: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-input {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+        }
+
+        /* 탈퇴 비밀번호 입력 폼 스타일 */
+        .password-form {
+            margin-top: 20px;
+        }
+
+        .password-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .password-form button {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .password-form button:hover {
+            background-color: #c82333;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+        }
+
+        /* 회원정보 보기 스타일 */
+        .profile-container {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .profile-info {
+            margin-bottom: 20px;
+        }
+
+        .profile-info label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .profile-info p {
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+
+        .edit-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 배송지 관리 버튼 스타일 */
+        .address-management-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+            margin-left: 10px;
+        }
+
+        .address-management-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <th:block th:replace="~{layout/MyPageHeader}"></th:block>
+    <div class="" style="display: flex; width: 1400px;">
+    <th:block th:replace="~{layout/SideMenu}"></th:block>
+
+    <!-- 회원정보 보기 -->
+    <div class="profile-container" style="margin-left: 200px; width: 1000px;">
+        <h3>회원정보 보기</h3>
+        <div class="profile-info">
+            <label for="username">이름:</label>
+            <p id="username">[[${member.username}]]</p>
+        </div>
+        <div class="profile-info">
+            <label for="email">이메일:</label>
+            <p id="email">[[${member.email}]]</p>
+        </div>
+        <div class="profile-info">
+            <label for="joinDate">가입일:</label>
+            <p id="joinDate">[[${member.regdate}]]</p>
+        </div>
+        <div class="profile-info">
+            <label for="address">기본 배송지:</label>
+            <p id="address" th:if="${viewBasicAddr != null}">
+                [[${viewBasicAddr.address}]], [[${viewBasicAddr.detailAddr}]]
+            </p>
+            <p id="address" th:unless="${viewBasicAddr != null}">
+                기본 배송지가 없습니다.
+            </p>
+        </div>
+        
+
+        <!-- 수정 버튼 -->
+        <a href="modifyMemberInfo" id="featureLink" class="edit-button">회원정보 수정</a>
+        <a href="/mypage/addrList" class="edit-button">배송지 리스트</a>
+    </div>
+    </div>
+<script>
+    document.getElementById('featureLink').addEventListener('click', function(event) {
+            event.preventDefault(); // 링크 기본 동작 방지
+            alert("추후 보완 예정입니다.");
+        });
+</script>
+</body>
+</html>

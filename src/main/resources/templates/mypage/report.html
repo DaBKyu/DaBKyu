@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신고 게시판</title>
+    <link rel="stylesheet" href="/css/mypage.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+
+        #myMenu {
+            width: 250px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .report-section {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+        }
+
+        .search-section {
+            margin-bottom: 20px;
+        }
+
+        .search-section input {
+            padding: 10px;
+            width: 80%;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-section button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-section button:hover {
+            background-color: #0056b3;
+        }
+
+        .report-item {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .report-item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .report-details {
+            flex: 1;
+        }
+
+        .report-title {
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .report-info {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+        }
+
+        .close {
+            cursor: pointer;
+            color: #007bff;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="myMenu">
+        <h2>mypage</h2>
+        <div class="user-icon">
+            <i class="fas fa-user-circle"></i> <!-- 사용자 아이콘 -->
+        </div>
+        <nav>
+            <div>
+                <div>나의 쇼핑</div>
+                <ul>
+                    <li><a href="order.html" title="주문목록/배송조회">주문/배송조회</a></li>
+                    <li><a href="cancelRefundChange.html" title="취소/환불/교환">취소/환불/교환</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 정보</div>
+                <ul>
+                    <li><a href="meberInfo.html" title="회원정보 보기">회원정보 보기</a></li>
+                    <li><a href="modifyProfile.html" title="회원정보 수정">회원정보 수정</a></li>
+                    <li><a href="deleteAccount.html" title="회원탈퇴" id="deleteAccountBtn">회원탈퇴</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 관심목록</div>
+                <ul>
+                    <li><a href="wishlist.html" title="찜한 상품">찜한 상품</a></li>
+                    <li><a href="myCategory.html" title="카테고리">카테고리</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 활동</div>
+                <ul>
+                    <li><a href="reviews.html" title="리뷰 모음">리뷰 모음</a></li>
+                    <li><a href="myQuestion.html" title="문의 게시판">문의 게시판</a></li>
+                    <li><a href="report.html" title="신고 게시판">신고 게시판</a></li>
+                </ul>
+            </div>
+            <div>
+                <div>나의 혜택</div>
+                <ul>
+                    <li><a href="myCoupons.html" title="할인쿠폰">할인쿠폰</a></li>
+                    <li><a href="membership.html" title="등급">등급페이지</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- 신고 게시판 섹션 -->
+    <div class="report-section">
+        <h2>신고 게시판</h2>
+
+        <!-- 신고된 항목들 -->
+        <div class="report-item" data-id="1">
+            <img src="path/to/image1.jpg" alt="상품 이미지 1">
+            <div class="report-details">
+                <p class="report-title">상품 제목 1</p>
+                <p class="report-info">2024-10-01 | 상태: 처리 대기</p>
+                <p>신고 내용: 상품에 대한 불만 제기</p>
+            </div>
+            <div class="report-actions">
+                <button onclick="viewReport(1)">상세보기</button>
+                <button onclick="deleteReport(1)">삭제</button>
+            </div>
+        </div>
+
+        <div class="report-item" data-id="2">
+            <img src="path/to/image2.jpg" alt="상품 이미지 2">
+            <div class="report-details">
+                <p class="report-title">상품 제목 2</p>
+                <p class="report-info">2024-10-02 | 상태: 처리 완료</p>
+                <p>신고 내용: 상품 설명에 오류가 포함됨</p>
+            </div>
+            <div class="report-actions">
+                <button onclick="viewReport(2)">상세보기</button>
+                <button onclick="deleteReport(2)">삭제</button>
+            </div>
+        </div>
+
+        <div class="report-item" data-id="3">
+            <img src="path/to/image3.jpg" alt="상품 이미지 3">
+            <div class="report-details">
+                <p class="report-title">상품 제목 3</p>
+                <p class="report-info">2024-11-11 | 상태: 처리 대기</p>
+                <p>신고 내용: 관련 없는 내용</p>
+            </div>
+            <div class="report-actions">
+                <button onclick="viewReport(3)">상세보기</button>
+                <button onclick="deleteReport(3)">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 모달 팝업 -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2>신고 내용 상세</h2>
+            <p id="modalContent"></p>
+            <div class="close" id="closeModal">닫기</div>
+        </div>
+    </div>
+
+    <script>
+        // 신고 상세보기 팝업 열기
+        function viewReport(reportId) {
+            const reportContent = getReportContentById(reportId); // 신고 내용 불러오기
+            document.getElementById('modalContent').textContent = reportContent;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        // 신고 삭제
+        function deleteReport(reportId) {
+            const reportItem = document.querySelector(`.report-item[data-id="${reportId}"]`);
+            reportItem.remove(); // DOM에서 해당 신고 항목 삭제
+            alert("신고가 삭제되었습니다.");
+        }
+
+        // 신고 내용을 저장하는 예시 (실제 데이터는 서버에서 받아와야 함)
+        function getReportContentById(reportId) {
+            const reports = {
+                1: "상품 제목 1에 대한 신고 내용: 불만 사항이 있습니다.",
+                2: "상품 제목 2에 대한 신고 내용: 상품 설명에 오류가 있습니다.",
+                3: "상품 제목 3에 대한 신고 내용: 관련 없는 내용."
+            };
+            return reports[reportId] || "신고 내용이 없습니다.";
+        }
+
+        // 모달 닫기
+        document.getElementById('closeModal').addEventListener('click', function () {
+            document.getElementById('modal').style.display = 'none';
+        });
+    </script>
+</body>
+
+</html>

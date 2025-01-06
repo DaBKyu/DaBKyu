@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원정보수정</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/master.css" th:href="@{/css/master.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('modifyForm');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                if (!form.checkValidity()) {
+                    event.stopPropagation();
+                    form.classList.add('was-validated');
+                    return;
+                }
+
+                const formData = new FormData(form);
+                fetch('/master/modifyViewClient', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === "good") {
+                        alert("회원 정보 수정이 완료되었습니다.");
+                        window.location.href = "/master/client?page=1";
+                    } else {
+                        alert("회원 정보 수정에 실패했습니다. 다시 시도해주세요.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("오류가 발생했습니다. 다시 시도해주세요.");
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <!-- 네비게이션 바 -->
+    <div th:insert="~{layout/masterNav }"></div>
+        
+    <div class="container mt-5 mb-5">     
+        <h2 class="mt-4">회원정보수정</h2>
+
+        <!-- 회원정보 수정폼 -->
+        <!-- 수정가능 내용관련 필요 -->
+        <form id="modifyForm" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+    
+            <!-- 이메일 -->
+            <div class="mb-3">
+                <label for="email" class="form-label">이메일</label>
+                <input type="text" id="email" name="email" class="form-control" th:value="${member.email}" readonly>
+            </div>
+    
+            <!-- username -->
+            <div class="mb-3">
+                <label for="username" class="form-label">이름</label>
+                <input id="username" name="username" class="form-control" placeholder="이름을 입력하세요" th:value="${member.username}" required>
+                <div class="invalid-feedback">이름을 입력해주세요.</div>
+            </div>
+
+            <!-- 전화번호 -->
+            <div class="mb-3">
+                <label for="telno" class="form-label">전화번호</label>
+                <input id="telno" name="telno" class="form-control" th:value="${member.telno}" readonly>
+            </div>
+
+            <!-- 성별 -->
+            <div class="mb-3">
+                <label for="gender" class="form-label">성별</label>
+                <input id="gender" name="gender" class="form-control" th:value="${member.gender}" readonly>
+            </div>
+
+            <!-- 생일 -->
+            <div class="mb-3">
+                <label for="birthDate" class="form-label">생일</label>
+                <input type="hidden" id="birthDate" name="birthDate" class="form-control" th:value="${member.birthDate}" readonly>
+                <input class="form-control" th:value="${#temporals.format(member.birthDate, 'yyyy-MM-dd')}" readonly>
+            </div>
+
+            <!-- 등급 -->
+            <div class="mb-3">
+                <label for="memberGrade" class="form-label">회원등급</label>
+                <select id="memberGrade" name="memberGrade" class="form-select" required>
+                    <option value="" disabled selected>등급을 선택하세요</option>
+                    <option value="Platinum" th:selected="${member.memberGrade}=='Platinum'">Platinum</option>
+                    <option value="Gold" th:selected="${member.memberGrade}=='Gold'">Gold</option>
+                    <option value="Silver" th:selected="${member.memberGrade}=='Silver'">Silver</option>
+                    <option value="Bronze" th:selected="${member.memberGrade}=='Bronze'">Bronze</option>
+                </select>
+                <div class="invalid-feedback">등급을 선택해주세요.</div>
+            </div>
+            
+            <!-- 결제수단 -->
+            <div class="mb-3">
+                <label for="pay" class="form-label">결제수단</label>
+                <input id="pay" name="pay" class="form-control" th:value="${member.pay}" readonly>
+            </div>
+
+            <!-- 포인트 -->
+            <div class="mb-3">
+                <label for="point" class="form-label">포인트</label>
+                <input id="point" name="point" class="form-control" th:value="${member.point}" readonly>
+            </div>
+
+            <!-- 권한 -->
+            <div class="mb-3">
+                <label for="role" class="form-label">권한</label>
+                <input id="role" name="role" class="form-control" th:value="${member.role}" readonly>
+            </div>
+
+            <!-- 수신동의 -->
+            <div class="mb-3">
+                <label for="emailRecept" class="form-label">수신동의</label>
+                <input id="emailRecept" name="emailRecept" class="form-control" th:value="${member.emailRecept}" readonly>
+            </div>
+    
+    
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary w-100">수정</button>
+    
+                <a href="/master/client?page=1&keyword=" class="btn btn-secondary w-100">작성 취소</a>
+            </div>
+    
+        </form>
+
+    </div>
+    
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 페이지</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<style>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 화면 높이만큼 설정하여 수직 중앙 정렬 */
+    margin: 0;
+}
+.ModifyForm {
+    margin: auto;
+    padding: 20px;
+    border:2px solid #adabab;
+    border-radius: 10px;
+    margin-top: 40px;
+}
+.input_field{
+    width: 300px;
+    height: 25px;
+    border-radius: 6px;
+    border:1px solid #adabab;
+    margin-bottom: 10px;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<script>
+window.onload = async () => {
+	
+	//쿠키 가져 오기 
+	const getCookie = (name) => {
+		
+		const cookies = document.cookie.split(`; `).map((el)=>el.split('='));
+		let getItem = []; 
+		
+		for(let i=0; i<cookies.length;i++){
+			if(cookies[i][0] === name){
+				getItem.push(cookies[i][1]);
+				break;
+			}
+		} 
+		if(getItem.length > 0) {
+			return decodeURIComponent(getItem[0]);
+		}
+	}
+	
+	const session_email = '[[${session.email}]]';
+	if(getCookie('remember-me') !== '' && session_email !== '')
+		document.location.href='/shop/main';
+	
+	let email = getCookie('email');
+			
+	//email 쿠키가 존재하면...
+	if(email !== undefined){
+		document.querySelector('#rememberEmail').checked = true;
+		document.querySelector('#email').value = email;
+	}else {
+		document.querySelector('#rememberEmail').checked = false;
+	}
+	
+}
+
+const login = () => {
+	document.loginForm.action = '/member/login';
+	document.loginForm.submit();
+}
+
+//로그인 처리
+const loginCheck = async () => {
+	
+	const email = document.querySelector('#email');
+	const password = document.querySelector('#password');
+			
+	if(email.value === ''){
+		alert("아이디를 입력하세요");
+		email.focus();
+		return false;
+	}
+	
+	if(password.value === ''){
+		alert("암호를 입력하세요");
+		password.focus();
+		return false;
+	}
+	
+	let formData = new FormData();
+	formData.append("email", email.value);
+	formData.append("password", password.value);
+	
+	await fetch('/member/loginCheck',{
+		method: "POST",
+		body: formData
+	}).then((response) => response.json())
+		.then((data) => {
+			if(data.message === 'good'){
+				cookieManage(email.value,password.value);
+				login();
+			}else if(data.message === 'ID_NOT_FOUND'){
+				msg.innerHTML = '존재하지 않는 아이디입니다.';
+			}else if(data.message === 'PASSWORD_NOT_FOUND'){
+				msg.innerHTML = '잘못된 패스워드입니다.';
+			}else {
+				alert("시스템 장애로 로그인이 실패 했습니다.");
+			}
+		}).catch((error)=> {
+			console.log("error = " + error);
+		})
+
+}
+
+//이메일 체크 관리
+const checkRememberEmail = () => {
+	if(document.querySelector('#rememberEmail').checked)
+		document.querySelector('#rememberMe').checked = false;
+}
+
+//자동 로그인 체크 관리
+const checkRememberMe = () => {
+	if(document.querySelector('#rememberMe').checked){
+		document.querySelector('#rememberEmail').checked = false;
+	}
+}
+
+//쿠키 관리
+const cookieManage = (email,password) => {
+	
+	//email가 체크되었을 경우
+	if(rememberEmail.checked) {
+		document.cookie = 'email=' + email + '; path=/; expires=Tue, 31, Dec 2024 23:59:59 GMT';
+	}else {
+		document.cookie = 'email=' + email + '; path=/; max-age=0';
+	}
+	
+}
+
+const press = () => {
+	if(event.keyCode == 13) loginCheck();
+}
+
+</script>
+</head>
+<body>
+<div class="ModifyForm" style="text-align:center;">
+    
+    <div class="WriteForm">
+        <h1>로그인</h1>
+        <form name="loginForm" id="loginForm" method="post">
+            <!-- 아이디 기억 체크박스 -->
+            <input type="checkbox" id="rememberEmail" onclick="checkRememberEmail()" style="margin-left:-30px;">아이디 기억
+            <!-- 자동 로그인 체크박스 -->
+            <input type="checkbox" id="rememberMe" onclick="checkRememberMe()" style="margin-left:20px;">로그인 상태 유지<br>
+            <!--패스워드 기억 체크박스<input type="checkbox" id="rememberPassword" onclick="checkRememberPassword()">-->
+
+            <!-- 이메일 입력란 -->
+            <input type="text" class="input_field" id="email" name="email" placeholder="이메일을 입력하세요." style="width: 300px; height: 40px; border-radius: 5px; border: 1px solid; margin-bottom: 5px; margin-top: 5px;"><br>
+
+            <!-- 패스워드 입력란 -->
+            <input type="password" class="input_field" id="password" name="password" placeholder="패스워드를 입력하세요." style="width: 300px; height: 40px; border-radius: 5px; border: 1px solid;" onkeydown="press()"><br>
+        
+            
+            <p id="msg" style="color:red; text-align:center"></p>
+            <!-- 로그인 버튼 -->
+            <input type="button" id="btn_login" class="btn_login" value="Login" onclick="loginCheck()" style="width: 300px; height: 40px; margin-bottom: 20px; background-color: black; color: white; border-radius: 5px; border: 1px solid black;">
+            <br>
+
+            <a href="/oauth2/authorization/google" class="btn_login" style="display: inline-block; width: 300px; height: 40px; margin-bottom: 5px; text-align: center; line-height: 40px; text-decoration: none; border-radius: 5px; border: 1px solid black;">
+                Sign in with Google
+            </a>
+            <br>
+            <a href="/oauth2/authorization/naver" class="btn_login" style="display: inline-block; width: 300px; height: 40px; text-align: center; line-height: 40px;  text-decoration: none; border-radius: 5px; border: 1px solid black;">
+                Sign in with Naver
+            </a>
+            
+        
+            		
+        </form>
+        
+        <div class="bottomText">
+            <a href="/member/signup" style="text-decoration: none;" onmouseover="this.style.background='#e3e3e3';"
+            onmouseout="this.style.background='white'; this.style.textDecoration='none';">회원가입</a><a> | </a>
+            <a href="/member/searchID" 
+               style="text-decoration: none;" 
+               onmouseover="this.style.background='#e3e3e3'; this.style.textDecoration='none';" 
+               onmouseout="this.style.background='white'; this.style.textDecoration='none';">아이디 찾기</a><a> | </a>
+            <a href="/member/searchPassword" 
+               style="text-decoration: none;" 
+               onmouseover="this.style.background='#e3e3e3'; this.style.textDecoration='none';" 
+               onmouseout="this.style.background='white'; this.style.textDecoration='none';">비밀번호 찾기</a>
+            <br><br>
+        </div>
+    </div>
+</div>
+</body>
+</html>
