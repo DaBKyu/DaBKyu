@@ -34,7 +34,12 @@
 
 ## ⚙️Skills
 <h3 style="margin-top:0px">Platforms & Languages</h3>
-<img src="https://img.shields.io/badge/Java-007396?style=flat-square&logo=Java&logoColor=white" alt="Java" /><img src="https://img.shields.io/badge/javascript-F7DF1E?style=flat-square&logo=javascript&logoColor=black"><img src="https://img.shields.io/badge/Spring-6DB33F?style=flat-square&logo=spring&logoColor=white" alt="Spring" /><img src="https://img.shields.io/badge/ORACLE-F80000?style=flat-square&logo=oracle&logoColor=white"><!-- <img src="https://img.shields.io/badge/react-61DAFB?style=flat-square&logo=react&logoColor=black"> --><img src="https://img.shields.io/badge/apache tomcat-F8DC75?style=flat-square&logo=apachetomcat&logoColor=white">
+<img src="https://img.shields.io/badge/Java-007396?style=flat-square&logo=Java&logoColor=white" alt="Java" />
+<img src="https://img.shields.io/badge/javascript-F7DF1E?style=flat-square&logo=javascript&logoColor=black">
+<img src="https://img.shields.io/badge/Spring-6DB33F?style=flat-square&logo=spring&logoColor=white" alt="Spring" />
+<img src="https://img.shields.io/badge/ORACLE-F80000?style=flat-square&logo=oracle&logoColor=white">
+<!-- <img src="https://img.shields.io/badge/react-61DAFB?style=flat-square&logo=react&logoColor=black"> -->
+<img src="https://img.shields.io/badge/apache tomcat-F8DC75?style=flat-square&logo=apachetomcat&logoColor=white">
 
 <img src="https://img.shields.io/badge/Thymeleaf-005F0F?style=flat-square&logo=Thymeleaf&logoColor=white">
 <img src="https://img.shields.io/badge/Hibernate-59666C?style=flat-square&logo=hibernate&logoColor=white">
