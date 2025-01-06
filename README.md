@@ -84,7 +84,7 @@
 - 직관적인 디자인과 단순한 구조로 관리자의 웹사이트 운영 편의성을 향상
 
 ## 시스템 구성도 & 사이트맵
-<div style="display:flex; justify-content: center; gap: 100px">
+<div style="display:flex; justify-content: center; gap: 100px;">
 <div>
 <h3>시스템 구성도</h3>
   <img src="README_img/systemDiagram.png" alt="예제 이미지" width="300px">
