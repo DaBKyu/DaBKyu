@@ -46,7 +46,6 @@
 <img src="https://img.shields.io/badge/Hibernate-59666C?style=flat-square&logo=hibernate&logoColor=white">
 <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat-square&logo=springBoot&logoColor=white">
 <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=flat-square&logo=springsecurity&logoColor=white"></p>
-
 <br>
 <h3 style="margin-top:0px">Tools</h3>
 <p align="left">
