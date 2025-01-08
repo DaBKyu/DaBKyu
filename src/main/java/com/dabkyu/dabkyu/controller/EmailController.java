@@ -1,5 +1,6 @@
 package com.dabkyu.dabkyu.controller;
 
+import java.io.File;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,26 @@ public class EmailController {
         @RequestParam(name = "couponSeqnoList", required = false) List<Long> couponSeqnoList
     ) throws Exception {
 
+        // 운영체제에 따라 이미지 저장 경로 설정
+        String os = System.getProperty("os.name").toLowerCase();
+        String fileSavePath = os.contains("win") 
+            ? "c:\\Repository\\dabkyu\\mail\\images\\" 
+            : "/home/gladius/Repository/dabkyu/mail/images/";
+
+        // 디렉토리 존재 여부 확인 후, 없으면 생성
+        File saveDir = new File(fileSavePath);
+        if (!saveDir.exists()) {
+            System.out.println("디렉토리 존재하지 않음. 생성 시도...");
+            if (saveDir.mkdirs()) {
+                System.out.println("디렉토리 생성 성공");
+            } else {
+                System.err.println("첨부파일 저장 디렉토리 생성 실패. 경로: " + saveDir.getAbsolutePath());
+            }
+        } else {
+            System.out.println("디렉토리가 이미 존재합니다.");
+        }
+
+
         //이메일 발송
         emailService.sendEmail(title, content, mailFileList, kind, category3SeqnoList, productSeqnoList, couponSeqnoList);
 
@@ -60,7 +81,7 @@ public class EmailController {
         if (mailFileList != null && mailFileList.length > 0) {
             for (MultipartFile file : mailFileList) {
                 if (!file.isEmpty()) {
-                    emailService.saveEmailFile(maxSeqno, new MultipartFile[]{file});
+                    emailService.saveEmailFile(maxSeqno, fileSavePath, new MultipartFile[]{file});
                 }
             }
         }

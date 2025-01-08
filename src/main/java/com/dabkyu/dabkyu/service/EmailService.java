@@ -27,7 +27,7 @@ public interface EmailService {
     public void saveEmailLike(Long maxSeqno, List<Long>productSeqnoList);
 
     //파일 저장
-    public void saveEmailFile(Long maxSeqno, MultipartFile[] mailFileList);
+    public void saveEmailFile(Long maxSeqno, String fileSavePath, MultipartFile[] mailFileList);
 
     //메일 리스트 조회
     public List<EmailEntity> getAllMails();

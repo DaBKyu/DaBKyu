@@ -40,7 +40,9 @@ public class WebSecurityConfig {
     //스프링 시큐리티 적용 제외 대상 설정을 빈에 등록
     @Bean
     WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/images/**", "/css/**", "/js/**", "/product/images/**", "/product/thumbnails/**","/question/images/**");
+        return (web) -> web.ignoring().requestMatchers("/images/**", "/css/**", "/js/**", "/product/images/**", "/product/thumbnails/**","/question/images/**",
+        "/review/images/**","/mail/images/**"
+    );
     }
 
     //스프링 시큐리티 필터 빈에 등록

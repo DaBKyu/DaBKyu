@@ -26,23 +26,34 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dabkyu.dabkyu.dto.Category1DTO;
 import com.dabkyu.dabkyu.dto.Category2DTO;
 import com.dabkyu.dabkyu.dto.Category3DTO;
+import com.dabkyu.dabkyu.dto.CategorySalesDTO;
 import com.dabkyu.dabkyu.dto.CouponDTO;
 import com.dabkyu.dabkyu.dto.DailySalesDTO;
 import com.dabkyu.dabkyu.dto.DailyVisitorDTO;
 import com.dabkyu.dabkyu.dto.MemberDTO;
+import com.dabkyu.dabkyu.dto.MemberSalesDTO;
+import com.dabkyu.dabkyu.dto.MonthlySalesDTO;
 import com.dabkyu.dabkyu.dto.OrderInfoDTO;
 import com.dabkyu.dabkyu.dto.ProductDTO;
 import com.dabkyu.dabkyu.dto.ProductFileDTO;
 import com.dabkyu.dabkyu.dto.ProductInfoFileDTO;
 import com.dabkyu.dabkyu.dto.ProductOptionDTO;
+import com.dabkyu.dabkyu.dto.ProductSalesDTO;
 import com.dabkyu.dabkyu.dto.QuestionCommentDTO;
 import com.dabkyu.dabkyu.dto.RelatedProductDTO;
 import com.dabkyu.dabkyu.dto.ReportDTO;
+import com.dabkyu.dabkyu.dto.SalesByAgeGroupDTO;
+import com.dabkyu.dabkyu.dto.SalesByMemberGradeDTO;
+import com.dabkyu.dabkyu.dto.SignupAgeStatDTO;
+import com.dabkyu.dabkyu.dto.SignupDateStatDTO;
+import com.dabkyu.dabkyu.dto.SignupGenderStatDTO;
 import com.dabkyu.dabkyu.entity.Category1Entity;
 import com.dabkyu.dabkyu.entity.Category2Entity;
 import com.dabkyu.dabkyu.entity.Category3Entity;
@@ -1180,6 +1191,7 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
         
     }
 
+    //리뷰 관리
     //리뷰 리스트 조회
     @GetMapping("/master/reviewList")
     public ResponseEntity<Map<String, Object>> getReviewList() {
@@ -1252,6 +1264,7 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
         }
     }
 
+    //메일 관리
     //메일 리스트 조회
     @GetMapping("/master/mailList")
     public ResponseEntity<Map<String, Object>> getMailList() {
@@ -1272,10 +1285,176 @@ public ResponseEntity<Map<String, Object>> addCategory2(@RequestBody Category2DT
         return ResponseEntity.ok(response);
     } 
 
-
     //메일 발송
+    @PostMapping("/master/sendMail")
+    public ResponseEntity<String> sendCategoryInterestMail(
+        @RequestParam(name = "category3SeqnoList", required = false) List<Long> category3SeqnoList,
+        @RequestParam(name = "productSeqnoList", required = false) List<Long> productSeqnoList,
+        @RequestParam(name = "mailFileList", required = false) MultipartFile[] mailFileList,
+        @RequestParam(name = "kind") String kind,
+        @RequestParam(name = "title") String title,
+        @RequestParam(name = "content") String content,
+        @RequestParam(name = "couponSeqnoList", required = false) List<Long> couponSeqnoList
+    ) throws Exception {
+
+        // 운영체제에 따라 이미지 저장 경로 설정
+        String os = System.getProperty("os.name").toLowerCase();
+        String fileSavePath = os.contains("win") 
+            ? "c:\\Repository\\dabkyu\\mail\\images\\" 
+            : "/home/gladius/Repository/dabkyu/mail/images/";
+
+        // 디렉토리 존재 여부 확인 후, 없으면 생성
+        File saveDir = new File(fileSavePath);
+        if (!saveDir.exists()) {
+            System.out.println("디렉토리 존재하지 않음. 생성 시도...");
+            if (saveDir.mkdirs()) {
+                System.out.println("디렉토리 생성 성공");
+            } else {
+                System.err.println("첨부파일 저장 디렉토리 생성 실패. 경로: " + saveDir.getAbsolutePath());
+            }
+        } else {
+            System.out.println("디렉토리가 이미 존재합니다.");
+        }
+
+        // 이메일 발송
+        emailService.sendEmail(title, content, mailFileList, kind, category3SeqnoList, productSeqnoList, couponSeqnoList);
+
+        // maxSeqno 구하기
+        Long maxSeqno = emailService.getMaxSeqno();
+        
+        // 카테고리 저장 
+        if(category3SeqnoList != null) {
+        emailService.saveEmailCategory(maxSeqno, category3SeqnoList);
+        }
+        
+        // 찜상품 저장
+        if(productSeqnoList != null) {
+        emailService.saveEmailLike(maxSeqno, productSeqnoList);
+        }
+        
+        // 파일 저장
+        if (mailFileList != null && mailFileList.length > 0) {
+            for (MultipartFile file : mailFileList) {
+                if (!file.isEmpty()) {
+                    emailService.saveEmailFile(maxSeqno, fileSavePath, new MultipartFile[]{file});
+                }
+            }
+        }
+
+        return ResponseEntity.ok("메일이 발송되었습니다.");
+    }
+
     
     //통계(매출,가입,방문)
+    
+    //월별 매출
+    @GetMapping("/master/salesByYearData")
+    public ResponseEntity<List<MonthlySalesDTO>> getYearlySales(@RequestParam("year") int year) {
+        List<MonthlySalesDTO> monthlySalesData = masterService.getYearlySales(year);
+        return ResponseEntity.ok(monthlySalesData);  // 200 OK 응답과 함께 반환
+    }
+    
+    //카테고리별 매출
+    @GetMapping("/master/salesByCategoryData")
+    public ResponseEntity<List<CategorySalesDTO>> getCategorySalesData() {
+        List<CategorySalesDTO> categorySalesData = masterService.getCategorySales();
+        return ResponseEntity.ok(categorySalesData);
+    }
+
+    //회원별
+    @GetMapping("/master/salesByMemberData")
+    public ResponseEntity<List<MemberSalesDTO>> getMemberSales() {
+        List<MemberSalesDTO> memberSalesData = masterService.getMemberSales();
+        return ResponseEntity.ok(memberSalesData);
+    }
+
+    //연령대별
+    @GetMapping("/master/salesByAgeData")
+    public ResponseEntity<List<SalesByAgeGroupDTO>> getSalesByAge() {
+        List<SalesByAgeGroupDTO> ageGroupData = masterService.getSalesByAge();
+        return ResponseEntity.ok(ageGroupData);
+    }
+
+    //등급별
+    @GetMapping("/master/salesByGradeData")
+    public ResponseEntity<List<SalesByMemberGradeDTO>> getSalesByGrade() {
+        List<SalesByMemberGradeDTO> gradeData = masterService.getSalesByGrade();
+        return ResponseEntity.ok(gradeData);
+    }
+    
+    //상품별
+    @GetMapping("/master/salesByProductData")
+    public ResponseEntity<List<ProductSalesDTO>> getProductSales() {
+        List<ProductSalesDTO> productSalesData = masterService.getSalesByProduct();
+        return ResponseEntity.ok(productSalesData);
+    }
+
+    //가입일 기준 가입 통계
+    @GetMapping("/master/signupDateStatData")
+    public ResponseEntity<List<SignupDateStatDTO>> getSignupDateStat(
+        @RequestParam("startDateTime") 
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+        @RequestParam("endDateTime") 
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
+
+        try {
+            // Service를 호출하여 통계 데이터를 가져옵니다.
+            List<SignupDateStatDTO> result = masterService.getSignupDateStat(startDateTime, endDateTime);
+            
+            // 데이터가 없을 경우, 상태 코드 404와 함께 빈 리스트를 반환
+            if (result.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+            }
+
+            // 데이터를 정상적으로 가져온 경우 200 OK와 함께 데이터를 반환
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+            
+        } catch (Exception e) {
+            // 예외 발생 시 서버 오류 메시지를 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // 성별 기준 가입 통계
+    @GetMapping("/master/signupGenderStatData")
+    public ResponseEntity<List<SignupGenderStatDTO>> getSignupGenderStat() {
+        try {
+            List<SignupGenderStatDTO> result = masterService.getSignupGenderStat();
+            
+            // 데이터가 없을 경우, 상태 코드 404와 함께 빈 리스트를 반환
+            if (result.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+            }
+
+            // 데이터를 정상적으로 가져온 경우 200 OK와 함께 데이터를 반환
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+            
+        } catch (Exception e) {
+            // 예외 발생 시 서버 오류 메시지를 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // 연령대 기준 가입 통계
+    @GetMapping("/master/signupAgeStatData")
+    public ResponseEntity<List<SignupAgeStatDTO>> getSignupAgeStat() {
+        try {
+            List<SignupAgeStatDTO> result = masterService.getSignupAgeStat();
+            
+            // 데이터가 없을 경우, 상태 코드 404와 함께 빈 리스트를 반환
+            if (result.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+            }
+
+            // 데이터를 정상적으로 가져온 경우 200 OK와 함께 데이터를 반환
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+            
+        } catch (Exception e) {
+            // 예외 발생 시 서버 오류 메시지를 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 
 
     }

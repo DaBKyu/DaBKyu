@@ -1,5 +1,6 @@
 package com.dabkyu.dabkyu.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -126,7 +127,6 @@ public class EmailServiceImpl implements EmailService {
                 helper.setTo(member.getEmail());
                 helper.setSubject(title);
 
-               
                 // 이메일 본문 내용 설정
                 StringBuilder emailContent = new StringBuilder(content);
 
@@ -243,13 +243,26 @@ public class EmailServiceImpl implements EmailService {
 
     // 파일 저장
     @Override
-    public void saveEmailFile(Long maxSeqno, MultipartFile[] mailFileList) {
+    public void saveEmailFile(Long maxSeqno,String fileSavePath, MultipartFile[] mailFileList) {
         EmailEntity emailEntity = emailRepository.findById(maxSeqno).get();
         if (mailFileList != null && mailFileList.length > 0) {
             for (MultipartFile mailFile : mailFileList) {
                 String originalFilename = mailFile.getOriginalFilename();
                 String orgFileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
                 String storedFilename = UUID.randomUUID().toString().replaceAll("-", "") + orgFileExtension;
+                // 파일 저장 경로 설정 
+                String path = fileSavePath;
+                File targetFile = new File(path + storedFilename);
+
+                // 파일을 디스크에 저장
+                try {
+                    mailFile.transferTo(targetFile);
+                } catch (IOException e) {
+                    e.printStackTrace(); // 예외 처리
+                    // 예외가 발생한 경우 적절한 처리를 추가하거나 로그를 남길 수 있습니다.
+                }
+
+
                 EmailFileEntity emailFileEntity = EmailFileEntity.builder()
                                                                  .orgFilename(originalFilename)
                                                                  .storedFilename(storedFilename)

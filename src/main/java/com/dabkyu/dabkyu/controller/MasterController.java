@@ -1086,11 +1086,12 @@ public class MasterController{
     public void getSalesByCategoryPage() {
     }
 
-    @GetMapping("/master/salesByCategoryData")
+    /*@GetMapping("/master/salesByCategoryData")
     @ResponseBody
     public List<CategorySalesDTO> getCategorySalesData() {
         return masterService.getCategorySales(); // JSON 데이터를 반환
     }
+    */
 
     //일별 매출 통계
     /* 
@@ -1113,14 +1114,15 @@ public class MasterController{
     @GetMapping("/master/salesByYear")
     public void getSalesByYearPage() {
     }
-    
+    /* 
     @GetMapping("/master/salesByYearData")
     @ResponseBody
     public List<MonthlySalesDTO> getYearlySales(
         @RequestParam("year") int year) {
         return masterService.getYearlySales(year);
     }
-
+    */
+/* 
     //회원별 매출 통계
     @GetMapping("/master/salesByMember")
     public void getSalesByMemberPage() {
@@ -1173,7 +1175,7 @@ public class MasterController{
     */
 
     //가입일 기준 가입 통계
-    @GetMapping("/master/signupDateStat")
+    /*@GetMapping("/master/signupDateStat")
     public void getSignupDateStatPage() {
     }
     
